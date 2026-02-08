@@ -1,0 +1,21 @@
+import { useMemo } from "react";
+import { useAtomValue } from "jotai";
+import { Avatar } from "@heroui/react";
+import { formatAmount, getPrimaryTokenAvatar } from "@liberfi/core";
+import { chainAtom, useWalletPrimaryTokenBalance, WalletIcon } from "@liberfi/ui-base";
+
+export function BottomToolBarWallet() {
+  const chain = useAtomValue(chainAtom);
+
+  const primaryTokenAvatar = useMemo(() => getPrimaryTokenAvatar(chain), [chain]);
+
+  const balance = useWalletPrimaryTokenBalance();
+
+  return (
+    <div className="h-6 px-2 flex items-center gap-1 text-xs rounded-full border border-content3">
+      <WalletIcon width={14} height={14} className="text-neutral" />
+      {balance?.amount ? formatAmount(balance.amount) : "--"}
+      <Avatar className="w-3.5 h-3.5 bg-transparent" src={primaryTokenAvatar} />
+    </div>
+  );
+}

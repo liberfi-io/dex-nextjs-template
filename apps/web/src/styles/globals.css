@@ -1,0 +1,122 @@
+@import "@liberfi.io/ui/tailwind/tailwind.css";
+@import "./theme.css";
+
+@source "../../src/**/*.{js,ts,jsx,tsx,mdx}";
+@source "../../node_modules/@liberfi/ui-base/dist/**/*.{js,ts,jsx,tsx}";
+@source "../../node_modules/@liberfi/ui-dex/dist/**/*.{js,ts,jsx,tsx}";
+@source "../../node_modules/@liberfi/ui-redpacket/dist/**/*.{js,ts,jsx,tsx}";
+@source "../../node_modules/@liberfi/ui-launchpad/dist/**/*.{js,ts,jsx,tsx}";
+@source "../../../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}";
+@source "../../../../node_modules/@heroui/react/dist/**/*.{js,ts,jsx,tsx}";
+@source "../../../../node_modules/@liberfi.io/ui/dist/**/*.{js,ts,jsx,tsx}";
+@source "../../../../node_modules/@liberfi.io/ui-tokens/dist/**/*.{js,ts,jsx,tsx}";
+@source "../../../../node_modules/@liberfi.io/ui-scaffold/dist/**/*.{js,ts,jsx,tsx}";
+@source "../../../../node_modules/@liberfi.io/ui-media-track/dist/**/*.{js,ts,jsx,tsx}";
+@source "../../../../node_modules/@liberfi.io/ui-channels/dist/**/*.{js,ts,jsx,tsx}";
+@source "../../../../node_modules/@liberfi.io/ui-chain-select/dist/**/*.{js,ts,jsx,tsx}";
+@source "../../../../node_modules/@liberfi.io/ui-predict/dist/**/*.{js,ts,jsx,tsx}";
+@source "../../../../node_modules/@agent-widget/react/dist/**/*.{js,ts,jsx,tsx}";
+
+@layer base {
+  :root {
+    --header-height: 60px;
+    --footer-height: 56px;
+    --safe-area-inset-bottom: calc(100vh - var(--tg-viewport-height, 100vh));
+    --safe-area-inset-stable-bottom: calc(100vh - var(--tg-viewport-stable-height, 100vh));
+
+    --aw-bg-primary: #0c0f13;
+    --aw-bg-secondary: #15181f;
+    --aw-bg-tertiary: #1a1f28;
+    --aw-bg-hover: #121821;
+    --aw-bg-hover-2: #16202a;
+    --aw-bg-hover-3: #1a1d23;
+    --aw-bg-hover-4: #2a2f38;
+    --aw-border: #2a3441;
+    --aw-border-secondary: #2a2f38;
+    --aw-text-primary: #e8edf5;
+    --aw-text-secondary: #b0b8c3;
+    --aw-text-tertiary: #9ca3af;
+    --aw-text-quaternary: #8a8f98;
+    --aw-text-muted: #6c7684;
+    --aw-text-placeholder: #566173;
+    --aw-accent: #c8ff3d;
+    --aw-accent-hover: #b8ef2d;
+    --aw-accent-secondary: #8ba84e;
+    --aw-accent-secondary-hover: #9bb85e;
+    --aw-accent-text: #0b0d0f;
+    --aw-info: #3b82f6;
+    --aw-info-bg: rgba(59, 130, 246, 0.1);
+    --aw-warning: #f59e0b;
+    --aw-warning-bg: rgba(245, 158, 11, 0.1);
+    --aw-danger: #ef4444;
+    --aw-danger-bg: rgba(239, 68, 68, 0.1);
+    --aw-scrollbar: #27313d;
+    --aw-scrollbar-hover: #526175;
+    --aw-shadow-accent-xs: 0 0 14px rgba(200, 255, 61, 0.2);
+    --aw-shadow-accent-sm: 0 0 6px rgba(200, 255, 61, 0.3);
+    --aw-shadow-accent-md: 0 0 12px rgba(200, 255, 61, 0.35);
+    --aw-shadow-accent-lg: 0 0 12px rgba(200, 255, 61, 0.4);
+    --aw-shadow-accent-xl: 0 0 12px rgba(200, 255, 61, 0.45);
+  }
+}
+
+@layer utilities {
+  @keyframes toast-progress {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+  @keyframes shake {
+    0% {
+      transform: translateX(0);
+    }
+    10% {
+      transform: translateX(-25px);
+    }
+    20% {
+      transform: translateX(25px);
+    }
+    30% {
+      transform: translateX(-25px);
+    }
+    40% {
+      transform: translateX(25px);
+    }
+    50% {
+      transform: translateX(-25px);
+    }
+    60% {
+      transform: translateX(25px);
+    }
+    70% {
+      transform: translateX(-25px);
+    }
+    80% {
+      transform: translateX(25px);
+    }
+    90% {
+      transform: translateX(-25px);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* override agent-widget styles */
+.agui-chat-widget-container > div {
+  bottom: 0 !important;
+  right: 0 !important;
+}

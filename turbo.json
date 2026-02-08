@@ -1,0 +1,55 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "build": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "dist/**",
+        ".next/**",
+        "!.next/cache/**"
+      ],
+      "env": [
+        "NODE_ENV",
+        "SENTRY_AUTH_TOKEN",
+        "GRAPHQL_SERVER_ENDPOINT",
+        "DEX_AGGREGATOR_URL",
+        "MEDIA_TRACK_URL",
+        "CHANNELS_URL",
+        "PREDICT_URL",
+        "DEX_AUTH0_AUDIENCE",
+        "DEX_AUTH0_CLIENT_ID",
+        "DEX_AUTH0_CLIENT_SECRET",
+        "DEX_AUTH0_DOMAIN",
+        "JWT_AUDIENCE",
+        "JWT_COOKIE_NAME",
+        "JWT_EXPIRES_IN",
+        "JWT_ISSUER",
+        "JWT_SECRET",
+        "PRIVY_APP_ID",
+        "PRIVY_APP_SECRET"
+      ]
+    },
+    "dev": {
+      "dependsOn": [
+        "^dev"
+      ],
+      "outputs": [
+        "dist/**",
+        ".next/**",
+        "!.next/cache/**"
+      ]
+    },
+    "lint": {
+      "dependsOn": [
+        "^lint"
+      ]
+    },
+    "lint-fix": {
+      "dependsOn": [
+        "^lint-fix"
+      ]
+    }
+  }
+}
