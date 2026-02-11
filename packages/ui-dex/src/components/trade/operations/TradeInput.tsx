@@ -2,7 +2,7 @@ import { useSwapContext } from "@/components/swap/SwapContext";
 import { getBuyTokenUrl } from "@/libs";
 import { Button, Input } from "@heroui/react";
 import { CONFIG } from "@liberfi/core";
-import { useAppSdk, useAuth, useTranslation, walletBalancesAtom } from "@liberfi/ui-base";
+import { useAppSdk, useAuth, useTranslation, walletNetWorthAtom } from "@liberfi/ui-base";
 import BigNumber from "bignumber.js";
 import clsx from "clsx";
 import { useAtomValue } from "jotai";
@@ -25,13 +25,13 @@ export function TradeInput({ type, displayEmptyWalletError = false }: TradeInput
   const { setAmount, fromToken, fromTokenBalance, routeError } = useSwapContext();
 
   // 钱包余额
-  const wallet = useAtomValue(walletBalancesAtom);
+  const walletNetWorth = useAtomValue(walletNetWorthAtom);
 
   // 钱包是否为空
   const isWalletEmpty = useMemo(() => {
-    if (!wallet || !wallet.balances || wallet.balances.length === 0) return true;
-    return wallet.balances.every((balance) => new BigNumber(balance.amount ?? 0).eq(0));
-  }, [wallet]);
+    if (!walletNetWorth || !walletNetWorth.data || walletNetWorth.data.length === 0) return true;
+    return walletNetWorth.data.every((balance) => new BigNumber(balance.amount ?? 0).eq(0));
+  }, [walletNetWorth]);
 
   // 错误信息
   const [error, setError] = useState<string | undefined>(undefined);

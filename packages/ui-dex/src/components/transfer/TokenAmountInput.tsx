@@ -158,7 +158,11 @@ export function TokenAmountInput() {
               disableRipple
               startContent={
                 tokenBalance && (
-                  <TokenAvatar size={24} src={tokenBalance.imageUrl} name={tokenBalance.symbol} />
+                  <TokenAvatar
+                    size={24}
+                    src={tokenBalance.logoUri ?? token?.imageUrl ?? ""}
+                    name={tokenBalance.symbol}
+                  />
                 )
               }
               endContent={<ArrowDownIcon width={16} height={16} className="text-neutral" />}

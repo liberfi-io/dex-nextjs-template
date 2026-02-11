@@ -3,7 +3,7 @@ import { clsx } from "clsx";
 import { useAtomValue } from "jotai";
 import { BigNumber } from "bignumber.js";
 import { NumberInput } from "@heroui/react";
-import { useTranslation, useWalletTokenBalance } from "@liberfi/ui-base";
+import { useTranslation, useWalletTokenNetWorth } from "@liberfi/ui-base";
 import { tokenInfoAtom } from "@/states";
 import { SellPercentageQuickInputs } from "./SellPercentageQuickInputs";
 
@@ -18,7 +18,7 @@ export function SellAmountInput({ value, onChange, className }: SellAmountInputP
 
   const tokenInfo = useAtomValue(tokenInfoAtom);
 
-  const balance = useWalletTokenBalance(tokenInfo?.address ?? "");
+  const balance = useWalletTokenNetWorth(tokenInfo?.address ?? "");
 
   const handleValueChange = useCallback(
     (value: number | ChangeEvent<HTMLInputElement>) => {
@@ -48,8 +48,12 @@ export function SellAmountInput({ value, onChange, className }: SellAmountInputP
         onChange={handleValueChange}
         fullWidth
         hideStepper
-        startContent={<span className="flex-none text-xs text-neutral">{t("extend.trade.amount")}</span>}
-        endContent={<span className="flex-none text-xs text-neutral">{tokenInfo?.symbol ?? ""}</span>}
+        startContent={
+          <span className="flex-none text-xs text-neutral">{t("extend.trade.amount")}</span>
+        }
+        endContent={
+          <span className="flex-none text-xs text-neutral">{tokenInfo?.symbol ?? ""}</span>
+        }
         formatOptions={{
           maximumFractionDigits: tokenInfo?.decimals ? tokenInfo.decimals : undefined,
         }}

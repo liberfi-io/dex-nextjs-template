@@ -3,7 +3,7 @@ import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { Button, Form, Image, Link } from "@heroui/react";
 import { useAtomValue } from "jotai";
 import BigNumber from "bignumber.js";
-import { Token, WalletBalanceDetailDTO } from "@chainstream-io/sdk";
+import { Token, WalletNetWorthItemDTO } from "@chainstream-io/sdk";
 import { chainIcon, chainTxExplorer } from "@liberfi/core";
 import {
   useCreateFixedAmountRedPacketMutation,
@@ -31,7 +31,7 @@ export type FixedRedPacketFormValues = {
     address?: string;
     amount?: string;
     token?: Token;
-    balance?: WalletBalanceDetailDTO;
+    balance?: WalletNetWorthItemDTO;
   };
   maxClaims: string;
   memo?: string;
@@ -94,7 +94,13 @@ export function FixedRedPacketForm() {
 
   const onSubmit = useAuthenticatedCallback(
     async (data: FixedRedPacketFormValues) => {
-      if (!user?.solanaAddress || !data.mint.address || !data.mint.amount || !data.mint.token || !walletInstance) {
+      if (
+        !user?.solanaAddress ||
+        !data.mint.address ||
+        !data.mint.amount ||
+        !data.mint.token ||
+        !walletInstance
+      ) {
         return;
       }
 
@@ -114,7 +120,9 @@ export function FixedRedPacketForm() {
         });
 
         // sign tx
-        const signedTxBuffer = await walletInstance.signTransaction(Buffer.from(txSerialize, "base64"));
+        const signedTxBuffer = await walletInstance.signTransaction(
+          Buffer.from(txSerialize, "base64"),
+        );
         const signedTx = Buffer.from(signedTxBuffer).toString("base64");
 
         // send tx
@@ -188,7 +196,8 @@ export function FixedRedPacketForm() {
             const body = JSON.parse(bodyText ?? "{}") as { message?: string; details?: string };
             toast({
               type: "error",
-              message: body.details ?? body.message ?? t("extend.redpacket.create.transaction_error"),
+              message:
+                body.details ?? body.message ?? t("extend.redpacket.create.transaction_error"),
             });
           } catch (e2) {
             console.error("create red packet parse exception error", e2);
@@ -200,7 +209,8 @@ export function FixedRedPacketForm() {
         } else {
           toast({
             type: "error",
-            message: e instanceof Error ? e.message : t("extend.redpacket.create.transaction_error"),
+            message:
+              e instanceof Error ? e.message : t("extend.redpacket.create.transaction_error"),
           });
         }
       } finally {
@@ -225,7 +235,9 @@ export function FixedRedPacketForm() {
       <Form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
         {/* mint token & amount */}
         <div className="w-full flex flex-col gap-2">
-          <h2 className="text-sm text-neutral">{t("extend.redpacket.create.random.amount_label")}</h2>
+          <h2 className="text-sm text-neutral">
+            {t("extend.redpacket.create.random.amount_label")}
+          </h2>
           <RedPacketMintAmountInput />
         </div>
 

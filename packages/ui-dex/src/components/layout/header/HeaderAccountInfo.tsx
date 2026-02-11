@@ -24,8 +24,9 @@ import {
   UserIcon,
   useRouter,
   useTranslation,
-  walletBalancesAtom,
+  walletNetWorthAtom,
   WalletIcon,
+  walletPnlAtom,
 } from "@liberfi/ui-base";
 
 export function HeaderAccountInfo() {
@@ -48,11 +49,13 @@ function Authenticated() {
 
   const { signOut } = useAuth();
 
-  const wallet = useAtomValue(walletBalancesAtom);
+  const walletNetWorth = useAtomValue(walletNetWorthAtom);
+
+  const walletPnl = useAtomValue(walletPnlAtom);
 
   const bullish = useMemo(
-    () => new BigNumber(wallet?.totalProfitInUsd ?? 0).gte(0),
-    [wallet?.totalProfitInUsd],
+    () => new BigNumber(walletPnl?.totalProfitInUsd ?? 0).gte(0),
+    [walletPnl?.totalProfitInUsd],
   );
 
   const [isOpen, setIsOpen] = useState(false);
@@ -84,7 +87,7 @@ function Authenticated() {
     [handleOpenSettings, handleOpenWallet, signOut],
   );
 
-  if (!wallet) {
+  if (!walletNetWorth || !walletPnl) {
     return <Authenticating />;
   }
 
@@ -109,7 +112,7 @@ function Authenticated() {
           }
         >
           <div className="flex flex-col items-start">
-            <p className="text-xs">{formatAmountUSD(wallet?.totalBalancesInUsd ?? 0)}</p>
+            <p className="text-xs">{formatAmountUSD(walletNetWorth?.totalValueInUsd ?? 0)}</p>
             <p
               className="flex items-center gap-0.5 text-xxs text-bearish data-[bullish=true]:text-bullish"
               data-bullish={bullish}
@@ -119,7 +122,7 @@ function Authenticated() {
               ) : (
                 <TriangleDownIcon width={8} height={8} />
               )}
-              <span>{formatAmountUSD(wallet?.totalProfitInUsd ?? 0)}</span>
+              <span>{formatAmountUSD(walletPnl?.totalProfitInUsd ?? 0)}</span>
             </p>
           </div>
         </Button>

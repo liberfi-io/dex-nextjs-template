@@ -7,7 +7,8 @@ import {
   useAuthenticatedCallback,
   useRouter,
   useTranslation,
-  walletBalancesAtom,
+  walletNetWorthAtom,
+  walletPnlAtom,
 } from "@liberfi/ui-base";
 import { useAtomValue } from "jotai";
 import { useMemo } from "react";
@@ -36,7 +37,9 @@ function AccountOverviewContent() {
 
   const { navigate } = useRouter();
 
-  const wallet = useAtomValue(walletBalancesAtom);
+  const walletNetWorth = useAtomValue(walletNetWorthAtom);
+
+  const walletPnl = useAtomValue(walletPnlAtom);
 
   // TODO wait for backend
   const bullish = useMemo(() => true, []);
@@ -48,7 +51,7 @@ function AccountOverviewContent() {
     navigate(AppRoute.account);
   }, [navigate]);
 
-  if (!wallet) {
+  if (!walletNetWorth || !walletPnl) {
     return <AccountOverviewSkeleton />;
   }
 
@@ -65,14 +68,18 @@ function AccountOverviewContent() {
           </Link>
 
           <p className="text-2xl font-semibold">
-            <Number value={wallet.totalBalancesInUsd ?? 0} abbreviate defaultCurrencySign="$" />
+            <Number
+              value={walletNetWorth?.totalValueInUsd ?? 0}
+              abbreviate
+              defaultCurrencySign="$"
+            />
           </p>
           <p
             className="text-sm font-medium flex items-center gap-2 text-bearish data-[bullish=true]:text-bullish"
             data-bullish={bullish}
           >
             <span>
-              <Number value={wallet.totalProfitInUsd ?? 0} abbreviate defaultCurrencySign="$" />
+              <Number value={walletPnl?.totalProfitInUsd ?? 0} abbreviate defaultCurrencySign="$" />
             </span>
             <span className="flex items-center gap-1">
               (

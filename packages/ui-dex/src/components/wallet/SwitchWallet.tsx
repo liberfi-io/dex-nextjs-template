@@ -7,7 +7,7 @@ import {
   chainAtom,
   SettingsIcon,
   useAppSdk,
-  useWalletPrimaryTokenBalance,
+  useWalletPrimaryTokenNetWorth,
   WalletIcon,
 } from "@liberfi/ui-base";
 
@@ -22,7 +22,7 @@ export function SwitchWallet({ enableSettings = false }: SwitchWalletProps) {
 
   const primaryTokenAvatar = useMemo(() => getPrimaryTokenAvatar(chain), [chain]);
 
-  const balance = useWalletPrimaryTokenBalance();
+  const balance = useWalletPrimaryTokenNetWorth();
 
   const handleSettings = useCallback(() => appSdk.events.emit("trade_settings:open"), [appSdk]);
 

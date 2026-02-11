@@ -1,7 +1,7 @@
 import { LineTooltip } from "@/components/chart/LineTooltip";
 import { Number } from "@/components/Number";
 import { interpolateTimes } from "@/libs";
-import { useTranslation, walletBalancesAtom } from "@liberfi/ui-base";
+import { useTranslation, walletPnlAtom } from "@liberfi/ui-base";
 import { Skeleton, Spinner, Tab, Tabs } from "@heroui/react";
 import clsx from "clsx";
 import { Key, useMemo, useState } from "react";
@@ -28,7 +28,7 @@ function Chart({
 }) {
   const { t } = useTranslation();
 
-  const wallet = useAtomValue(walletBalancesAtom);
+  const walletPnl = useAtomValue(walletPnlAtom);
 
   // TODO wait for backend
   const data = useMemo(() => {
@@ -43,7 +43,7 @@ function Chart({
     return [Math.min(...data.map((d) => d.value)), Math.max(...data.map((d) => d.value))];
   }, [data]);
 
-  if (!wallet) {
+  if (!walletPnl) {
     return <Skeletons className={className} time={time} setTime={setTime} />;
   }
 
@@ -54,7 +54,7 @@ function Chart({
           <span className="text-xs text-neutral">{t("extend.account.pnl")}</span>
 
           <span className="text-sm">
-            <Number value={wallet?.totalProfitInUsd ?? 0} abbreviate defaultCurrencySign="$" />
+            <Number value={walletPnl?.totalProfitInUsd ?? 0} abbreviate defaultCurrencySign="$" />
           </span>
         </div>
 

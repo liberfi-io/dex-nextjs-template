@@ -1,11 +1,11 @@
 import { ListField } from "@/components/ListField";
 import { ChainAddress } from "@/components/ChainAddress";
-import { Token, WalletBalanceDetailDTO } from "@chainstream-io/sdk";
+import { Token, WalletNetWorthItemDTO } from "@chainstream-io/sdk";
 
 export interface ContractFieldProps {
   className?: string;
   token?: Token;
-  balance: WalletBalanceDetailDTO;
+  balance: WalletNetWorthItemDTO;
 }
 
 export function ContractField({ className, balance }: ContractFieldProps) {

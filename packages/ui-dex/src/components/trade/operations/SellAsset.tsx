@@ -3,14 +3,14 @@ import { Number } from "@/components/Number";
 import { useSwapContext } from "@/components/swap/SwapContext";
 import { TokenAvatar } from "@/components/TokenAvatar";
 import { Button, Skeleton } from "@heroui/react";
-import { walletBalancesQueryStateAtom } from "@liberfi/ui-base";
+import { walletNetWorthQueryStateAtom } from "@liberfi/ui-base";
 import { useAtomValue } from "jotai";
 import { useCallback, useMemo } from "react";
 
 export function SellAsset() {
   const { fromToken, fromTokenBalance } = useSwapContext();
 
-  const walletBalancesQueryState = useAtomValue(walletBalancesQueryStateAtom);
+  const walletBalancesQueryState = useAtomValue(walletNetWorthQueryStateAtom);
 
   const isFetchingWallet = useMemo(
     () => walletBalancesQueryState?.isFetching ?? false,

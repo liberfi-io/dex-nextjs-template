@@ -148,8 +148,18 @@ export const QueryKeys = {
     param.limit ? param.limit.toString() : "",
     param.direction ?? "",
   ],
-  walletBalance: (chain: CHAIN_ID, walletAddress: string) => [
-    "walletBalance",
+  walletNetWorth: (chain: CHAIN_ID, walletAddress: string) => [
+    "walletNetWorth",
+    chain,
+    walletAddress,
+  ],
+  walletPnl: (chain: CHAIN_ID, walletAddress: string) => [
+    "walletPnl",
+    chain,
+    walletAddress,
+  ],
+  walletPnlDetails: (chain: CHAIN_ID, walletAddress: string) => [
+    "walletPnl",
     chain,
     walletAddress,
   ],

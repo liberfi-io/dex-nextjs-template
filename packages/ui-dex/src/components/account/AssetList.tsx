@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useTokensQuery } from "@liberfi/react-dex";
 import { ListEmptyData } from "../ListEmptyData";
 import { AssetListSkeleton } from "./AssetListSkeleton";
-import { appendPrimaryTokenBalances, AppRoute } from "@/libs";
+import { appendPrimaryTokenNetWorth, appendPrimaryTokenPnl, AppRoute } from "@/libs";
 import clsx from "clsx";
 import {
   TokenField,
@@ -15,10 +15,15 @@ import {
   // ContractField,
   PriceHistoryField,
 } from "./fields/asset";
-import { Token, WalletBalanceDetailDTO } from "@chainstream-io/sdk";
+import {
+  PnlDetailItemDTO,
+  PnlDetailsPage,
+  Token,
+  WalletNetWorthItemDTO,
+} from "@chainstream-io/sdk";
 import { keyBy } from "lodash-es";
 import BigNumber from "bignumber.js";
-import { useAuth, useRouter, walletBalancesAtom } from "@liberfi/ui-base";
+import { useAuth, useRouter, walletNetWorthAtom, walletPnlDetailsAtom } from "@liberfi/ui-base";
 import { Virtuoso } from "react-virtuoso";
 import { useAtomValue } from "jotai";
 
@@ -89,34 +94,49 @@ function Content({
   classNames,
   useWindowScroll = false,
 }: ContentProps) {
-  const wallet = useAtomValue(walletBalancesAtom);
+  const walletNetWorth = useAtomValue(walletNetWorthAtom);
+
+  const walletPnlDetails = useAtomValue(walletPnlDetailsAtom);
 
   // append primary token balances
-  const fullWallet = useMemo(() => {
-    if (!wallet) return undefined;
-    return appendPrimaryTokenBalances((chainId ?? CHAIN_ID.SOLANA) as CHAIN_ID, wallet);
-  }, [wallet, chainId]);
+  const fullWalletNetWorth = useMemo(() => {
+    if (!walletNetWorth) return undefined;
+    return appendPrimaryTokenNetWorth((chainId ?? CHAIN_ID.SOLANA) as CHAIN_ID, walletNetWorth);
+  }, [walletNetWorth, chainId]);
+
+  // append primary token pnl details
+  const fullWalletPnlDetails = useMemo(() => {
+    if (!walletPnlDetails) return undefined;
+    return appendPrimaryTokenPnl((chainId ?? CHAIN_ID.SOLANA) as CHAIN_ID, walletPnlDetails);
+  }, [walletPnlDetails, chainId]);
 
   const tokenAddresses = useMemo(() => {
-    if (!fullWallet) return [];
-    return (fullWallet.balances ?? []).map((it) => it.tokenAddress);
-  }, [fullWallet]);
+    if (!fullWalletNetWorth) return [];
+    return (fullWalletNetWorth.data ?? []).map((it) => it.tokenAddress);
+  }, [fullWalletNetWorth]);
 
   const { data: tokens } = useTokensQuery({ chain: chainId, tokenAddresses });
 
   const tokenMap = useMemo(() => keyBy(tokens ?? [], "address"), [tokens]);
 
   const balances = useMemo(() => {
-    if (!fullWallet) return [];
-    return (fullWallet.balances ?? [])
+    if (!fullWalletNetWorth) return [];
+    return (fullWalletNetWorth.data ?? [])
       .filter((it) => new BigNumber(it.amount).gt(0))
       .filter((it) => !hideLowHoldingAssets || new BigNumber(it.valueInUsd).gte(0.1))
       .sort((a, b) =>
-        compareBalances(a, tokenMap[a.tokenAddress], b, tokenMap[b.tokenAddress], sort),
+        compareBalances(
+          a,
+          tokenMap[a.tokenAddress],
+          b,
+          tokenMap[b.tokenAddress],
+          sort,
+          fullWalletPnlDetails,
+        ),
       );
-  }, [fullWallet, hideLowHoldingAssets, sort, tokenMap]);
+  }, [fullWalletNetWorth, fullWalletPnlDetails, hideLowHoldingAssets, sort, tokenMap]);
 
-  if (!wallet) {
+  if (!fullWalletNetWorth) {
     return <AssetListSkeleton compact={compact} classNames={classNames} />;
   }
 
@@ -133,6 +153,9 @@ function Content({
       itemContent={(_, balance) => (
         <AssetItem
           balance={balance}
+          pnlDetail={fullWalletPnlDetails?.data?.find(
+            (it) => it.tokenAddress === balance.tokenAddress,
+          )}
           token={tokenMap[balance.tokenAddress]}
           compact={compact}
           classNames={classNames}
@@ -143,7 +166,8 @@ function Content({
 }
 
 type AssetItemProps = {
-  balance: WalletBalanceDetailDTO;
+  balance: WalletNetWorthItemDTO;
+  pnlDetail?: PnlDetailItemDTO;
   token?: Token;
   compact?: boolean;
   classNames?: {
@@ -152,7 +176,7 @@ type AssetItemProps = {
   };
 };
 
-function AssetItem({ balance, token, compact = false, classNames }: AssetItemProps) {
+function AssetItem({ balance, pnlDetail, token, compact = false, classNames }: AssetItemProps) {
   const { navigate } = useRouter();
 
   return (
@@ -190,6 +214,7 @@ function AssetItem({ balance, token, compact = false, classNames }: AssetItemPro
         <PnlField
           token={token}
           balance={balance}
+          pnlDetail={pnlDetail}
           compact={compact}
           className="lg:group-data-[compact=false]:w-[110px] max-lg:flex-1 lg:group-data-[compact=true]:flex-1"
         />
@@ -209,12 +234,16 @@ function AssetItem({ balance, token, compact = false, classNames }: AssetItemPro
 }
 
 function compareBalances(
-  a: WalletBalanceDetailDTO,
+  a: WalletNetWorthItemDTO,
   aToken: Token | undefined,
-  b: WalletBalanceDetailDTO,
+  b: WalletNetWorthItemDTO,
   bToken: Token | undefined,
   sort: Record<string, "asc" | "desc">,
+  fullWalletPnlDetails: PnlDetailsPage | undefined,
 ) {
+  const aPnlDetail = fullWalletPnlDetails?.data?.find((it) => it.tokenAddress === a.tokenAddress);
+  const bPnlDetail = fullWalletPnlDetails?.data?.find((it) => it.tokenAddress === b.tokenAddress);
+
   if (sort["balance"]) {
     const aValueInUSD = new BigNumber(a.valueInUsd);
     const bValueInUSD = new BigNumber(b.valueInUsd);
@@ -232,16 +261,16 @@ function compareBalances(
   }
 
   if (sort["pnl"]) {
-    const aProfitInUsd = new BigNumber(a.totalRealizedProfitInUsd);
-    const bProfitInUsd = new BigNumber(b.totalRealizedProfitInUsd);
+    const aProfitInUsd = new BigNumber(aPnlDetail?.realizedProfitInUsd ?? 0);
+    const bProfitInUsd = new BigNumber(bPnlDetail?.realizedProfitInUsd ?? 0);
     return sort["pnl"] === "asc"
       ? aProfitInUsd.minus(bProfitInUsd).toNumber()
       : bProfitInUsd.minus(aProfitInUsd).toNumber();
   }
 
   if (sort["pnl_change"]) {
-    const aProfitRatio = new BigNumber(a.totalRealizedProfitRatio);
-    const bProfitRatio = new BigNumber(b.totalRealizedProfitRatio);
+    const aProfitRatio = new BigNumber(aPnlDetail?.realizedProfitRatio ?? 0);
+    const bProfitRatio = new BigNumber(bPnlDetail?.realizedProfitRatio ?? 0);
     return sort["pnl_change"] === "asc"
       ? aProfitRatio.minus(bProfitRatio).toNumber()
       : bProfitRatio.minus(aProfitRatio).toNumber();

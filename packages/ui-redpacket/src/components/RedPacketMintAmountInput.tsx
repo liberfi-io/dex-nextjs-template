@@ -11,12 +11,12 @@ import {
   useAppSdk,
   useAuthenticatedCallback,
   useTranslation,
-  walletBalancesAtom,
+  walletNetWorthAtom,
 } from "@liberfi/ui-base";
 import { TokenAvatar } from "@liberfi/ui-dex/dist/components/TokenAvatar";
 import { WithdrawOutlinedIcon } from "@liberfi/ui-dex/dist/assets/icons";
 import { Number } from "@liberfi/ui-dex/dist/components/Number";
-import { Token, WalletBalanceDetailDTO } from "@chainstream-io/sdk";
+import { Token, WalletNetWorthItemDTO } from "@chainstream-io/sdk";
 
 export function RedPacketMintAmountInput() {
   const {
@@ -29,7 +29,7 @@ export function RedPacketMintAmountInput() {
       address?: string;
       amount?: string;
       token?: Token;
-      balance?: WalletBalanceDetailDTO;
+      balance?: WalletNetWorthItemDTO;
     };
   }>();
 
@@ -48,22 +48,23 @@ export function RedPacketMintAmountInput() {
   const amount = useWatch({ control, name: "mint.amount" });
 
   // wallet balances
-  const wallet = useAtomValue(walletBalancesAtom);
+  const walletNetWorth = useAtomValue(walletNetWorthAtom);
 
   // set default mint token address
   useEffect(() => {
-    if (!tokenAddress && wallet?.balances && wallet.balances.length > 0) {
-      const tokenAddress = wallet.balances[0].tokenAddress;
+    if (!tokenAddress && walletNetWorth?.data && walletNetWorth.data.length > 0) {
+      const tokenAddress = walletNetWorth.data[0].tokenAddress;
       setValue("mint.address", tokenAddress);
     }
     // setValue should not be included in the dependency array
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [wallet, tokenAddress]);
+  }, [walletNetWorth, tokenAddress]);
 
   // mint token balance
   const tokenBalance = useMemo(
-    () => (wallet?.balances ?? []).find((it) => tokenAddress && it.tokenAddress === tokenAddress),
-    [wallet, tokenAddress],
+    () =>
+      (walletNetWorth?.data ?? []).find((it) => tokenAddress && it.tokenAddress === tokenAddress),
+    [walletNetWorth, tokenAddress],
   );
 
   useEffect(() => {
@@ -219,7 +220,11 @@ export function RedPacketMintAmountInput() {
             )}
             startContent={
               tokenBalance && (
-                <TokenAvatar size={24} src={tokenBalance.imageUrl} name={tokenBalance.symbol} />
+                <TokenAvatar
+                  size={24}
+                  src={tokenBalance.logoUri ?? ""}
+                  name={tokenBalance.symbol}
+                />
               )
             }
             endContent={<ArrowDownOutlinedIcon width={16} height={16} className="text-neutral" />}

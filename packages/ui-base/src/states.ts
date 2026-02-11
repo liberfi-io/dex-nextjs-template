@@ -2,7 +2,7 @@ import { BehaviorSubject } from "rxjs";
 import { atom } from "jotai";
 // import { atomWithStorage } from "jotai/utils";
 import { QueryClient, UseQueryResult } from "@tanstack/react-query";
-import { ChainStreamClient, WalletBalancesDTO } from "@chainstream-io/sdk";
+import { ChainStreamClient, PnlDetailsPage, WalletNetWorthPage, WalletPnlSummaryDTO } from "@chainstream-io/sdk";
 import { CHAIN_ID } from "@liberfi/core";
 import { Layout } from "./types";
 
@@ -30,11 +30,23 @@ export const bottomNavigationBarActiveKeyAtom = atom<string>();
 // current chain
 export const chainAtom = atom(CHAIN_ID.SOLANA);
 
-// latest wallet balances query state
-export const walletBalancesQueryStateAtom = atom<Pick<
-  UseQueryResult<WalletBalancesDTO>,
+export const walletNetWorthQueryStateAtom = atom<Pick<
+  UseQueryResult<WalletNetWorthPage>,
   "error" | "isLoading" | "isFetching" | "isRefetching" | "refetch"
 > | null>(null);
 
-// latest wallet balances, merged from query & subscription
-export const walletBalancesAtom = atom<WalletBalancesDTO | null>(null);
+export const walletPnlQueryStateAtom = atom<Pick<
+  UseQueryResult<WalletPnlSummaryDTO>,
+  "error" | "isLoading" | "isFetching" | "isRefetching" | "refetch"
+> | null>(null);
+
+export const walletPnlDetailsQueryStateAtom = atom<Pick<
+  UseQueryResult<PnlDetailsPage>,
+  "error" | "isLoading" | "isFetching" | "isRefetching" | "refetch"
+> | null>(null);
+
+export const walletNetWorthAtom = atom<WalletNetWorthPage | null>(null);
+
+export const walletPnlAtom = atom<WalletPnlSummaryDTO | null>(null);
+
+export const walletPnlDetailsAtom = atom<PnlDetailsPage | null>(null);

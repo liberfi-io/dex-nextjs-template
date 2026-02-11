@@ -1,12 +1,12 @@
 import { ListField } from "@/components/ListField";
 import { Number } from "@/components/Number";
-import { Token, WalletBalanceDetailDTO } from "@chainstream-io/sdk";
+import { Token, WalletNetWorthItemDTO } from "@chainstream-io/sdk";
 import { useMemo } from "react";
 
 export interface BalanceFieldProps {
   className?: string;
   token?: Token;
-  balance: WalletBalanceDetailDTO;
+  balance: WalletNetWorthItemDTO;
   compact?: boolean;
 }
 

@@ -14,7 +14,7 @@ import {
   chainAtom,
   useAuthenticatedCallback,
   useTranslation,
-  useWalletTokenBalance,
+  useWalletTokenNetWorth,
 } from "@liberfi/ui-base";
 import { tokenInfoAtom, tokenLatestPriceAtom, tradeSellPresetAtom, useQuotePrice } from "@/states";
 import { useSwap, useTradeSellSettings } from "@/hooks";
@@ -50,7 +50,7 @@ export function MarketSellForm() {
   const tokenInfo = useAtomValue(tokenInfoAtom);
 
   // sell token balance
-  const tokenBalance = useWalletTokenBalance(tokenInfo?.address ?? "");
+  const tokenBalance = useWalletTokenNetWorth(tokenInfo?.address ?? "");
 
   // sell token price in usd
   const tokenPrice = useAtomValue(tokenLatestPriceAtom);

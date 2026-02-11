@@ -31,8 +31,8 @@ export function PulseTokenMarketCap({ token }: PulseTokenMarketCapProps) {
   );
 
   const [buyW, sellW] = useMemo(() => {
-    const buys = Number(token.stats?.buys1h ?? 0);
-    const sells = Number(token.stats?.sells1h ?? 0);
+    const buys = Number(token.stats?.periods?.["1h"]?.buys ?? 0);
+    const sells = Number(token.stats?.periods?.["1h"]?.sells ?? 0);
     const trades = buys + sells;
     const width = layout === "narrow" ? 40 : 24;
     if (trades === 0) return [width / 2, width / 2];
@@ -44,7 +44,7 @@ export function PulseTokenMarketCap({ token }: PulseTokenMarketCapProps) {
       .toNumber();
     const sellWidth = width - buyWidth;
     return [buyWidth, sellWidth];
-  }, [layout, token.stats?.buys1h, token.stats?.sells1h]);
+  }, [layout, token.stats?.periods]);
 
   return (
     <div className="absolute top-0 right-0 flex flex-col gap-2 items-end">
@@ -80,7 +80,7 @@ export function PulseTokenMarketCap({ token }: PulseTokenMarketCapProps) {
         <div className="flex items-end gap-1">
           <div className="text-xs leading-none text-neutral">{t("extend.pulse.volume")}</div>
           <div className="text-base font-medium leading-none text-foreground">
-            {formatAmountUSD3(token.stats?.volumesInUsd1h ?? 0)}
+            {formatAmountUSD3(token.stats?.periods?.["1h"]?.totalVolumeInUsd ?? 0)}
           </div>
         </div>
       </Tooltip>
@@ -106,15 +106,21 @@ export function PulseTokenMarketCap({ token }: PulseTokenMarketCapProps) {
             <div className="flex flex-col gap-1">
               <div className="w-full flex justify-between gap-4">
                 <div className="text-xs text-enutral">{t("extend.pulse.txs_explained")}</div>
-                <div className="text-xs text-foreground">{formatAmount(token.stats?.trades1h ?? 0)}</div>
+                <div className="text-xs text-foreground">
+                  {formatAmount(token.stats?.periods?.["1h"]?.trades ?? 0)}
+                </div>
               </div>
               <div className="w-full flex justify-between gap-2">
                 <div className="text-xs text-enutral">{t("extend.pulse.buys_explained")}</div>
-                <div className="text-xs text-foreground">{formatAmount(token.stats?.buys1h ?? 0)}</div>
+                <div className="text-xs text-foreground">
+                  {formatAmount(token.stats?.periods?.["1h"]?.buys ?? 0)}
+                </div>
               </div>
               <div className="w-full flex justify-between gap-2">
                 <div className="text-xs text-enutral">{t("extend.pulse.sells_explained")}</div>
-                <div className="text-xs text-foreground">{formatAmount(token.stats?.sells1h ?? 0)}</div>
+                <div className="text-xs text-foreground">
+                  {formatAmount(token.stats?.periods?.["1h"]?.sells ?? 0)}
+                </div>
               </div>
             </div>
           }
@@ -125,7 +131,7 @@ export function PulseTokenMarketCap({ token }: PulseTokenMarketCapProps) {
             <div className="flex items-center gap-1">
               <div className="text-xs leading-none text-neutral">{t("extend.pulse.txs")}</div>
               <div className="text-xs leading-none text-foreground">
-                {formatAmount(token.stats?.trades1h ?? 0)}
+                {formatAmount(token.stats?.periods?.["1h"]?.trades ?? 0)}
               </div>
             </div>
             <div className="w-6 group-data-[layout=narrow]:w-10 flex rounded-full overflow-hidden">

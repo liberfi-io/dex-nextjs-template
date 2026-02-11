@@ -18,7 +18,7 @@ import {
 } from "@/libs/tvchart";
 import { quotePricesSubject, updateTokenLatestPrice } from "@/states";
 import { Candle, Resolution, Token } from "@chainstream-io/sdk";
-import { Unsubscribable } from "@chainstream-io/sdk/stream";
+import { Unsubscribable, WsCandle } from "@chainstream-io/sdk/stream";
 import { CONFIG, parseChainId } from "@liberfi/core";
 import { chainParam, fetchToken, fetchTokenCandles, QueryKeys } from "@liberfi/react-dex";
 import { dexClientSubject, queryClientSubject } from "@liberfi/ui-base";
@@ -302,7 +302,7 @@ export class TvChartDataFeedModule implements ITvChartDataFeedModule {
     return bars;
   }
   mapCandleToBar(
-    candle: Candle,
+    candle: Candle | WsCandle,
     token: Token,
     quote: TvChartQuoteType,
     priceType: TvChartPriceType,
@@ -361,7 +361,7 @@ export class TvChartDataFeedModule implements ITvChartDataFeedModule {
       chain: chainParam(chainId),
       tokenAddress: address,
       resolution: resolution as Resolution,
-      callback: (candle: Candle) => {
+      callback: (candle: WsCandle) => {
         const bar = this.mapCandleToBar(candle, token, quote, priceType);
         onTick(bar);
 
@@ -402,7 +402,7 @@ export class TvChartDataFeedModule implements ITvChartDataFeedModule {
     _symbols: string[],
     _onDataCallback: QuotesCallback,
     _1onErrorCallback: QuotesErrorCallback,
-  ) {}
+  ) { }
   subscribeQuotes(
     symbols: string[],
     _fastSymbols: string[],
@@ -454,8 +454,8 @@ function tokenSymbolInfo(
         ? token.marketData.priceInUsd
         : token.marketData.marketCapInUsd
       : priceType === TvChartPriceType.Price
-      ? token.marketData.priceInSol ?? 0
-      : token.marketData.marketCapInSol ?? 0;
+        ? token.marketData.priceInSol ?? 0
+        : token.marketData.marketCapInSol ?? 0;
 
   // 根据实际价格推算精度
   const precision = calculateDecimalPrecision(price, { precision: true });

@@ -6,7 +6,7 @@ import {
   SwapRouteInputSwapMode,
   SwapRouteResponse,
   Token,
-  WalletBalanceDetailDTO,
+  WalletNetWorthItemDTO,
 } from "@chainstream-io/sdk";
 import { CHAIN_ID, chainIcon } from "@liberfi/core";
 import {
@@ -32,7 +32,7 @@ import {
   useTranslation,
   useWaitForTransactionConfirmation,
   useWallet,
-  walletBalancesAtom,
+  walletNetWorthAtom,
 } from "@liberfi/ui-base";
 import { Button, Image, Link } from "@heroui/react";
 import { useAtomValue } from "jotai";
@@ -43,7 +43,7 @@ export type SwapContextValue = {
   // 支付代币地址
   fromTokenAddress?: string | null;
   // 支付代币余额
-  fromTokenBalance?: WalletBalanceDetailDTO | null;
+  fromTokenBalance?: WalletNetWorthItemDTO | null;
   // 支付代币信息
   fromToken?: Token | null;
   // 设置支付代币地址
@@ -51,7 +51,7 @@ export type SwapContextValue = {
   // 获得代币地址
   toTokenAddress?: string | null;
   // 获得代币当前余额
-  toTokenBalance?: WalletBalanceDetailDTO | null;
+  toTokenBalance?: WalletNetWorthItemDTO | null;
   // 获得代币信息
   toToken?: Token | null;
   // 设置获得代币地址
@@ -107,7 +107,7 @@ export function SwapProvider({
   const { user } = useAuth();
 
   // 用户余额
-  const wallet = useAtomValue(walletBalancesAtom);
+  const walletNetWorth = useAtomValue(walletNetWorthAtom);
 
   // 支付代币地址
   const [fromTokenAddress, setFromTokenAddress] = useState(defaultFromTokenAddress ?? "");
@@ -141,8 +141,8 @@ export function SwapProvider({
 
   // 支付代币余额
   const fromTokenBalance = useMemo(
-    () => (wallet?.balances ?? []).find((it) => it.tokenAddress === fromTokenAddress),
-    [wallet, fromTokenAddress],
+    () => (walletNetWorth?.data ?? []).find((it) => it.tokenAddress === fromTokenAddress),
+    [walletNetWorth, fromTokenAddress],
   );
 
   // 支付代币数量
@@ -198,8 +198,8 @@ export function SwapProvider({
 
   // 获得代币余额
   const toTokenBalance = useMemo(
-    () => (wallet?.balances ?? []).find((it) => it.tokenAddress === toTokenAddress),
-    [wallet, toTokenAddress],
+    () => (walletNetWorth?.data ?? []).find((it) => it.tokenAddress === toTokenAddress),
+    [walletNetWorth, toTokenAddress],
   );
 
   // 信息完备，可以计算路由
@@ -244,7 +244,9 @@ export function SwapProvider({
         try {
           const bodyText = await e.response.text();
           const body = JSON.parse(bodyText ?? "{}") as { message?: string; details?: string };
-          setRouteError(body.details ?? body.message ?? t("extend.account.convert_errors.route_error"));
+          setRouteError(
+            body.details ?? body.message ?? t("extend.account.convert_errors.route_error"),
+          );
           // eslint-disable-next-line unused-imports/no-unused-vars
         } catch (_e) {
           setRouteError(t("extend.account.convert_errors.route_error"));
@@ -300,7 +302,9 @@ export function SwapProvider({
       const serializedTx = routeInfo.serializedTx;
 
       // sign tx
-      const signedTxBuffer = await walletInstance.signTransaction(Buffer.from(serializedTx, "base64"));
+      const signedTxBuffer = await walletInstance.signTransaction(
+        Buffer.from(serializedTx, "base64"),
+      );
       const signedTx = Buffer.from(signedTxBuffer).toString("base64");
 
       // send tx

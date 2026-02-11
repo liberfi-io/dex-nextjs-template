@@ -1,8 +1,8 @@
 import BigNumber from "bignumber.js";
 import { PieActiveShape, PiePayload } from "@/components/chart";
-import { useTranslation, walletBalancesAtom } from "@liberfi/ui-base";
+import { useTranslation, walletNetWorthAtom } from "@liberfi/ui-base";
 import {
-  appendPrimaryTokenBalances,
+  appendPrimaryTokenNetWorth,
   CHART_COLORS,
   formatAbbreviatingNumber2,
   formatPercentage,
@@ -41,20 +41,20 @@ export function PortfolioChart({
 function Chart({ className, classNames, displayLegendValue = true }: PortfolioChartProps) {
   const { t } = useTranslation();
 
-  const wallet = useAtomValue(walletBalancesAtom);
+  const walletNetWorth = useAtomValue(walletNetWorthAtom);
 
   // append primary token balances
-  const fullWallet = useMemo(() => {
-    if (!wallet) return undefined;
-    return appendPrimaryTokenBalances(CHAIN_ID.SOLANA, wallet);
-  }, [wallet]);
+  const fullWalletNetWorth = useMemo(() => {
+    if (!walletNetWorth) return undefined;
+    return appendPrimaryTokenNetWorth(CHAIN_ID.SOLANA, walletNetWorth);
+  }, [walletNetWorth]);
 
   // current highlighted token index
   const [activeIndex, setActiveIndex] = useState(0);
 
   // TODO wait for backend
   const data = useMemo<PiePayload[]>(() => {
-    if (!fullWallet) {
+    if (!fullWalletNetWorth) {
       return [
         {
           key: "primary_tokens",
@@ -66,12 +66,12 @@ function Chart({ className, classNames, displayLegendValue = true }: PortfolioCh
       ];
     }
 
-    const totalBalancesInUsd = new BigNumber(fullWallet.totalBalancesInUsd ?? 0).toNumber();
+    const totalBalancesInUsd = new BigNumber(fullWalletNetWorth.totalValueInUsd ?? 0).toNumber();
 
     // sort tokens by valueInUsd descending
     const allData = reverse(
       sortBy(
-        (fullWallet.balances ?? []).map((balance) => {
+        (fullWalletNetWorth.data ?? []).map((balance) => {
           const value = new BigNumber(balance.valueInUsd ?? 0).toNumber();
           return {
             key: balance.tokenAddress,
@@ -105,7 +105,7 @@ function Chart({ className, classNames, displayLegendValue = true }: PortfolioCh
           totalBalancesInUsd > 0 ? formatPercentage(totalValue / totalBalancesInUsd) : "0%",
       },
     ];
-  }, [fullWallet, t]);
+  }, [fullWalletNetWorth, t]);
 
   const handlePieEnter = useCallback(
     (_: unknown, index: number) => {
@@ -114,7 +114,7 @@ function Chart({ className, classNames, displayLegendValue = true }: PortfolioCh
     [setActiveIndex],
   );
 
-  if (!fullWallet) {
+  if (!fullWalletNetWorth) {
     return (
       <Skeletons
         className={className}
@@ -124,7 +124,7 @@ function Chart({ className, classNames, displayLegendValue = true }: PortfolioCh
     );
   }
 
-  if (!fullWallet.balances || fullWallet.balances.length === 0) {
+  if (!fullWalletNetWorth.data || fullWalletNetWorth.data.length === 0) {
     return (
       <Empty
         className={className}

@@ -2,7 +2,13 @@ import { ArrowDownIcon, ArrowUpIcon, BearishIcon, BullishIcon, RefreshIcon } fro
 import { formatPercentage } from "@/libs";
 import { Button, Image } from "@heroui/react";
 import { CONFIG } from "@liberfi/core";
-import { useTranslation, walletBalancesAtom, walletBalancesQueryStateAtom } from "@liberfi/ui-base";
+import {
+  useTranslation,
+  walletNetWorthAtom,
+  walletNetWorthQueryStateAtom,
+  walletPnlAtom,
+  walletPnlQueryStateAtom,
+} from "@liberfi/ui-base";
 import clsx from "clsx";
 import { useAtomValue } from "jotai";
 import { useCallback, useMemo, useState } from "react";
@@ -15,18 +21,24 @@ import { HeaderBalanceChart } from "./charts";
 export function AccountOverview() {
   const { t } = useTranslation();
 
-  const wallet = useAtomValue(walletBalancesAtom);
+  const walletNetWorth = useAtomValue(walletNetWorthAtom);
 
-  const walletBalancesQueryState = useAtomValue(walletBalancesQueryStateAtom);
+  const walletPnl = useAtomValue(walletPnlAtom);
+
+  const walletNetWorthQueryState = useAtomValue(walletNetWorthQueryStateAtom);
+
+  const walletPnlQueryState = useAtomValue(walletPnlQueryStateAtom);
 
   const isFetchingWallet = useMemo(
-    () => walletBalancesQueryState?.isFetching ?? false,
-    [walletBalancesQueryState],
+    () =>
+      (walletNetWorthQueryState?.isFetching ?? false) || (walletPnlQueryState?.isFetching ?? false),
+    [walletNetWorthQueryState, walletPnlQueryState],
   );
 
   const refetchWallet = useCallback(() => {
-    walletBalancesQueryState?.refetch();
-  }, [walletBalancesQueryState]);
+    walletNetWorthQueryState?.refetch();
+    walletPnlQueryState?.refetch();
+  }, [walletNetWorthQueryState, walletPnlQueryState]);
 
   // TODO wait for backend
   const bullish = useMemo(() => true, []);
@@ -41,7 +53,7 @@ export function AccountOverview() {
     setIsOpenCharts((prev) => !prev);
   }, []);
 
-  if (!wallet) {
+  if (!walletNetWorth || !walletPnl) {
     return <AccountOverviewSkeleton />;
   }
 
@@ -72,7 +84,7 @@ export function AccountOverview() {
               {/* balance value */}
               <span>
                 <Number
-                  value={wallet?.totalBalancesInUsd ?? 0}
+                  value={walletNetWorth?.totalValueInUsd ?? 0}
                   abbreviate
                   defaultCurrencySign="$"
                 />
@@ -100,7 +112,11 @@ export function AccountOverview() {
               data-bullish={bullish}
             >
               <span>
-                <Number value={wallet?.totalProfitInUsd ?? 0} abbreviate defaultCurrencySign="$" />
+                <Number
+                  value={walletPnl?.totalProfitInUsd ?? 0}
+                  abbreviate
+                  defaultCurrencySign="$"
+                />
               </span>
               <span className="flex items-center">
                 (

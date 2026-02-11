@@ -1,6 +1,6 @@
 import { ListField } from "@/components/ListField";
 import { getWrappedAddress } from "@/libs";
-import { Token, WalletBalanceDetailDTO } from "@chainstream-io/sdk";
+import { Token, WalletNetWorthItemDTO } from "@chainstream-io/sdk";
 import { CHAIN_ID } from "@liberfi/core";
 import { Image } from "@heroui/react";
 import { useMemo } from "react";
@@ -8,7 +8,7 @@ import { useMemo } from "react";
 export interface PriceHistoryFieldProps {
   className?: string;
   token?: Token;
-  balance: WalletBalanceDetailDTO;
+  balance: WalletNetWorthItemDTO;
 }
 
 export function PriceHistoryField({ token, balance, className }: PriceHistoryFieldProps) {

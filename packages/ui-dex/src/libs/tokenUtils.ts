@@ -79,15 +79,15 @@ export function tokenPriceChangeRatioInUsd(
 ): number | string | undefined {
   switch (timeframe) {
     case "1m":
-      return token.stats?.priceChangeRatioInUsd1m;
+      return token.stats?.periods?.["1m"]?.priceChangeRatioInUsd;
     case "5m":
-      return token.stats?.priceChangeRatioInUsd5m;
+      return token.stats?.periods?.["5m"]?.priceChangeRatioInUsd;
     case "1h":
-      return token.stats?.priceChangeRatioInUsd1h;
+      return token.stats?.periods?.["1h"]?.priceChangeRatioInUsd;
     case "4h":
-      return token.stats?.priceChangeRatioInUsd4h;
+      return token.stats?.periods?.["4h"]?.priceChangeRatioInUsd;
     case "24h":
-      return token.stats?.priceChangeRatioInUsd24h;
+      return token.stats?.periods?.["24h"]?.priceChangeRatioInUsd;
     default:
       return undefined;
   }
@@ -96,15 +96,15 @@ export function tokenPriceChangeRatioInUsd(
 export function tokenVolumesInUsd(token: Token, timeframe: string): number | string | undefined {
   switch (timeframe) {
     case "1m":
-      return token.stats?.volumesInUsd1m;
+      return token.stats?.periods?.["1m"]?.totalVolumeInUsd;
     case "5m":
-      return token.stats?.volumesInUsd5m;
+      return token.stats?.periods?.["5m"]?.totalVolumeInUsd;
     case "1h":
-      return token.stats?.volumesInUsd1h;
+      return token.stats?.periods?.["1h"]?.totalVolumeInUsd;
     case "4h":
-      return token.stats?.volumesInUsd4h;
+      return token.stats?.periods?.["4h"]?.totalVolumeInUsd;
     case "24h":
-      return token.stats?.volumesInUsd24h;
+      return token.stats?.periods?.["24h"]?.totalVolumeInUsd;
     default:
       return undefined;
   }
@@ -113,19 +113,19 @@ export function tokenVolumesInUsd(token: Token, timeframe: string): number | str
 export function tokenBuyVolumesInUsd(token: Token, timeframe: string): number | string | undefined {
   switch (timeframe) {
     case "1m":
-      return token.stats?.buyVolumesInUsd1m;
+      return token.stats?.periods?.["1m"]?.buyVolumeInUsd;
     case "5m":
-      return token.stats?.buyVolumesInUsd5m;
+      return token.stats?.periods?.["5m"]?.buyVolumeInUsd;
     case "15m":
-      return token.stats?.buyVolumesInUsd15m;
+      return token.stats?.periods?.["15m"]?.buyVolumeInUsd;
     case "30m":
-      return token.stats?.buyVolumesInUsd30m;
+      return token.stats?.periods?.["30m"]?.buyVolumeInUsd;
     case "1h":
-      return token.stats?.buyVolumesInUsd1h;
+      return token.stats?.periods?.["1h"]?.buyVolumeInUsd;
     case "4h":
-      return token.stats?.buyVolumesInUsd4h;
+      return token.stats?.periods?.["4h"]?.buyVolumeInUsd;
     case "24h":
-      return token.stats?.buyVolumesInUsd24h;
+      return token.stats?.periods?.["24h"]?.buyVolumeInUsd;
     default:
       return undefined;
   }
@@ -137,19 +137,19 @@ export function tokenSellVolumesInUsd(
 ): number | string | undefined {
   switch (timeframe) {
     case "1m":
-      return token.stats?.sellVolumesInUsd1m;
+      return token.stats?.periods?.["1m"]?.sellVolumeInUsd;
     case "5m":
-      return token.stats?.sellVolumesInUsd5m;
+      return token.stats?.periods?.["5m"]?.sellVolumeInUsd;
     case "15m":
-      return token.stats?.sellVolumesInUsd15m;
+      return token.stats?.periods?.["15m"]?.sellVolumeInUsd;
     case "30m":
-      return token.stats?.sellVolumesInUsd30m;
+      return token.stats?.periods?.["30m"]?.sellVolumeInUsd;
     case "1h":
-      return token.stats?.sellVolumesInUsd1h;
+      return token.stats?.periods?.["1h"]?.sellVolumeInUsd;
     case "4h":
-      return token.stats?.sellVolumesInUsd4h;
+      return token.stats?.periods?.["4h"]?.sellVolumeInUsd;
     case "24h":
-      return token.stats?.sellVolumesInUsd24h;
+      return token.stats?.periods?.["24h"]?.sellVolumeInUsd;
     default:
       return undefined;
   }
@@ -158,15 +158,15 @@ export function tokenSellVolumesInUsd(
 export function tokenTrades(token: Token, timeframe: string): number | string | undefined {
   switch (timeframe) {
     case "1m":
-      return token.stats?.trades1m;
+      return token.stats?.periods?.["1m"]?.trades;
     case "5m":
-      return token.stats?.trades5m;
+      return token.stats?.periods?.["5m"]?.trades;
     case "1h":
-      return token.stats?.trades1h;
+      return token.stats?.periods?.["1h"]?.trades;
     case "4h":
-      return token.stats?.trades4h;
+      return token.stats?.periods?.["4h"]?.trades;
     case "24h":
-      return token.stats?.trades24h;
+      return token.stats?.periods?.["24h"]?.trades;
     default:
       return undefined;
   }
@@ -175,19 +175,19 @@ export function tokenTrades(token: Token, timeframe: string): number | string | 
 export function tokenBuys(token: Token, timeframe: string): number | string | undefined {
   switch (timeframe) {
     case "1m":
-      return token.stats?.buys1m;
+      return token.stats?.periods?.["1m"]?.buys;
     case "5m":
-      return token.stats?.buys5m;
+      return token.stats?.periods?.["5m"]?.buys;
     case "15m":
-      return token.stats?.buys15m;
+      return token.stats?.periods?.["15m"]?.buys;
     case "30m":
-      return token.stats?.buys30m;
+      return token.stats?.periods?.["30m"]?.buys;
     case "1h":
-      return token.stats?.buys1h;
+      return token.stats?.periods?.["1h"]?.buys;
     case "4h":
-      return token.stats?.buys4h;
+      return token.stats?.periods?.["4h"]?.buys;
     case "24h":
-      return token.stats?.buys24h;
+      return token.stats?.periods?.["24h"]?.buys;
     default:
       return undefined;
   }
@@ -196,19 +196,19 @@ export function tokenBuys(token: Token, timeframe: string): number | string | un
 export function tokenSells(token: Token, timeframe: string): number | string | undefined {
   switch (timeframe) {
     case "1m":
-      return token.stats?.sells1m;
+      return token.stats?.periods?.["1m"]?.sells;
     case "5m":
-      return token.stats?.sells5m;
+      return token.stats?.periods?.["5m"]?.sells;
     case "15m":
-      return token.stats?.sells15m;
+      return token.stats?.periods?.["15m"]?.sells;
     case "30m":
-      return token.stats?.sells30m;
+      return token.stats?.periods?.["30m"]?.sells;
     case "1h":
-      return token.stats?.sells1h;
+      return token.stats?.periods?.["1h"]?.sells;
     case "4h":
-      return token.stats?.sells4h;
+      return token.stats?.periods?.["4h"]?.sells;
     case "24h":
-      return token.stats?.sells24h;
+      return token.stats?.periods?.["24h"]?.sells;
     default:
       return undefined;
   }
@@ -217,15 +217,15 @@ export function tokenSells(token: Token, timeframe: string): number | string | u
 export function tokenTraders(token: Token, timeframe: string): number | string | undefined {
   switch (timeframe) {
     case "1m":
-      return token.stats?.traders1m;
+      return token.stats?.periods?.["1m"]?.traders;
     case "5m":
-      return token.stats?.traders5m;
+      return token.stats?.periods?.["5m"]?.traders;
     case "1h":
-      return token.stats?.traders1h;
+      return token.stats?.periods?.["1h"]?.traders;
     case "4h":
-      return token.stats?.traders4h;
+      return token.stats?.periods?.["4h"]?.traders;
     case "24h":
-      return token.stats?.traders24h;
+      return token.stats?.periods?.["24h"]?.traders;
     default:
       return undefined;
   }
@@ -234,19 +234,19 @@ export function tokenTraders(token: Token, timeframe: string): number | string |
 export function tokenBuyers(token: Token, timeframe: string): number | string | undefined {
   switch (timeframe) {
     case "1m":
-      return token.stats?.buyers1m;
+      return token.stats?.periods?.["1m"]?.buyers;
     case "5m":
-      return token.stats?.buyers5m;
+      return token.stats?.periods?.["5m"]?.buyers;
     case "15m":
-      return token.stats?.buyers15m;
+      return token.stats?.periods?.["15m"]?.buyers;
     case "30m":
-      return token.stats?.buyers30m;
+      return token.stats?.periods?.["30m"]?.buyers;
     case "1h":
-      return token.stats?.buyers1h;
+      return token.stats?.periods?.["1h"]?.buyers;
     case "4h":
-      return token.stats?.buyers4h;
+      return token.stats?.periods?.["4h"]?.buyers;
     case "24h":
-      return token.stats?.buyers24h;
+      return token.stats?.periods?.["24h"]?.buyers;
     default:
       return undefined;
   }
@@ -255,19 +255,19 @@ export function tokenBuyers(token: Token, timeframe: string): number | string | 
 export function tokenSellers(token: Token, timeframe: string): number | string | undefined {
   switch (timeframe) {
     case "1m":
-      return token.stats?.sellers1m;
+      return token.stats?.periods?.["1m"]?.sellers;
     case "5m":
-      return token.stats?.sellers5m;
+      return token.stats?.periods?.["5m"]?.sellers;
     case "15m":
-      return token.stats?.sellers15m;
+      return token.stats?.periods?.["15m"]?.sellers;
     case "30m":
-      return token.stats?.sellers30m;
+      return token.stats?.periods?.["30m"]?.sellers;
     case "1h":
-      return token.stats?.sellers1h;
+      return token.stats?.periods?.["1h"]?.sellers;
     case "4h":
-      return token.stats?.sellers4h;
+      return token.stats?.periods?.["4h"]?.sellers;
     case "24h":
-      return token.stats?.sellers24h;
+      return token.stats?.periods?.["24h"]?.sellers;
     default:
       return undefined;
   }

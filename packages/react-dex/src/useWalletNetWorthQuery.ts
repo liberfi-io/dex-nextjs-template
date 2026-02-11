@@ -1,30 +1,30 @@
 import { useQuery, UseQueryOptions } from "@tanstack/react-query";
-import { ChainStreamClient, WalletBalancesDTO } from "@chainstream-io/sdk";
+import { ChainStreamClient, WalletNetWorthPage } from "@chainstream-io/sdk";
 import { CHAIN_ID } from "@liberfi/core";
 import { useDexClient } from "./DexClientProvider";
 import { QueryKeys } from "./queryKeys";
 import { chainParam } from "./utils";
 
-export async function fetchWalletBalance(
+export async function fetchWalletNetWorth(
   client: ChainStreamClient,
   chain: CHAIN_ID,
   walletAddress: string,
 ) {
-  return await client.wallet.getBalance(chainParam(chain), walletAddress);
+  return await client.wallet.getNetWorth(chainParam(chain), walletAddress, { limit: 100 });
 }
 
-export function useWalletBalanceQuery(
+export function useWalletNetWorthQuery(
   chain: CHAIN_ID,
   walletAddress: string,
   options: Omit<
-    UseQueryOptions<WalletBalancesDTO, Error, WalletBalancesDTO, string[]>,
+    UseQueryOptions<WalletNetWorthPage, Error, WalletNetWorthPage, string[]>,
     "queryKey" | "queryFn"
   > = {},
 ) {
   const client = useDexClient();
   return useQuery({
-    queryKey: QueryKeys.walletBalance(chain, walletAddress),
-    queryFn: async () => fetchWalletBalance(client, chain, walletAddress),
+    queryKey: QueryKeys.walletNetWorth(chain, walletAddress),
+    queryFn: async () => fetchWalletNetWorth(client, chain, walletAddress),
     ...options,
   });
 }

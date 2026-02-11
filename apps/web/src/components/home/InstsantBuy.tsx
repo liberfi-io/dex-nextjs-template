@@ -11,7 +11,7 @@ import {
   chainAtom,
   useAppSdk,
   useAuthenticatedCallback,
-  useWalletPrimaryTokenBalance,
+  useWalletPrimaryTokenNetWorth,
 } from "@liberfi/ui-base";
 import { defaultTradePresetValues, useSwap, useTradeBuySettings } from "@liberfi/ui-dex";
 import { useMemo } from "react";
@@ -27,7 +27,7 @@ export function InstantBuy({ token }: TokenListActionsProps) {
 
   const { amount, preset } = useInstantBuy();
 
-  const balance = useWalletPrimaryTokenBalance();
+  const walletNetWorth = useWalletPrimaryTokenNetWorth();
 
   const primaryTokenSymbol = useMemo(() => getPrimaryTokenSymbol(chainId), [chainId]);
 
@@ -45,7 +45,7 @@ export function InstantBuy({ token }: TokenListActionsProps) {
   const { swap, isSwapping } = useSwap();
 
   const handleInstantBuy = useAuthenticatedCallback(async () => {
-    if (!balance?.amount || !primaryTokenAddress || !primaryTokenDecimals || !token.address) return;
+    if (!walletNetWorth?.amount || !primaryTokenAddress || !primaryTokenDecimals || !token.address) return;
 
     if (!amount || new SafeBigNumber(amount).lte(0.0001)) {
       toast.error(
@@ -55,7 +55,7 @@ export function InstantBuy({ token }: TokenListActionsProps) {
     }
 
     // balance is insufficient
-    if (new SafeBigNumber(balance.amount).lt(amount)) {
+    if (new SafeBigNumber(walletNetWorth.amount).lt(amount)) {
       toast.error(t("extend.trade.buy_insufficient_balance"));
       appSdk.events.emit("deposit:open");
       return;
@@ -96,7 +96,7 @@ export function InstantBuy({ token }: TokenListActionsProps) {
     primaryTokenDecimals,
     primaryTokenAddress,
     swap,
-    balance?.amount,
+    walletNetWorth?.amount,
     presetSettings,
   ]);
 

@@ -8,7 +8,7 @@ import {
   useAppSdk,
   useAuthenticatedCallback,
   useTranslation,
-  useWalletPrimaryTokenBalance,
+  useWalletPrimaryTokenNetWorth,
 } from "@liberfi/ui-base";
 import { tokenAddressAtom, tradeBuyPresetAtom, useQuotePrice } from "@/states";
 import { useSwap, useTradeBuySettings } from "@/hooks";
@@ -29,7 +29,7 @@ export function MarketBuyForm() {
   const [amount, setAmount] = useState<number | undefined>();
 
   // primary token balance
-  const balance = useWalletPrimaryTokenBalance();
+  const balance = useWalletPrimaryTokenNetWorth();
 
   // primary token address
   const primaryTokenAddress = useMemo(() => getPrimaryTokenAddress(chain), [chain]);

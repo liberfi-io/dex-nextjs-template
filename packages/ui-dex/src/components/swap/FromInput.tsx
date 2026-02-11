@@ -162,7 +162,7 @@ export function FromInput() {
                 fromTokenBalance && (
                   <TokenAvatar
                     size={24}
-                    src={fromTokenBalance.imageUrl}
+                    src={fromTokenBalance.logoUri ?? fromToken?.imageUrl ?? ""}
                     name={fromTokenBalance.symbol}
                   />
                 )
@@ -194,7 +194,9 @@ export function FromInput() {
             </div>
           )}
         </div>
-        {error && <p className="mt-1 text-danger-500 text-xs max-sm:text-xxs break-words">{error}</p>}
+        {error && (
+          <p className="mt-1 text-danger-500 text-xs max-sm:text-xxs break-words">{error}</p>
+        )}
       </div>
     </div>
   );

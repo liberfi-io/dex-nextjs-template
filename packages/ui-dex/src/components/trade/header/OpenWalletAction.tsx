@@ -3,10 +3,10 @@ import { Number } from "@/components/Number";
 import { Button } from "@heroui/react";
 import clsx from "clsx";
 import { useAtomValue } from "jotai";
-import { walletBalancesAtom } from "@liberfi/ui-base";
+import { walletNetWorthAtom } from "@liberfi/ui-base";
 
 export function OpenWalletAction({ className }: { className?: string }) {
-  const wallet = useAtomValue(walletBalancesAtom);
+  const walletNetWorth = useAtomValue(walletNetWorthAtom);
 
   return (
     <Button
@@ -17,7 +17,7 @@ export function OpenWalletAction({ className }: { className?: string }) {
       disableRipple
       startContent={<WithdrawOutlinedIcon width={14} height={14} className="text-neutral" />}
     >
-      <Number value={wallet?.totalBalancesInUsd ?? 0} abbreviate defaultCurrencySign="$" />
+      <Number value={walletNetWorth?.totalValueInUsd ?? 0} abbreviate defaultCurrencySign="$" />
     </Button>
   );
 }

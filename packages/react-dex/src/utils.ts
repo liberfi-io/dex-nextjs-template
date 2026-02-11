@@ -31,38 +31,131 @@ export function chainParam(chain: CHAIN_ID): ChainParam {
 }
 
 export function convertStreamTokenStat(stat: StreamTokenStat): Partial<TokenStat> {
+  const statRecord = stat as unknown as Record<string, number | string | undefined>;
+  const timeframes: Timeframe[] = ["1m", "5m", "15m", "30m", "1h", "4h", "24h"];
+
+  const periods: TokenStat["periods"] = {} as TokenStat["periods"];
+
+  for (const timeframe of timeframes) {
+    const buys = statRecord[`buys${timeframe}`] as number | undefined;
+    const sells = statRecord[`sells${timeframe}`] as number | undefined;
+    const buyers = statRecord[`buyers${timeframe}`] as number | undefined;
+    const sellers = statRecord[`sellers${timeframe}`] as number | undefined;
+    const buyVolumeInUsd = statRecord[`buyVolumeInUsd${timeframe}`] as BigNumber.Value | undefined;
+    const sellVolumeInUsd = statRecord[`sellVolumeInUsd${timeframe}`] as BigNumber.Value | undefined;
+    const trades = statRecord[`trades${timeframe}`] as number | undefined;
+    const priceInUsd = statRecord[`price${timeframe}`] as BigNumber.Value | undefined;
+    const openInUsd = statRecord[`openInUsd${timeframe}`] as BigNumber.Value | undefined;
+    const closeInUsd = statRecord[`closeInUsd${timeframe}`] as BigNumber.Value | undefined;
+    const dappProgramCount = statRecord[`dappProgramCount${timeframe}`] as number | undefined;
+    const poolCount = statRecord[`poolCount${timeframe}`] as number | undefined;
+    const liquidityInUsd = statRecord[`liquidityInUsd${timeframe}`] as BigNumber.Value | undefined;
+
+    const hasData =
+      buys !== undefined ||
+      sells !== undefined ||
+      buyers !== undefined ||
+      sellers !== undefined ||
+      buyVolumeInUsd !== undefined ||
+      sellVolumeInUsd !== undefined ||
+      trades !== undefined ||
+      priceInUsd !== undefined ||
+      openInUsd !== undefined ||
+      closeInUsd !== undefined;
+
+    if (!hasData) continue;
+
+    const totalTrades =
+      trades ??
+      new BigNumber(buys ?? 0)
+        .plus(sells ?? 0)
+        .toNumber();
+
+    const traders = new BigNumber(buyers ?? 0)
+      .plus(sellers ?? 0)
+      .toNumber();
+
+    const buyVolume = calculateInQuote(buyVolumeInUsd, priceInUsd);
+    const sellVolume = calculateInQuote(sellVolumeInUsd, priceInUsd);
+
+    const totalVolumeInUsd =
+      buyVolumeInUsd !== undefined && sellVolumeInUsd !== undefined
+        ? new BigNumber(buyVolumeInUsd).plus(sellVolumeInUsd).toString()
+        : buyVolumeInUsd?.toString() ?? sellVolumeInUsd?.toString() ?? "0";
+
+    const totalVolume =
+      buyVolume !== undefined && sellVolume !== undefined
+        ? new BigNumber(buyVolume).plus(sellVolume).toString()
+        : buyVolume ?? sellVolume ?? "0";
+
+    const openInNative = calculateInQuote(openInUsd, priceInUsd);
+    const closeInNative = calculateInQuote(closeInUsd, priceInUsd);
+
+    periods[timeframe] = {
+      buys: (buys ?? 0).toString(),
+      sells: (sells ?? 0).toString(),
+      trades: totalTrades.toString(),
+      buyers: (buyers ?? 0).toString(),
+      sellers: (sellers ?? 0).toString(),
+      traders: traders.toString(),
+      buyVolume: buyVolume ?? "0",
+      buyVolumeInUsd: buyVolumeInUsd?.toString() ?? "0",
+      buyVolumeInNative: buyVolume ?? "0",
+      sellVolume: sellVolume ?? "0",
+      sellVolumeInUsd: sellVolumeInUsd?.toString() ?? "0",
+      sellVolumeInNative: sellVolume ?? "0",
+      totalVolumeInUsd,
+      totalVolumeInNative: totalVolume,
+      openInUsd: openInUsd?.toString() ?? "0",
+      closeInUsd: closeInUsd?.toString() ?? "0",
+      highInUsd: openInUsd?.toString() ?? closeInUsd?.toString() ?? "0",
+      lowInUsd: openInUsd?.toString() ?? closeInUsd?.toString() ?? "0",
+      openInNative: openInNative ?? "0",
+      closeInNative: closeInNative ?? "0",
+      highInNative: openInNative ?? closeInNative ?? "0",
+      lowInNative: openInNative ?? closeInNative ?? "0",
+      averagePriceInUsd: priceInUsd?.toString() ?? "0",
+      averagePriceInNative: calculateInQuote(priceInUsd, priceInUsd) ?? "0",
+      priceChangeRatioInUsd:
+        calculatePriceChangeRatio(openInUsd, closeInUsd) ?? "0",
+      prevBuys: "0",
+      prevSells: "0",
+      prevTrades: "0",
+      prevBuyers: "0",
+      prevSellers: "0",
+      prevTraders: "0",
+      prevBuyVolume: "0",
+      prevSellVolume: "0",
+      prevBuyVolumeInUsd: "0",
+      prevSellVolumeInUsd: "0",
+      prevBuyVolumeInNative: "0",
+      prevSellVolumeInNative: "0",
+      prevOpenInUsd: "0",
+      prevCloseInUsd: "0",
+      prevHighInUsd: "0",
+      prevLowInUsd: "0",
+      prevOpenInNative: "0",
+      prevCloseInNative: "0",
+      prevHighInNative: "0",
+      prevLowInNative: "0",
+      dappProgramCount: (dappProgramCount ?? 0).toString(),
+      prevDappProgramCount: "0",
+      poolCount: (poolCount ?? 0).toString(),
+      prevPoolCount: "0",
+      currentLiquidityInUsd: liquidityInUsd?.toString() ?? "0",
+      prevLiquidityInUsd: "0",
+      // WsTokenStat 里对应的是简单字符串比例，这里先不强行映射到复杂对象结构
+      volumeChangeRatio: undefined,
+      liquidityChangeRatio: undefined,
+      buySellRatio: undefined,
+      updatedAt: stat.timestamp?.toString(),
+    } as TokenStat["periods"][string];
+  }
+
   return {
-    volumesInUsd1m: new BigNumber(stat.buyVolumeInUsd1m ?? 0)
-      .plus(stat.sellVolumeInUsd1m ?? 0)
-      .toString(),
-    volumesInUsd5m: new BigNumber(stat.buyVolumeInUsd5m ?? 0)
-      .plus(stat.sellVolumeInUsd5m ?? 0)
-      .toString(),
-    volumesInUsd1h: new BigNumber(stat.buyVolumeInUsd1h ?? 0)
-      .plus(stat.sellVolumeInUsd1h ?? 0)
-      .toString(),
-    volumesInUsd4h: new BigNumber(stat.buyVolumeInUsd4h ?? 0)
-      .plus(stat.sellVolumeInUsd4h ?? 0)
-      .toString(),
-    volumesInUsd24h: new BigNumber(stat.buyVolumeInUsd24h ?? 0)
-      .plus(stat.sellVolumeInUsd24h ?? 0)
-      .toString(),
-    trades1m: new BigNumber(stat.buys1m ?? 0).plus(stat.sells1m ?? 0).toString(),
-    trades5m: new BigNumber(stat.buys5m ?? 0).plus(stat.sells5m ?? 0).toString(),
-    trades1h: new BigNumber(stat.buys1h ?? 0).plus(stat.sells1h ?? 0).toString(),
-    trades4h: new BigNumber(stat.buys4h ?? 0).plus(stat.sells4h ?? 0).toString(),
-    trades24h: new BigNumber(stat.buys24h ?? 0).plus(stat.sells24h ?? 0).toString(),
-    traders1m: new BigNumber(stat.buyers1m ?? 0).plus(stat.sellers1m ?? 0).toString(),
-    traders5m: new BigNumber(stat.buyers5m ?? 0).plus(stat.sellers5m ?? 0).toString(),
-    traders1h: new BigNumber(stat.buyers1h ?? 0).plus(stat.sellers1h ?? 0).toString(),
-    traders4h: new BigNumber(stat.buyers4h ?? 0).plus(stat.sellers4h ?? 0).toString(),
-    traders24h: new BigNumber(stat.buyers24h ?? 0).plus(stat.sellers24h ?? 0).toString(),
-    priceChangeRatioInUsd1m: calculatePriceChangeRatio(stat.openInUsd1m, stat.closeInUsd1m),
-    priceChangeRatioInUsd5m: calculatePriceChangeRatio(stat.openInUsd5m, stat.closeInUsd5m),
-    priceChangeRatioInUsd1h: calculatePriceChangeRatio(stat.openInUsd1h, stat.closeInUsd1h),
-    priceChangeRatioInUsd4h: calculatePriceChangeRatio(stat.openInUsd4h, stat.closeInUsd4h),
-    priceChangeRatioInUsd24h: calculatePriceChangeRatio(stat.openInUsd24h, stat.closeInUsd24h),
-  };
+    address: stat.address,
+    periods,
+  } as Partial<TokenStat>;
 }
 
 export function convertStreamTokenStatToMarketData(

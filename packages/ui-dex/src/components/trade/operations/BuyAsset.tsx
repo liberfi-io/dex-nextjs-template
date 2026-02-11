@@ -2,7 +2,7 @@ import { ArrowDownIcon, RefreshIcon } from "@/assets";
 import { Number } from "@/components/Number";
 import { useSwapContext } from "@/components/swap/SwapContext";
 import { TokenAvatar } from "@/components/TokenAvatar";
-import { useAppSdk, walletBalancesAtom, walletBalancesQueryStateAtom } from "@liberfi/ui-base";
+import { useAppSdk, walletNetWorthAtom, walletNetWorthQueryStateAtom } from "@liberfi/ui-base";
 import { getUnwrappedAddress, getWrappedAddress, PRIMARY_TOKEN_ADDRESSES } from "@/libs";
 import { CHAIN_ID, chainSlugs } from "@liberfi/core";
 import { Button, Skeleton } from "@heroui/react";
@@ -39,9 +39,9 @@ export function BuyAsset() {
     return addresses;
   }, [chainId, toTokenAddress]);
 
-  const wallet = useAtomValue(walletBalancesAtom);
+  const walletNetWorth = useAtomValue(walletNetWorthAtom);
 
-  const walletBalancesQueryState = useAtomValue(walletBalancesQueryStateAtom);
+  const walletBalancesQueryState = useAtomValue(walletNetWorthQueryStateAtom);
 
   const isFetchingWallet = useMemo(
     () => walletBalancesQueryState?.isFetching ?? false,
@@ -58,7 +58,7 @@ export function BuyAsset() {
     if (fromTokenAddress && !unavailableTokenAddresses.includes(fromTokenAddress)) return;
 
     // 优先支付余额多的代币
-    const balances = (wallet?.balances ?? [])
+    const balances = (walletNetWorth?.data ?? [])
       .sort((a, b) => new BigNumber(b.valueInUsd).minus(a.valueInUsd).toNumber())
       // 过滤掉无法使用的支付代币
       .filter(
@@ -90,7 +90,7 @@ export function BuyAsset() {
     }
   }, [
     chainId,
-    wallet?.balances,
+    walletNetWorth?.data,
     fromTokenAddress,
     setFromTokenAddress,
     toTokenAddress,
@@ -135,7 +135,7 @@ export function BuyAsset() {
     <div className="w-full h-8 flex items-center justify-between">
       <div
         className="flex items-center text-neutral text-xs cursor-pointer data-[disabled=true]:cursor-not-allowed"
-        data-disabled={!wallet?.balances}
+        data-disabled={!walletNetWorth?.data}
         onClick={handleSelectAsset}
       >
         <TokenAvatar size={24} src={fromToken?.imageUrl ?? ""} name={fromToken?.symbol} />

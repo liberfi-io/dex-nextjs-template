@@ -1,5 +1,5 @@
 import { tokenInfoAtom } from "@/states";
-import { useTranslation, useWalletTokenBalance } from "@liberfi/ui-base";
+import { useTranslation, useWalletTokenNetWorth } from "@liberfi/ui-base";
 import { clsx } from "clsx";
 import { useAtomValue } from "jotai";
 
@@ -12,7 +12,7 @@ export function SellTokenBalance({ className }: SellTokenBalanceProps) {
 
   const tokenInfo = useAtomValue(tokenInfoAtom);
 
-  const balance = useWalletTokenBalance(tokenInfo?.address ?? "");
+  const balance = useWalletTokenNetWorth(tokenInfo?.address ?? "");
 
   return (
     <div className={clsx("text-xs text-neutral space-x-1", className)}>

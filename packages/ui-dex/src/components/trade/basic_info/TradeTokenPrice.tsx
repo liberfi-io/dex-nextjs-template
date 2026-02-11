@@ -42,18 +42,18 @@ export function TradeTokenPrice() {
   const tokenStats = useAtomValue(tokenStatsAtom);
 
   const bearish = useMemo(() => {
-    if (!tokenStats?.closePriceInUsd24h) return false;
+    if (!tokenStats?.periods?.["24h"]?.closeInUsd) return false;
     if (!latestPrice) return false;
-    return new BigNumber(latestPrice).lt(tokenStats.closePriceInUsd24h);
+    return new BigNumber(latestPrice).lt(tokenStats.periods?.["24h"]?.closeInUsd);
   }, [tokenStats, latestPrice]);
 
   const priceChange = useMemo(() => {
-    if (!tokenStats?.closePriceInUsd24h) return undefined;
+    if (!tokenStats?.periods?.["24h"]?.closeInUsd) return undefined;
     if (!latestPrice) return undefined;
-    if (new BigNumber(latestPrice).eq(tokenStats.closePriceInUsd24h)) return 0;
+    if (new BigNumber(latestPrice).eq(tokenStats.periods["24h"].closeInUsd)) return 0;
     return new BigNumber(latestPrice)
-      .minus(tokenStats.closePriceInUsd24h)
-      .div(tokenStats.closePriceInUsd24h)
+      .minus(tokenStats.periods["24h"].closeInUsd)
+      .div(tokenStats.periods["24h"].closeInUsd)
       .abs()
       .toNumber();
   }, [tokenStats, latestPrice]);

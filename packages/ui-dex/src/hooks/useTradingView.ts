@@ -5,8 +5,8 @@
 /* eslint-disable unused-imports/no-unused-vars */
 import { formatLongNumber, getNumberDefaultPrecision, objectKeys } from "@/libs";
 import { tokenInfoAtom } from "@/states";
-import { ChainStreamClient, Candle, Resolution, Token  } from "@chainstream-io/sdk";
-import { StreamApi } from "@chainstream-io/sdk/stream";
+import { ChainStreamClient, Candle, Resolution, Token } from "@chainstream-io/sdk";
+import { StreamApi, WsCandle } from "@chainstream-io/sdk/stream";
 import { CONFIG } from "@liberfi/core";
 import { useDexClient } from "@liberfi/react-dex";
 import { useRouter, useTranslation } from "@liberfi/ui-base";
@@ -153,7 +153,7 @@ export const useTradingView = ({
 
         // tvChartWidget.onContextMenu();
 
-        tvChartWidget.headerReady().then(() => {});
+        tvChartWidget.headerReady().then(() => { });
 
         tvChartWidget.subscribe("onAutoSaveNeeded", () => {
           tvChartWidget.save((chartConfig: object) => {
@@ -321,7 +321,7 @@ const getDatafeed = ({
       chain: "sol",
       tokenAddress: token.address,
       resolution: RESOLUTION_MAP[resolution],
-      callback: (data: Candle) => {
+      callback: (data: WsCandle) => {
         if (!symbolInfo.ticker) return;
 
         onTick(mapCandle(data));
@@ -348,7 +348,7 @@ export const mapCandle = ({
   close,
   volume,
   time,
-}: Candle): TradingViewChartBar => {
+}: Candle | WsCandle): TradingViewChartBar => {
   const tradeOpen = parseFloat(open);
   const tradeClose = parseFloat(close);
   const tradeLow = parseFloat(low);
@@ -375,67 +375,67 @@ export const getWidgetOverrides = ({
   upColor: string;
   downColor: string;
 }) =>
-  //   {}: // appTheme,
-  // // appColorMode,
-  // {
-  //   // appTheme: AppTheme;
-  //   // appColorMode: AppColorMode;
-  // }
-  {
-    // const theme = Themes[appTheme][appColorMode];
+//   {}: // appTheme,
+// // appColorMode,
+// {
+//   // appTheme: AppTheme;
+//   // appColorMode: AppColorMode;
+// }
+{
+  // const theme = Themes[appTheme][appColorMode];
 
-    return {
-      theme: "Dark" as const, // THEME_NAMES[appTheme],
-      overrides: {
-        volumePaneSize: "tiny",
-        "paneProperties.leftAxisProperties.background": "#000000", // 左侧背景色
-        "paneProperties.leftAxisProperties.backgroundTransparency": 50, // 透明度 (0-100)
+  return {
+    theme: "Dark" as const, // THEME_NAMES[appTheme],
+    overrides: {
+      volumePaneSize: "tiny",
+      "paneProperties.leftAxisProperties.background": "#000000", // 左侧背景色
+      "paneProperties.leftAxisProperties.backgroundTransparency": 50, // 透明度 (0-100)
 
-        // 'paneProperties.background': theme.layer2,
-        // 'paneProperties.horzGridProperties.color': theme.layer3,
-        // 'paneProperties.vertGridProperties.color': theme.layer3,
-        "paneProperties.crossHairProperties.style": 1,
-        "paneProperties.legendProperties.showBarChange": false,
-        "paneProperties.backgroundType": "solid" as const,
+      // 'paneProperties.background': theme.layer2,
+      // 'paneProperties.horzGridProperties.color': theme.layer3,
+      // 'paneProperties.vertGridProperties.color': theme.layer3,
+      "paneProperties.crossHairProperties.style": 1,
+      "paneProperties.legendProperties.showBarChange": false,
+      "paneProperties.backgroundType": "solid" as const,
 
-        "mainSeriesProperties.style": 1,
-        // 'mainSeriesProperties.candleStyle.upColor': theme.positive,
-        // 'mainSeriesProperties.candleStyle.borderUpColor': theme.positive,
-        // 'mainSeriesProperties.candleStyle.wickUpColor': theme.positive,
-        // 'mainSeriesProperties.candleStyle.downColor': theme.negative,
-        // 'mainSeriesProperties.candleStyle.borderDownColor': theme.negative,
-        // 'mainSeriesProperties.candleStyle.wickDownColor': theme.negative,
-        "mainSeriesProperties.statusViewStyle.symbolTextSource": "ticker",
+      "mainSeriesProperties.style": 1,
+      // 'mainSeriesProperties.candleStyle.upColor': theme.positive,
+      // 'mainSeriesProperties.candleStyle.borderUpColor': theme.positive,
+      // 'mainSeriesProperties.candleStyle.wickUpColor': theme.positive,
+      // 'mainSeriesProperties.candleStyle.downColor': theme.negative,
+      // 'mainSeriesProperties.candleStyle.borderDownColor': theme.negative,
+      // 'mainSeriesProperties.candleStyle.wickDownColor': theme.negative,
+      "mainSeriesProperties.statusViewStyle.symbolTextSource": "ticker",
 
-        // 'scalesProperties.textColor': theme.textPrimary,
-        // 'scalesProperties.backgroundColor': theme.layer2,
-        // 'scalesProperties.lineColor': theme.layer3,
-        "scalesProperties.fontSize": 12,
-      } as Partial<ChartPropertiesOverrides>,
-      studies_overrides: {
-        "volume.volume.color.1": upColor,
-        "volume.volume.color.0": downColor,
-        "volume.volume.transparency": 60,
-        "volume.volume ma.visible": false,
-        // 'relative strength index.plot.color': theme.accent,
-        "relative strength index.plot.linewidth": 1.5,
-        "relative strength index.hlines background.color": "#134A9F",
-      },
-      // 添加时间刻度配置
-      timeScale: {
-        visible: true,
-        timeVisible: true,
-        secondsVisible: false,
-        rightOffset: 5,
-        barSpacing: 6,
-        minBarSpacing: 4,
-      },
-      loading_screen: {
-        // backgroundColor: theme.layer2,
-        // foregroundColor: theme.layer2,
-      },
-    };
+      // 'scalesProperties.textColor': theme.textPrimary,
+      // 'scalesProperties.backgroundColor': theme.layer2,
+      // 'scalesProperties.lineColor': theme.layer3,
+      "scalesProperties.fontSize": 12,
+    } as Partial<ChartPropertiesOverrides>,
+    studies_overrides: {
+      "volume.volume.color.1": upColor,
+      "volume.volume.color.0": downColor,
+      "volume.volume.transparency": 60,
+      "volume.volume ma.visible": false,
+      // 'relative strength index.plot.color': theme.accent,
+      "relative strength index.plot.linewidth": 1.5,
+      "relative strength index.hlines background.color": "#134A9F",
+    },
+    // 添加时间刻度配置
+    timeScale: {
+      visible: true,
+      timeVisible: true,
+      secondsVisible: false,
+      rightOffset: 5,
+      barSpacing: 6,
+      minBarSpacing: 4,
+    },
+    loading_screen: {
+      // backgroundColor: theme.layer2,
+      // foregroundColor: theme.layer2,
+    },
   };
+};
 
 export const getWidgetOptions = (
   {
@@ -504,11 +504,11 @@ export const getWidgetOptions = (
 
 export const subscriptionsByGuid: {
   [guid: string]:
-    | {
-        guid: string;
-        unsub: () => void;
-      }
-    | undefined;
+  | {
+    guid: string;
+    unsub: () => void;
+  }
+  | undefined;
 } = {};
 
 export const getTvWidgetChartPropertiesOverrides = ({

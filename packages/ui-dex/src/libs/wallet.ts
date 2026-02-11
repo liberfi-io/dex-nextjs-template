@@ -1,25 +1,50 @@
-import { WalletBalanceDetailDTO, WalletBalancesDTO } from "@chainstream-io/sdk";
+import { PnlDetailItemDTO, PnlDetailsPage, WalletNetWorthItemDTO, WalletNetWorthPage } from "@chainstream-io/sdk";
 import { CHAIN_ID, chainSlugs } from "@liberfi/core";
 import { PRIMARY_TOKENS_MAP } from "./tokenUtils";
 import { capitalize } from "lodash-es";
 import { PublicKey } from "@solana/web3.js";
 
-export function appendPrimaryTokenBalances(
+export function appendPrimaryTokenNetWorth(
   chainId: CHAIN_ID,
-  inWallet: WalletBalancesDTO,
-): WalletBalancesDTO {
-  const wallet = { ...inWallet, balances: [...(inWallet.balances ?? [])] };
+  inWalletNetWorth: WalletNetWorthPage,
+): WalletNetWorthPage {
+  const walletNetWorth = { ...inWalletNetWorth, data: [...(inWalletNetWorth.data ?? [])] };
   (PRIMARY_TOKENS_MAP[chainId] ?? []).forEach((token) => {
-    const balance = wallet.balances.find((it) => it.tokenAddress === token.address);
+    const balance = walletNetWorth.data.find((it) => it.tokenAddress === token.address);
     if (!balance) {
-      wallet.balances.push({
+      walletNetWorth.data.push({
         tokenAddress: token.address,
         name: token.name,
         symbol: token.symbol,
-      } as WalletBalanceDetailDTO);
+        logoUri: token.imageUrl,
+        amount: "0",
+        valueInUsd: "0",
+        valueInNative: "0",
+        priceInUsd: "0",
+        priceInNative: "0",
+      } as WalletNetWorthItemDTO);
     }
   });
-  return wallet;
+  return walletNetWorth;
+}
+
+export function appendPrimaryTokenPnl(
+  chainId: CHAIN_ID,
+  inWalletPnl: PnlDetailsPage,
+): PnlDetailsPage {
+  const walletPnl = { ...inWalletPnl, data: [...(inWalletPnl.data ?? [])] };
+  (PRIMARY_TOKENS_MAP[chainId] ?? []).forEach((token) => {
+    const details = walletPnl.data.find((it) => it.tokenAddress === token.address);
+    if (!details) {
+      walletPnl.data.push({
+        tokenAddress: token.address,
+        name: token.name,
+        symbol: token.symbol,
+        logoUri: token.imageUrl,
+      } as PnlDetailItemDTO);
+    }
+  });
+  return walletPnl;
 }
 
 // 示例: https://opencrypto.pro/widget-page/mobileTran?widgetId=STlhSHJkZEc&tradeType=buy&cryptoCoin=USDT&network=Solana&walletAddress=2efnxsDRZRoFgdPRk2CadaN8SvmiZMHChd285AAjPU86&locale=en&fiatCoin=USD&fiatAmt=200
@@ -148,7 +173,7 @@ export const getBubbleMapUrl = (chainId: CHAIN_ID, tokenAddress: string) => {
   switch (chainId) {
     case CHAIN_ID.SOLANA:
       return `https://app.insightx.network/bubblemaps/solana/${tokenAddress}`;
-      // return `https://faster100x.com/zh/embedded?tokenAddress=${tokenAddress}&tokenChain=sol`;
+    // return `https://faster100x.com/zh/embedded?tokenAddress=${tokenAddress}&tokenChain=sol`;
   }
   return undefined;
 };

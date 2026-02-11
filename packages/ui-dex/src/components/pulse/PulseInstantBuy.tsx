@@ -17,7 +17,7 @@ import {
   useAppSdk,
   useAuthenticatedCallback,
   useTranslation,
-  useWalletPrimaryTokenBalance,
+  useWalletPrimaryTokenNetWorth,
 } from "@liberfi/ui-base";
 import { usePulseListContext } from "./PulseListContext";
 import { useSwap, useTradeBuySettings } from "@/hooks";
@@ -55,7 +55,7 @@ export function PulseInstantBuy({ token }: PulseInstantBuyProps) {
     [buySettings, pulseSettings, type],
   );
 
-  const balance = useWalletPrimaryTokenBalance();
+  const primaryTokenNetWorth = useWalletPrimaryTokenNetWorth();
 
   const primaryTokenSymbol = useMemo(
     () => (chain ? getPrimaryTokenSymbol(chain) : undefined),
@@ -75,7 +75,13 @@ export function PulseInstantBuy({ token }: PulseInstantBuyProps) {
   const { swap } = useSwap();
 
   const handleInstantBuy = useAuthenticatedCallback(async () => {
-    if (!balance?.amount || !primaryTokenAddress || !primaryTokenDecimals || !token.address) return;
+    if (
+      !primaryTokenNetWorth?.amount ||
+      !primaryTokenAddress ||
+      !primaryTokenDecimals ||
+      !token.address
+    )
+      return;
 
     if (!instantBuyAmount || new BigNumber(instantBuyAmount).lte(0.0001)) {
       toast.error(
@@ -85,7 +91,7 @@ export function PulseInstantBuy({ token }: PulseInstantBuyProps) {
     }
 
     // balance is insufficient
-    if (new BigNumber(balance.amount).lt(instantBuyAmount)) {
+    if (new BigNumber(primaryTokenNetWorth.amount).lt(instantBuyAmount)) {
       toast.error(t("extend.trade.buy_insufficient_balance"));
       appSdk.events.emit("deposit:open");
       return;
@@ -126,7 +132,7 @@ export function PulseInstantBuy({ token }: PulseInstantBuyProps) {
     primaryTokenDecimals,
     primaryTokenAddress,
     swap,
-    balance?.amount,
+    primaryTokenNetWorth?.amount,
     presetSettings,
   ]);
 

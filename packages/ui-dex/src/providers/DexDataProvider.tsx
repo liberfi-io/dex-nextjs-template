@@ -1,6 +1,11 @@
 import { PropsWithChildren, useEffect } from "react";
 import { useAtomValue } from "jotai";
-import { chainAtom, useRefreshWalletBalances } from "@liberfi/ui-base";
+import {
+  chainAtom,
+  useRefreshWalletNetWorth,
+  useRefreshWalletPnl,
+  useRefreshWalletPnlDetails,
+} from "@liberfi/ui-base";
 import { setCurrentQuoteSymbol } from "@/states";
 import { CHAIN_QUOTE_TOKEN_SYMBOLS } from "@/libs";
 
@@ -16,7 +21,11 @@ export function DexDataProvider({ children }: PropsWithChildren) {
   }, [chain]);
 
   // keep wallet balances updated
-  useRefreshWalletBalances();
+  useRefreshWalletNetWorth();
+
+  useRefreshWalletPnl();
+
+  useRefreshWalletPnlDetails();
 
   return children;
 }

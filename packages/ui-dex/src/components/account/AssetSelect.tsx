@@ -1,7 +1,6 @@
-import { WalletBalanceDetailDTO } from "@chainstream-io/sdk";
 import { Listbox, ListboxItem, Skeleton } from "@heroui/react";
 import { CONFIG, CHAIN_ID } from "@liberfi/core";
-import { useTranslation, walletBalancesAtom } from "@liberfi/ui-base";
+import { useTranslation, walletNetWorthAtom } from "@liberfi/ui-base";
 import BigNumber from "bignumber.js";
 import clsx from "clsx";
 import { useAtomValue } from "jotai";
@@ -9,6 +8,7 @@ import { useMemo } from "react";
 import { EmptyData } from "../EmptyData";
 import { Number } from "../Number";
 import { TokenAvatar } from "../TokenAvatar";
+import { WalletNetWorthItemDTO } from "@chainstream-io/sdk";
 
 type AssetSelectProps = {
   chainId?: CHAIN_ID;
@@ -35,12 +35,12 @@ export function AssetSelect({
 }
 
 function List({ exceptTokenAddresses = [], onSelect, onBuy, onReceive }: AssetSelectProps) {
-  const wallet = useAtomValue(walletBalancesAtom);
+  const walletNetWorth = useAtomValue(walletNetWorthAtom);
 
   const balances = useMemo(() => {
-    if (!wallet) return [];
+    if (!walletNetWorth) return [];
     return (
-      (wallet.balances ?? [])
+      (walletNetWorth.data ?? [])
         // 过滤掉余额为0
         .filter((it) => new BigNumber(it.valueInUsd).gt(0))
         // 过滤掉不可用的代币
@@ -48,9 +48,9 @@ function List({ exceptTokenAddresses = [], onSelect, onBuy, onReceive }: AssetSe
         // 按余额由多到少排序
         .sort((a, b) => new BigNumber(b.valueInUsd).minus(a.valueInUsd).toNumber())
     );
-  }, [wallet, exceptTokenAddresses]);
+  }, [walletNetWorth, exceptTokenAddresses]);
 
-  if (!wallet) {
+  if (!walletNetWorth) {
     return <Skeletons />;
   }
 
@@ -81,15 +81,15 @@ function List({ exceptTokenAddresses = [], onSelect, onBuy, onReceive }: AssetSe
 }
 
 type ListItemProps = {
-  balance: WalletBalanceDetailDTO;
+  balance: WalletNetWorthItemDTO;
 };
 
 function ListItem({ balance }: ListItemProps) {
   return (
     <div className="w-full h-14 flex items-center gap-2">
-      {balance.imageUrl ? (
+      {balance.logoUri ? (
         <div className="flex-0">
-          <TokenAvatar src={balance.imageUrl} name={balance.symbol} size={32} />
+          <TokenAvatar src={balance.logoUri} name={balance.symbol} size={32} />
         </div>
       ) : (
         <Skeleton className="flex-0 w-8 h-8 rounded-full" />

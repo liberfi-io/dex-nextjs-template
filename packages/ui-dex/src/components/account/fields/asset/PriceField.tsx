@@ -2,14 +2,14 @@ import { ListField } from "@/components/ListField";
 import { formatPercentage } from "@/libs";
 import { useMemo } from "react";
 import { BearishIcon, BullishIcon } from "@/assets";
-import { Token, WalletBalanceDetailDTO } from "@chainstream-io/sdk";
+import { Token, WalletNetWorthItemDTO } from "@chainstream-io/sdk";
 import BigNumber from "bignumber.js";
 import { Number } from "@/components/Number";
 
 export interface PriceFieldProps {
   className?: string;
   token?: Token;
-  balance: WalletBalanceDetailDTO;
+  balance: WalletNetWorthItemDTO;
 }
 
 export function PriceField({ className, token, balance }: PriceFieldProps) {
@@ -20,8 +20,8 @@ export function PriceField({ className, token, balance }: PriceFieldProps) {
   }, [token, balance]);
 
   const priceChangeRatioInUsd24h = useMemo(
-    () => token?.stats?.priceChangeRatioInUsd24h ?? balance.priceChangeRatioInUsd24h,
-    [token, balance],
+    () => token?.stats?.periods?.["24h"]?.priceChangeRatioInUsd,
+    [token],
   );
 
   const bullish = useMemo(

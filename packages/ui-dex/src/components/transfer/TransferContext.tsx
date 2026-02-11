@@ -11,7 +11,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { Token, WalletBalanceDetailDTO } from "@chainstream-io/sdk";
+import { Token, WalletNetWorthItemDTO } from "@chainstream-io/sdk";
 import {
   chainAtom,
   useAppSdk,
@@ -19,7 +19,7 @@ import {
   useTimerToast,
   useTranslation,
   useWallet,
-  walletBalancesAtom,
+  walletNetWorthAtom,
 } from "@liberfi/ui-base";
 import { ClientError } from "graphql-request";
 import { useAtomValue } from "jotai";
@@ -32,7 +32,7 @@ import { useTokenQuery } from "@liberfi/react-dex";
 
 export type TransferContextValue = {
   tokenAddress?: string | null;
-  tokenBalance?: WalletBalanceDetailDTO | null;
+  tokenBalance?: WalletNetWorthItemDTO | null;
   token?: Token | null;
   setTokenAddress: (tokenAddress: string) => void;
   walletAddress?: string | null;
@@ -79,7 +79,7 @@ export function TransferProvider({
   const chain = useAtomValue(chainAtom);
 
   // 用户账户余额
-  const wallet = useAtomValue(walletBalancesAtom);
+  const walletNetWorth = useAtomValue(walletNetWorthAtom);
 
   // 代币地址
   const [tokenAddress, setTokenAddress] = useState(defaultTokenAddress ?? "");
@@ -111,8 +111,8 @@ export function TransferProvider({
 
   // 代币余额
   const tokenBalance = useMemo(
-    () => (wallet?.balances ?? []).find((it) => it.tokenAddress === tokenAddress),
-    [wallet, tokenAddress],
+    () => (walletNetWorth?.data ?? []).find((it) => it.tokenAddress === tokenAddress),
+    [walletNetWorth, tokenAddress],
   );
 
   // 转账代币数量
@@ -242,7 +242,9 @@ export function TransferProvider({
       const serializedTx = transaction.serializedTx;
 
       // sign tx
-      const signedTxBuffer = await walletInstance.signTransaction(Buffer.from(serializedTx, "base64"));
+      const signedTxBuffer = await walletInstance.signTransaction(
+        Buffer.from(serializedTx, "base64"),
+      );
       const signedTx = Buffer.from(signedTxBuffer).toString("base64");
 
       // send tx

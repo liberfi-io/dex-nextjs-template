@@ -1,32 +1,29 @@
 import { ListField } from "@/components/ListField";
 import { formatPercentage } from "@/libs";
 import { useMemo } from "react";
-import { Token, WalletBalanceDetailDTO } from "@chainstream-io/sdk";
+import { PnlDetailItemDTO, Token, WalletNetWorthItemDTO } from "@chainstream-io/sdk";
 import { Number } from "@/components/Number";
 import BigNumber from "bignumber.js";
 
 export interface PnlFieldProps {
   className?: string;
   token?: Token;
-  balance: WalletBalanceDetailDTO;
+  balance: WalletNetWorthItemDTO;
+  pnlDetail?: PnlDetailItemDTO;
   compact?: boolean;
 }
 
-export function PnlField({ className, balance, compact = false }: PnlFieldProps) {
+export function PnlField({ className, pnlDetail, compact = false }: PnlFieldProps) {
   const profitBearish = useMemo(
     () =>
-      balance.totalRealizedProfitInUsd
-        ? new BigNumber(balance.totalRealizedProfitInUsd).lt(0)
-        : false,
-    [balance],
+      pnlDetail?.realizedProfitInUsd ? new BigNumber(pnlDetail.realizedProfitInUsd).lt(0) : false,
+    [pnlDetail],
   );
 
   const profitRatioBearish = useMemo(
     () =>
-      balance.totalRealizedProfitRatio
-        ? new BigNumber(balance.totalRealizedProfitRatio).lt(0)
-        : false,
-    [balance],
+      pnlDetail?.realizedProfitRatio ? new BigNumber(pnlDetail.realizedProfitRatio).lt(0) : false,
+    [pnlDetail],
   );
 
   return (
@@ -36,7 +33,7 @@ export function PnlField({ className, balance, compact = false }: PnlFieldProps)
           {profitBearish ? "-" : "+"}
           <span>
             <Number
-              value={new BigNumber(balance.totalRealizedProfitInUsd ?? 0).abs().toNumber()}
+              value={new BigNumber(pnlDetail?.realizedProfitInUsd ?? 0).abs().toNumber()}
               abbreviate
               defaultCurrencySign="$"
             />
@@ -47,7 +44,7 @@ export function PnlField({ className, balance, compact = false }: PnlFieldProps)
           data-bearish={profitRatioBearish}
         >
           {profitRatioBearish ? "-" : "+"}
-          {formatPercentage(new BigNumber(balance.totalRealizedProfitRatio ?? 0).abs().toNumber())}
+          {formatPercentage(new BigNumber(pnlDetail?.realizedProfitRatio ?? 0).abs().toNumber())}
         </div>
       </div>
     </ListField>
