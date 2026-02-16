@@ -1,7 +1,12 @@
 "use client";
 
 import { clsx } from "@liberfi.io/ui";
-import { hideHeaderOnLayoutAtom, useRouter, useSetBottomNavigationBarActiveKey, useShowBottomNavigationBar } from "@liberfi/ui-base";
+import {
+  hideHeaderOnLayoutAtom,
+  useRouter,
+  useSetBottomNavigationBarActiveKey,
+  useShowBottomNavigationBar,
+} from "@liberfi/ui-base";
 import { useSetAtom } from "jotai";
 import { useEffect } from "react";
 import { EventsWidget } from "@liberfi.io/ui-predict";
@@ -33,10 +38,15 @@ export function PredictPage() {
         "max-sm:h-[calc(100vh-0.625rem-var(--footer-height))]",
       )}
     >
-      <div className="p-2 sm:p-4 w-full max-w-[1550px] mx-auto">
-        <EventsWidget onSelect={(event) => {
-          navigate(`/predict/${event.id}`);
-        }} />
+      <div className="p-2 sm:p-4 w-full h-full max-w-[1550px] mx-auto">
+        <EventsWidget
+          onSelect={(event) => {
+            navigate(`/predict/${event.ticker}`);
+          }}
+          onSelectOutcome={(outcome) => {
+            navigate(`/predict/${outcome.ticker}`);
+          }}
+        />
       </div>
     </div>
   );

@@ -1,10 +1,14 @@
 "use client";
 
 import { clsx } from "@liberfi.io/ui";
-import { hideHeaderOnLayoutAtom, useSetBottomNavigationBarActiveKey, useShowBottomNavigationBar } from "@liberfi/ui-base";
+import {
+  hideHeaderOnLayoutAtom,
+  useSetBottomNavigationBarActiveKey,
+  useShowBottomNavigationBar,
+} from "@liberfi/ui-base";
 import { useSetAtom } from "jotai";
 import { useEffect } from "react";
-import { EventDetailWidget } from "@liberfi.io/ui-predict";
+import { EventDetailPage } from "@liberfi.io/ui-predict";
 
 export function PredictDetailPage({ id }: { id: string }) {
   // hide header on mobile
@@ -31,8 +35,8 @@ export function PredictDetailPage({ id }: { id: string }) {
         "max-sm:h-[calc(100vh-0.625rem-var(--footer-height))]",
       )}
     >
-      <div className="p-2 sm:p-4 w-full max-w-[1550px] mx-auto">
-        <EventDetailWidget eventId={id} />
+      <div className="p-2 sm:p-4 flex w-full max-w-[1550px] mx-auto">
+        <EventDetailPage eventId={id} />
       </div>
     </div>
   );
