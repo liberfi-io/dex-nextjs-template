@@ -39,8 +39,8 @@ importers:
         specifier: ^0.1.13
         version: 0.1.13(fastestsmallesttextencoderdecoder@1.0.22)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)(ws@7.5.10(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@liberfi.io/i18n':
-        specifier: ^0.1.15
-        version: 0.1.15(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
+        specifier: ^0.1.17
+        version: 0.1.17(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
       '@liberfi.io/types':
         specifier: ^0.1.13
         version: 0.1.13
@@ -57,8 +57,8 @@ importers:
         specifier: ^0.1.16
         version: 0.1.16(@emotion/is-prop-valid@1.2.2)(@types/react@18.3.23)(fastestsmallesttextencoderdecoder@1.0.22)(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwind-merge@3.3.1)(tailwindcss@4.1.11)(typescript@5.8.3)(ws@7.5.10(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@liberfi.io/ui-predict':
-        specifier: ^0.1.1
-        version: 0.1.1(@emotion/is-prop-valid@1.2.2)(@types/react@18.3.23)(fastestsmallesttextencoderdecoder@1.0.22)(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-is@18.3.1)(react@18.3.1)(redux@5.0.1)(tailwind-merge@3.3.1)(typescript@5.8.3)(ws@7.5.10(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+        specifier: ^0.1.2
+        version: 0.1.2(@emotion/is-prop-valid@1.2.2)(@types/react@18.3.23)(fastestsmallesttextencoderdecoder@1.0.22)(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-is@18.3.1)(react@18.3.1)(redux@5.0.1)(tailwind-merge@3.3.1)(typescript@5.8.3)(ws@7.5.10(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@liberfi.io/ui-scaffold':
         specifier: ^0.1.15
         version: 0.1.15(@emotion/is-prop-valid@1.2.2)(@types/react@18.3.23)(fastestsmallesttextencoderdecoder@1.0.22)(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwind-merge@3.3.1)(typescript@5.8.3)(ws@7.5.10(bufferutil@4.0.9)(utf-8-validate@5.0.10))
@@ -3996,6 +3996,13 @@ packages:
       react: '>=18'
       react-dom: '>=18'
 
+  '@liberfi.io/i18n@0.1.17':
+    resolution: {integrity: sha512-Iwml9eKepd7xyNnXIoXf9sCv2yWNj0zsmtcDJLdQ+LuS0fZOJdJQB78XPI//cK0FeG8UMZqjaJN/yKhlRWVevw==}
+    hasBin: true
+    peerDependencies:
+      react: '>=18'
+      react-dom: '>=18'
+
   '@liberfi.io/types@0.1.13':
     resolution: {integrity: sha512-EJgzuKhs5xm+6ediKDPWvVcnV5fjl0tDz0GmhaeGfGbo2o3mIdwiAnNs7ZlJvUksVAECB2odlw+j+4I9xlz1sQ==}
 
@@ -4018,8 +4025,8 @@ packages:
       react: '>=18'
       react-dom: '>=18'
 
-  '@liberfi.io/ui-predict@0.1.1':
-    resolution: {integrity: sha512-bHy+Q9SNi4BC9YFGRuHWrMxxTpxcSZUULMGwjc1wfhGftJ0BTAYKqrbVZcWzguOcYAHgMU4EOszN3zXmEAk52A==}
+  '@liberfi.io/ui-predict@0.1.2':
+    resolution: {integrity: sha512-mKDhI737QYRK8shgfqEe1ybTRNxkvDTG8qTQ/spxOh2yYimKP7JxANr6WgJIDk6z5D6j7OJovnvOVEspjaDVxA==}
     peerDependencies:
       react: '>=18'
       react-dom: '>=18'
@@ -16307,6 +16314,17 @@ snapshots:
       - react-native
       - typescript
 
+  '@liberfi.io/i18n@0.1.17(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)':
+    dependencies:
+      i18next: 25.6.0(typescript@5.8.3)
+      i18next-browser-languagedetector: 8.2.0
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      react-i18next: 15.7.4(i18next@25.6.0(typescript@5.8.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
+    transitivePeerDependencies:
+      - react-native
+      - typescript
+
   '@liberfi.io/types@0.1.13': {}
 
   '@liberfi.io/ui-chain-select@0.1.6(@emotion/is-prop-valid@1.2.2)(@types/react@18.3.23)(fastestsmallesttextencoderdecoder@1.0.22)(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwind-merge@3.3.1)(tailwindcss@4.1.11)(typescript@5.8.3)(ws@7.5.10(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
@@ -16423,11 +16441,11 @@ snapshots:
       - typescript
       - ws
 
-  '@liberfi.io/ui-predict@0.1.1(@emotion/is-prop-valid@1.2.2)(@types/react@18.3.23)(fastestsmallesttextencoderdecoder@1.0.22)(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-is@18.3.1)(react@18.3.1)(redux@5.0.1)(tailwind-merge@3.3.1)(typescript@5.8.3)(ws@7.5.10(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
+  '@liberfi.io/ui-predict@0.1.2(@emotion/is-prop-valid@1.2.2)(@types/react@18.3.23)(fastestsmallesttextencoderdecoder@1.0.22)(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-is@18.3.1)(react@18.3.1)(redux@5.0.1)(tailwind-merge@3.3.1)(typescript@5.8.3)(ws@7.5.10(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
       '@liberfi.io/client': 0.1.23(fastestsmallesttextencoderdecoder@1.0.22)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)(ws@7.5.10(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@liberfi.io/hooks': 0.1.13(fastestsmallesttextencoderdecoder@1.0.22)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)(ws@7.5.10(bufferutil@4.0.9)(utf-8-validate@5.0.10))
-      '@liberfi.io/i18n': 0.1.15(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
+      '@liberfi.io/i18n': 0.1.17(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
       '@liberfi.io/types': 0.1.13
       '@liberfi.io/ui': 0.1.15(@emotion/is-prop-valid@1.2.2)(@types/react@18.3.23)(fastestsmallesttextencoderdecoder@1.0.22)(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwind-merge@3.3.1)(typescript@5.8.3)(ws@7.5.10(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@liberfi.io/utils': 0.1.12(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(ws@7.5.10(bufferutil@4.0.9)(utf-8-validate@5.0.10))
