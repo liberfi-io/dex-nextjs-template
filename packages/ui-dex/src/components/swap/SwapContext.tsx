@@ -1,4 +1,4 @@
-import { getTxExplorerUrl, getWrappedAddress, SOL_TOKEN_DECIMALS } from "@/libs";
+import { getTxExplorerUrl, getWrappedAddress, SOL_TOKEN_DECIMALS } from "../../libs";
 import BigNumber from "bignumber.js";
 import {
   SendTxInputSubmitType,

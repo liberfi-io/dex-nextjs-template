@@ -1,4 +1,4 @@
-import { ListSort } from "@/components/ListSort";
+import { ListSort } from "../../ListSort";
 import { useTokenListContext } from "../TokenListContext";
 import { PropsWithChildren, useCallback } from "react";
 

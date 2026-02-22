@@ -1,4 +1,4 @@
-import { FilterIcon } from "@/assets/icons";
+import { FilterIcon } from "../assets/icons";
 import { useTranslation } from "@liberfi/ui-base";
 import { Button, Popover, PopoverContent, PopoverTrigger, useDisclosure } from "@heroui/react";
 import clsx from "clsx";

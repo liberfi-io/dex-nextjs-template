@@ -8,7 +8,7 @@ import {
   getWrappedAddress,
   SOL_TOKEN_ADDRESS,
   SOL_TOKEN_SYMBOL,
-} from "@liberfi/ui-dex/dist/libs";
+} from "@liberfi/ui-dex/libs";
 
 const options = [
   {

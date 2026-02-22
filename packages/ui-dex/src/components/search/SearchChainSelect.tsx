@@ -1,8 +1,8 @@
-import { ChainFilter, ChainFilterMobile, useTokenListContext } from "@/components/tokens";
+import { ChainFilter, ChainFilterMobile, useTokenListContext } from "../tokens";
 import { CHAIN_ID } from "@liberfi/core";
 import { Button } from "@heroui/react";
 import clsx from "clsx";
-import { ChainImage, NetworkIcon } from "@/assets";
+import { ChainImage, NetworkIcon } from "../../assets";
 import { useAtomValue } from "jotai";
 import { layoutAtom } from "@liberfi/ui-base";
 

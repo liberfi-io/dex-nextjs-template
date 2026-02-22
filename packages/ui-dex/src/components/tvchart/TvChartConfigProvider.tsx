@@ -8,7 +8,7 @@ import {
   TvChartSymbolResolver,
   TvChartTheme,
   TvChartType,
-} from "@/libs/tvchart";
+} from "../../libs/tvchart";
 import { PropsWithChildren, useEffect, useState } from "react";
 import {
   LanguageCode,

@@ -5,7 +5,7 @@ import clsx from "clsx";
 import { NumberInput } from "@heroui/react";
 import { formatCount3 } from "@liberfi/core";
 import { useTranslation } from "@liberfi/ui-base";
-import { defaultRaydiumLaunchPadFormValues } from "@/types";
+import { defaultRaydiumLaunchPadFormValues } from "../../types";
 
 export function RaydiumLaunchPadLockedInput() {
   const { control, trigger } = useFormContext();

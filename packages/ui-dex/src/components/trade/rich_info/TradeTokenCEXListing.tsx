@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ArrowDownIcon, ArrowUpIcon } from "@/assets";
-import { EmptyData } from "@/components/EmptyData";
+import { ArrowDownIcon, ArrowUpIcon } from "../../../assets";
+import { EmptyData } from "../../EmptyData";
 import { useTranslation } from "@liberfi/ui-base";
 import { Token } from "@chainstream-io/sdk";
 import { Button, Chip, Divider, Image } from "@heroui/react";

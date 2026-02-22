@@ -3,7 +3,7 @@ import { Button } from "@heroui/react";
 import { useTvChartManager } from "./TvChartProvider";
 import { useCallback, useEffect, useState } from "react";
 import clsx from "clsx";
-import { FullScreenIcon, RestoreScreenIcon } from "@/assets";
+import { FullScreenIcon, RestoreScreenIcon } from "../../assets";
 
 export function TvChartFullscreen({ className }: { className?: string }) {
   const chartManager = useTvChartManager();

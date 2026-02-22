@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { clsx } from "clsx";
 import { Button, Tooltip } from "@heroui/react";
 import { useCopyToClipboard, useTranslation } from "@liberfi/ui-base";
-import { formatShortAddress } from "@/libs";
+import { formatShortAddress } from "../../libs";
 import { TokenAvatar } from "../token";
 import { Token } from "@chainstream-io/sdk";
 import { RecursivePartial } from "@liberfi/core";

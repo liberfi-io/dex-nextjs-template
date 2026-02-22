@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useSetAtom } from "jotai";
 import { throttle } from "lodash-es";
-import { layoutAtom } from "@/states";
+import { layoutAtom } from "../states";
 
 const screenSizes = {
   sm: 640,

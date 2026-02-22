@@ -1,6 +1,6 @@
-import { ListField } from "@/components/ListField";
+import { ListField } from "../../../ListField";
 import { Button } from "@heroui/react";
-import { ShareIcon } from "@/assets";
+import { ShareIcon } from "../../../../assets";
 import { Token, WalletNetWorthItemDTO } from "@chainstream-io/sdk";
 
 export interface ActionsFieldProps {

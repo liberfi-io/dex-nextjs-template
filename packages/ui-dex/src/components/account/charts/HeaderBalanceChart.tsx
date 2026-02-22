@@ -1,4 +1,4 @@
-import { interpolateTimes } from "@/libs";
+import { interpolateTimes } from "../../../libs";
 import clsx from "clsx";
 import { useMemo } from "react";
 import { LineChart, Line, ResponsiveContainer, YAxis } from "recharts";

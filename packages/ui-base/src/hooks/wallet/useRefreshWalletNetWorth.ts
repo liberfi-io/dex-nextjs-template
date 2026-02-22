@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useWalletNetWorthQuery } from "@liberfi/react-dex";
-import { chainAtom, walletNetWorthAtom, walletNetWorthQueryStateAtom } from "@/states";
+import { chainAtom, walletNetWorthAtom, walletNetWorthQueryStateAtom } from "../../states";
 import { useCurrentWalletAddress } from "./useCurrentWalletAddress";
 
 export function useRefreshWalletNetWorth() {

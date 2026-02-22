@@ -1,7 +1,7 @@
 import { Button } from "@heroui/react";
-import { ViewListOutlinedIcon } from "@/assets";
+import { ViewListOutlinedIcon } from "../../../assets";
 import { ViewListFieldProps } from "./ViewListField";
-import { ListField } from "@/components/ListField";
+import { ListField } from "../../ListField";
 import clsx from "clsx";
 
 export function ViewListMobileField({ isViewed, onAction, className }: ViewListFieldProps) {

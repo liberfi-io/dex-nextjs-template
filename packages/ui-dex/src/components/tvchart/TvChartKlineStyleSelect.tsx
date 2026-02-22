@@ -3,7 +3,7 @@ import { useTvChartManager } from "./TvChartProvider";
 import { useTvChartToolbarContext } from "./TvChartToolbarProvider";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { SeriesType } from "../../../../../apps/web/public/static/charting_library/charting_library";
-import { TvChartKlineStyle } from "@/libs/tvchart";
+import { TvChartKlineStyle } from "../../libs/tvchart";
 import {
   KlineAreaIcon,
   KlineBarsIcon,
@@ -14,7 +14,7 @@ import {
   KlineHighLowIcon,
   KlineHollowCandlesIcon,
   KlineLineIcon,
-} from "@/assets";
+} from "../../assets";
 import { Button, Popover, PopoverContent, PopoverTrigger, useDisclosure } from "@heroui/react";
 import clsx from "clsx";
 

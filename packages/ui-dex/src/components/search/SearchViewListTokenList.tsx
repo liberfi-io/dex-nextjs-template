@@ -10,7 +10,7 @@ import { ListError } from "../ListError";
 import { ListEmptyData } from "../ListEmptyData";
 import { Listbox, ListboxItem } from "@heroui/react";
 import clsx from "clsx";
-import { tokenFilters, tokenSort } from "@/libs";
+import { tokenFilters, tokenSort } from "../../libs";
 import { Token } from "@chainstream-io/sdk";
 import { SearchDiscoverTokenListSkeleton } from "./SearchDiscoverTokenListSkeleton";
 import { SearchDiscoverTokenListItem } from "./SearchDiscoverTokenListItem";

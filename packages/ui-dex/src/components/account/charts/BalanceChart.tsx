@@ -1,11 +1,11 @@
-import { LineTooltip } from "@/components/chart/LineTooltip";
-import { interpolateTimes } from "@/libs";
+import { LineTooltip } from "../../chart/LineTooltip";
+import { interpolateTimes } from "../../../libs";
 import { Skeleton, Spinner, Tab, Tabs } from "@heroui/react";
 import { useTranslation, walletNetWorthAtom } from "@liberfi/ui-base";
 import clsx from "clsx";
 import { Key, useMemo, useState } from "react";
 import { Line, LineChart, ResponsiveContainer, YAxis, Tooltip } from "recharts";
-import { Number } from "@/components/Number";
+import { Number } from "../../Number";
 import { useAtomValue } from "jotai";
 
 export type BalanceChartProps = {

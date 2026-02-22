@@ -1,6 +1,6 @@
 import { useAppSdk, useAuthenticatedCallback, useTranslation } from "@liberfi/ui-base";
 import { AccountAction } from "./AccountAction";
-import { SendOutlinedIcon } from "@/assets/icons";
+import { SendOutlinedIcon } from "../../../assets/icons";
 
 export function SendAction() {
   const { t } = useTranslation();

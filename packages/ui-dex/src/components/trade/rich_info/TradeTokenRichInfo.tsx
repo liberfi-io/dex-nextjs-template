@@ -4,10 +4,10 @@ import { Key, useCallback, useState } from "react";
 import { TradeTokenAbout } from "./TradeTokenAbout";
 import { TradeTokenHolders } from "./TradeTokenHolders";
 import { TradeTokenTransactions } from "./TradeTokenTransactions";
-import { BubbleMapIcon } from "@/assets";
+import { BubbleMapIcon } from "../../../assets";
 import { CHAIN_ID } from "@liberfi/core";
-import { getBubbleMapUrl } from "@/libs";
-import { tokenInfoAtom } from "@/states";
+import { getBubbleMapUrl } from "../../../libs";
+import { tokenInfoAtom } from "../../../states";
 import { useAtomValue } from "jotai";
 
 export function TradeTokenRichInfo() {

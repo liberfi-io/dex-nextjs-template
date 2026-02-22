@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { AppSdkContext } from "@/providers";
+import { AppSdkContext } from "../providers";
 
 export function useAppSdk() {
   const context = useContext(AppSdkContext);

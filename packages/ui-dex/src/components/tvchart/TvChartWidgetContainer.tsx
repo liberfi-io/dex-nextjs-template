@@ -1,6 +1,6 @@
-import { TvChartLibraryWidget } from "@/libs/tvchart";
+import { TvChartLibraryWidget } from "../../libs/tvchart";
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
-import { TvChartLibraryWidgetBridge } from "@/libs/tvchart/TvChartLibraryWidgetBridge";
+import { TvChartLibraryWidgetBridge } from "../../libs/tvchart/TvChartLibraryWidgetBridge";
 import { useTvChartContext } from "./TvChartProvider";
 import { TvChartLayout } from "./TvChartLayout";
 

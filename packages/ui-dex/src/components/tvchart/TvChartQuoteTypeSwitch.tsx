@@ -2,9 +2,9 @@ import { useCallback, useMemo } from "react";
 import { useSetAtom } from "jotai";
 import clsx from "clsx";
 import { chainIdBySlug } from "@liberfi/core";
-import { isUSDChartAtom } from "@/states";
-import { CHAIN_QUOTE_TOKEN_SYMBOLS } from "@/libs";
-import { stringifySymbol, TvChartQuoteType } from "@/libs/tvchart";
+import { isUSDChartAtom } from "../../states";
+import { CHAIN_QUOTE_TOKEN_SYMBOLS } from "../../libs";
+import { stringifySymbol, TvChartQuoteType } from "../../libs/tvchart";
 import { useTvChartToolbarContext } from "./TvChartToolbarProvider";
 
 export function TvChartQuoteTypeSwitch({ className }: { className?: string }) {

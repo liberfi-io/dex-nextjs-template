@@ -5,7 +5,7 @@ import BigNumber from "bignumber.js";
 import { throttle } from "lodash-es";
 import { CHAIN_ID } from "@liberfi/core";
 import { chainParam, useDexClient } from "@liberfi/react-dex";
-import { stringifyTickerSymbol } from "@/libs";
+import { stringifyTickerSymbol } from "../libs";
 import { tokenLatestMarketCapAtom, tokenLatestPriceAtom } from "./trade";
 
 type PriceInfo = {

@@ -2,7 +2,7 @@ import { Controller, useFormContext, useWatch } from "react-hook-form";
 import clsx from "clsx";
 import { NumberInput, Select, SelectItem, Switch } from "@heroui/react";
 import { useTranslation } from "@liberfi/ui-base";
-import { defaultRaydiumLaunchPadFormValues } from "@/types";
+import { defaultRaydiumLaunchPadFormValues } from "../../types";
 import { useEffect } from "react";
 
 export function RaydiumLaunchPadVestingCliffInput() {

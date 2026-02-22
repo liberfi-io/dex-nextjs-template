@@ -1,6 +1,6 @@
 import { CHAIN_ID } from "@liberfi/core";
 import { useTokenListContext } from "../TokenListContext";
-import { ChainSelect, ChainSelectProps } from "@/components/ChainSelect";
+import { ChainSelect, ChainSelectProps } from "../../ChainSelect";
 
 export function ChainFilter(props: Pick<ChainSelectProps, "trigger">) {
   const { chainId, setChainId } = useTokenListContext();

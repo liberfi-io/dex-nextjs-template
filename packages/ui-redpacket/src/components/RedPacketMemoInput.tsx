@@ -1,7 +1,7 @@
 import { Controller, useFormContext } from "react-hook-form";
 import { Input } from "@heroui/react";
 import { useTranslation } from "@liberfi/ui-base";
-import { RedPacketMemoIcon } from "@/icons";
+import { RedPacketMemoIcon } from "../icons";
 
 export function RedPacketMemoInput() {
   const { control } = useFormContext();

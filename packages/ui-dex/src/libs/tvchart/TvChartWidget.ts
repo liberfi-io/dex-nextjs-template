@@ -8,7 +8,7 @@ import { TvChartDataFeed } from "./TvChartDataFeed";
 import { TvChartLibraryWidgetBridge } from "./TvChartLibraryWidgetBridge";
 import { TvChartManager } from "./TvChartManager";
 import { TvChartSettings } from "./TvChartSettings";
-import { duplicate, observableToPromise } from "@/libs";
+import { duplicate, observableToPromise } from "..";
 import { getTvChartLibraryResolution } from "./utils";
 import { TvChartResolution } from "./types";
 

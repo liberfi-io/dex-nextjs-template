@@ -5,7 +5,7 @@ import {
   FavoriteFilledIcon,
   FavoriteOutlinedIcon,
   TradeOutlinedIcon,
-} from "@/assets";
+} from "../../assets";
 import {
   Modal,
   useAppSdk,
@@ -20,8 +20,8 @@ import { useTradeDataContext } from "./providers";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { uniqBy } from "lodash-es";
 import { useRemoveTokenFromCollectionMutation } from "@liberfi/react-backend";
-import { AppRoute } from "@/libs";
-import { tokenInfoAtom } from "@/states";
+import { AppRoute } from "../../libs";
+import { tokenInfoAtom } from "../../states";
 import { useAtomValue } from "jotai";
 import { InstantTrade } from "./instant_trade";
 

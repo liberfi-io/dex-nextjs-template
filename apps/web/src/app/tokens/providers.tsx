@@ -3,9 +3,9 @@
 import { useParams, redirect } from "next/navigation";
 import { PropsWithChildren, useMemo } from "react";
 import { chainIdBySlug } from "@liberfi/core";
-import { AppRoute } from "@liberfi/ui-dex/dist/libs/routes";
-import { TradeDataLoader } from "@liberfi/ui-dex/dist/components/trade";
-import { TradeDataProvider } from "@liberfi/ui-dex/dist/components/trade/providers";
+import { AppRoute } from "@liberfi/ui-dex/libs/routes";
+import { TradeDataLoader } from "@liberfi/ui-dex/components/trade";
+import { TradeDataProvider } from "@liberfi/ui-dex/components/trade/providers";
 import { TradePage } from "@liberfi/ui-dex";
 
 export function Providers({ children }: PropsWithChildren) {

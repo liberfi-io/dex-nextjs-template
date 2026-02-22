@@ -1,5 +1,5 @@
 import { useTokenListContext } from "../TokenListContext";
-import { ListSort } from "@/components/ListSort";
+import { ListSort } from "../../ListSort";
 import { PropsWithChildren, useCallback } from "react";
 
 export function TxsSort({ children }: PropsWithChildren) {

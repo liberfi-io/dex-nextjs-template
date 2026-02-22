@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { BehaviorSubject } from "rxjs";
 import { CHAIN_ID } from "@liberfi/core";
-import { CHAIN_PRIMARY_TOKENS } from "@/libs";
+import { CHAIN_PRIMARY_TOKENS } from "../libs";
 import { dexClientSubject, queryClientSubject } from "@liberfi/ui-base";
 import { fetchTokenMarketData, QueryKeys } from "@liberfi/react-dex";
 

@@ -1,6 +1,6 @@
-import { Number } from "@/components/Number";
+import { Number } from "../../Number";
 import { useTranslation } from "@liberfi/ui-base";
-import { tokenBuyers, tokenSellers, tokenTraders } from "@/libs";
+import { tokenBuyers, tokenSellers, tokenTraders } from "../../../libs";
 import { Token } from "@chainstream-io/sdk";
 import { Progress } from "@heroui/react";
 import BigNumber from "bignumber.js";

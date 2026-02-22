@@ -1,5 +1,5 @@
-import { ArrowRightIcon, BullishIcon } from "@/assets/icons";
-import { AppRoute, formatPercentage } from "@/libs";
+import { ArrowRightIcon, BullishIcon } from "../../assets/icons";
+import { AppRoute, formatPercentage } from "../../libs";
 import { Link } from "@heroui/react";
 import { CONFIG } from "@liberfi/core";
 import { useAuthenticatedCallback, useRouter, useTranslation } from "@liberfi/ui-base";

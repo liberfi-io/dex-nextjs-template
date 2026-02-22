@@ -1,9 +1,9 @@
 import { useCallback, useMemo } from "react";
 import { useAtomValue } from "jotai";
 import { chainAtom } from "@liberfi/ui-base";
-import { tradeSellPresetAtom } from "@/states";
-import { useSaveTradeSellSettings, useTradeSellSettings } from "@/hooks";
-import { defaultSellSettingsValues, defaultTradePresetValues, TradePresetValues } from "@/types";
+import { tradeSellPresetAtom } from "../../../states";
+import { useSaveTradeSellSettings, useTradeSellSettings } from "../../../hooks";
+import { defaultSellSettingsValues, defaultTradePresetValues, TradePresetValues } from "../../../types";
 import { PresetForm } from "./PresetForm";
 
 export type SellTradeSettingsFormProps = {

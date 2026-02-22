@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { clsx } from "clsx";
-import { TradePresetValues } from "@/types";
+import { TradePresetValues } from "../../../types";
 import { SlippageInput } from "./SlippageInput";
 import { PriorityFeeInput } from "./PriorityFeeInput";
 import { TipFeeInput } from "./TipFeeInput";

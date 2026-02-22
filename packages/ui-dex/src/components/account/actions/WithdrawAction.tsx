@@ -1,7 +1,7 @@
-import { WithdrawOutlinedIcon } from "@/assets";
+import { WithdrawOutlinedIcon } from "../../../assets";
 import { AccountAction } from "./AccountAction";
 import { useAppSdk, useAuth, useAuthenticatedCallback, useTranslation } from "@liberfi/ui-base";
-import { getSellTokenUrl } from "@/libs";
+import { getSellTokenUrl } from "../../../libs";
 import { CHAIN_ID } from "@liberfi/core";
 
 export type WithdrawActionProps = {

@@ -10,7 +10,7 @@ import { ListEmptyData } from "../ListEmptyData";
 import { Listbox, ListboxItem } from "@heroui/react";
 import clsx from "clsx";
 import { SearchDiscoverTokenListSkeleton } from "./SearchDiscoverTokenListSkeleton";
-import { tokenFilters, tokenSort } from "@/libs";
+import { tokenFilters, tokenSort } from "../../libs";
 import { SearchDiscoverTokenListItem } from "./SearchDiscoverTokenListItem";
 import { useAtomValue } from "jotai";
 import { chainAtom, useAuth } from "@liberfi/ui-base";

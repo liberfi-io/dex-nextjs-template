@@ -1,4 +1,4 @@
-import { AppRoute } from "@/libs";
+import { AppRoute } from "../../libs";
 import { layoutAtom, useAuthenticatedCallback, useRouter } from "@liberfi/ui-base";
 import { Token } from "@chainstream-io/sdk";
 import clsx from "clsx";

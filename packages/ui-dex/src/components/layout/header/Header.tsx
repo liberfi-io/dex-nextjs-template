@@ -1,4 +1,4 @@
-// import { ChainSelect } from "@/components/ChainSelect";
+// import { ChainSelect } from "../../ChainSelect";
 import { HeaderAccountInfo } from "./HeaderAccountInfo";
 import { HeaderBrand } from "./HeaderBrand";
 import { HeaderLinks } from "./HeaderLinks";

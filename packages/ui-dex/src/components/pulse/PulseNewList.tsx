@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { Token } from "@chainstream-io/sdk";
 import { useTranslation } from "@liberfi/ui-base";
-import { usePulseWsNewTokens } from "@/hooks";
+import { usePulseWsNewTokens } from "../../hooks";
 import { PulseList } from "./PulseList";
 import { PulseListItemBondingTooltip } from "./PulseListItemBondingTooltip";
 import { RecursivePartial } from "@liberfi/core";

@@ -5,7 +5,7 @@ import { TradeTokenCategories } from "./TradeTokenCategories";
 import { TradeTokenCEXListing } from "./TradeTokenCEXListing";
 import { TradeTokenLiquidities, TradeTokenLiquiditiesSkeleton } from "./TradeTokenLiquidities";
 import { TradeTokenSecurity, TradeTokenSecuritySkeleton } from "./TradeTokenSecurity";
-import { tokenInfoAtom } from "@/states";
+import { tokenInfoAtom } from "../../../states";
 import { useAtomValue } from "jotai";
 
 export function TradeTokenAbout() {

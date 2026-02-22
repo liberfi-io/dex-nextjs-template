@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "jsx": "preserve",
     "allowJs": true,
     "skipLibCheck": true,
@@ -20,12 +24,78 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@liberfi/core": [
+        "../../packages/core/src"
+      ],
+      "@liberfi/locales": [
+        "../../packages/locales/src"
+      ],
+      "@liberfi/react-backend": [
+        "../../packages/react-backend/src"
+      ],
+      "@liberfi/react-dex": [
+        "../../packages/react-dex/src"
+      ],
+      "@liberfi/react-dex/*": [
+        "../../packages/react-dex/src/*"
+      ],
+      "@liberfi/react-launchpad": [
+        "../../packages/react-launchpad/src"
+      ],
+      "@liberfi/react-launchpad/*": [
+        "../../packages/react-launchpad/src/*"
+      ],
+      "@liberfi/react-redpacket": [
+        "../../packages/react-redpacket/src"
+      ],
+      "@liberfi/react-redpacket/*": [
+        "../../packages/react-redpacket/src/*"
+      ],
+      "@liberfi/ui-base": [
+        "../../packages/ui-base/src"
+      ],
+      "@liberfi/ui-dex": [
+        "../../packages/ui-dex/src"
+      ],
+      "@liberfi/ui-dex/*": [
+        "../../packages/ui-dex/src/*"
+      ],
+      "@liberfi/ui-launchpad": [
+        "../../packages/ui-launchpad/src"
+      ],
+      "@liberfi/ui-redpacket": [
+        "../../packages/ui-redpacket/src"
+      ],
+      "@liberfi/core/*": [
+        "../../packages/core/src/*"
+      ],
+      "@liberfi/locales/*": [
+        "../../packages/locales/src/*"
+      ],
+      "@liberfi/react-backend/*": [
+        "../../packages/react-backend/src/*"
+      ],
+      "@liberfi/ui-base/*": [
+        "../../packages/ui-base/src/*"
+      ],
+      "@liberfi/ui-launchpad/*": [
+        "../../packages/ui-launchpad/src/*"
+      ],
+      "@liberfi/ui-redpacket/*": [
+        "../../packages/ui-redpacket/src/*"
+      ]
     },
     "plugins": [
-      {"name": "next"}
+      {
+        "name": "next"
+      }
     ]
   },
-  "include": ["src", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "src",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

@@ -30,7 +30,7 @@ import {
 } from "./fields";
 import { FavoriteTokenListHeaders } from "./FavoriteTokenListHeaders";
 import { FavoriteTokenListSkeleton } from "./FavoriteTokenListSkeleton";
-import { AppRoute, tokenFilters, tokenSort } from "@/libs";
+import { AppRoute, tokenFilters, tokenSort } from "../../libs";
 import { useTokenListContext } from "./TokenListContext";
 import { Token } from "@chainstream-io/sdk";
 import { Virtuoso } from "react-virtuoso";

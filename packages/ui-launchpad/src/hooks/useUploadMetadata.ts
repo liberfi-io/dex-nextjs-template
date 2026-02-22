@@ -1,4 +1,4 @@
-import { createMintMetadataFile } from "@/utils";
+import { createMintMetadataFile } from "../utils";
 import { useUpload } from "@liberfi/ui-base";
 import { useCallback } from "react";
 

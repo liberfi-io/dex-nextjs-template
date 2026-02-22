@@ -12,7 +12,7 @@ import {
   TradeHeaderTokenInfo,
   TradeFooter,
   InstantTrade,
-} from "@/components/trade";
+} from "../components/trade";
 
 export function TradePage() {
   // hide header on tablet & mobile

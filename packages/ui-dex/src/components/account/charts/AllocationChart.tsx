@@ -1,5 +1,5 @@
-import { PieActiveShape, PiePayload } from "@/components/chart";
-import { CHART_COLORS } from "@/libs";
+import { PieActiveShape, PiePayload } from "../../chart";
+import { CHART_COLORS } from "../../../libs";
 import { Button } from "@heroui/react";
 import { CHAIN_ID, chainSlugs } from "@liberfi/core";
 import clsx from "clsx";

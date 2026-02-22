@@ -1,5 +1,5 @@
-import { ListField } from "@/components/ListField";
-import { ChainAddress } from "@/components/ChainAddress";
+import { ListField } from "../../../ListField";
+import { ChainAddress } from "../../../ChainAddress";
 import { Token, WalletNetWorthItemDTO } from "@chainstream-io/sdk";
 
 export interface ContractFieldProps {

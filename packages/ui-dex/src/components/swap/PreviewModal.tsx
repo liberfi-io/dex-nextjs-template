@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ArrowDownIcon, ArrowUpIcon, TradeOutlinedIcon, WithdrawOutlinedIcon } from "@/assets";
+import { ArrowDownIcon, ArrowUpIcon, TradeOutlinedIcon, WithdrawOutlinedIcon } from "../../assets";
 import { useTranslation } from "@liberfi/ui-base";
 import { useTokensQuery } from "@liberfi/react-dex";
 import BigNumber from "bignumber.js";

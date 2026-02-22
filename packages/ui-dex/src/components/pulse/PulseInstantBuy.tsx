@@ -20,11 +20,11 @@ import {
   useWalletPrimaryTokenNetWorth,
 } from "@liberfi/ui-base";
 import { usePulseListContext } from "./PulseListContext";
-import { useSwap, useTradeBuySettings } from "@/hooks";
-import { defaultTradePresetValues } from "@/types";
+import { useSwap, useTradeBuySettings } from "../../hooks";
+import { defaultTradePresetValues } from "../../types";
 import { useAtomValue } from "jotai";
 import { toast } from "react-hot-toast";
-import { pulseSettingsAtom } from "@/states";
+import { pulseSettingsAtom } from "../../states";
 
 export type PulseInstantBuyProps = {
   token: RecursivePartial<Token>;

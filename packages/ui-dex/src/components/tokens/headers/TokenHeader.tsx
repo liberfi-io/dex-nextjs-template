@@ -1,4 +1,4 @@
-import { ListHeader } from "@/components/ListHeader";
+import { ListHeader } from "../../ListHeader";
 import { useTranslation } from "@liberfi/ui-base";
 
 export type TokenHeaderProps = {

@@ -1,4 +1,4 @@
-import { ListHeader } from "@/components/ListHeader";
+import { ListHeader } from "../../ListHeader";
 import { AgeFilter } from "../filters";
 import { AgeSort } from "../sorts";
 import { useTranslation } from "@liberfi/ui-base";

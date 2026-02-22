@@ -4,7 +4,7 @@ import { useAtomValue } from "jotai";
 import { BigNumber } from "bignumber.js";
 import { formatPrice, getPrimaryTokenSymbol, SOL_TOKEN_SYMBOL } from "@liberfi/core";
 import { chainAtom } from "@liberfi/ui-base";
-import { tokenInfoAtom, tokenLatestPriceAtom, useQuotePrice } from "@/states";
+import { tokenInfoAtom, tokenLatestPriceAtom, useQuotePrice } from "../../../states";
 
 export type SellTokenAmountProps = {
   amount: number | undefined;

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useWalletPnlDetailsQuery } from "@liberfi/react-dex";
-import { chainAtom, walletPnlDetailsAtom, walletPnlDetailsQueryStateAtom } from "@/states";
+import { chainAtom, walletPnlDetailsAtom, walletPnlDetailsQueryStateAtom } from "../../states";
 import { useCurrentWalletAddress } from "./useCurrentWalletAddress";
 
 export function useRefreshWalletPnlDetails() {

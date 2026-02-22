@@ -1,4 +1,4 @@
-import { ArrowLeftIcon } from "@/assets";
+import { ArrowLeftIcon } from "../../assets";
 import { Button } from "@heroui/react";
 import clsx from "clsx";
 import { PropsWithChildren } from "react";

@@ -1,7 +1,7 @@
 import { useTokensQuery } from "@liberfi/react-dex";
 import { useWalletClaimsQuery } from "@liberfi/react-redpacket";
 import { chainAtom, useAuth } from "@liberfi/ui-base";
-import { ListEmptyData } from "@liberfi/ui-dex/dist/components/ListEmptyData";
+import { ListEmptyData } from "@liberfi/ui-dex/components/ListEmptyData";
 import { useAtomValue } from "jotai";
 import { keyBy } from "lodash-es";
 import { useMemo } from "react";

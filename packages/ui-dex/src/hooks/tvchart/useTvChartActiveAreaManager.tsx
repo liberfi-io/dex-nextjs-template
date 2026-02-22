@@ -1,5 +1,5 @@
-import { useTvChartManager } from "@/components/tvchart/TvChartProvider";
-import { TvChartAreaManager } from "@/libs/tvchart/TvChartAreaManager";
+import { useTvChartManager } from "../../components/tvchart/TvChartProvider";
+import { TvChartAreaManager } from "../../libs/tvchart/TvChartAreaManager";
 import { useEffect, useState } from "react";
 
 export function useTvChartActiveAreaManager() {

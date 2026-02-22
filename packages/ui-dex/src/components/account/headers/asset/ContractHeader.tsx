@@ -1,5 +1,5 @@
 import { useTranslation } from "@liberfi/ui-base";
-import { ListHeader } from "@/components/ListHeader";
+import { ListHeader } from "../../../ListHeader";
 
 export type ContractHeaderProps = {
   className?: string;

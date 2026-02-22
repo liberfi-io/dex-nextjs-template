@@ -32,7 +32,7 @@ import {
   TV_CHART_LIGHT_THEME_COLORS,
   TV_CHART_THEME_COLORS,
 } from "./constants";
-import { checkKeyboardShortcut, createEventObservable, getCssPropertyValue } from "@/libs";
+import { checkKeyboardShortcut, createEventObservable, getCssPropertyValue } from "..";
 import { TvChartDataFeed } from "./TvChartDataFeed";
 import { TvChartSaveLoadAdapter } from "./TvChartSaveLoadAdapter";
 import { TvChartSettingsAdapter } from "./TvChartSettingsAdapter";

@@ -1,4 +1,4 @@
-import { ArrowDownIcon } from "@/assets";
+import { ArrowDownIcon } from "../../../assets";
 import { useTranslation } from "@liberfi/ui-base";
 import {
   Button,

@@ -14,7 +14,7 @@ import {
   useTokenInfo,
   useTokenLatestPriceUpdate,
   useTvChartMultiTokens,
-} from "@/states";
+} from "../../states";
 
 export type TradeDataLoaderProps = PropsWithChildren<{
   chainId: CHAIN_ID;

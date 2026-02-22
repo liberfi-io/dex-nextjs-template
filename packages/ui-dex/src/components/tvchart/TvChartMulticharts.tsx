@@ -1,14 +1,14 @@
-import { SplitWindowIcon } from "@/assets";
+import { SplitWindowIcon } from "../../assets";
 import { chainAtom, useAppSdk, useTranslation } from "@liberfi/ui-base";
 import { Button } from "@heroui/react";
 import clsx from "clsx";
 import { useTvChartContext } from "./TvChartProvider";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { stringifySymbol, TvChartLayout, TvChartPriceType, TvChartQuoteType } from "@/libs/tvchart";
+import { stringifySymbol, TvChartLayout, TvChartPriceType, TvChartQuoteType } from "../../libs/tvchart";
 import { chainSlugs } from "@liberfi/core";
-import { isPriceChartAtom, isUSDChartAtom } from "@/states";
+import { isPriceChartAtom, isUSDChartAtom } from "../../states";
 import { useAtomValue } from "jotai";
-import { CHAIN_QUOTE_TOKEN_SYMBOLS } from "@/libs";
+import { CHAIN_QUOTE_TOKEN_SYMBOLS } from "../../libs";
 
 export function TvChartMulticharts({ className }: { className?: string }) {
   const { t } = useTranslation();

@@ -2,8 +2,8 @@ import { PropsWithChildren, useCallback } from "react";
 import { useAtom } from "jotai";
 import clsx from "clsx";
 import { Button } from "@heroui/react";
-import { HideSidePanelIcon } from "@/assets";
-import { hideTradeLeftPanelAtom } from "@/states";
+import { HideSidePanelIcon } from "../../../assets";
+import { hideTradeLeftPanelAtom } from "../../../states";
 
 export type TradeMainSplitLeftProps = PropsWithChildren<{
   sideContent?: React.ReactNode;

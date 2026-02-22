@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "jsx": "react-jsx",
     "allowJs": true,
     "skipLibCheck": true,
@@ -19,9 +23,54 @@
     "declaration": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@liberfi/core": [
+        "../core/src"
+      ],
+      "@liberfi/locales": [
+        "../locales/src"
+      ],
+      "@liberfi/react-backend": [
+        "../react-backend/src"
+      ],
+      "@liberfi/react-dex": [
+        "../react-dex/src"
+      ],
+      "@liberfi/react-redpacket": [
+        "../react-redpacket/src"
+      ],
+      "@liberfi/ui-base": [
+        "../ui-base/src"
+      ],
+      "@liberfi/ui-dex": [
+        "../ui-dex/src"
+      ],
+      "@liberfi/ui-dex/*": [
+        "../ui-dex/src/*"
+      ],
+      "@liberfi/core/*": [
+        "../core/src/*"
+      ],
+      "@liberfi/locales/*": [
+        "../locales/src/*"
+      ],
+      "@liberfi/react-backend/*": [
+        "../react-backend/src/*"
+      ],
+      "@liberfi/react-dex/*": [
+        "../react-dex/src/*"
+      ],
+      "@liberfi/react-redpacket/*": [
+        "../react-redpacket/src/*"
+      ],
+      "@liberfi/ui-base/*": [
+        "../ui-base/src/*"
+      ]
     }
   },
-  "include": ["src"],
-  "exclude": ["node_modules"]
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

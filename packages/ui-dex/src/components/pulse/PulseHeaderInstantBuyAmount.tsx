@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { useAtom } from "jotai";
 import { cloneDeep } from "lodash-es";
-import { pulseSettingsAtom } from "@/states";
+import { pulseSettingsAtom } from "../../states";
 import { InstantBuyAmountInput } from "../trade";
 import { usePulseContext } from "./PulseContext";
 

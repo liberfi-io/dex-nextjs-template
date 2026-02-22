@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { calculateDecimalPrecision } from "@/libs";
+import { calculateDecimalPrecision } from "../../libs";
 import {
   ALL_TV_CHART_RESOLUTIONS,
   getTvChartLibraryResolution,
@@ -15,8 +15,8 @@ import {
   TvChartQuoteType,
   TvChartSettings,
   TvChartSymbolInfo,
-} from "@/libs/tvchart";
-import { quotePricesSubject, updateTokenLatestPrice } from "@/states";
+} from "../../libs/tvchart";
+import { quotePricesSubject, updateTokenLatestPrice } from "../../states";
 import { Candle, Resolution, Token } from "@chainstream-io/sdk";
 import { Unsubscribable, WsCandle } from "@chainstream-io/sdk/stream";
 import { CONFIG, parseChainId } from "@liberfi/core";

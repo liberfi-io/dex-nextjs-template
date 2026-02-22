@@ -1,6 +1,6 @@
-import { ListField } from "@/components/ListField";
-import { Number } from "@/components/Number";
-import { formatPercentage } from "@/libs/format";
+import { ListField } from "../../ListField";
+import { Number } from "../../Number";
+import { formatPercentage } from "../../../libs/format";
 import { Token } from "@chainstream-io/sdk";
 
 interface HoldersFieldProps {

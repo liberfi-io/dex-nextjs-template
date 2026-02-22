@@ -1,6 +1,6 @@
-import { LineTooltip } from "@/components/chart/LineTooltip";
-import { Number } from "@/components/Number";
-import { interpolateTimes } from "@/libs";
+import { LineTooltip } from "../../chart/LineTooltip";
+import { Number } from "../../Number";
+import { interpolateTimes } from "../../../libs";
 import { useTranslation, walletPnlAtom } from "@liberfi/ui-base";
 import { Skeleton, Spinner, Tab, Tabs } from "@heroui/react";
 import clsx from "clsx";

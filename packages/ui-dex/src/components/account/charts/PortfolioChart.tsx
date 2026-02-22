@@ -1,5 +1,5 @@
 import BigNumber from "bignumber.js";
-import { PieActiveShape, PiePayload } from "@/components/chart";
+import { PieActiveShape, PiePayload } from "../../chart";
 import { useTranslation, walletNetWorthAtom } from "@liberfi/ui-base";
 import {
   appendPrimaryTokenNetWorth,
@@ -7,15 +7,15 @@ import {
   formatAbbreviatingNumber2,
   formatPercentage,
   PIE_MAX_COUNT,
-} from "@/libs";
+} from "../../../libs";
 import { Button, Spinner } from "@heroui/react";
 import clsx from "clsx";
 import { reverse, sortBy } from "lodash-es";
 import { useCallback, useMemo, useState } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { CHAIN_ID } from "@liberfi/core";
-import { Number } from "@/components/Number";
-import { EmptyData } from "@/components/EmptyData";
+import { Number } from "../../Number";
+import { EmptyData } from "../../EmptyData";
 import { useAtomValue } from "jotai";
 
 export type PortfolioChartProps = {

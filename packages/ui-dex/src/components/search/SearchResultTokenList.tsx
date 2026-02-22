@@ -13,7 +13,7 @@ import { useMeasure } from "react-use";
 import { SearchResultTokenListHeaders } from "./SearchResultTokenListHeaders";
 import { SearchDiscoverTokenListSkeleton } from "./SearchDiscoverTokenListSkeleton";
 import { SearchParams } from "@chainstream-io/sdk";
-import { tokenSort } from "@/libs";
+import { tokenSort } from "../../libs";
 import { SearchDiscoverTokenListItem } from "./SearchDiscoverTokenListItem";
 import { useAtomValue } from "jotai";
 import { chainAtom, useAuth } from "@liberfi/ui-base";

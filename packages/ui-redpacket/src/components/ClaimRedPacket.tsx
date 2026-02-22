@@ -1,4 +1,4 @@
-import { RedPacketIcon } from "@/icons";
+import { RedPacketIcon } from "../icons";
 import { RedPacketDTO } from "@chainstream-io/sdk";
 import { Button, Image, Link } from "@heroui/react";
 import { chainIcon, chainTxExplorer } from "@liberfi/core";
@@ -16,7 +16,7 @@ import {
   useWaitForTransactionConfirmation,
   useWallet,
 } from "@liberfi/ui-base";
-import { formatShortAddress } from "@liberfi/ui-dex/dist/libs/format";
+import { formatShortAddress } from "@liberfi/ui-dex/libs/format";
 import { useAtomValue } from "jotai";
 import { useState } from "react";
 

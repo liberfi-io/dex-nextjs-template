@@ -1,7 +1,7 @@
 import { useTokenListContext } from "../TokenListContext";
 import { useCallback, useEffect, useState } from "react";
 import { PriceChangeFilterForm } from "./PriceChangeFilterForm";
-import { ListFilter } from "@/components/ListFilter";
+import { ListFilter } from "../../ListFilter";
 
 export function PriceChangeFilter() {
   const { filters, setFilters } = useTokenListContext();

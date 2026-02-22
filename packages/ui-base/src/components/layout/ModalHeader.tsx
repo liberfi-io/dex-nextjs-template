@@ -1,7 +1,7 @@
 import { PropsWithChildren } from "react";
 import { clsx } from "clsx";
 import { Button, ModalHeader as HeroModalHeader } from "@heroui/react";
-import { ChevronLeftIcon, XCloseIcon } from "@/icons";
+import { ChevronLeftIcon, XCloseIcon } from "../../icons";
 
 export type ModalHeaderProps = PropsWithChildren<{
   full?: boolean;

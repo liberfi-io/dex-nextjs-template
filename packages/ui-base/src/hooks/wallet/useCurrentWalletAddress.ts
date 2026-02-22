@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useAtomValue } from "jotai";
 import { CHAIN_ID } from "@liberfi/core";
-import { chainAtom } from "@/states";
+import { chainAtom } from "../../states";
 import { Chain } from "@liberfi.io/types";
 import { useAuth } from "../useAuth";
 

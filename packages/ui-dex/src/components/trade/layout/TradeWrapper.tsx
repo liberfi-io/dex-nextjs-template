@@ -2,8 +2,8 @@ import { PropsWithChildren, useCallback } from "react";
 import { useAtom } from "jotai";
 import { clsx } from "clsx";
 import { Button } from "@heroui/react";
-import { hideTradeLeftPanelAtom } from "@/states";
-import { OpenSidePanelIcon } from "@/assets";
+import { hideTradeLeftPanelAtom } from "../../../states";
+import { OpenSidePanelIcon } from "../../../assets";
 
 export function TradeWrapper({ children }: PropsWithChildren) {
   const [hideLeftPanel, setHideLeftPanel] = useAtom(hideTradeLeftPanelAtom);

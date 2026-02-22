@@ -16,7 +16,7 @@ import {
   useTokenAddressesInCollectionQuery,
 } from "@liberfi/react-backend";
 import { SearchDiscoverTokenListSkeleton } from "./SearchDiscoverTokenListSkeleton";
-import { tokenFilters, tokenSort } from "@/libs";
+import { tokenFilters, tokenSort } from "../../libs";
 import { Token } from "@chainstream-io/sdk";
 import { chainAtom, useAuth, useAuthenticatedCallback } from "@liberfi/ui-base";
 import { AuthGuard } from "../AuthGuard";

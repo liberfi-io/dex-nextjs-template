@@ -1,7 +1,7 @@
 import { Token } from "@chainstream-io/sdk";
 import { useMemo } from "react";
 import { useTokenListContext } from "../TokenListContext";
-import { formatPercentage, tokenPriceChangeRatioInUsd } from "@/libs";
+import { formatPercentage, tokenPriceChangeRatioInUsd } from "../../../libs";
 import { formatPriceUSD } from "@liberfi/core";
 import clsx from "clsx";
 import { TriangleDownIcon, TriangleUpIcon } from "@liberfi/ui-base";

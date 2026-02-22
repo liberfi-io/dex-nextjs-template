@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { CHAIN_ID } from "@liberfi/core";
-import { getWrappedAddress, SOL_TOKEN_ADDRESS } from "@liberfi/ui-dex/dist/libs";
+import { getWrappedAddress, SOL_TOKEN_ADDRESS } from "@liberfi/ui-dex/libs";
 
 export const LaunchPadBasicFormSchema = z.object({
   name: z

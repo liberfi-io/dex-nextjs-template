@@ -1,11 +1,11 @@
-import { CloseIcon, CopyIcon } from "@/assets";
+import { CloseIcon, CopyIcon } from "../../assets";
 import { SearchIcon, useTranslation } from "@liberfi/ui-base";
 import { Button, Input } from "@heroui/react";
 import clsx from "clsx";
 import { useTokenListContext } from "../tokens";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { debounce } from "lodash-es";
-import { usePaste, useSearchHistories } from "@/hooks";
+import { usePaste, useSearchHistories } from "../../hooks";
 
 export type SearchInputProps = {
   defaultKeyword?: string;

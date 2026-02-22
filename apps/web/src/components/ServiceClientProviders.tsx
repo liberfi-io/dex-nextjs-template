@@ -5,7 +5,7 @@ import Cookies from "js-cookie";
 import { ChainStreamClient } from "@chainstream-io/sdk";
 import { DexClientProvider } from "@liberfi/react-dex";
 import { PinataProvider, useDexTokenProvider } from "@liberfi/ui-base";
-import { pinata } from "@/libs/pinata";
+import { pinata } from "../libs/pinata";
 import { DexClientProvider as APIClientProvider, Client } from "@liberfi.io/client";
 import { MediaTrackClient } from "@liberfi.io/ui-media-track/client";
 import { MediaTrackProvider } from "@liberfi.io/ui-media-track";

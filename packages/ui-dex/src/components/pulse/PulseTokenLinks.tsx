@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { Button, Link } from "@heroui/react";
 import { Token, TokenSocialMediasDTO } from "@chainstream-io/sdk";
 import { SearchIcon, TelegramIcon, TwitterIcon, WebsiteIcon } from "@liberfi/ui-base";
-import { searchTwitterUrl } from "@/libs";
+import { searchTwitterUrl } from "../../libs";
 import { RecursivePartial } from "@liberfi/core";
 
 export type PulseTokenLinksProps = {

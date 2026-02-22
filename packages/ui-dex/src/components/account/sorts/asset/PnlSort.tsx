@@ -1,5 +1,5 @@
 import { PropsWithChildren, useCallback } from "react";
-import { ListSort } from "@/components/ListSort";
+import { ListSort } from "../../../ListSort";
 
 export type PnlSortProps = PropsWithChildren<{
   sort: Record<string, "asc" | "desc">;

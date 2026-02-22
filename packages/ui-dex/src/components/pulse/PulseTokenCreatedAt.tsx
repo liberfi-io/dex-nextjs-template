@@ -3,7 +3,7 @@ import { Link, Tooltip } from "@heroui/react";
 import { tickAtom } from "@liberfi/ui-base";
 import { Token } from "@chainstream-io/sdk";
 import { useMemo } from "react";
-import { formatAge } from "@/libs";
+import { formatAge } from "../../libs";
 import { RecursivePartial, ROUTES } from "@liberfi/core";
 
 export type PulseTokenCreatedAtProps = {

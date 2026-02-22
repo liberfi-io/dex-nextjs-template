@@ -1,15 +1,15 @@
 import { useTokenHoldersQuery } from "@liberfi/react-dex";
 import { Token, TokenHolder } from "@chainstream-io/sdk";
-import { ChainAddress } from "@/components/ChainAddress";
-import { formatPercentage } from "@/libs";
+import { ChainAddress } from "../../ChainAddress";
+import { formatPercentage } from "../../../libs";
 import { Skeleton } from "@heroui/react";
-import { Number } from "@/components/Number";
+import { Number } from "../../Number";
 import { Virtuoso } from "react-virtuoso";
 import { CHAIN_ID, chainIdBySlug } from "@liberfi/core";
 import { useMemo } from "react";
 import { useAtomValue } from "jotai";
 import { layoutAtom } from "@liberfi/ui-base";
-import { tokenInfoAtom } from "@/states";
+import { tokenInfoAtom } from "../../../states";
 
 export function HoldersList() {
   const token = useAtomValue(tokenInfoAtom);

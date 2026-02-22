@@ -1,4 +1,4 @@
-import { tokenInfoAtom } from "@/states";
+import { tokenInfoAtom } from "../../../states";
 import { useTranslation, useWalletTokenNetWorth } from "@liberfi/ui-base";
 import { clsx } from "clsx";
 import { useAtomValue } from "jotai";

@@ -4,9 +4,9 @@ import {
   NetworkIcon,
   SelectedIndicatorIcon,
   UnselectedIndicatorIcon,
-} from "@/assets";
+} from "../assets";
 import { useTranslation } from "@liberfi/ui-base";
-import { capitalize } from "@/libs";
+import { capitalize } from "../libs";
 import { Button, Popover, PopoverContent, PopoverTrigger, useDisclosure } from "@heroui/react";
 import { CHAIN_ID, chainSlugs } from "@liberfi/core";
 import clsx from "clsx";

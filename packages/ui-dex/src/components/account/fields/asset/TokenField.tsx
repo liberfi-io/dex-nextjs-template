@@ -1,7 +1,7 @@
-import { TokenAvatar } from "@/components/TokenAvatar";
-import { ListField } from "@/components/ListField";
+import { TokenAvatar } from "../../../TokenAvatar";
+import { ListField } from "../../../ListField";
 import { Token, WalletNetWorthItemDTO } from "@chainstream-io/sdk";
-import { Number } from "@/components/Number";
+import { Number } from "../../../Number";
 import { useMemo } from "react";
 
 export interface TokenFieldProps {

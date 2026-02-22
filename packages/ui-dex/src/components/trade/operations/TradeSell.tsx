@@ -1,11 +1,11 @@
 import { CHAIN_ID, chainSlugs } from "@liberfi/core";
-import PreviewModal from "@/components/swap/PreviewModal";
-import { SwapProvider } from "@/components/swap/SwapContext";
+import PreviewModal from "../../swap/PreviewModal";
+import { SwapProvider } from "../../swap/SwapContext";
 import { useDisclosure } from "@heroui/react";
-import { getUnwrappedAddress, getWrappedAddress, PRIMARY_TOKEN_ADDRESSES } from "@/libs";
+import { getUnwrappedAddress, getWrappedAddress, PRIMARY_TOKEN_ADDRESSES } from "../../../libs";
 import { SellForm } from "./SellForm";
 import { useCallback, useMemo } from "react";
-import { tokenInfoAtom } from "@/states";
+import { tokenInfoAtom } from "../../../states";
 import { useAtomValue } from "jotai";
 
 export type TradeSellProps = {

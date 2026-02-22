@@ -13,9 +13,9 @@ import {
   useTranslation,
   walletNetWorthAtom,
 } from "@liberfi/ui-base";
-import { TokenAvatar } from "@liberfi/ui-dex/dist/components/TokenAvatar";
-import { WithdrawOutlinedIcon } from "@liberfi/ui-dex/dist/assets/icons";
-import { Number } from "@liberfi/ui-dex/dist/components/Number";
+import { TokenAvatar } from "@liberfi/ui-dex/components/TokenAvatar";
+import { WithdrawOutlinedIcon } from "@liberfi/ui-dex/assets/icons";
+import { Number } from "@liberfi/ui-dex/components/Number";
 import { Token, WalletNetWorthItemDTO } from "@chainstream-io/sdk";
 
 export function RedPacketMintAmountInput() {

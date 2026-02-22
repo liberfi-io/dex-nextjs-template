@@ -20,7 +20,7 @@ import {
 } from "@liberfi.io/ui-tokens";
 import { chainSlug } from "@liberfi.io/utils";
 import { Chain, Token } from "@liberfi.io/types";
-import { AppRoute } from "@liberfi/ui-dex/dist/libs/routes";
+import { AppRoute } from "@liberfi/ui-dex/libs/routes";
 import { InstantBuyProvider } from "./InstantBuyContext";
 import { InstantBuy } from "./InstsantBuy";
 

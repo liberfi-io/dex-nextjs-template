@@ -1,4 +1,4 @@
-import { ArrowDownIcon, WithdrawOutlinedIcon } from "@/assets";
+import { ArrowDownIcon, WithdrawOutlinedIcon } from "../../assets";
 import { useAppSdk, useTranslation } from "@liberfi/ui-base";
 import { Button, Input } from "@heroui/react";
 import BigNumber from "bignumber.js";

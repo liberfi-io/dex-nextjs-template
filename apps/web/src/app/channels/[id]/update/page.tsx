@@ -1,6 +1,6 @@
 "use client";
 
-import { ChannelsUpdatePage } from "@/components/ChannelsUpdatePage";
+import { ChannelsUpdatePage } from "../../../../components/ChannelsUpdatePage";
 import { useParams, useSearchParams } from "next/navigation";
 
 export default function Page() {

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Token } from "@chainstream-io/sdk";
 import { chainIdBySlug } from "@liberfi/core";
-import { fetchTokenInfo } from "@/states";
-import { parseSymbol, TvChartSymbol, TvChartAreaManager } from "@/libs/tvchart";
+import { fetchTokenInfo } from "../../states";
+import { parseSymbol, TvChartSymbol, TvChartAreaManager } from "../../libs/tvchart";
 
 export function useTvChartSymbolInfo(areaManager: TvChartAreaManager | null) {
   const [symbolInfo, setSymbolInfo] = useState<TvChartSymbol | null>(null);

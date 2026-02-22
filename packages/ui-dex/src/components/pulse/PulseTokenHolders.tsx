@@ -9,7 +9,7 @@ import {
   useTranslation,
   VerifiedIcon,
 } from "@liberfi/ui-base";
-import { accountExplorerUrl } from "@/libs";
+import { accountExplorerUrl } from "../../libs";
 import { useMemo } from "react";
 
 export type PulseTokenHoldersProps = {

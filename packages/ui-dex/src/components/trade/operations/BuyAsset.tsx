@@ -1,9 +1,9 @@
-import { ArrowDownIcon, RefreshIcon } from "@/assets";
-import { Number } from "@/components/Number";
-import { useSwapContext } from "@/components/swap/SwapContext";
-import { TokenAvatar } from "@/components/TokenAvatar";
+import { ArrowDownIcon, RefreshIcon } from "../../../assets";
+import { Number } from "../../Number";
+import { useSwapContext } from "../../swap/SwapContext";
+import { TokenAvatar } from "../../TokenAvatar";
 import { useAppSdk, walletNetWorthAtom, walletNetWorthQueryStateAtom } from "@liberfi/ui-base";
-import { getUnwrappedAddress, getWrappedAddress, PRIMARY_TOKEN_ADDRESSES } from "@/libs";
+import { getUnwrappedAddress, getWrappedAddress, PRIMARY_TOKEN_ADDRESSES } from "../../../libs";
 import { CHAIN_ID, chainSlugs } from "@liberfi/core";
 import { Button, Skeleton } from "@heroui/react";
 import BigNumber from "bignumber.js";

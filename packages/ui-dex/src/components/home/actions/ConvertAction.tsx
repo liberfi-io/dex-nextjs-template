@@ -1,6 +1,6 @@
 import { useAppSdk, useAuthenticatedCallback, useTranslation } from "@liberfi/ui-base";
 import { AccountAction } from "./AccountAction";
-import { ConvertOutlinedIcon } from "@/assets/icons";
+import { ConvertOutlinedIcon } from "../../../assets/icons";
 import { CHAIN_ID } from "@liberfi/core";
 
 export function ConvertAction() {

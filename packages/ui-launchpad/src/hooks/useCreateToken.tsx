@@ -10,7 +10,7 @@ import {
   useWaitForTransactionConfirmation,
   useWallet,
 } from "@liberfi/ui-base";
-import { getTxExplorerUrl } from "@liberfi/ui-dex/dist/libs";
+import { getTxExplorerUrl } from "@liberfi/ui-dex/libs";
 
 export const useCreateToken = () => {
   const { t } = useTranslation();

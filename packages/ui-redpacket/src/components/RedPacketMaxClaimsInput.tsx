@@ -1,7 +1,7 @@
 import { Controller, useFormContext } from "react-hook-form";
 import { Input } from "@heroui/react";
 import { useTranslation } from "@liberfi/ui-base";
-import { CreateRedPacketIcon } from "@/icons";
+import { CreateRedPacketIcon } from "../icons";
 
 export function RedPacketMaxClaimsInput() {
   const { control } = useFormContext();

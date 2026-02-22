@@ -1,12 +1,12 @@
-import { ArrowLeftIcon, FavoriteFilledIcon, FavoriteOutlinedIcon, ShareIcon } from "@/assets";
-import { ChainAddress } from "@/components/ChainAddress";
-import { TokenAvatar } from "@/components/TokenAvatar";
+import { ArrowLeftIcon, FavoriteFilledIcon, FavoriteOutlinedIcon, ShareIcon } from "../../../assets";
+import { ChainAddress } from "../../ChainAddress";
+import { TokenAvatar } from "../../TokenAvatar";
 import { SearchIcon, useAppSdk, useRouter } from "@liberfi/ui-base";
 import { Button, Skeleton } from "@heroui/react";
 import { useCallback, useMemo } from "react";
 import { useTradeDataContext } from "../providers";
-import { AppRoute } from "@/libs";
-import { tokenInfoAtom } from "@/states";
+import { AppRoute } from "../../../libs";
+import { tokenInfoAtom } from "../../../states";
 import { useAtomValue } from "jotai";
 
 export function TradeHeader() {

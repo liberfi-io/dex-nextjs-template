@@ -6,10 +6,10 @@ import {
   useImperativeHandle,
   useMemo,
 } from "react";
-import { TvChartManager } from "@/libs/tvchart/TvChartManager";
-import { TvChartSettings } from "@/libs/tvchart/TvChartSettings";
+import { TvChartManager } from "../../libs/tvchart/TvChartManager";
+import { TvChartSettings } from "../../libs/tvchart/TvChartSettings";
 import { Timezone } from "../../../../../apps/web/public/static/charting_library";
-import { TvChartLayout, TvChartResolution, TvChartType } from "@/libs/tvchart";
+import { TvChartLayout, TvChartResolution, TvChartType } from "../../libs/tvchart";
 import { TvChartConfig, TvChartConfigProvider } from "./TvChartConfigProvider";
 
 export type TvChartContextValue = {

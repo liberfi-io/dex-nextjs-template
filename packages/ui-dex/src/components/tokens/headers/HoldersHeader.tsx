@@ -1,5 +1,5 @@
 import { useTranslation } from "@liberfi/ui-base";
-import { ListHeader } from "@/components/ListHeader";
+import { ListHeader } from "../../ListHeader";
 import { HoldersFilter } from "../filters";
 import { HoldersSort } from "../sorts";
 

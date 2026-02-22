@@ -3,8 +3,8 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable unused-imports/no-unused-vars */
-import { formatLongNumber, getNumberDefaultPrecision, objectKeys } from "@/libs";
-import { tokenInfoAtom } from "@/states";
+import { formatLongNumber, getNumberDefaultPrecision, objectKeys } from "../libs";
+import { tokenInfoAtom } from "../states";
 import { ChainStreamClient, Candle, Resolution, Token } from "@chainstream-io/sdk";
 import { StreamApi, WsCandle } from "@chainstream-io/sdk/stream";
 import { CONFIG } from "@liberfi/core";

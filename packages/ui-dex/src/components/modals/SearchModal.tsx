@@ -1,7 +1,7 @@
 import { layoutAtom, useAppSdk, useRouter } from "@liberfi/ui-base";
 import { Modal, ModalContent, useDisclosure } from "@heroui/react";
 import { useCallback, useEffect } from "react";
-import { AppRoute } from "@/libs";
+import { AppRoute } from "../../libs";
 import { Search } from "../search/Search";
 import { ModalWrapper } from "../layout";
 import { useAtomValue } from "jotai";

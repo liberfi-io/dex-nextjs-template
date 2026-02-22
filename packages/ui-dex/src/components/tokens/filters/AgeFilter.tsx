@@ -1,4 +1,4 @@
-import { ListFilter } from "@/components/ListFilter";
+import { ListFilter } from "../../ListFilter";
 import { useTokenListContext } from "../TokenListContext";
 import { useCallback, useEffect, useState } from "react";
 import { AgeFilterForm } from "../filters";

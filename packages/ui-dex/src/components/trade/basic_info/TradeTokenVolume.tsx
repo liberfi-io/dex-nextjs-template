@@ -1,7 +1,7 @@
 import { Token } from "@chainstream-io/sdk";
-import { Number } from "@/components/Number";
+import { Number } from "../../Number";
 import { useTranslation } from "@liberfi/ui-base";
-import { tokenTraders, tokenTrades, tokenVolumesInUsd } from "@/libs";
+import { tokenTraders, tokenTrades, tokenVolumesInUsd } from "../../../libs";
 import { useMemo } from "react";
 
 export function TradeTokenVolume({ token }: { token: Token }) {

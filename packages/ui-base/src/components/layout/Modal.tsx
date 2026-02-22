@@ -7,9 +7,9 @@ import {
   ModalContent as HeroUIModalContent,
   useDisclosure,
 } from "@heroui/react";
-import { Layout } from "@/types";
-import { useAppSdk } from "@/hooks";
-import { layoutAtom } from "@/states";
+import { Layout } from "../../types";
+import { useAppSdk } from "../../hooks";
+import { layoutAtom } from "../../states";
 import { ModalHeader } from "./ModalHeader";
 import { ModalBody } from "./ModalBody";
 

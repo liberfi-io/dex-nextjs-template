@@ -1,6 +1,6 @@
 "use client";
 
-import { ChannelInfoPage } from "@/components/ChannelsInfoPage";
+import { ChannelInfoPage } from "../../../components/ChannelsInfoPage";
 import { useParams } from "next/navigation";
 
 export default function Page() {

@@ -6,9 +6,9 @@ import {
   CloseTabsIcon,
   ForwardIcon,
   ViewListOutlinedIcon,
-} from "@/assets";
-import { Number } from "@/components/Number";
-import { AppRoute, formatPercentage, tokenPriceChangeRatioInUsd } from "@/libs";
+} from "../../../assets";
+import { Number } from "../../Number";
+import { AppRoute, formatPercentage, tokenPriceChangeRatioInUsd } from "../../../libs";
 import { Token } from "@chainstream-io/sdk";
 import { useRemoveTokenFromCollectionMutation } from "@liberfi/react-backend";
 import { Button, Skeleton } from "@heroui/react";
@@ -17,7 +17,7 @@ import { throttle, uniqBy } from "lodash-es";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth, useAuthenticatedCallback, useRouter } from "@liberfi/ui-base";
 import { useTradeDataContext } from "../providers";
-import { tokenInfoAtom } from "@/states";
+import { tokenInfoAtom } from "../../../states";
 import { useAtomValue } from "jotai";
 
 export function TradeTokenTabs() {

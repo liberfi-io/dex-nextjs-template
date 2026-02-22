@@ -1,4 +1,4 @@
-import { PredictPage } from "@/components/PredictPage";
+import { PredictPage } from "../../components/PredictPage";
 
 export default function Page() {
   return <PredictPage />;

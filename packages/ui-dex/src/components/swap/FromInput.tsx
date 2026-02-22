@@ -2,7 +2,7 @@ import BigNumber from "bignumber.js";
 import clsx from "clsx";
 import { debounce } from "lodash-es";
 import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowDownIcon, WithdrawOutlinedIcon } from "@/assets";
+import { ArrowDownIcon, WithdrawOutlinedIcon } from "../../assets";
 import { useAppSdk, useTranslation } from "@liberfi/ui-base";
 import { Button, Input } from "@heroui/react";
 import { Number } from "../Number";

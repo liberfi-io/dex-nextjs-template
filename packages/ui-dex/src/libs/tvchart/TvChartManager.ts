@@ -25,7 +25,7 @@ import { PriceAlertStore } from "./PriceAlertStore";
 import { ContextMenuStore } from "./ContextMenuStore";
 import { HistoryTradesStore } from "./HistoryTradesStore";
 import { getDefaultSettings } from "./settings";
-import { Storage } from "@/libs/storage";
+import { Storage } from "../storage";
 import { cloneDeep, isEqual, merge as mergeDeep } from "lodash-es";
 import { getTvChartLibraryTheme, parseSymbol, stringifySymbolShort } from "./utils";
 import {

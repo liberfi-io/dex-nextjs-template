@@ -1,4 +1,4 @@
-import { ConvertOutlinedIcon } from "@/assets";
+import { ConvertOutlinedIcon } from "../../../assets";
 import { AccountAction } from "./AccountAction";
 import { useAppSdk, useAuthenticatedCallback, useTranslation } from "@liberfi/ui-base";
 import { CHAIN_ID } from "@liberfi/core";

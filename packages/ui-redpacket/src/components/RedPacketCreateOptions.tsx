@@ -1,7 +1,7 @@
 import { Controller, useFormContext, useWatch } from "react-hook-form";
 import { Checkbox, Input } from "@heroui/react";
 import { useTranslation } from "@liberfi/ui-base";
-import { TwitterIcon } from "@liberfi/ui-dex/dist/assets/icons";
+import { TwitterIcon } from "@liberfi/ui-dex/assets/icons";
 
 export function RedPacketCreateOptions() {
   const { control } = useFormContext();

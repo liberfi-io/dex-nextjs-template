@@ -30,7 +30,7 @@ import {
 } from "./fields";
 import { ViewListTokenListSkeleton } from "./ViewListTokenListSkeleton";
 import { ViewListTokenListHeaders } from "./ViewListTokenListHeaders";
-import { AppRoute, tokenFilters, tokenSort } from "@/libs";
+import { AppRoute, tokenFilters, tokenSort } from "../../libs";
 import { Token } from "@chainstream-io/sdk";
 import { useTokenListContext } from "./TokenListContext";
 import { Virtuoso } from "react-virtuoso";

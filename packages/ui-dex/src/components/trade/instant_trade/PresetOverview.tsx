@@ -8,7 +8,7 @@ import {
   useTranslation,
   ZapFastIcon,
 } from "@liberfi/ui-base";
-import { TradePresetValues } from "@/types";
+import { TradePresetValues } from "../../../types";
 import { formatPercent, formatPrice } from "@liberfi/core";
 
 export type PresetOverviewProps = {

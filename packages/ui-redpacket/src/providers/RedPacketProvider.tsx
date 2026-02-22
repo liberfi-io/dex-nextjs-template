@@ -1,4 +1,4 @@
-import { getRedPacketStatus } from "@/utils";
+import { getRedPacketStatus } from "../utils";
 import { useRedPacketQuery } from "@liberfi/react-redpacket";
 import { useAppSdk, useTranslation } from "@liberfi/ui-base";
 import { PropsWithChildren, useEffect } from "react";

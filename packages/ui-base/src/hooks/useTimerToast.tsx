@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { toast } from "react-hot-toast";
-import { TimerToast, TimerToastProps } from "@/components";
+import { TimerToast, TimerToastProps } from "../components";
 
 export function useTimerToast() {
   return useCallback(

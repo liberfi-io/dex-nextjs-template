@@ -1,8 +1,8 @@
-import { DeleteIcon } from "@/assets";
+import { DeleteIcon } from "../../assets";
 import { useTranslation } from "@liberfi/ui-base";
 import { Button, Chip } from "@heroui/react";
 import clsx from "clsx";
-import { useSearchHistories } from "@/hooks";
+import { useSearchHistories } from "../../hooks";
 
 export type SearchHistoryProps = {
   className?: string;

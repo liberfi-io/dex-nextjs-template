@@ -1,4 +1,8 @@
 import { withSentryConfig } from "@sentry/nextjs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /* eslint-disable no-undef */
 const nextConfig = {
@@ -31,6 +35,14 @@ const nextConfig = {
   },
   webpack(config) {
     config.optimization.minimize = process.env.NODE_ENV === "production";
+
+    // Fix: Ensure all jotai imports resolve to the same instance
+    // Prevents "multiple jotai instances" warning in monorepo setup
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      jotai: path.resolve(__dirname, "node_modules/jotai"),
+    };
+
     config.module.rules.push({
       test: /\.svg$/i,
       use: [

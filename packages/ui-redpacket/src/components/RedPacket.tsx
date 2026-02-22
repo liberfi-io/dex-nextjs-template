@@ -10,14 +10,14 @@ import {
   useTranslation,
 } from "@liberfi/ui-base";
 import { Button, Link, Skeleton } from "@heroui/react";
-import { RedPacketIcon, RedPacketMemoIcon } from "@/icons";
-import { formatShortAddress } from "@liberfi/ui-dex/dist/libs/format";
+import { RedPacketIcon, RedPacketMemoIcon } from "../icons";
+import { formatShortAddress } from "@liberfi/ui-dex/libs/format";
 import { useTokenQuery } from "@liberfi/react-dex";
 import { useAtomValue } from "jotai";
-import { TokenAvatar } from "@liberfi/ui-dex/dist/components/TokenAvatar";
+import { TokenAvatar } from "@liberfi/ui-dex/components/TokenAvatar";
 import { BigNumber } from "bignumber.js";
 import { chainTxExplorer } from "@liberfi/core";
-import { getRedPacketStatus } from "@/utils";
+import { getRedPacketStatus } from "../utils";
 
 export type RedPacketProps = {
   perspective: "received" | "sent";

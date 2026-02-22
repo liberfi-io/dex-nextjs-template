@@ -1,4 +1,4 @@
-import { SettingsIcon } from "@/assets";
+import { SettingsIcon } from "../../assets";
 import { Button, Image } from "@heroui/react";
 import { CONFIG } from "@liberfi/core";
 import { useAppSdk, useAuthenticatedCallback, useTranslation } from "@liberfi/ui-base";

@@ -1,4 +1,4 @@
-import { launchPadCurvePoints } from "@/states";
+import { launchPadCurvePoints } from "../states";
 import { formatAmount3, formatPrice } from "@liberfi/core";
 import { defaultTheme, useTranslation } from "@liberfi/ui-base";
 import { useAtomValue } from "jotai";

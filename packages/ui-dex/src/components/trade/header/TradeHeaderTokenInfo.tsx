@@ -2,7 +2,7 @@ import { Token } from "@chainstream-io/sdk";
 import { TradeHeaderTokenMarketData } from "./TradeHeaderTokenMarketData";
 import { TradeHeaderTokenPrice } from "./TradeHeaderTokenPrice";
 import { Skeleton } from "@heroui/react";
-import { tokenInfoAtom } from "@/states";
+import { tokenInfoAtom } from "../../../states";
 import { useAtomValue } from "jotai";
 
 export function TradeHeaderTokenInfo() {

@@ -4,12 +4,12 @@ import { TradeTokenMCap } from "./TradeTokenMCap";
 import { TradeTokenPrice } from "./TradeTokenPrice";
 import { TradeTokenVolume } from "./TradeTokenVolume";
 import { Token } from "@chainstream-io/sdk";
-// import { BubbleMapIcon } from "@/assets";
-// import { useAppSdk, useTranslation } from "@/hooks";
+// import { BubbleMapIcon } from "../../../assets";
+// import { useAppSdk, useTranslation } from "../../../hooks";
 // import { useCallback } from "react";
-// import { getBubbleMapUrl } from "@/libs";
+// import { getBubbleMapUrl } from "../../../libs";
 // import { CHAIN_ID } from "@liberfi/core";
-import { tokenInfoAtom } from "@/states";
+import { tokenInfoAtom } from "../../../states";
 import { useAtomValue } from "jotai";
 
 export function TradeTokenMarketInfo() {

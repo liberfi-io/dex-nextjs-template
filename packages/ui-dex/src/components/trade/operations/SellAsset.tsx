@@ -1,7 +1,7 @@
-import { RefreshIcon } from "@/assets";
-import { Number } from "@/components/Number";
-import { useSwapContext } from "@/components/swap/SwapContext";
-import { TokenAvatar } from "@/components/TokenAvatar";
+import { RefreshIcon } from "../../../assets";
+import { Number } from "../../Number";
+import { useSwapContext } from "../../swap/SwapContext";
+import { TokenAvatar } from "../../TokenAvatar";
 import { Button, Skeleton } from "@heroui/react";
 import { walletNetWorthQueryStateAtom } from "@liberfi/ui-base";
 import { useAtomValue } from "jotai";

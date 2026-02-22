@@ -1,7 +1,7 @@
 import { Token } from "@chainstream-io/sdk";
 import { useMemo } from "react";
 import { useTokenListContext } from "../TokenListContext";
-import { tokenBuyVolumesInUsd, tokenSellVolumesInUsd, tokenVolumesInUsd } from "@/libs";
+import { tokenBuyVolumesInUsd, tokenSellVolumesInUsd, tokenVolumesInUsd } from "../../../libs";
 import { formatAmountUSD } from "@liberfi/core";
 
 export function TokenVolumesCell({ token }: { token: Token }) {

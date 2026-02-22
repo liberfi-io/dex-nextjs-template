@@ -1,8 +1,8 @@
 import { useAppSdk, useAuth, useAuthenticatedCallback, useTranslation } from "@liberfi/ui-base";
 import { AccountAction } from "./AccountAction";
-import { CashInOutlinedIcon } from "@/assets";
+import { CashInOutlinedIcon } from "../../../assets";
 import { CHAIN_ID } from "@liberfi/core";
-import { getBuyTokenUrl } from "@/libs";
+import { getBuyTokenUrl } from "../../../libs";
 
 export function AddCashAction() {
   const { t, i18n } = useTranslation();

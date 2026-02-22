@@ -1,4 +1,4 @@
-import { formatAbbreviatingNumber2, formatNumber2 } from "@/libs";
+import { formatAbbreviatingNumber2, formatNumber2 } from "../libs";
 import { useMemo } from "react";
 
 export type NumberProps = {

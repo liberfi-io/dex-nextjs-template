@@ -1,7 +1,7 @@
 import { RedPacketClaimDTO, Token } from "@chainstream-io/sdk";
 import { ForwardOutlinedIcon, useAppSdk, useAuth, useTranslation } from "@liberfi/ui-base";
-import { TokenAvatar } from "@liberfi/ui-dex/dist/components/TokenAvatar";
-import { formatShortAddress } from "@liberfi/ui-dex/dist/libs/format";
+import { TokenAvatar } from "@liberfi/ui-dex/components/TokenAvatar";
+import { formatShortAddress } from "@liberfi/ui-dex/libs/format";
 import { useCallback, useMemo } from "react";
 import BigNumber from "bignumber.js";
 

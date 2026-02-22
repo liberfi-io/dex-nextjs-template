@@ -1,7 +1,7 @@
 import { createContext, PropsWithChildren, useContext, useMemo } from "react";
 import { Token } from "@chainstream-io/sdk";
-import { useTvChartActiveAreaManager, useTvChartSymbolInfo } from "@/hooks/tvchart";
-import { TvChartAreaManager, TvChartSymbol } from "@/libs/tvchart";
+import { useTvChartActiveAreaManager, useTvChartSymbolInfo } from "../../hooks/tvchart";
+import { TvChartAreaManager, TvChartSymbol } from "../../libs/tvchart";
 
 export interface TvChartToolbarContextValue {
   activeAreaManager: TvChartAreaManager | null;

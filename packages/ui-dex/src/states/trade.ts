@@ -4,7 +4,7 @@
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import { Token, TokenStat } from "@chainstream-io/sdk";
-import { TradeSettingsValuesByChain } from "@/types";
+import { TradeSettingsValuesByChain } from "../types";
 
 // current token address
 export const tokenAddressAtom = atom<string | null>(null);

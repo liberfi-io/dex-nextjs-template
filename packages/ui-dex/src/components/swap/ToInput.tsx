@@ -3,7 +3,7 @@ import BigNumber from "bignumber.js";
 import clsx from "clsx";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button, Input } from "@heroui/react";
-import { ArrowDownIcon, WithdrawOutlinedIcon } from "@/assets";
+import { ArrowDownIcon, WithdrawOutlinedIcon } from "../../assets";
 import { useAppSdk, useTranslation } from "@liberfi/ui-base";
 import { Number } from "../Number";
 import { TokenAvatar } from "../TokenAvatar";

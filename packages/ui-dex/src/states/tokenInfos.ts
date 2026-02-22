@@ -6,7 +6,7 @@ import { BehaviorSubject, EMPTY, filter, switchMap, take } from "rxjs";
 import { flatten, groupBy, isArray, isEqual } from "lodash-es";
 import { Token } from "@chainstream-io/sdk";
 import { CHAIN_ID } from "@liberfi/core";
-import { parseTickerSymbol, stringifyTickerSymbol, stringifyTickerSymbolByChainSlug } from "@/libs";
+import { parseTickerSymbol, stringifyTickerSymbol, stringifyTickerSymbolByChainSlug } from "../libs";
 import { dexClientSubject, queryClientSubject } from "@liberfi/ui-base";
 import { fetchToken, fetchTokens, QueryKeys, useTokenQuery } from "@liberfi/react-dex";
 

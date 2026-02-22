@@ -1,7 +1,7 @@
 import { Button, Link } from "@heroui/react";
-import { TwitterIcon, TelegramIcon, WebsiteIcon } from "@/assets";
+import { TwitterIcon, TelegramIcon, WebsiteIcon } from "../../../assets";
 import { useMemo } from "react";
-import { ListField } from "@/components/ListField";
+import { ListField } from "../../ListField";
 import { Token, TokenSocialMediasDTO } from "@chainstream-io/sdk";
 
 interface SocialMediaFieldProps {

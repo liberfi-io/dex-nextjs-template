@@ -1,4 +1,4 @@
-import { usePinata } from "@/providers";
+import { usePinata } from "../providers";
 import { fetchUploadPresign, useDexClient } from "@liberfi/react-dex";
 import { useCallback } from "react";
 

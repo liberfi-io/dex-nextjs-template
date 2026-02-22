@@ -1,5 +1,5 @@
-import { ViewListOutlinedIcon } from "@/assets";
-import { ListHeader } from "@/components/ListHeader";
+import { ViewListOutlinedIcon } from "../../../assets";
+import { ListHeader } from "../../ListHeader";
 import { Button } from "@heroui/react";
 
 export type ViewListHeaderProps = {

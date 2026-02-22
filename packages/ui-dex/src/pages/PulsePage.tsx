@@ -1,5 +1,5 @@
 import { clsx } from "clsx";
-import { Pulse, PulseProvider } from "@/components";
+import { Pulse, PulseProvider } from "../components";
 import {
   useSetBottomNavigationBarActiveKey,
   useShowBottomNavigationBar,

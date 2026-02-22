@@ -1,7 +1,7 @@
-import { BearishIcon, BullishIcon } from "@/assets";
-import { Number } from "@/components/Number";
+import { BearishIcon, BullishIcon } from "../../../assets";
+import { Number } from "../../Number";
 import { useTranslation } from "@liberfi/ui-base";
-import { formatPercentage, tokenPriceChangeRatioInUsd } from "@/libs";
+import { formatPercentage, tokenPriceChangeRatioInUsd } from "../../../libs";
 import { Token } from "@chainstream-io/sdk";
 import { useMemo } from "react";
 

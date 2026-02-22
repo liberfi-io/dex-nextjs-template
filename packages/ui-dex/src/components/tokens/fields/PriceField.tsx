@@ -1,12 +1,12 @@
 import { useMemo } from "react";
 import clsx from "clsx";
-import { BearishIcon, BullishIcon } from "@/assets";
-import { formatPercentage } from "@/libs/format";
-import { ListField } from "@/components/ListField";
+import { BearishIcon, BullishIcon } from "../../../assets";
+import { formatPercentage } from "../../../libs/format";
+import { ListField } from "../../ListField";
 import { Token } from "@chainstream-io/sdk";
 import { useTokenListContext } from "../TokenListContext";
-import { tokenPriceChangeRatioInUsd } from "@/libs";
-import { Number } from "@/components/Number";
+import { tokenPriceChangeRatioInUsd } from "../../../libs";
+import { Number } from "../../Number";
 
 export interface PriceFieldProps {
   className?: string;

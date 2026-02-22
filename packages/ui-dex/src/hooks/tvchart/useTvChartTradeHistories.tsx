@@ -1,4 +1,4 @@
-import { TvChartInstance } from "@/components/tvchart/TvChart";
+import { TvChartInstance } from "../../components/tvchart/TvChart";
 
 export type UseTvChartTradeHistoriesProps = {
   chartRef: React.RefObject<TvChartInstance>;

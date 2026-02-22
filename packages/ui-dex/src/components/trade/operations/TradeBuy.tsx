@@ -1,9 +1,9 @@
-import { SwapProvider } from "@/components/swap/SwapContext";
+import { SwapProvider } from "../../swap/SwapContext";
 import { BuyForm } from "./BuyForm";
-import PreviewModal from "@/components/swap/PreviewModal";
+import PreviewModal from "../../swap/PreviewModal";
 import { useDisclosure } from "@heroui/react";
 import { useCallback } from "react";
-import { tokenInfoAtom } from "@/states";
+import { tokenInfoAtom } from "../../../states";
 import { useAtomValue } from "jotai";
 
 export type TradeBuyProps = {

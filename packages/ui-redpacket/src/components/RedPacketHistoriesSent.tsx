@@ -4,7 +4,7 @@ import { useWalletRedPacketsQuery } from "@liberfi/react-redpacket";
 import { useMemo } from "react";
 import { useTokensQuery } from "@liberfi/react-dex";
 import { keyBy } from "lodash-es";
-import { ListEmptyData } from "@liberfi/ui-dex/dist/components/ListEmptyData";
+import { ListEmptyData } from "@liberfi/ui-dex/components/ListEmptyData";
 import { Virtuoso } from "react-virtuoso";
 import { RedPacketHistory, RedPacketHistoryProps } from "./RedPacketHistory";
 import { Skeleton } from "@heroui/react";

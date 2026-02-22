@@ -6,7 +6,7 @@ import {
   formatLongNumber,
   formatPercentage,
   formatShortNumber,
-} from "@/libs";
+} from "../../../libs";
 import {
   isPriceChartAtom,
   isUSDChartAtom,
@@ -14,9 +14,9 @@ import {
   tokenLatestPriceAtom,
   tokenStatsAtom,
   useQuotePrice,
-} from "@/states";
+} from "../../../states";
 import { chainAtom, useTranslation } from "@liberfi/ui-base";
-import { BearishIcon, BullishIcon } from "@/assets";
+import { BearishIcon, BullishIcon } from "../../../assets";
 
 export function TradeTokenPrice() {
   const { t } = useTranslation();

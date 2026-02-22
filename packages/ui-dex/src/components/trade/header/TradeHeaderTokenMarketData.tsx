@@ -1,6 +1,6 @@
-import { Number } from "@/components/Number";
+import { Number } from "../../Number";
 import { tickAtom, useTranslation } from "@liberfi/ui-base";
-import { formatAge, formatPercentage, tokenTraders, tokenTrades, tokenVolumesInUsd } from "@/libs";
+import { formatAge, formatPercentage, tokenTraders, tokenTrades, tokenVolumesInUsd } from "../../../libs";
 import { Token } from "@chainstream-io/sdk";
 import { useMemo } from "react";
 import { useAtomValue } from "jotai";

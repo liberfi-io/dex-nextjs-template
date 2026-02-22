@@ -1,4 +1,4 @@
-import { NoDataIcon } from "@/assets";
+import { NoDataIcon } from "../assets";
 import { useTranslation } from "@liberfi/ui-base";
 import clsx from "clsx";
 

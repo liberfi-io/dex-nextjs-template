@@ -1,5 +1,5 @@
 import { useTranslation } from "@liberfi/ui-base";
-import { ListHeader } from "@/components/ListHeader";
+import { ListHeader } from "../../ListHeader";
 import { VolumeSort, TxsSort, TradersSort } from "../sorts";
 import { VolumeAndTxsAndTradersCompositeFilter } from "../filters";
 import { useTokenListContext } from "../TokenListContext";

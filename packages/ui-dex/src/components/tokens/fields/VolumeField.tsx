@@ -1,6 +1,6 @@
-import { ListField } from "@/components/ListField";
-import { Number } from "@/components/Number";
-import { tokenTraders, tokenTrades, tokenVolumesInUsd } from "@/libs";
+import { ListField } from "../../ListField";
+import { Number } from "../../Number";
+import { tokenTraders, tokenTrades, tokenVolumesInUsd } from "../../../libs";
 import { Token } from "@chainstream-io/sdk";
 import { useMemo } from "react";
 import { useTokenListContext } from "../TokenListContext";

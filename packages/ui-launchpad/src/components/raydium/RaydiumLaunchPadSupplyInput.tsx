@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { Select, SelectItem } from "@heroui/react";
 import { formatCount3 } from "@liberfi/core";
 import { useTranslation } from "@liberfi/ui-base";
-import { raydiumSupplyOptions } from "@/types";
+import { raydiumSupplyOptions } from "../../types";
 
 export function RaydiumLaunchPadSupplyInput() {
   const { control } = useFormContext();

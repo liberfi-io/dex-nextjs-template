@@ -15,16 +15,16 @@ import {
   useTranslation,
   useUpload,
 } from "@liberfi/ui-base";
-import { SOL_TOKEN_DECIMALS } from "@liberfi/ui-dex/dist/libs";
-import { launchPadCurvePoints } from "@/states";
-import { useCreateToken, useUploadMetadata } from "@/hooks";
+import { SOL_TOKEN_DECIMALS } from "@liberfi/ui-dex/libs";
+import { launchPadCurvePoints } from "../../states";
+import { useCreateToken, useUploadMetadata } from "../../hooks";
 import { PumpLaunchPadBasicForm } from "./PumpLaunchPadBasicForm";
 import { PumpLaunchPadSocialsForm } from "./PumpLaunchPadSocialsForm";
 import {
   defaultPumpLaunchPadFormValues,
   PumpLaunchPadFormSchema,
   PumpLaunchPadFormValues,
-} from "@/types";
+} from "../../types";
 import { isEmpty, pick } from "lodash-es";
 
 const NEW_TOKEN_DECIMALS = 6; // fixed decimals for new token

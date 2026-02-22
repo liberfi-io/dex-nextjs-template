@@ -1,6 +1,6 @@
 import { useTokenListContext } from "../TokenListContext";
 import { PropsWithChildren, useCallback } from "react";
-import { ListSort } from "@/components/ListSort";
+import { ListSort } from "../../ListSort";
 
 export function PriceSort({ children }: PropsWithChildren) {
   const { sort, setSort } = useTokenListContext();

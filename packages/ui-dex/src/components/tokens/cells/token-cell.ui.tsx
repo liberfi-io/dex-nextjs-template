@@ -1,6 +1,6 @@
-import { StyledTooltip } from "@/components/StyledTooltip";
-import { TokenAvatar2 } from "@/components/token/TokenAvatar2";
-import { formatAge, searchTwitterUrl } from "@/libs";
+import { StyledTooltip } from "../../StyledTooltip";
+import { TokenAvatar2 } from "../../token/TokenAvatar2";
+import { formatAge, searchTwitterUrl } from "../../../libs";
 import { Token } from "@chainstream-io/sdk";
 import { Link } from "@heroui/react";
 import {

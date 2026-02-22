@@ -1,4 +1,4 @@
-import { ArrowDownIcon } from "@/assets/icons";
+import { ArrowDownIcon } from "../../assets/icons";
 import { Button, Skeleton } from "@heroui/react";
 import { CONFIG } from "@liberfi/core";
 import { useTranslation } from "@liberfi/ui-base";

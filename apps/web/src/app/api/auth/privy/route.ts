@@ -1,4 +1,4 @@
-import { privyClient } from "@/libs/privyClient";
+import { privyClient } from "../../../../libs/privyClient";
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 

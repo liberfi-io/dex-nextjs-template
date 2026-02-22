@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { useTransferContext } from "./TransferContext";
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@heroui/react";
 import { TokenAvatar } from "../TokenAvatar";
-import { WithdrawOutlinedIcon } from "@/assets";
+import { WithdrawOutlinedIcon } from "../../assets";
 import { Number } from "../Number";
 import { useTranslation } from "@liberfi/ui-base";
-import { SOL_TOKEN_SYMBOL } from "@/libs";
+import { SOL_TOKEN_SYMBOL } from "../../libs";
 import { UnsignedTransactionDto } from "@liberfi/react-backend";
 
 export type PreviewModalProps = {

@@ -2,7 +2,7 @@ import { Controller, useFormContext } from "react-hook-form";
 import clsx from "clsx";
 import { NumberInput } from "@heroui/react";
 import { useTranslation } from "@liberfi/ui-base";
-import { defaultRaydiumLaunchPadFormValues } from "@/types";
+import { defaultRaydiumLaunchPadFormValues } from "../../types";
 
 export function RaydiumLaunchPadRaisedInput() {
   const { control } = useFormContext();

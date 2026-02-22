@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useTokensQuery } from "@liberfi/react-dex";
 import { ListEmptyData } from "../ListEmptyData";
 import { AssetListSkeleton } from "./AssetListSkeleton";
-import { appendPrimaryTokenNetWorth, appendPrimaryTokenPnl, AppRoute } from "@/libs";
+import { appendPrimaryTokenNetWorth, appendPrimaryTokenPnl, AppRoute } from "../../libs";
 import clsx from "clsx";
 import {
   TokenField,

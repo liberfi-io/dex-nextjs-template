@@ -1,5 +1,5 @@
-import { FavoriteOutlinedIcon } from "@/assets";
-import { ListHeader } from "@/components/ListHeader";
+import { FavoriteOutlinedIcon } from "../../../assets";
+import { ListHeader } from "../../ListHeader";
 import { Button } from "@heroui/react";
 
 export type FavoriteHeaderProps = {

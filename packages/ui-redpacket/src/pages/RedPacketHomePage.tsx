@@ -11,11 +11,11 @@ import {
   useRouter,
   useTranslation,
 } from "@liberfi/ui-base";
-import { MultipleRedPacketsIcon } from "@/icons";
+import { MultipleRedPacketsIcon } from "../icons";
 import { RedPacketCodeInput } from "../components/RedPacketCodeInput";
 import { fetchRedPacket } from "@liberfi/react-redpacket";
 import { useDexClient } from "@liberfi/react-dex";
-import { getRedPacketStatus } from "@/utils";
+import { getRedPacketStatus } from "../utils";
 import toast from "react-hot-toast";
 
 export function RedPacketHomePage() {

@@ -1,4 +1,4 @@
-import { AppRoute, CHAIN_QUOTE_TOKEN_SYMBOLS, formatLongNumber, formatShortNumber } from "@/libs";
+import { AppRoute, CHAIN_QUOTE_TOKEN_SYMBOLS, formatLongNumber, formatShortNumber } from "../../libs";
 import { chainAtom, useRouter, useTranslation } from "@liberfi/ui-base";
 import { useTvChartTradeHistories } from "../../hooks/tvchart/useTvChartTradeHistories";
 import {
@@ -22,7 +22,7 @@ import { Subscription } from "rxjs";
 import clsx from "clsx";
 import { chainSlugs } from "@liberfi/core";
 import { TvChartDataFeedModule } from "./TvChartDataFeedModule";
-import { isPriceChartAtom, isUSDChartAtom, tokenAddressAtom } from "@/states";
+import { isPriceChartAtom, isUSDChartAtom, tokenAddressAtom } from "../../states";
 import { useAtomValue } from "jotai";
 
 export interface TvChartWrapperProps {

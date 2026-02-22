@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { formatAge } from "@/libs/format";
-import { ListField } from "@/components/ListField";
+import { formatAge } from "../../../libs/format";
+import { ListField } from "../../ListField";
 import { Token } from "@chainstream-io/sdk";
 import clsx from "clsx";
 import { useAtomValue } from "jotai";

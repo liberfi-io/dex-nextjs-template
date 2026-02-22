@@ -1,5 +1,5 @@
-import { TokenAvatar } from "@/components/TokenAvatar";
-import { ListField } from "@/components/ListField";
+import { TokenAvatar } from "../../TokenAvatar";
+import { ListField } from "../../ListField";
 import clsx from "clsx";
 import { Token } from "@chainstream-io/sdk";
 

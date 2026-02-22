@@ -1,7 +1,7 @@
-import { TradeOutlinedIcon } from "@/assets";
+import { TradeOutlinedIcon } from "../../../assets";
 import { AccountAction } from "./AccountAction";
 import { useTranslation } from "@liberfi/ui-base";
-import { AppRoute } from "@/libs";
+import { AppRoute } from "../../../libs";
 
 export type TradeActionProps = {
   className?: string;

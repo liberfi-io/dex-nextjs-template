@@ -1,6 +1,6 @@
 import { Button } from "@heroui/react";
-import { ViewListOutlinedIcon } from "@/assets";
-import { ListField } from "@/components/ListField";
+import { ViewListOutlinedIcon } from "../../../assets";
+import { ListField } from "../../ListField";
 import clsx from "clsx";
 import { Token } from "@chainstream-io/sdk";
 

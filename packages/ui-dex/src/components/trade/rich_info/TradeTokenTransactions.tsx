@@ -1,5 +1,5 @@
 import { Token } from "@chainstream-io/sdk";
-import { formatPercentage, tokenPriceChangeRatioInUsd } from "@/libs";
+import { formatPercentage, tokenPriceChangeRatioInUsd } from "../../../libs";
 import { Button, Divider, Skeleton } from "@heroui/react";
 import clsx from "clsx";
 import { useCallback, useMemo, useState } from "react";
@@ -8,7 +8,7 @@ import { TradeTokenTransactionsOverview } from "./TradeTokenTransactionsOverview
 import { TradeTokenVolumesOverview } from "./TradeTokenVolumesOverview";
 import { RealtimeTradeList } from "./RealTimeTradeList";
 import { useAtomValue } from "jotai";
-import { tokenInfoAtom } from "@/states";
+import { tokenInfoAtom } from "../../../states";
 
 const defaultTimeframes = ["5m", "1h", "4h", "24h"];
 

@@ -1,5 +1,5 @@
-import { ListField } from "@/components/ListField";
-import { getWrappedAddress } from "@/libs";
+import { ListField } from "../../../ListField";
+import { getWrappedAddress } from "../../../../libs";
 import { Token, WalletNetWorthItemDTO } from "@chainstream-io/sdk";
 import { CHAIN_ID } from "@liberfi/core";
 import { Image } from "@heroui/react";

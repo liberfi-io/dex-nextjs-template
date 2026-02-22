@@ -1,4 +1,4 @@
-import { useSwapContext } from "@/components/swap/SwapContext";
+import { useSwapContext } from "../../swap/SwapContext";
 import { useTranslation } from "@liberfi/ui-base";
 import { Button } from "@heroui/react";
 import { TradeInput } from "./TradeInput";

@@ -1,7 +1,7 @@
 import { useTokenListContext } from "../TokenListContext";
 import { useTranslation } from "@liberfi/ui-base";
 import { PriceChangeFilter } from "../filters";
-import { ListHeader } from "@/components/ListHeader";
+import { ListHeader } from "../../ListHeader";
 import { PriceSort, PriceChangeSort } from "../sorts";
 
 export type PriceHeaderProps = {

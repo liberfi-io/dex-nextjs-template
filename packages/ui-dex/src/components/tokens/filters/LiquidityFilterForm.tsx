@@ -1,5 +1,5 @@
 import { useTranslation } from "@liberfi/ui-base";
-import { ListFilterForm, ListFilterFormProps } from "@/components/ListFilterForm";
+import { ListFilterForm, ListFilterFormProps } from "../../ListFilterForm";
 
 export function LiquidityFilterForm({
   value,

@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { useTvChartManager } from "./TvChartProvider";
 import { useTranslation } from "@liberfi/ui-base";
 import { Button, Popover, PopoverContent, PopoverTrigger, useDisclosure } from "@heroui/react";
-import { CameraIcon, CopyIcon, DownloadIcon } from "@/assets";
+import { CameraIcon, CopyIcon, DownloadIcon } from "../../assets";
 import clsx from "clsx";
 import { toast } from "react-hot-toast";
 

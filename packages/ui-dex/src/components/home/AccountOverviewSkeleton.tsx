@@ -1,5 +1,5 @@
-import { ArrowRightIcon } from "@/assets/icons";
-import { AppRoute } from "@/libs";
+import { ArrowRightIcon } from "../../assets/icons";
+import { AppRoute } from "../../libs";
 import { Link, Skeleton } from "@heroui/react";
 import { CONFIG } from "@liberfi/core";
 import { useAuthenticatedCallback, useRouter, useTranslation } from "@liberfi/ui-base";

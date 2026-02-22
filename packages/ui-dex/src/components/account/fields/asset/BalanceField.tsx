@@ -1,5 +1,5 @@
-import { ListField } from "@/components/ListField";
-import { Number } from "@/components/Number";
+import { ListField } from "../../../ListField";
+import { Number } from "../../../Number";
 import { Token, WalletNetWorthItemDTO } from "@chainstream-io/sdk";
 import { useMemo } from "react";
 

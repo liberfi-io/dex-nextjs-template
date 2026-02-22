@@ -1,4 +1,4 @@
-import { GoPlusIcon, TooltipIcon } from "@/assets";
+import { GoPlusIcon, TooltipIcon } from "../../../assets";
 import { useTranslation } from "@liberfi/ui-base";
 import { Token } from "@chainstream-io/sdk";
 import { Button, Link, Popover, PopoverContent, PopoverTrigger, Skeleton } from "@heroui/react";

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useSetAtom } from "jotai";
-import { tickAtom } from "@/states";
+import { tickAtom } from "../states";
 
 export function useUpdateTick() {
   const setTick = useSetAtom(tickAtom);

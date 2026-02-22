@@ -1,6 +1,6 @@
 import { Button } from "@heroui/react";
-import { FavoriteFilledIcon, FavoriteOutlinedIcon } from "@/assets";
-import { ListField } from "@/components/ListField";
+import { FavoriteFilledIcon, FavoriteOutlinedIcon } from "../../../assets";
+import { ListField } from "../../ListField";
 import clsx from "clsx";
 import { FavoriteFieldProps } from "./FavoriteField";
 

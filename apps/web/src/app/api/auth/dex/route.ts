@@ -1,4 +1,4 @@
-import { auth0Client } from "@/libs/auth0Client";
+import { auth0Client } from "../../../../libs/auth0Client";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(_request: NextRequest) {

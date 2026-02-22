@@ -1,9 +1,9 @@
 import { RedPacketDTO, Token } from "@chainstream-io/sdk";
 import { ForwardOutlinedIcon, useAppSdk, useTranslation } from "@liberfi/ui-base";
-import { TokenAvatar } from "@liberfi/ui-dex/dist/components/TokenAvatar";
+import { TokenAvatar } from "@liberfi/ui-dex/components/TokenAvatar";
 import { useCallback, useMemo } from "react";
 import BigNumber from "bignumber.js";
-import { getRedPacketStatus } from "@/utils";
+import { getRedPacketStatus } from "../utils";
 
 export type RedPacketHistoryProps = {
   redPacket: RedPacketDTO;

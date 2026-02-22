@@ -1,7 +1,7 @@
 import { Key, useCallback } from "react";
 import { useAtom } from "jotai";
 import { Tab, Tabs } from "@heroui/react";
-import { tradeBuyPresetAtom, tradeSellPresetAtom } from "@/states";
+import { tradeBuyPresetAtom, tradeSellPresetAtom } from "../../../states";
 import { useTranslation } from "@liberfi/ui-base";
 
 export type SwitchPresetProps = {

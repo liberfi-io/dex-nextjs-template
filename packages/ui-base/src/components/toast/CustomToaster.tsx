@@ -1,4 +1,4 @@
-import { defaultTheme } from "@/styles";
+import { defaultTheme } from "../../styles";
 import { Toaster } from "react-hot-toast";
 
 export function CustomToaster() {

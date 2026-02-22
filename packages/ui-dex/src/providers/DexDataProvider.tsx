@@ -6,8 +6,8 @@ import {
   useRefreshWalletPnl,
   useRefreshWalletPnlDetails,
 } from "@liberfi/ui-base";
-import { setCurrentQuoteSymbol } from "@/states";
-import { CHAIN_QUOTE_TOKEN_SYMBOLS } from "@/libs";
+import { setCurrentQuoteSymbol } from "../states";
+import { CHAIN_QUOTE_TOKEN_SYMBOLS } from "../libs";
 
 export function DexDataProvider({ children }: PropsWithChildren) {
   const chain = useAtomValue(chainAtom);

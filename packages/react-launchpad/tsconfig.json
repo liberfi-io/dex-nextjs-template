@@ -17,7 +17,21 @@
     "noEmit": false,
     "outDir": "dist",
     "declaration": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@liberfi/core": [
+        "../core/src"
+      ],
+      "@liberfi/react-dex": [
+        "../react-dex/src"
+      ],
+      "@liberfi/core/*": [
+        "../core/src/*"
+      ],
+      "@liberfi/react-dex/*": [
+        "../react-dex/src/*"
+      ]
+    }
   },
   "include": ["src"],
   "exclude": ["node_modules"]

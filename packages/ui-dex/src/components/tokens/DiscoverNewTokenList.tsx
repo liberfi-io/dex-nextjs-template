@@ -8,7 +8,7 @@ import {
 import { ListError } from "../ListError";
 import { DiscoverTokenListSkeleton } from "./DiscoverTokenListSkeleton";
 import { ListEmptyData } from "../ListEmptyData";
-import { tokenFilters, tokenSort } from "@/libs";
+import { tokenFilters, tokenSort } from "../../libs";
 import { DiscoverTokenListItem } from "./DiscoverTokenListItem";
 import { Virtuoso } from "react-virtuoso";
 import { useAtomValue } from "jotai";

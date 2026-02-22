@@ -1,5 +1,5 @@
-import { ChainAddress } from "@/components/ChainAddress";
-import { ListField } from "@/components/ListField";
+import { ChainAddress } from "../../ChainAddress";
+import { ListField } from "../../ListField";
 import { Token } from "@chainstream-io/sdk";
 import { CHAIN_ID } from "@liberfi/core";
 

@@ -1,12 +1,12 @@
 import { useMemo } from "react";
 import clsx from "clsx";
-import { BearishIcon, BullishIcon } from "@/assets";
-import { formatPercentage } from "@/libs/format";
-import { ListField } from "@/components/ListField";
+import { BearishIcon, BullishIcon } from "../../../assets";
+import { formatPercentage } from "../../../libs/format";
+import { ListField } from "../../ListField";
 import { PriceFieldProps } from "./PriceField";
 import { useTokenListContext } from "../TokenListContext";
-import { tokenPriceChangeRatioInUsd } from "@/libs";
-import { Number } from "@/components/Number";
+import { tokenPriceChangeRatioInUsd } from "../../../libs";
+import { Number } from "../../Number";
 
 export function PriceMobileField({ className, token }: PriceFieldProps) {
   const { timeframe } = useTokenListContext();

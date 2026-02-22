@@ -1,5 +1,5 @@
 import { TokenListTab } from "./TokenListTab";
-import { ViewListOutlinedIcon } from "@/assets/icons";
+import { ViewListOutlinedIcon } from "../../../assets/icons";
 import { useTokenListContext } from "../TokenListContext";
 import { useCallback } from "react";
 import { useTranslation } from "@liberfi/ui-base";

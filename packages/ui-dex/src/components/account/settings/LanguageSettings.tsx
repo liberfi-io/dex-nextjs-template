@@ -1,4 +1,4 @@
-import { SelectedIndicatorIcon, UnselectedIndicatorIcon } from "@/assets";
+import { SelectedIndicatorIcon, UnselectedIndicatorIcon } from "../../../assets";
 import { useTranslation } from "@liberfi/ui-base";
 import clsx from "clsx";
 import { useCallback } from "react";

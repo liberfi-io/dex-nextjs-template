@@ -1,10 +1,10 @@
-import "@/styles/globals.css";
+import "../styles/globals.css";
 import { Metadata, Viewport } from "next";
-import { AppLayout } from "@/components/AppLayout";
+import { AppLayout } from "../components/AppLayout";
 import { Inter } from "next/font/google";
-import { GoogleAnalytics } from "@/components/GoogleAnalytics";
-import { initServerI18n } from "@/i18n/initServerI18n";
-import { detectLanguage } from "@/i18n/detectLanguage";
+import { GoogleAnalytics } from "../components/GoogleAnalytics";
+import { initServerI18n } from "../i18n/initServerI18n";
+import { detectLanguage } from "../i18n/detectLanguage";
 import { defaultNS } from "@liberfi.io/i18n/server";
 import { CONFIG } from "@liberfi/core";
 

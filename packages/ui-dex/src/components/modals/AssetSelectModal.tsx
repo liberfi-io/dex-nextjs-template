@@ -2,7 +2,7 @@ import { useAppSdk, useAuth, useTranslation } from "@liberfi/ui-base";
 import { Modal, ModalBody, ModalContent, ModalHeader, useDisclosure } from "@heroui/react";
 import { useCallback, useEffect, useState } from "react";
 import { AssetSelect } from "../account";
-import { getBuyTokenUrl } from "@/libs";
+import { getBuyTokenUrl } from "../../libs";
 import { CHAIN_ID } from "@liberfi/core";
 
 export default function AssetSelectModal() {

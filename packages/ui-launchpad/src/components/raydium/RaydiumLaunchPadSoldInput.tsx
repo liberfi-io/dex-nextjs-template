@@ -5,7 +5,7 @@ import { useEffect, useMemo } from "react";
 import { BigNumber } from "bignumber.js";
 import { formatCount3 } from "@liberfi/core";
 import clsx from "clsx";
-import { defaultRaydiumLaunchPadFormValues } from "@/types";
+import { defaultRaydiumLaunchPadFormValues } from "../../types";
 
 export function RaydiumLaunchPadSoldInput() {
   const { control, trigger } = useFormContext();

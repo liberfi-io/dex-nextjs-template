@@ -8,7 +8,7 @@ import { Token, TradeDetailDTO } from "@chainstream-io/sdk";
 import { CHAIN_ID } from "@liberfi/core";
 import { reverse, sortBy, uniqBy } from "lodash-es";
 import { useAuth, useAuthenticatedCallback } from "@liberfi/ui-base";
-import { tokenInfoAtom } from "@/states";
+import { tokenInfoAtom } from "../../../states";
 import { useAtomValue } from "jotai";
 import { useTokensQuery, useTokenTradesQuery } from "@liberfi/react-dex";
 

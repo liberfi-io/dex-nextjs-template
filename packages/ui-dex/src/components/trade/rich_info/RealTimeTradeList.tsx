@@ -1,11 +1,11 @@
 import { layoutAtom, useTranslation } from "@liberfi/ui-base";
 import { useInterval } from "react-use";
 import { useTradeDataContext } from "../providers";
-import { BuyIcon, SellIcon } from "@/assets";
+import { BuyIcon, SellIcon } from "../../../assets";
 import { ChainAddress } from "../../ChainAddress";
-import { formatDuration } from "@/libs";
+import { formatDuration } from "../../../libs";
 import { useMemo, useState } from "react";
-import { Number } from "@/components/Number";
+import { Number } from "../../Number";
 import { Skeleton } from "@heroui/react";
 import { Virtuoso } from "react-virtuoso";
 import { useAtomValue } from "jotai";

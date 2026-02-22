@@ -3,8 +3,8 @@ import { clsx } from "clsx";
 import { useAtomValue } from "jotai";
 import { Button, NumberInput } from "@heroui/react";
 import { chainAtom, CheckIcon, EditIcon } from "@liberfi/ui-base";
-import { useSaveTradeSellSettings, useTradeSellSettings } from "@/hooks";
-import { defaultCustomSellPercentages, defaultSellSettingsValues } from "@/types";
+import { useSaveTradeSellSettings, useTradeSellSettings } from "../../../hooks";
+import { defaultCustomSellPercentages, defaultSellSettingsValues } from "../../../types";
 
 export type SellPercentageQuickInputsProps = {
   onChange?: (percent: number) => void;

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useAtomValue } from "jotai";
 import { chainAtom } from "@liberfi/ui-base";
 import { useFinalStretchTokensQuery } from "@liberfi/react-dex";
-import { usePulseListContext } from "@/components/pulse/PulseListContext";
+import { usePulseListContext } from "../../components/pulse/PulseListContext";
 import { Token } from "@chainstream-io/sdk";
 import { sortBy } from "lodash-es";
 

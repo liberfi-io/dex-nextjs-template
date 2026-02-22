@@ -1,5 +1,5 @@
-import { ArrowDownIcon, ArrowUpIcon, BearishIcon, BullishIcon, RefreshIcon } from "@/assets/icons";
-import { formatPercentage } from "@/libs";
+import { ArrowDownIcon, ArrowUpIcon, BearishIcon, BullishIcon, RefreshIcon } from "../../assets/icons";
+import { formatPercentage } from "../../libs";
 import { Button, Image } from "@heroui/react";
 import { CONFIG } from "@liberfi/core";
 import {

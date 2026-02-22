@@ -1,7 +1,7 @@
 import { PropsWithChildren, ReactNode } from "react";
 import { useAtomValue } from "jotai";
 import { clsx } from "clsx";
-import { hideHeaderOnLayoutAtom, showBottomNavigationBarOnLayoutAtom } from "@/states";
+import { hideHeaderOnLayoutAtom, showBottomNavigationBarOnLayoutAtom } from "../../states";
 
 export type PageProps = PropsWithChildren<{
   header?: ReactNode;

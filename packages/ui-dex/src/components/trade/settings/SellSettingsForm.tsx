@@ -3,10 +3,10 @@ import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Form, Tab, Tabs } from "@heroui/react";
 import { chainAtom, useTranslation } from "@liberfi/ui-base";
-import { defaultSellSettingsValues, SellSettingsSchema, SellSettingsValues } from "@/types";
+import { defaultSellSettingsValues, SellSettingsSchema, SellSettingsValues } from "../../../types";
 import { TradePresetForm } from "./TradePresetForm";
 import { CustomSellPercentagesInput } from "./CustomSellPercentagesInput";
-import { useSaveTradeSellSettings, useTradeSellSettings } from "@/hooks";
+import { useSaveTradeSellSettings, useTradeSellSettings } from "../../../hooks";
 import { useAtomValue } from "jotai";
 
 export type SellSettingsFormProps = {

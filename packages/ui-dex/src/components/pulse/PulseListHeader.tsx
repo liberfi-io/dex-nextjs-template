@@ -2,8 +2,8 @@ import { useCallback, useEffect, useMemo } from "react";
 import { useAtom } from "jotai";
 import { clsx } from "clsx";
 import { cloneDeep } from "lodash-es";
-import { InstantBuyAmountInput } from "@/components/trade";
-import { pulseSettingsAtom } from "@/states";
+import { InstantBuyAmountInput } from "../trade";
+import { pulseSettingsAtom } from "../../states";
 import { usePulseListContext } from "./PulseListContext";
 import { PauseIcon } from "@liberfi/ui-base";
 

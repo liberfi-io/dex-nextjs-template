@@ -1,5 +1,5 @@
-import { CloseIcon } from "@/assets";
-import { formatLongNumber, formatPercentage, tokenPriceChangeRatioInUsd } from "@/libs";
+import { CloseIcon } from "../../assets";
+import { formatLongNumber, formatPercentage, tokenPriceChangeRatioInUsd } from "../../libs";
 import {
   parseSymbol,
   stringifySymbol,
@@ -7,7 +7,7 @@ import {
   TvChartManager,
   TvChartSymbol,
   TvChartSymbolInfo,
-} from "@/libs/tvchart";
+} from "../../libs/tvchart";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { defaultTheme } from "@liberfi/ui-base";
 

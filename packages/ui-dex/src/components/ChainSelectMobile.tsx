@@ -1,6 +1,6 @@
-import { ChainImage, NetworkIcon } from "@/assets";
+import { ChainImage, NetworkIcon } from "../assets";
 import { useTranslation } from "@liberfi/ui-base";
-import { capitalize } from "@/libs";
+import { capitalize } from "../libs";
 import {
   Button,
   Listbox,

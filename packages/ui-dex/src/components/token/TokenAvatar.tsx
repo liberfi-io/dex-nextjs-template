@@ -6,7 +6,7 @@ import { Avatar, Tooltip } from "@heroui/react";
 import { Token, TokenExtraDTO, TokenMarketData } from "@chainstream-io/sdk";
 import { chainIdBySlug, getTokenProtocol } from "@liberfi/core";
 import { CameraIcon, chainAtom } from "@liberfi/ui-base";
-import { searchImageUrl } from "@/libs";
+import { searchImageUrl } from "../../libs";
 
 type TokenProps = Pick<Partial<Token>, "chain" | "symbol" | "name" | "address" | "imageUrl"> & {
   marketData?: Pick<TokenMarketData, "completionRatio">;

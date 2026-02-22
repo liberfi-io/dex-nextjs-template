@@ -1,6 +1,6 @@
 "use client";
 
-import { MediaTrackPage } from "@/components/MediaTrackPage";
+import { MediaTrackPage } from "../../components/MediaTrackPage";
 
 export default function Page() {
   return <MediaTrackPage />;

@@ -1,5 +1,5 @@
-import { WithdrawOutlinedIcon } from "@/assets";
-import { Number } from "@/components/Number";
+import { WithdrawOutlinedIcon } from "../../../assets";
+import { Number } from "../../Number";
 import { Button } from "@heroui/react";
 import clsx from "clsx";
 import { useAtomValue } from "jotai";

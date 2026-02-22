@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import toast, { CheckmarkIcon, ErrorIcon, ToastType } from "react-hot-toast";
-import { defaultTheme } from "@/styles";
-import { useSafeLayoutEffect } from "@/hooks";
+import { defaultTheme } from "../../styles";
+import { useSafeLayoutEffect } from "../../hooks";
 
 export type TimerToastProps = {
   id?: string;

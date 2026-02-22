@@ -12,8 +12,8 @@ import {
   AssetList,
   ActivityList,
   AccountHeader,
-} from "@/components/account";
-import { AssetTap } from "@/components/account/AssetTap";
+} from "../components/account";
+import { AssetTap } from "../components/account/AssetTap";
 
 export function AccountPage() {
   // hide header on tablet & mobile

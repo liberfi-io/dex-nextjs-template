@@ -1,4 +1,4 @@
-import { ListHeader } from "@/components/ListHeader";
+import { ListHeader } from "../../../ListHeader";
 
 export type ActionsHeaderProps = {
   className?: string;

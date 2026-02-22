@@ -2,7 +2,7 @@ import { Key, useCallback, useRef, useState } from "react";
 import { clsx } from "clsx";
 import { Tab, Tabs } from "@heroui/react";
 import { useTranslation } from "@liberfi/ui-base";
-import { SwitchWallet } from "@/components/wallet/SwitchWallet";
+import { SwitchWallet } from "../../wallet/SwitchWallet";
 import { SwitchPreset } from "./SwitchPreset";
 import { MarketBuyForm } from "./MarketBuyForm";
 import { MarketSellForm } from "./MarketSellForm";

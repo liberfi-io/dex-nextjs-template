@@ -23,7 +23,7 @@ import { RedPacketMaxClaimsInput } from "./RedPacketMaxClaimsInput";
 import { RedPacketMemoInput } from "./RedPacketMemoInput";
 import { RedPacketCreateOptions } from "./RedPacketCreateOptions";
 import { RedPacketMintAmountInput } from "./RedPacketMintAmountInput";
-import { getWrappedAddress } from "@liberfi/ui-dex/dist/libs/wallet";
+import { getWrappedAddress } from "@liberfi/ui-dex/libs/wallet";
 
 // TODO zod
 export type RandomRedPacketFormValues = {

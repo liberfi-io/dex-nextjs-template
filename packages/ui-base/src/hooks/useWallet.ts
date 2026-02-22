@@ -1,4 +1,4 @@
-import { chainAtom } from "@/states";
+import { chainAtom } from "../states";
 import { useAuth } from "./useAuth";
 import { useAtomValue } from "jotai";
 import { CHAIN_ID } from "@liberfi/core";

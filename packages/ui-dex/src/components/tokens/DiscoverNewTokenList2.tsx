@@ -2,7 +2,7 @@ import { useTokenListContext } from "./TokenListContext";
 import { ReactElement, useCallback, useEffect, useMemo, useState } from "react";
 import { ListError } from "../ListError";
 import { ListEmptyData } from "../ListEmptyData";
-import { AppRoute, tokenFilters, tokenSort } from "@/libs";
+import { AppRoute, tokenFilters, tokenSort } from "../../libs";
 import { useAtomValue } from "jotai";
 import { chainAtom, layoutAtom, useRouter, useTranslation } from "@liberfi/ui-base";
 import {

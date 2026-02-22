@@ -3,7 +3,7 @@ import {
   useShowBottomNavigationBar,
   useShowHeader,
 } from "@liberfi/ui-base";
-import { TokenList, TokenListProvider, TokenListTap } from "@/components/tokens";
+import { TokenList, TokenListProvider, TokenListTap } from "../components/tokens";
 import clsx from "clsx";
 
 export function TokenListPage() {

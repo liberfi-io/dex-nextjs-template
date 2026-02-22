@@ -1,4 +1,4 @@
-import { BitCoinTradeIcon, DashboardIcon, TradeHistoryIcon } from "@/assets";
+import { BitCoinTradeIcon, DashboardIcon, TradeHistoryIcon } from "../../assets";
 import { useTranslation } from "@liberfi/ui-base";
 import { Button } from "@heroui/react";
 import clsx from "clsx";

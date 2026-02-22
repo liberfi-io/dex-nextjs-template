@@ -1,10 +1,10 @@
-// import { useAppContext, useTranslation } from "@/hooks";
+// import { useAppContext, useTranslation } from "../../hooks";
 import { useTranslation } from "@liberfi/ui-base";
 import { CHAIN_ID } from "@liberfi/core";
 // import { ChainSelect } from "../ChainSelect";
 // import { ChainSelectMobile } from "../ChainSelectMobile";
 import { Button } from "@heroui/react";
-import { SelectedIndicatorIcon, UnselectedIndicatorIcon } from "@/assets";
+import { SelectedIndicatorIcon, UnselectedIndicatorIcon } from "../../assets";
 import { useCallback } from "react";
 
 export type AssetTapProps = {

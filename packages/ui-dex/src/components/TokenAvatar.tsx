@@ -1,6 +1,6 @@
 import { Avatar, Image } from "@heroui/react";
 import { CHAIN_ID } from "@liberfi/core";
-import { ChainImage, MultiChainIcon } from "@/assets";
+import { ChainImage, MultiChainIcon } from "../assets";
 import clsx from "clsx";
 
 export type TokenAvatarProps = {

@@ -8,7 +8,7 @@ import {
   TvChartSettings,
   TvChartTheme,
   TvChartType,
-} from "@/libs/tvchart";
+} from "../../libs/tvchart";
 import { TvChartHandle, TvChartProvider } from "./TvChartProvider";
 import { Subscription } from "rxjs";
 import { TvChartToolbar } from "./TvChartToolbar";

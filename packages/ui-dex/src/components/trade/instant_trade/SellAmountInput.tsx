@@ -4,7 +4,7 @@ import { useAtomValue } from "jotai";
 import { BigNumber } from "bignumber.js";
 import { NumberInput } from "@heroui/react";
 import { useTranslation, useWalletTokenNetWorth } from "@liberfi/ui-base";
-import { tokenInfoAtom } from "@/states";
+import { tokenInfoAtom } from "../../../states";
 import { SellPercentageQuickInputs } from "./SellPercentageQuickInputs";
 
 export type SellAmountInputProps = {

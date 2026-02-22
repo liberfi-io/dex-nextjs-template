@@ -1,12 +1,12 @@
 import clsx from "clsx";
 import { Button, Input } from "@heroui/react";
-import { CloseIcon, CopyIcon } from "@/assets";
+import { CloseIcon, CopyIcon } from "../../assets";
 import { useAuth, useTranslation } from "@liberfi/ui-base";
-import { usePaste } from "@/hooks";
+import { usePaste } from "../../hooks";
 import { useTransferContext } from "./TransferContext";
 import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { debounce } from "lodash-es";
-import { isValidWalletAddress } from "@/libs";
+import { isValidWalletAddress } from "../../libs";
 import { CHAIN_ID } from "@liberfi/core";
 
 export function WalletAddressInput() {

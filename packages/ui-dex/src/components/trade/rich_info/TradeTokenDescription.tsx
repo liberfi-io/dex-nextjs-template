@@ -1,4 +1,4 @@
-import { ArrowDownIcon, ArrowUpIcon } from "@/assets";
+import { ArrowDownIcon, ArrowUpIcon } from "../../../assets";
 import { useTranslation } from "@liberfi/ui-base";
 import { Token } from "@chainstream-io/sdk";
 import { Button, Divider } from "@heroui/react";

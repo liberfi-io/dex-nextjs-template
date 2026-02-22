@@ -1,7 +1,7 @@
-import { ArrowDownIcon, ArrowUpIcon } from "@/assets";
-import { EmptyData } from "@/components/EmptyData";
-import { Number } from "@/components/Number";
-import { ChainAddress } from "@/components/ChainAddress";
+import { ArrowDownIcon, ArrowUpIcon } from "../../../assets";
+import { EmptyData } from "../../EmptyData";
+import { Number } from "../../Number";
+import { ChainAddress } from "../../ChainAddress";
 import { useTranslation } from "@liberfi/ui-base";
 import { Token } from "@chainstream-io/sdk";
 import { Button, Divider, Skeleton } from "@heroui/react";

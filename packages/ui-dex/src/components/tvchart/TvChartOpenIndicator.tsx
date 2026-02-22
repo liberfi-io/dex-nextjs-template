@@ -2,7 +2,7 @@ import { Button } from "@heroui/react";
 import { useTvChartManager } from "./TvChartProvider";
 import { useCallback } from "react";
 import clsx from "clsx";
-import { FunctionIcon } from "@/assets";
+import { FunctionIcon } from "../../assets";
 
 export function TvChartOpenIndicator({ className }: { className?: string }) {
   const chartManager = useTvChartManager();

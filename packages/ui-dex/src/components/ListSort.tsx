@@ -1,4 +1,4 @@
-import { SortAscIcon, SortDescIcon } from "@/assets/icons";
+import { SortAscIcon, SortDescIcon } from "../assets/icons";
 import clsx from "clsx";
 import { PropsWithChildren, useCallback } from "react";
 

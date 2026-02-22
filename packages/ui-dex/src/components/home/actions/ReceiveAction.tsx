@@ -1,6 +1,6 @@
 import { useAppSdk, useAuthenticatedCallback, useTranslation } from "@liberfi/ui-base";
 import { AccountAction } from "./AccountAction";
-import { ReceiveOutlinedIcon } from "@/assets";
+import { ReceiveOutlinedIcon } from "../../../assets";
 
 export function ReceiveAction() {
   const { t } = useTranslation();

@@ -16,9 +16,9 @@ import {
   useTranslation,
   useWalletTokenNetWorth,
 } from "@liberfi/ui-base";
-import { tokenInfoAtom, tokenLatestPriceAtom, tradeSellPresetAtom, useQuotePrice } from "@/states";
-import { useSwap, useTradeSellSettings } from "@/hooks";
-import { defaultTradePresetValues } from "@/types";
+import { tokenInfoAtom, tokenLatestPriceAtom, tradeSellPresetAtom, useQuotePrice } from "../../../states";
+import { useSwap, useTradeSellSettings } from "../../../hooks";
+import { defaultTradePresetValues } from "../../../types";
 import { SellAmountInput } from "./SellAmountInput";
 import { SellTokenAmount } from "./SellTokenAmount";
 import { SellTokenBalance } from "./SellTokenBalance";

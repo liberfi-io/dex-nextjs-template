@@ -9,15 +9,22 @@
     "build:web": "turbo run build --filter=./apps/web",
     "lint": "turbo run lint --parallel",
     "lint-fix": "turbo run lint-fix --parallel",
-    "lint-staged": "lint-staged"
+    "lint-staged": "lint-staged",
+    "tsconfig-paths": "tsx scripts/tsconfigPaths.ts"
   },
   "workspaces": [
     "packages/*",
     "apps/*"
   ],
   "devDependencies": {
+    "@manypkg/get-packages": "^2.2.2",
+    "@types/fs-extra": "^11.0.4",
+    "fs-extra": "^11.2.0",
+    "jsonc-parser": "^3.3.1",
     "lint-staged": "^15.5.2",
-    "turbo": "^2.3.3"
+    "tsx": "^4.19.2",
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.2"
   },
   "packageManager": "pnpm@9.5.0"
 }

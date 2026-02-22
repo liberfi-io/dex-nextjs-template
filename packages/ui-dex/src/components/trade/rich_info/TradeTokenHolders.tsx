@@ -1,12 +1,12 @@
 import { Divider, Skeleton } from "@heroui/react";
 import { useTranslation } from "@liberfi/ui-base";
-import { formatPercentage } from "@/libs";
+import { formatPercentage } from "../../../libs";
 import { ReactNode } from "react";
 import { HoldersList } from "./HoldersList";
-import { Number } from "@/components/Number";
+import { Number } from "../../Number";
 import { Token } from "@chainstream-io/sdk";
 import { useAtomValue } from "jotai";
-import { tokenInfoAtom } from "@/states";
+import { tokenInfoAtom } from "../../../states";
 
 export function TradeTokenHolders() {
   const token = useAtomValue(tokenInfoAtom);

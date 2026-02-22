@@ -1,6 +1,6 @@
 import { PropsWithChildren, useCallback, useMemo } from "react";
 import { Button, Link, Skeleton } from "@heroui/react";
-import { ListEmptyData } from "@liberfi/ui-dex/dist/components/ListEmptyData";
+import { ListEmptyData } from "@liberfi/ui-dex/components/ListEmptyData";
 import { useRedPacketClaimsQuery } from "@liberfi/react-redpacket";
 import {
   BackwardOutlinedIcon,
@@ -10,10 +10,10 @@ import {
   useTranslation,
 } from "@liberfi/ui-base";
 import { RedPacketClaimDTO, Token } from "@chainstream-io/sdk";
-import { formatShortAddress } from "@liberfi/ui-dex/dist/libs/format";
+import { formatShortAddress } from "@liberfi/ui-dex/libs/format";
 import { useTokenQuery } from "@liberfi/react-dex";
 import { useAtomValue } from "jotai";
-import { TokenAvatar } from "@liberfi/ui-dex/dist/components/TokenAvatar";
+import { TokenAvatar } from "@liberfi/ui-dex/components/TokenAvatar";
 import { BigNumber } from "bignumber.js";
 import { chainTxExplorer } from "@liberfi/core";
 

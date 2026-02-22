@@ -3,8 +3,8 @@ import { clsx } from "clsx";
 import { useAtomValue } from "jotai";
 import { Button, NumberInput } from "@heroui/react";
 import { chainAtom, CheckIcon, EditIcon } from "@liberfi/ui-base";
-import { useSaveTradeBuySettings, useTradeBuySettings } from "@/hooks";
-import { defaultBuySettingsValues, defaultCustomBuyAmounts } from "@/types";
+import { useSaveTradeBuySettings, useTradeBuySettings } from "../../../hooks";
+import { defaultBuySettingsValues, defaultCustomBuyAmounts } from "../../../types";
 
 export type BuyAmountQuickInputsProps = {
   onChange?: (amount: number) => void;

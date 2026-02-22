@@ -2,7 +2,7 @@ import { useTokenListContext } from "../TokenListContext";
 import { useCallback, useEffect, useState } from "react";
 import { MarketCapFilterForm } from "./MarketCapFilterForm";
 import { LiquidityFilterForm } from "./LiquidityFilterForm";
-import { ListFilter } from "@/components/ListFilter";
+import { ListFilter } from "../../ListFilter";
 
 export function MarketCapAndLiquidityCompositeFilter() {
   const { filters, setFilters } = useTokenListContext();

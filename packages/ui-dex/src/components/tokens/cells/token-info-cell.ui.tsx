@@ -7,10 +7,10 @@ import {
   useTranslation,
 } from "@liberfi/ui-base";
 import { useMemo } from "react";
-import { StyledTooltip } from "@/components/StyledTooltip";
+import { StyledTooltip } from "../../StyledTooltip";
 import { Chip } from "@heroui/react";
 import { formatAmount } from "@liberfi/core";
-import { formatPercentage } from "@/libs";
+import { formatPercentage } from "../../../libs";
 
 export function TokenInfoCell({ token }: { token: Token }) {
   const { t } = useTranslation();

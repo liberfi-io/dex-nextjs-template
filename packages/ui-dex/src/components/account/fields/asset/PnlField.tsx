@@ -1,8 +1,8 @@
-import { ListField } from "@/components/ListField";
-import { formatPercentage } from "@/libs";
+import { ListField } from "../../../ListField";
+import { formatPercentage } from "../../../../libs";
 import { useMemo } from "react";
 import { PnlDetailItemDTO, Token, WalletNetWorthItemDTO } from "@chainstream-io/sdk";
-import { Number } from "@/components/Number";
+import { Number } from "../../../Number";
 import BigNumber from "bignumber.js";
 
 export interface PnlFieldProps {

@@ -4,7 +4,7 @@ import clsx from "clsx";
 import { Image, Tab, Tabs } from "@heroui/react";
 import { useTranslation } from "@liberfi/ui-base";
 import { LaunchPadPlatform } from "@liberfi/react-launchpad";
-import { launchPadPlatform } from "@/states";
+import { launchPadPlatform } from "../states";
 import { PumpLaunchPadForm } from "./pump";
 import { RaydiumLaunchPadForm } from "./raydium";
 import { LaunchPadCurveAreaChart } from "./LaunchPadCurveAreaChart";

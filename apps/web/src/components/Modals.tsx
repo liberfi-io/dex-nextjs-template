@@ -3,14 +3,14 @@ import { LaunchPadModal } from "@liberfi/ui-launchpad";
 import { lazy, Suspense } from "react";
 
 const modals = [
-  lazy(() => import("@liberfi/ui-dex/dist/components/modals/SearchModal")),
-  lazy(() => import("@liberfi/ui-dex/dist/components/modals/WebviewModal")),
-  lazy(() => import("@liberfi/ui-dex/dist/components/modals/ReceiveModal")),
-  lazy(() => import("@liberfi/ui-dex/dist/components/modals/AssetSelectModal")),
-  lazy(() => import("@liberfi/ui-dex/dist/components/modals/TokenSelectModal")),
-  lazy(() => import("@liberfi/ui-dex/dist/components/modals/SwapModal")),
-  lazy(() => import("@liberfi/ui-dex/dist/components/modals/LanguageModal")),
-  lazy(() => import("@liberfi/ui-dex/dist/components/modals/TransferModal")),
+  lazy(() => import("@liberfi/ui-dex/components/modals/SearchModal")),
+  lazy(() => import("@liberfi/ui-dex/components/modals/WebviewModal")),
+  lazy(() => import("@liberfi/ui-dex/components/modals/ReceiveModal")),
+  lazy(() => import("@liberfi/ui-dex/components/modals/AssetSelectModal")),
+  lazy(() => import("@liberfi/ui-dex/components/modals/TokenSelectModal")),
+  lazy(() => import("@liberfi/ui-dex/components/modals/SwapModal")),
+  lazy(() => import("@liberfi/ui-dex/components/modals/LanguageModal")),
+  lazy(() => import("@liberfi/ui-dex/components/modals/TransferModal")),
 ];
 
 export function Modals() {

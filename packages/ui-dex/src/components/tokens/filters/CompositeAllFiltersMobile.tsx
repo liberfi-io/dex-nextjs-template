@@ -8,7 +8,7 @@ import {
   ModalHeader,
   useDisclosure,
 } from "@heroui/react";
-import { FilterIcon } from "@/assets";
+import { FilterIcon } from "../../../assets";
 import { useTranslation } from "@liberfi/ui-base";
 import clsx from "clsx";
 import { useTokenListContext } from "../TokenListContext";

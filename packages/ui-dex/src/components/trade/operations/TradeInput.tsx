@@ -1,5 +1,5 @@
-import { useSwapContext } from "@/components/swap/SwapContext";
-import { getBuyTokenUrl } from "@/libs";
+import { useSwapContext } from "../../swap/SwapContext";
+import { getBuyTokenUrl } from "../../../libs";
 import { Button, Input } from "@heroui/react";
 import { CONFIG } from "@liberfi/core";
 import { useAppSdk, useAuth, useTranslation, walletNetWorthAtom } from "@liberfi/ui-base";

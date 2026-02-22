@@ -19,8 +19,8 @@ import {
   useNewTokensQuery,
 } from "@liberfi/react-dex";
 import { chainAtom } from "@liberfi/ui-base";
-import { usePulseListContext } from "@/components/pulse/PulseListContext";
-import { useQuotePrice } from "@/states";
+import { usePulseListContext } from "../../components/pulse/PulseListContext";
+import { useQuotePrice } from "../../states";
 import { getPrimaryTokenSymbol, RecursivePartial } from "@liberfi/core";
 
 export function usePulseWsNewTokens() {

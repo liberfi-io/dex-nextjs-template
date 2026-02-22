@@ -2,8 +2,8 @@ import { useCallback } from "react";
 import { useSetAtom } from "jotai";
 import clsx from "clsx";
 import { useTranslation } from "@liberfi/ui-base";
-import { isPriceChartAtom } from "@/states";
-import { stringifySymbol, TvChartPriceType } from "@/libs/tvchart";
+import { isPriceChartAtom } from "../../states";
+import { stringifySymbol, TvChartPriceType } from "../../libs/tvchart";
 import { useTvChartToolbarContext } from "./TvChartToolbarProvider";
 
 export function TvChartPriceTypeSwitch({ className }: { className?: string }) {

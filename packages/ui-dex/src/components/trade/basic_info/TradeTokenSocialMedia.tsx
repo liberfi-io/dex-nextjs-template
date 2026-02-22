@@ -6,7 +6,7 @@ import {
   DiscordIcon,
   RedditIcon,
   GithubIcon,
-} from "@/assets";
+} from "../../../assets";
 import { Token, TokenSocialMediasDTO } from "@chainstream-io/sdk";
 import { useMemo } from "react";
 

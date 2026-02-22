@@ -1,4 +1,4 @@
-import { usePulseListContext } from "@/components/pulse/PulseListContext";
+import { usePulseListContext } from "../../components/pulse/PulseListContext";
 import { Token } from "@chainstream-io/sdk";
 import { useMigratedTokensQuery } from "@liberfi/react-dex";
 import { chainAtom } from "@liberfi/ui-base";

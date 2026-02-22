@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useTvChartManager } from "./TvChartProvider";
-import { TvChartSettingsIcon } from "@/assets";
+import { TvChartSettingsIcon } from "../../assets";
 import { Button } from "@heroui/react";
 import clsx from "clsx";
 

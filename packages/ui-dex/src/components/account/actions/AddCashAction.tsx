@@ -1,7 +1,7 @@
-import { CashInOutlinedIcon } from "@/assets";
+import { CashInOutlinedIcon } from "../../../assets";
 import { AccountAction } from "./AccountAction";
 import { useAuthenticatedCallback, useTranslation, useAppSdk, useAuth } from "@liberfi/ui-base";
-import { getBuyTokenUrl } from "@/libs";
+import { getBuyTokenUrl } from "../../../libs";
 import { CHAIN_ID } from "@liberfi/core";
 
 export function AddCashAction() {

@@ -20,8 +20,8 @@ import {
   useTranslation,
   ZapFastIcon,
 } from "@liberfi/ui-base";
-import { useTradeBuySettings } from "@/hooks";
-import { defaultTradePresetValues, TradePresetValues } from "@/types";
+import { useTradeBuySettings } from "../../../hooks";
+import { defaultTradePresetValues, TradePresetValues } from "../../../types";
 
 export type InstantBuyAmountInputProps = {
   amount?: number;

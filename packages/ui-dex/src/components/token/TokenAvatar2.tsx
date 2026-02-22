@@ -2,7 +2,7 @@ import { MouseEvent, PropsWithChildren, useCallback, useMemo, useState } from "r
 import { Avatar, Image } from "@heroui/react";
 import { CHAIN_ID, chainIdBySlug, getTokenProtocol, SafeBigNumber } from "@liberfi/core";
 import { Token } from "@chainstream-io/sdk";
-import { searchImageUrl } from "@/libs";
+import { searchImageUrl } from "../../libs";
 import clsx from "clsx";
 import { CameraIcon } from "@liberfi/ui-base";
 import { StyledTooltip } from "../StyledTooltip";

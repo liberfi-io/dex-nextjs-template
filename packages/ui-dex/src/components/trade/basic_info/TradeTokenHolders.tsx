@@ -1,5 +1,5 @@
-import { formatPercentage } from "@/libs";
-import { Number } from "@/components/Number";
+import { formatPercentage } from "../../../libs";
+import { Number } from "../../Number";
 import { useTranslation } from "@liberfi/ui-base";
 import { Token } from "@chainstream-io/sdk";
 

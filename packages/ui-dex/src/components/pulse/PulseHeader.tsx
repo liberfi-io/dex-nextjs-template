@@ -1,5 +1,5 @@
 import { clsx } from "clsx";
-import { SwitchWallet } from "@/components/wallet";
+import { SwitchWallet } from "../wallet";
 import { useTranslation } from "@liberfi/ui-base";
 import { PulseHeaderInstantBuyAmount } from "./PulseHeaderInstantBuyAmount";
 

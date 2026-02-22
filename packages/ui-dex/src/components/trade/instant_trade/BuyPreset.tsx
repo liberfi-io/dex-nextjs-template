@@ -3,9 +3,9 @@ import { clsx } from "clsx";
 import { useAtomValue } from "jotai";
 import { Button } from "@heroui/react";
 import { chainAtom, ChevronDownIcon } from "@liberfi/ui-base";
-import { useSaveTradeBuySettings, useTradeBuySettings } from "@/hooks";
-import { tradeBuyPresetAtom } from "@/states";
-import { defaultBuySettingsValues, defaultTradePresetValues, TradePresetValues } from "@/types";
+import { useSaveTradeBuySettings, useTradeBuySettings } from "../../../hooks";
+import { tradeBuyPresetAtom } from "../../../states";
+import { defaultBuySettingsValues, defaultTradePresetValues, TradePresetValues } from "../../../types";
 import { PresetOverview } from "./PresetOverview";
 import { PresetForm } from "./PresetForm";
 

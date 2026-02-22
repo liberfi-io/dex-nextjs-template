@@ -2,9 +2,9 @@
 
 import { PropsWithChildren } from "react";
 import { UIKitProvider } from "@liberfi/ui-base";
-import { useTranslationAdapter } from "@/hooks/useTranslationAdapter";
-import { useRouterAdapter } from "@/hooks/useRouterAdapter";
-import { browserAppSdk } from "@/libs/browser/BrowserAppSdk";
+import { useTranslationAdapter } from "../hooks/useTranslationAdapter";
+import { useRouterAdapter } from "../hooks/useRouterAdapter";
+import { browserAppSdk } from "../libs/browser/BrowserAppSdk";
 import { Modals } from "./Modals";
 import { BottomNavigationBar, DexDataProvider, Header } from "@liberfi/ui-dex";
 import { BottomToolBar } from "./BottomToolBar";

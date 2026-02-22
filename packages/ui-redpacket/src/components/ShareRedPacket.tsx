@@ -1,6 +1,6 @@
 "use client";
 
-import { RedPacketIcon } from "@/icons";
+import { RedPacketIcon } from "../icons";
 import { RedPacketDTO } from "@chainstream-io/sdk";
 import { Button, Link, Skeleton } from "@heroui/react";
 import { CONFIG, chainTxExplorer, ROUTES } from "@liberfi/core";
@@ -13,8 +13,8 @@ import {
   useCopyToClipboard,
   useTranslation,
 } from "@liberfi/ui-base";
-import { TelegramIcon, TwitterIcon } from "@liberfi/ui-dex/dist/assets/icons";
-import { TokenAvatar } from "@liberfi/ui-dex/dist/components/TokenAvatar";
+import { TelegramIcon, TwitterIcon } from "@liberfi/ui-dex/assets/icons";
+import { TokenAvatar } from "@liberfi/ui-dex/components/TokenAvatar";
 import { BigNumber } from "bignumber.js";
 import { useAtomValue } from "jotai";
 import { useCallback, useMemo } from "react";

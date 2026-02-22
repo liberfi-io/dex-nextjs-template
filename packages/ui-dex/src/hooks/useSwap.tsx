@@ -17,7 +17,7 @@ import {
 import { BigNumber } from "bignumber.js";
 import { chainIcon, getWrappedTokenAddress } from "@liberfi/core";
 import { Button, Image, Link } from "@heroui/react";
-import { getTxExplorerUrl } from "@/libs";
+import { getTxExplorerUrl } from "../libs";
 
 export type SwapOptions = {
   // input token address

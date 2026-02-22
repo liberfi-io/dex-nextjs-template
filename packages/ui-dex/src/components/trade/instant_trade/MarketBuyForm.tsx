@@ -10,9 +10,9 @@ import {
   useTranslation,
   useWalletPrimaryTokenNetWorth,
 } from "@liberfi/ui-base";
-import { tokenAddressAtom, tradeBuyPresetAtom, useQuotePrice } from "@/states";
-import { useSwap, useTradeBuySettings } from "@/hooks";
-import { defaultTradePresetValues } from "@/types";
+import { tokenAddressAtom, tradeBuyPresetAtom, useQuotePrice } from "../../../states";
+import { useSwap, useTradeBuySettings } from "../../../hooks";
+import { defaultTradePresetValues } from "../../../types";
 import { BuyAmountInput } from "./BuyAmountInput";
 import { BuyPreset } from "./BuyPreset";
 import { BuyTokenBalance } from "./BuyTokenBalance";

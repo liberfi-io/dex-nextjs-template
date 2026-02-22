@@ -1,9 +1,9 @@
-import { ListField } from "@/components/ListField";
-import { TokenAvatar } from "@/components/TokenAvatar";
-import { formatAge } from "@/libs/format";
+import { ListField } from "../../ListField";
+import { TokenAvatar } from "../../TokenAvatar";
+import { formatAge } from "../../../libs/format";
 import clsx from "clsx";
 import { Token } from "@chainstream-io/sdk";
-import { Number } from "@/components/Number";
+import { Number } from "../../Number";
 import { useMemo } from "react";
 import { useAtomValue } from "jotai";
 import { tickAtom } from "@liberfi/ui-base";

@@ -1,4 +1,4 @@
-import { LaunchPadPoolInfo, PoolBaseAmount } from "src/types";
+import { LaunchPadPoolInfo, PoolBaseAmount } from "../types";
 import { BaseCurve } from "./BaseCurve";
 
 export class LinearPriceCurve extends BaseCurve {

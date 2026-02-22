@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { VolumeFilterForm } from "./VolumeFilterForm";
 import { TxsFilterForm } from "./TxsFilterForm";
 import { TradersFilterForm } from "./TradersFilterForm";
-import { ListFilter } from "@/components/ListFilter";
+import { ListFilter } from "../../ListFilter";
 
 export function VolumeAndTxsAndTradersCompositeFilter() {
   const { filters, setFilters } = useTokenListContext();

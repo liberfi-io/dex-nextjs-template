@@ -1,7 +1,7 @@
 import { useTokenListContext } from "../TokenListContext";
 import { useCallback, useEffect, useState } from "react";
 import { HoldersFilterForm } from "./HoldersFilterForm";
-import { ListFilter } from "@/components/ListFilter";
+import { ListFilter } from "../../ListFilter";
 
 export function HoldersFilter() {
   const { filters, setFilters } = useTokenListContext();

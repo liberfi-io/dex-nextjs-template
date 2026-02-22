@@ -1,4 +1,4 @@
-import { ListField } from "@/components/ListField";
+import { ListField } from "../../ListField";
 import { Skeleton } from "@heroui/react";
 
 export function HoldersSkeleton() {

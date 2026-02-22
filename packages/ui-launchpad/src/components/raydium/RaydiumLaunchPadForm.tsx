@@ -15,19 +15,19 @@ import {
   useTranslation,
   useUpload,
 } from "@liberfi/ui-base";
-import { SOL_TOKEN_DECIMALS } from "@liberfi/ui-dex/dist/libs";
-import { launchPadCurvePoints } from "@/states";
-import { useCreateToken, useUploadMetadata } from "@/hooks";
+import { SOL_TOKEN_DECIMALS } from "@liberfi/ui-dex/libs";
+import { launchPadCurvePoints } from "../../states";
+import { useCreateToken, useUploadMetadata } from "../../hooks";
 import {
   defaultRaydiumLaunchPadFormValues,
   RaydiumLaunchPadFormSchema,
   RaydiumLaunchPadFormValues,
-} from "@/types";
+} from "../../types";
 import { RaydiumLaunchPadBasicForm } from "./RaydiumLaunchPadBasicForm";
 import { RaydiumLaunchPadSocialsForm } from "./RaydiumLaunchPadSocialsForm";
 import { RaydiumLaunchPadAdvancedForm } from "./RaydiumLaunchPadAdvancedForm";
 import { isEmpty, omit, pick } from "lodash-es";
-import { getVestingPeriod } from "@/utils";
+import { getVestingPeriod } from "../../utils";
 
 const NEW_TOKEN_DECIMALS = 6; // fixed decimals for new token
 const MIGRATE_FEE = 0.02;

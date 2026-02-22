@@ -1,4 +1,4 @@
-import { isValidWalletAddress } from "@/libs";
+import { isValidWalletAddress } from "../../libs";
 import BigNumber from "bignumber.js";
 import { CHAIN_ID } from "@liberfi/core";
 import {

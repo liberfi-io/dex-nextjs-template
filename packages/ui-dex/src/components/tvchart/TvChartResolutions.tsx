@@ -1,11 +1,11 @@
 import clsx from "clsx";
 import { useTranslation } from "@liberfi/ui-base";
-import { ALL_TV_CHART_RESOLUTIONS, TvChartResolution } from "@/libs/tvchart";
+import { ALL_TV_CHART_RESOLUTIONS, TvChartResolution } from "../../libs/tvchart";
 import { memo, useCallback, useEffect, useState } from "react";
 import { useTvChartContext } from "./TvChartProvider";
 import { useTvChartToolbarContext } from "./TvChartToolbarProvider";
 import { Button, Popover, PopoverContent, PopoverTrigger, useDisclosure } from "@heroui/react";
-import { ArrowDownIcon } from "@/assets";
+import { ArrowDownIcon } from "../../assets";
 
 export const TvChartResolutions = memo(() => {
   const { t } = useTranslation();

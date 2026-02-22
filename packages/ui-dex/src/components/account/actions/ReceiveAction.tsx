@@ -1,4 +1,4 @@
-import { ReceiveOutlinedIcon } from "@/assets";
+import { ReceiveOutlinedIcon } from "../../../assets";
 import { AccountAction } from "./AccountAction";
 import { useAppSdk, useAuthenticatedCallback, useTranslation } from "@liberfi/ui-base";
 

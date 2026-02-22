@@ -1,7 +1,7 @@
 import { Key, useCallback, useState } from "react";
 import { Tab, Tabs } from "@heroui/react";
 import { useTranslation } from "@liberfi/ui-base";
-import { BuySettingsValues, SellSettingsValues, TradeSettingsValues } from "@/types";
+import { BuySettingsValues, SellSettingsValues, TradeSettingsValues } from "../../../types";
 import { BuySettingsForm } from "./BuySettingsForm";
 import { SellSettingsForm } from "./SellSettingsForm";
 

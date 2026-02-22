@@ -4,9 +4,9 @@ import { useMemo } from "react";
 import { CHAIN_ID, chainSlugs } from "@liberfi/core";
 import { capitalize } from "lodash-es";
 import { Button } from "@heroui/react";
-import { CopyIcon } from "@/assets";
+import { CopyIcon } from "../../assets";
 import clsx from "clsx";
-import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
+import { useCopyToClipboard } from "../../hooks/useCopyToClipboard";
 
 export function Receive() {
   const { t } = useTranslation();

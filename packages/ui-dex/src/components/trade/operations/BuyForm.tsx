@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useSwapContext } from "@/components/swap/SwapContext";
+import { useSwapContext } from "../../swap/SwapContext";
 import { useTranslation } from "@liberfi/ui-base";
 import { Button } from "@heroui/react";
 import { BuyAsset } from "./BuyAsset";
 import { TradeInput } from "./TradeInput";
-import { Number } from "@/components/Number";
+import { Number } from "../../Number";
 import { useMemo } from "react";
 import BigNumber from "bignumber.js";
 import clsx from "clsx";

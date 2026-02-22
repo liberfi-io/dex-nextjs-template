@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { DiscoveryIcon } from "@/assets/icons";
+import { DiscoveryIcon } from "../../../assets/icons";
 import { useTranslation } from "@liberfi/ui-base";
 import { useTokenListContext } from "../TokenListContext";
 import { TokenListTab } from "./TokenListTab";

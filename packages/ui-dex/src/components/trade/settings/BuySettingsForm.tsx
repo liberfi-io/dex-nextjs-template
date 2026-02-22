@@ -5,10 +5,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Form, Tab, Tabs } from "@heroui/react";
 import { getPrimaryTokenSymbol } from "@liberfi/core";
 import { chainAtom, useTranslation } from "@liberfi/ui-base";
-import { BuySettingsSchema, BuySettingsValues, defaultBuySettingsValues } from "@/types";
+import { BuySettingsSchema, BuySettingsValues, defaultBuySettingsValues } from "../../../types";
 import { CustomBuyAmountsInput } from "./CustomBuyAmountsInput";
 import { TradePresetForm } from "./TradePresetForm";
-import { useSaveTradeBuySettings, useTradeBuySettings } from "@/hooks";
+import { useSaveTradeBuySettings, useTradeBuySettings } from "../../../hooks";
 
 export type BuySettingsFormProps = {
   onSettings?: (settings: BuySettingsValues) => void;

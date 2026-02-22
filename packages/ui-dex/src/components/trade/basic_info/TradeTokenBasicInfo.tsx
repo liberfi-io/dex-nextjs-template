@@ -1,9 +1,9 @@
-import { FavoriteFilledIcon, FavoriteOutlinedIcon, ShareIcon } from "@/assets";
-import { ChainAddress } from "@/components/ChainAddress";
-import { TokenAvatar } from "@/components/TokenAvatar";
+import { FavoriteFilledIcon, FavoriteOutlinedIcon, ShareIcon } from "../../../assets";
+import { ChainAddress } from "../../ChainAddress";
+import { TokenAvatar } from "../../TokenAvatar";
 import { Button, Skeleton } from "@heroui/react";
 import { useTradeDataContext } from "../providers";
-import { tokenInfoAtom } from "@/states";
+import { tokenInfoAtom } from "../../../states";
 import { useAtomValue } from "jotai";
 
 export function TradeTokenBasicInfo() {

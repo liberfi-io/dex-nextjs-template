@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useTokenListContext } from "../TokenListContext";
 import { Token } from "@chainstream-io/sdk";
-import { tokenBuys, tokenSells, tokenTrades } from "@/libs";
+import { tokenBuys, tokenSells, tokenTrades } from "../../../libs";
 import { formatAmount } from "@liberfi/core";
 
 export function TokenTradesCell({ token }: { token: Token }) {

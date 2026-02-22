@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useAtomValue } from "jotai";
-import { walletNetWorthAtom } from "@/states";
+import { walletNetWorthAtom } from "../../states";
 import { WalletNetWorthItemDTO } from "@chainstream-io/sdk";
 
 export function useWalletTokenNetWorth(tokenAddress: string) {

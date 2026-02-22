@@ -17,7 +17,15 @@
     "noEmit": false,
     "outDir": "dist",
     "declaration": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@liberfi/core": [
+        "../core/src"
+      ],
+      "@liberfi/core/*": [
+        "../core/src/*"
+      ]
+    }
   },
   "include": ["src"],
   "exclude": ["node_modules"]
