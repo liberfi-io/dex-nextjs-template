@@ -3,8 +3,8 @@ import { BigNumber } from "bignumber.js";
 import { useAtomValue } from "jotai";
 import { Button } from "@heroui/react";
 import { formatAmountUSD, getPrimaryTokenAddress, getPrimaryTokenDecimals } from "@liberfi/core";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
-  chainAtom,
   useAppSdk,
   useAuthenticatedCallback,
   useTranslation,
@@ -23,7 +23,7 @@ export function MarketBuyForm() {
 
   const appSdk = useAppSdk();
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   // buy amount
   const [amount, setAmount] = useState<number | undefined>();

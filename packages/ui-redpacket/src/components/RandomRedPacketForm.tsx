@@ -1,16 +1,15 @@
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Button, Form, Image, Link } from "@heroui/react";
-import { useAtomValue } from "jotai";
 import BigNumber from "bignumber.js";
 import { Token } from "@chainstream-io/sdk";
-import { chainIcon, chainTxExplorer } from "@liberfi/core";
+import { chainIcon, txExplorerUrl } from "@liberfi.io/utils";
 import {
   useCreateRandomAmountRedPacketMutation,
   useSendRedPacketTransactionMutation,
 } from "@liberfi/react-redpacket";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
-  chainAtom,
   useAppSdk,
   useAuth,
   useAuthenticatedCallback,
@@ -52,7 +51,7 @@ export function RandomRedPacketForm() {
 
   const walletInstance = useWallet();
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const formMethods = useForm<RandomRedPacketFormValues>({
     reValidateMode: "onBlur",
@@ -98,7 +97,7 @@ export function RandomRedPacketForm() {
         console.debug("send red packet transaction result", result);
 
         const txHash = result.signature;
-        const txExplorerUrl = chainTxExplorer(chain, txHash);
+        const txUrl = txExplorerUrl(chain, txHash);
         const chainIconUrl = chainIcon(chain) ?? "";
 
         toast({
@@ -125,7 +124,7 @@ export function RandomRedPacketForm() {
               endContent: (
                 <Button
                   as={Link}
-                  href={txExplorerUrl}
+                  href={txUrl}
                   target="_blank"
                   isIconOnly
                   className="bg-transparent w-6 min-w-0 h-6 min-h-0"
@@ -144,7 +143,7 @@ export function RandomRedPacketForm() {
               endContent: (
                 <Button
                   as={Link}
-                  href={txExplorerUrl}
+                  href={txUrl}
                   target="_blank"
                   isIconOnly
                   className="bg-transparent w-6 min-w-0 h-6 min-h-0"

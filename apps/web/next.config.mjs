@@ -36,11 +36,24 @@ const nextConfig = {
   webpack(config) {
     config.optimization.minimize = process.env.NODE_ENV === "production";
 
-    // Fix: Ensure all jotai imports resolve to the same instance
-    // Prevents "multiple jotai instances" warning in monorepo setup
+    // In a pnpm monorepo, the same npm package can be resolved to different
+    // paths in the .pnpm virtual store by different workspace packages,
+    // resulting in multiple module instances at runtime.
+    // For packages containing globally shared state (e.g. jotai atoms),
+    // this causes state desync (e.g. ChainSelectWidget updates the chain
+    // but useCurrentChain in other components still returns the old value).
+    // Aliases below force all imports to resolve to a single copy under
+    // apps/web/node_modules, guaranteeing one module instance globally.
+    // NOTE: Do NOT alias packages that use subpath imports (e.g.
+    // "@liberfi.io/i18n/locales/en.json"), as it bypasses package.json
+    // "exports" mapping and causes module-not-found errors.
     config.resolve.alias = {
       ...config.resolve.alias,
       jotai: path.resolve(__dirname, "node_modules/jotai"),
+      "@liberfi.io/ui-chain-select": path.resolve(
+        __dirname,
+        "node_modules/@liberfi.io/ui-chain-select",
+      ),
     };
 
     config.module.rules.push({

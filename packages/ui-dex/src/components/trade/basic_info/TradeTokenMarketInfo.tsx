@@ -8,7 +8,7 @@ import { Token } from "@chainstream-io/sdk";
 // import { useAppSdk, useTranslation } from "../../../hooks";
 // import { useCallback } from "react";
 // import { getBubbleMapUrl } from "../../../libs";
-// import { CHAIN_ID } from "@liberfi/core";
+// import { Chain } from "@liberfi/core";
 import { tokenInfoAtom } from "../../../states";
 import { useAtomValue } from "jotai";
 

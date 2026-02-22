@@ -1,5 +1,5 @@
 import { Skeleton } from "@heroui/react";
-import { CHAIN_ID } from "@liberfi/core/";
+import { Chain } from "@liberfi/core/";
 import { useWalletTradesQuery } from "@liberfi/react-dex";
 import clsx from "clsx";
 import { ListEmptyData } from "../ListEmptyData";
@@ -11,7 +11,7 @@ import { Virtuoso } from "react-virtuoso";
 import { TradeDetailDTO } from "@chainstream-io/sdk";
 
 export type ActivityListProps = {
-  chainId?: CHAIN_ID;
+  chainId?: Chain;
   compact?: boolean;
   useWindowScroll?: boolean;
   classNames?: {
@@ -21,7 +21,7 @@ export type ActivityListProps = {
 };
 
 export function ActivityList({
-  chainId = CHAIN_ID.SOLANA,
+  chainId = Chain.SOLANA,
   compact,
   useWindowScroll,
   classNames,

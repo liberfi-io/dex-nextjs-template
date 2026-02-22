@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { Button, Image, Link } from "@heroui/react";
 import { SendTxInputSubmitType } from "@chainstream-io/sdk";
-import { chainIcon } from "@liberfi/core";
+import { chainIcon } from "@liberfi.io/utils";
 import { useSendTransactionMutation } from "@liberfi/react-dex";
 import { CreateTokenParams, useCreateTokenMutation } from "@liberfi/react-launchpad";
 import {

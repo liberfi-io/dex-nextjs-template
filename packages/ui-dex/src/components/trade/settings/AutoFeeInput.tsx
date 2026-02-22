@@ -1,9 +1,9 @@
 import { useMemo } from "react";
-import { useAtomValue } from "jotai";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
 import { Button, NumberInput, Switch, Tooltip } from "@heroui/react";
 import { getPrimaryTokenSymbol } from "@liberfi/core";
-import { chainAtom, InfoIcon, useTranslation } from "@liberfi/ui-base";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { InfoIcon, useTranslation } from "@liberfi/ui-base";
 
 export function AutoFeeInput({ preset }: { preset: number }) {
   const { t } = useTranslation();
@@ -12,7 +12,7 @@ export function AutoFeeInput({ preset }: { preset: number }) {
 
   const enabled = useWatch({ control, name: `presets.${preset}.autoFee` });
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const primaryTokenSymbol = useMemo(() => getPrimaryTokenSymbol(chain), [chain]);
 

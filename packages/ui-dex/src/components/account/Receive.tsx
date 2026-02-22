@@ -1,7 +1,8 @@
 import { useAuth, useTranslation } from "@liberfi/ui-base";
 import { QRCode } from "react-qrcode-logo";
 import { useMemo } from "react";
-import { CHAIN_ID, chainSlugs } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
+import { chainSlug } from "@liberfi.io/utils";
 import { capitalize } from "lodash-es";
 import { Button } from "@heroui/react";
 import { CopyIcon } from "../../assets";
@@ -37,7 +38,7 @@ export function Receive() {
       <p className="text-center text-sm text-neutral">
         {warning1}
         <span className="font-semibold text-foreground">
-          {capitalize(chainSlugs[CHAIN_ID.SOLANA])}
+          {capitalize(chainSlug(Chain.SOLANA))}
         </span>
         {warning2}
       </p>

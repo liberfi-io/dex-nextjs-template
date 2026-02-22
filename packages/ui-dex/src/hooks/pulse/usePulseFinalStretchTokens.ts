@@ -1,13 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { useAtomValue } from "jotai";
-import { chainAtom } from "@liberfi/ui-base";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { useFinalStretchTokensQuery } from "@liberfi/react-dex";
 import { usePulseListContext } from "../../components/pulse/PulseListContext";
 import { Token } from "@chainstream-io/sdk";
 import { sortBy } from "lodash-es";
 
 export function usePulseFinalStretchTokens() {
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const { isPaused } = usePulseListContext();
 

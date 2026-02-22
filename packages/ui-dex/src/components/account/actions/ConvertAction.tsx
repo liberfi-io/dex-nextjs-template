@@ -1,7 +1,7 @@
 import { ConvertOutlinedIcon } from "../../../assets";
 import { AccountAction } from "./AccountAction";
 import { useAppSdk, useAuthenticatedCallback, useTranslation } from "@liberfi/ui-base";
-import { CHAIN_ID } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
 
 export function ConvertAction() {
   const { t } = useTranslation();
@@ -12,7 +12,7 @@ export function ConvertAction() {
     appSdk.events.emit("swap", {
       method: "swap",
       params: {
-        chainId: CHAIN_ID.SOLANA,
+        chainId: Chain.SOLANA,
       },
     });
   }, [appSdk]);

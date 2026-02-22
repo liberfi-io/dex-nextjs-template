@@ -1,7 +1,7 @@
 "use client";
 
 import { useResizeObserver } from "@liberfi.io/hooks";
-// import { CHAIN_ID, SOL_TOKEN_DECIMALS } from "@liberfi/core";
+// import { Chain, SOL_TOKEN_DECIMALS } from "@liberfi/core";
 // import { fetchToken, useDexClient } from "@liberfi/react-dex";
 // import { useAuth, useTranslation } from "@liberfi/ui-base";
 import { ChatWidget, AgentProvider } from "@agent-widget/react";
@@ -32,13 +32,13 @@ export function BottomAICopilot() {
   //     const { from, to, amount } = event.data;
 
   //     try {
-  //       const fromToken = await fetchToken(dexClient, CHAIN_ID.SOLANA, from);
+  //       const fromToken = await fetchToken(dexClient, Chain.SOLANA, from);
   //       if (!fromToken || !fromToken.address) {
   //         toast.error(t("extend.account.convert_errors.token_not_found", { address: from }));
   //         return;
   //       }
 
-  //       const toToken = await fetchToken(dexClient, CHAIN_ID.SOLANA, to);
+  //       const toToken = await fetchToken(dexClient, Chain.SOLANA, to);
   //       if (!toToken || !toToken.address) {
   //         toast.error(t("extend.account.convert_errors.token_not_found", { address: to }));
   //         return;

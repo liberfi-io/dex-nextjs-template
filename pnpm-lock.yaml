@@ -346,6 +346,9 @@ importers:
       '@eslint/js':
         specifier: ^9.20.0
         version: 9.30.1
+      '@liberfi.io/types':
+        specifier: ^0.1.13
+        version: 0.1.13
       '@stylistic/eslint-plugin':
         specifier: ^2.12.1
         version: 2.13.0(eslint@9.30.1(jiti@2.4.2))(typescript@5.8.3)
@@ -776,9 +779,6 @@ importers:
       '@heroui/theme':
         specifier: ^2.4.19
         version: 2.4.19(tailwindcss@4.1.11)
-      '@liberfi.io/wallet-connector':
-        specifier: ^0.1.7
-        version: 0.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@liberfi/core':
         specifier: workspace:*
         version: link:../core
@@ -918,6 +918,9 @@ importers:
       '@eslint/js':
         specifier: ^9.20.0
         version: 9.30.1
+      '@liberfi.io/wallet-connector':
+        specifier: ^0.1.7
+        version: 0.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@storybook/addon-essentials':
         specifier: ^8.4.7
         version: 8.6.14(@types/react@18.3.23)(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10))
@@ -926,13 +929,13 @@ importers:
         version: 8.6.14(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10))
       '@storybook/addon-styling-webpack':
         specifier: ^1.0.1
-        version: 1.0.1(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10))(webpack@5.99.9(@swc/core@1.12.11(@swc/helpers@0.5.17))(esbuild@0.25.6))
+        version: 1.0.1(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10))(webpack@5.99.9)
       '@storybook/addon-themes':
         specifier: ^8.4.7
         version: 8.6.14(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10))
       '@storybook/addon-webpack5-compiler-swc':
         specifier: ^1.0.5
-        version: 1.0.6(@swc/helpers@0.5.17)(webpack@5.99.9(@swc/core@1.12.11(@swc/helpers@0.5.17))(esbuild@0.25.6))
+        version: 1.0.6(@swc/helpers@0.5.17)(webpack@5.99.9)
       '@storybook/blocks':
         specifier: ^8.4.7
         version: 8.6.14(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10))
@@ -944,7 +947,7 @@ importers:
         version: 8.6.14(@storybook/test@8.6.14(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10))(typescript@5.8.3)
       '@storybook/react-webpack5':
         specifier: ^8.4.7
-        version: 8.6.14(@storybook/test@8.6.14(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10)))(@swc/core@1.12.11(@swc/helpers@0.5.17))(esbuild@0.25.6)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10))(typescript@5.8.3)
+        version: 8.6.14(@storybook/test@8.6.14(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10))(typescript@5.8.3)
       '@storybook/test':
         specifier: ^8.4.7
         version: 8.6.14(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10))
@@ -992,7 +995,7 @@ importers:
         version: 10.4.21(postcss@8.5.6)
       css-loader:
         specifier: ^7.1.2
-        version: 7.1.2(webpack@5.99.9(@swc/core@1.12.11(@swc/helpers@0.5.17))(esbuild@0.25.6))
+        version: 7.1.2(webpack@5.99.9)
       cssnano:
         specifier: ^7.0.6
         version: 7.0.7(postcss@8.5.6)
@@ -1037,7 +1040,7 @@ importers:
         version: 8.5.6
       postcss-loader:
         specifier: ^8.1.1
-        version: 8.1.1(postcss@8.5.6)(typescript@5.8.3)(webpack@5.99.9(@swc/core@1.12.11(@swc/helpers@0.5.17))(esbuild@0.25.6))
+        version: 8.1.1(postcss@8.5.6)(typescript@5.8.3)(webpack@5.99.9)
       react-i18next:
         specifier: ^15.2.0
         version: 15.6.0(i18next@24.2.3(typescript@5.8.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
@@ -1049,7 +1052,7 @@ importers:
         version: 8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10)
       style-loader:
         specifier: ^4.0.0
-        version: 4.0.0(webpack@5.99.9(@swc/core@1.12.11(@swc/helpers@0.5.17))(esbuild@0.25.6))
+        version: 4.0.0(webpack@5.99.9)
       through2:
         specifier: ^4.0.2
         version: 4.0.2
@@ -1067,7 +1070,7 @@ importers:
         version: 8.36.0(eslint@9.30.1(jiti@2.4.2))(typescript@5.8.3)
       webpack:
         specifier: ^5.97.1
-        version: 5.99.9(@swc/core@1.12.11(@swc/helpers@0.5.17))(esbuild@0.25.6)
+        version: 5.99.9
 
   packages/ui-dex:
     dependencies:
@@ -1086,15 +1089,6 @@ importers:
       '@hookform/resolvers':
         specifier: ^5.1.1
         version: 5.1.1(react-hook-form@7.60.0(react@18.3.1))
-      '@liberfi.io/types':
-        specifier: ^0.1.13
-        version: 0.1.13
-      '@liberfi.io/ui':
-        specifier: ^0.1.15
-        version: 0.1.15(@emotion/is-prop-valid@1.2.2)(@types/react@18.3.23)(fastestsmallesttextencoderdecoder@1.0.22)(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwind-merge@3.4.0)(typescript@5.8.3)(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))
-      '@liberfi.io/ui-chain-select':
-        specifier: ^0.1.6
-        version: 0.1.6(@emotion/is-prop-valid@1.2.2)(@types/react@18.3.23)(fastestsmallesttextencoderdecoder@1.0.22)(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwind-merge@3.4.0)(tailwindcss@4.1.11)(typescript@5.8.3)(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@liberfi/core':
         specifier: workspace:*
         version: link:../core
@@ -1237,6 +1231,15 @@ importers:
       '@eslint/js':
         specifier: ^9.20.0
         version: 9.30.1
+      '@liberfi.io/types':
+        specifier: ^0.1.13
+        version: 0.1.13
+      '@liberfi.io/ui':
+        specifier: ^0.1.15
+        version: 0.1.15(@emotion/is-prop-valid@1.2.2)(@types/react@18.3.23)(fastestsmallesttextencoderdecoder@1.0.22)(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwind-merge@3.4.0)(typescript@5.8.3)(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+      '@liberfi.io/ui-chain-select':
+        specifier: ^0.1.6
+        version: 0.1.6(@emotion/is-prop-valid@1.2.2)(@types/react@18.3.23)(fastestsmallesttextencoderdecoder@1.0.22)(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwind-merge@3.4.0)(tailwindcss@4.1.11)(typescript@5.8.3)(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@storybook/addon-essentials':
         specifier: ^8.4.7
         version: 8.6.14(@types/react@18.3.23)(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10))
@@ -1245,13 +1248,13 @@ importers:
         version: 8.6.14(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10))
       '@storybook/addon-styling-webpack':
         specifier: ^1.0.1
-        version: 1.0.1(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10))(webpack@5.99.9)
+        version: 1.0.1(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10))(webpack@5.99.9(@swc/core@1.12.11(@swc/helpers@0.5.17))(esbuild@0.25.6))
       '@storybook/addon-themes':
         specifier: ^8.4.7
         version: 8.6.14(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10))
       '@storybook/addon-webpack5-compiler-swc':
         specifier: ^1.0.5
-        version: 1.0.6(@swc/helpers@0.5.17)(webpack@5.99.9)
+        version: 1.0.6(@swc/helpers@0.5.17)(webpack@5.99.9(@swc/core@1.12.11(@swc/helpers@0.5.17))(esbuild@0.25.6))
       '@storybook/blocks':
         specifier: ^8.4.7
         version: 8.6.14(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10))
@@ -1263,7 +1266,7 @@ importers:
         version: 8.6.14(@storybook/test@8.6.14(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10))(typescript@5.8.3)
       '@storybook/react-webpack5':
         specifier: ^8.4.7
-        version: 8.6.14(@storybook/test@8.6.14(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10))(typescript@5.8.3)
+        version: 8.6.14(@storybook/test@8.6.14(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10)))(@swc/core@1.12.11(@swc/helpers@0.5.17))(esbuild@0.25.6)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10))(typescript@5.8.3)
       '@storybook/test':
         specifier: ^8.4.7
         version: 8.6.14(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10))
@@ -1317,7 +1320,7 @@ importers:
         version: 10.4.21(postcss@8.5.6)
       css-loader:
         specifier: ^7.1.2
-        version: 7.1.2(webpack@5.99.9)
+        version: 7.1.2(webpack@5.99.9(@swc/core@1.12.11(@swc/helpers@0.5.17))(esbuild@0.25.6))
       cssnano:
         specifier: ^7.0.6
         version: 7.0.7(postcss@8.5.6)
@@ -1362,7 +1365,7 @@ importers:
         version: 8.5.6
       postcss-loader:
         specifier: ^8.1.1
-        version: 8.1.1(postcss@8.5.6)(typescript@5.8.3)(webpack@5.99.9)
+        version: 8.1.1(postcss@8.5.6)(typescript@5.8.3)(webpack@5.99.9(@swc/core@1.12.11(@swc/helpers@0.5.17))(esbuild@0.25.6))
       react-i18next:
         specifier: ^15.2.0
         version: 15.6.0(i18next@24.2.3(typescript@5.8.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
@@ -1374,7 +1377,7 @@ importers:
         version: 8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10)
       style-loader:
         specifier: ^4.0.0
-        version: 4.0.0(webpack@5.99.9)
+        version: 4.0.0(webpack@5.99.9(@swc/core@1.12.11(@swc/helpers@0.5.17))(esbuild@0.25.6))
       through2:
         specifier: ^4.0.2
         version: 4.0.2
@@ -1392,7 +1395,7 @@ importers:
         version: 8.36.0(eslint@9.30.1(jiti@2.4.2))(typescript@5.8.3)
       webpack:
         specifier: ^5.97.1
-        version: 5.99.9
+        version: 5.99.9(@swc/core@1.12.11(@swc/helpers@0.5.17))(esbuild@0.25.6)
 
   packages/ui-launchpad:
     dependencies:
@@ -1411,15 +1414,6 @@ importers:
       '@hookform/resolvers':
         specifier: ^5.1.1
         version: 5.1.1(react-hook-form@7.60.0(react@18.3.1))
-      '@liberfi.io/types':
-        specifier: ^0.1.13
-        version: 0.1.13
-      '@liberfi.io/ui':
-        specifier: ^0.1.15
-        version: 0.1.15(@emotion/is-prop-valid@1.2.2)(@types/react@18.3.23)(fastestsmallesttextencoderdecoder@1.0.22)(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwind-merge@3.4.0)(typescript@5.8.3)(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))
-      '@liberfi.io/ui-media-track':
-        specifier: ^0.1.16
-        version: 0.1.16(@emotion/is-prop-valid@1.2.2)(@types/react@18.3.23)(fastestsmallesttextencoderdecoder@1.0.22)(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwind-merge@3.4.0)(tailwindcss@4.1.11)(typescript@5.8.3)(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@liberfi/core':
         specifier: workspace:*
         version: link:../core
@@ -1565,6 +1559,15 @@ importers:
       '@eslint/js':
         specifier: ^9.20.0
         version: 9.30.1
+      '@liberfi.io/types':
+        specifier: ^0.1.13
+        version: 0.1.13
+      '@liberfi.io/ui':
+        specifier: ^0.1.15
+        version: 0.1.15(@emotion/is-prop-valid@1.2.2)(@types/react@18.3.23)(fastestsmallesttextencoderdecoder@1.0.22)(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwind-merge@3.4.0)(typescript@5.8.3)(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+      '@liberfi.io/ui-media-track':
+        specifier: ^0.1.16
+        version: 0.1.16(@emotion/is-prop-valid@1.2.2)(@types/react@18.3.23)(fastestsmallesttextencoderdecoder@1.0.22)(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwind-merge@3.4.0)(tailwindcss@4.1.11)(typescript@5.8.3)(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@storybook/addon-essentials':
         specifier: ^8.4.7
         version: 8.6.14(@types/react@18.3.23)(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10))

@@ -1,5 +1,6 @@
 import { AppRoute, CHAIN_QUOTE_TOKEN_SYMBOLS, formatLongNumber, formatShortNumber } from "../../libs";
-import { chainAtom, useRouter, useTranslation } from "@liberfi/ui-base";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { useRouter, useTranslation } from "@liberfi/ui-base";
 import { useTvChartTradeHistories } from "../../hooks/tvchart/useTvChartTradeHistories";
 import {
   TvChartKlineStyle,
@@ -20,7 +21,7 @@ import { TvChart, TvChartInstance, TvChartProps } from "./TvChart";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { Subscription } from "rxjs";
 import clsx from "clsx";
-import { chainSlugs } from "@liberfi/core";
+import { chainSlug } from "@liberfi.io/utils";
 import { TvChartDataFeedModule } from "./TvChartDataFeedModule";
 import { isPriceChartAtom, isUSDChartAtom, tokenAddressAtom } from "../../states";
 import { useAtomValue } from "jotai";
@@ -35,7 +36,7 @@ export const TvChartWrapper = memo(({ className }: TvChartWrapperProps) => {
 
   const { navigate } = useRouter();
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const isPriceChart = useAtomValue(isPriceChartAtom);
 
@@ -55,7 +56,7 @@ export const TvChartWrapper = memo(({ className }: TvChartWrapperProps) => {
   const [config, setConfig] = useState<TvChartProps["config"]>({
     storageId: "kline",
     tickerSymbol: stringifySymbol({
-      chain: chainSlugs[chain]!,
+      chain: chainSlug(chain)!,
       address: address ?? "",
       priceType: isPriceChart ? TvChartPriceType.Price : TvChartPriceType.MarketCap,
       quote: isUSDChart
@@ -101,7 +102,7 @@ export const TvChartWrapper = memo(({ className }: TvChartWrapperProps) => {
     if (chartReady) {
       chartRef.current?.setSymbol(
         stringifySymbol({
-          chain: chainSlugs[chain]!,
+          chain: chainSlug(chain)!,
           address: address ?? "",
           priceType: isPriceChart ? TvChartPriceType.Price : TvChartPriceType.MarketCap,
           quote: isUSDChart

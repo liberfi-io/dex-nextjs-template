@@ -1,7 +1,7 @@
 import { ListField } from "../../../ListField";
 import { getWrappedAddress } from "../../../../libs";
 import { Token, WalletNetWorthItemDTO } from "@chainstream-io/sdk";
-import { CHAIN_ID } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
 import { Image } from "@heroui/react";
 import { useMemo } from "react";
 
@@ -12,7 +12,7 @@ export interface PriceHistoryFieldProps {
 }
 
 export function PriceHistoryField({ token, balance, className }: PriceHistoryFieldProps) {
-  const chainId = CHAIN_ID[(token?.chain?.toUpperCase() ?? "SOLANA") as keyof typeof CHAIN_ID];
+  const chainId = Chain[(token?.chain?.toUpperCase() ?? "SOLANA") as keyof typeof Chain];
   const priceImage24H = useMemo(
     () =>
       `https://api-particle-gcp.mobula.io/api/1/market/sparkline?asset=${

@@ -1,11 +1,12 @@
 import { useMemo } from "react";
-import { useAtomValue } from "jotai";
+
 import { Avatar } from "@heroui/react";
 import { formatAmount, getPrimaryTokenAvatar } from "@liberfi/core";
-import { chainAtom, useWalletPrimaryTokenNetWorth, WalletIcon } from "@liberfi/ui-base";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { useWalletPrimaryTokenNetWorth, WalletIcon } from "@liberfi/ui-base";
 
 export function BottomToolBarWallet() {
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const primaryTokenAvatar = useMemo(() => getPrimaryTokenAvatar(chain), [chain]);
 

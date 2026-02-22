@@ -3,15 +3,15 @@ import { BigNumber } from "bignumber.js";
 import { Avatar, Tooltip } from "@heroui/react";
 import { Token } from "@chainstream-io/sdk";
 import {
-  chainIdBySlug,
   formatAmount,
   formatAmountUSD3,
   getPrimaryTokenAvatar,
   RecursivePartial,
 } from "@liberfi/core";
-import { chainAtom, useTranslation } from "@liberfi/ui-base";
+import { chainIdBySlug } from "@liberfi.io/utils";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { useTranslation } from "@liberfi/ui-base";
 import { useMemo } from "react";
-import { useAtomValue } from "jotai";
 import { usePulseListContext } from "./PulseListContext";
 
 export type PulseTokenMarketCapProps = {
@@ -23,7 +23,7 @@ export function PulseTokenMarketCap({ token }: PulseTokenMarketCapProps) {
 
   const { layout } = usePulseListContext();
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const primaryTokenAvatar = useMemo(
     () => getPrimaryTokenAvatar(chainIdBySlug(token.chain ?? "") ?? chain),

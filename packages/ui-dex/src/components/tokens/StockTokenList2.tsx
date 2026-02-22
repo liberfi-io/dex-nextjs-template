@@ -4,7 +4,8 @@ import { ListError } from "../ListError";
 import { ListEmptyData } from "../ListEmptyData";
 import { tokenSort, tokenFilters, AppRoute } from "../../libs";
 import { useAtomValue } from "jotai";
-import { chainAtom, layoutAtom, useRouter, useTranslation } from "@liberfi/ui-base";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { layoutAtom, useRouter, useTranslation } from "@liberfi/ui-base";
 import {
   chainParam,
   convertStreamTokenHoldersToMarketData,
@@ -64,7 +65,7 @@ function StockTokenListContent({ height }: { height?: number }) {
 
   const { timeframe, filters, sort } = useTokenListContext();
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const params = useMemo(() => {
     const sortRequest = sort ? tokenSort(sort, timeframe) : undefined;

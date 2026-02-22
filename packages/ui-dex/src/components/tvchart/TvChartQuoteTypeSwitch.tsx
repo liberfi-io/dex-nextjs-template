@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { useSetAtom } from "jotai";
 import clsx from "clsx";
-import { chainIdBySlug } from "@liberfi/core";
+import { chainIdBySlug } from "@liberfi.io/utils";
 import { isUSDChartAtom } from "../../states";
 import { CHAIN_QUOTE_TOKEN_SYMBOLS } from "../../libs";
 import { stringifySymbol, TvChartQuoteType } from "../../libs/tvchart";

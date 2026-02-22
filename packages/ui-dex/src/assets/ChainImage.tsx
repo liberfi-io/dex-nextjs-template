@@ -1,26 +1,27 @@
 import { Avatar, Image } from "@heroui/react";
-import { CHAIN_ID, chainIcon, chainSlugs } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
+import { chainIcon, chainSlug } from "@liberfi.io/utils";
 import clsx from "clsx";
 
 type Props = {
-  chainId: CHAIN_ID;
+  chainId: Chain;
   className?: string;
   width?: number;
   height?: number;
 };
 
-export function chainImageUrl(chainId: CHAIN_ID) {
+export function chainImageUrl(chainId: Chain) {
   switch (chainId) {
-    case CHAIN_ID.SOLANA:
+    case Chain.SOLANA:
       return `https://static.particle.network/chains/solana/icons/${chainId}.png`;
-    case CHAIN_ID.ETHEREUM:
-    case CHAIN_ID.BASE:
-    case CHAIN_ID.ARBITRUM:
-    case CHAIN_ID.BINANCE:
-    case CHAIN_ID.AVALANCHE:
-    case CHAIN_ID.POLYGON:
-    case CHAIN_ID.OPTIMISM:
-    case CHAIN_ID.LINEA:
+    case Chain.ETHEREUM:
+    case Chain.BASE:
+    case Chain.ARBITRUM:
+    case Chain.BINANCE:
+    case Chain.AVALANCHE:
+    case Chain.POLYGON:
+    case Chain.OPTIMISM:
+    case Chain.LINEA:
       return `https://static.particle.network/chains/evm/icons/${chainId}.png`;
     default:
       return chainIcon(chainId);
@@ -34,7 +35,7 @@ export function ChainImage({ className, chainId, width, height }: Props) {
       <Image
         src={src}
         classNames={{ img: clsx("z-0", className) }}
-        alt={chainSlugs[chainId]}
+        alt={chainSlug(chainId)}
         width={width ?? 24}
         height={height ?? 24}
       />
@@ -42,7 +43,7 @@ export function ChainImage({ className, chainId, width, height }: Props) {
   }
   return (
     <Avatar
-      name={chainSlugs[chainId]?.slice(0, 1)?.toUpperCase() ?? chainId}
+      name={chainSlug(chainId)?.slice(0, 1)?.toUpperCase() ?? chainId}
       color="primary"
       className={clsx("text-xl", className)}
       style={{ width: `${width ?? 24}px`, height: `${height ?? 24}px` }}

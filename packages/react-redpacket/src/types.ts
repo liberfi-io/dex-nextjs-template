@@ -1,8 +1,8 @@
 import { RedPacketSendTxInput } from "@chainstream-io/sdk";
-import { CHAIN_ID } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
 
 export interface CreateFixedAmountRedPacketParams {
-  chain: CHAIN_ID;
+  chain: Chain;
   creator: string;
   mint: string;
   maxClaims: number;
@@ -13,7 +13,7 @@ export interface CreateFixedAmountRedPacketParams {
 }
 
 export interface CreateRandomAmountRedPacketParams {
-  chain: CHAIN_ID;
+  chain: Chain;
   creator: string;
   mint: string;
   maxClaims: number;
@@ -24,7 +24,7 @@ export interface CreateRandomAmountRedPacketParams {
 }
 
 export interface ClaimRedPacketParams {
-  chain: CHAIN_ID;
+  chain: Chain;
   shareId: string;
   password?: string;
   claimer: string;
@@ -52,5 +52,5 @@ export interface FetchWalletRedPacketsParams {
 }
 
 export type SendRedPacketTransactionParams = RedPacketSendTxInput & {
-  chain: CHAIN_ID;
+  chain: Chain;
 };

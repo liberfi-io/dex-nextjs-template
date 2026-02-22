@@ -4,7 +4,7 @@ import { BigNumber } from "bignumber.js";
 import { useSetAtom } from "jotai";
 import clsx from "clsx";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CHAIN_ID } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
 import { Badge, Button, Form, Tab, Tabs } from "@heroui/react";
 import { CreateTokenInputDex } from "@chainstream-io/sdk";
 import { Curve, CurveType } from "@liberfi/react-launchpad";
@@ -157,7 +157,7 @@ export function PumpLaunchPadForm({
         });
 
         await createToken({
-          chain: CHAIN_ID.SOLANA,
+          chain: Chain.SOLANA,
           dex: CreateTokenInputDex.pumpfun,
           userAddress: user?.solanaAddress ?? "",
           name: data.name,

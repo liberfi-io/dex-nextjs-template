@@ -5,7 +5,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { BehaviorSubject, EMPTY, filter, switchMap, take } from "rxjs";
 import { flatten, groupBy, isArray, isEqual } from "lodash-es";
 import { Token } from "@chainstream-io/sdk";
-import { CHAIN_ID } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
 import { parseTickerSymbol, stringifyTickerSymbol, stringifyTickerSymbolByChainSlug } from "../libs";
 import { dexClientSubject, queryClientSubject } from "@liberfi/ui-base";
 import { fetchToken, fetchTokens, QueryKeys, useTokenQuery } from "@liberfi/react-dex";
@@ -67,7 +67,7 @@ export function setTokenInfo(tokenInfos: Token | Token[], mode: "merge" | "repla
  * @param address - The token address
  * @returns The token info
  */
-export function getTokenInfo(chainId: CHAIN_ID, address: string): Token | null {
+export function getTokenInfo(chainId: Chain, address: string): Token | null {
   const tickerSymbol = stringifyTickerSymbol(chainId, address);
   return tokenInfoMapSubject.value.get(tickerSymbol) || null;
 }
@@ -79,7 +79,7 @@ export function getTokenInfo(chainId: CHAIN_ID, address: string): Token | null {
  * @param tokenInfo - The token info to merge
  */
 export function mergeTokenInfoAfterBaseInfoLoaded(
-  chainId: CHAIN_ID,
+  chainId: Chain,
   address: string,
   tokenInfo: Pick<Token, "chain" | "address"> & Partial<Omit<Token, "chain" | "address">>,
 ) {
@@ -99,7 +99,7 @@ export function mergeTokenInfoAfterBaseInfoLoaded(
  * @param chainId - The chain id
  * @param addresses - The token addresses
  */
-async function fetchTokenInfos(chainId: CHAIN_ID, addresses: string | string[]): Promise<Token[]> {
+async function fetchTokenInfos(chainId: Chain, addresses: string | string[]): Promise<Token[]> {
   const queryClient = queryClientSubject.value;
   if (!queryClient) throw new Error("QueryClient subject is not initialized");
 
@@ -143,7 +143,7 @@ const batchResolversMap = new Map<
  * @param address - The token address
  * @returns The token info
  */
-async function fetchTokenInfoInBatch(chainId: CHAIN_ID, address: string) {
+async function fetchTokenInfoInBatch(chainId: Chain, address: string) {
   if (batchTimer) {
     clearTimeout(batchTimer);
     batchTimer = null;
@@ -164,7 +164,7 @@ async function fetchTokenInfoInBatch(chainId: CHAIN_ID, address: string) {
         await Promise.all(
           Object.entries(groupedTickerSymbols).map(([chainId, tickerSymbols]) =>
             fetchTokenInfos(
-              chainId as CHAIN_ID,
+              chainId as Chain,
               tickerSymbols.map((tickerSymbol) => parseTickerSymbol(tickerSymbol).address),
             ),
           ),
@@ -195,7 +195,7 @@ async function fetchTokenInfoInBatch(chainId: CHAIN_ID, address: string) {
 }
 
 export async function fetchTokenInfo(
-  chainId: CHAIN_ID,
+  chainId: Chain,
   address: string,
   mode: string = "single",
 ): Promise<Token | null> {
@@ -213,7 +213,7 @@ export async function fetchTokenInfo(
  * @param chainId - The chain id
  * @param address - The current selected chart's token address
  */
-export function useTvChartMultiTokens(chainId: CHAIN_ID, address: string) {
+export function useTvChartMultiTokens(chainId: Chain, address: string) {
   useLayoutEffect(() => {
     let fetched = false;
     // load the tv chart configs
@@ -249,7 +249,7 @@ export function useTvChartMultiTokens(chainId: CHAIN_ID, address: string) {
  * @param chainId - The chain id
  * @param address - The token address
  */
-export function useRefreshToken(chainId: CHAIN_ID, address: string) {
+export function useRefreshToken(chainId: Chain, address: string) {
   const { data: tokenInfo } = useTokenQuery(chainId, address, {
     refetchInterval: 15e3,
     enabled: !!address,
@@ -270,7 +270,7 @@ export function useRefreshToken(chainId: CHAIN_ID, address: string) {
  * @returns The token info
  */
 export function useTokenInfo(
-  chainId: CHAIN_ID,
+  chainId: Chain,
   address: string,
   transform?: (tokenInfo: Token) => Token,
 ): Token | null {

@@ -4,7 +4,8 @@ import { useSwapContext } from "../../swap/SwapContext";
 import { TokenAvatar } from "../../TokenAvatar";
 import { useAppSdk, walletNetWorthAtom, walletNetWorthQueryStateAtom } from "@liberfi/ui-base";
 import { getUnwrappedAddress, getWrappedAddress, PRIMARY_TOKEN_ADDRESSES } from "../../../libs";
-import { CHAIN_ID, chainSlugs } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
+import { chainSlug } from "@liberfi.io/utils";
 import { Button, Skeleton } from "@heroui/react";
 import BigNumber from "bignumber.js";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -68,7 +69,7 @@ export function BuyAsset() {
       );
 
     // 优先使用主流代币购买
-    const primaryTokenAddresses = PRIMARY_TOKEN_ADDRESSES[chainSlugs[chainId as CHAIN_ID]!];
+    const primaryTokenAddresses = PRIMARY_TOKEN_ADDRESSES[chainSlug(chainId as Chain)!];
     const balance = balances.find((balance) =>
       primaryTokenAddresses?.includes(balance.tokenAddress),
     );

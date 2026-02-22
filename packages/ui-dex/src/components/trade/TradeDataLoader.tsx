@@ -2,8 +2,8 @@ import { PropsWithChildren, useEffect, useState } from "react";
 import { useSetAtom } from "jotai";
 import { BigNumber } from "bignumber.js";
 import { useQueryClient } from "@tanstack/react-query";
-import { chainAtom } from "@liberfi/ui-base";
-import { CHAIN_ID } from "@liberfi/core";
+import { useSelectChain } from "@liberfi.io/ui-chain-select";
+import { Chain } from "@liberfi/core";
 import { QueryKeys, useTokenStatsQuery } from "@liberfi/react-dex";
 import {
   tokenAddressAtom,
@@ -17,7 +17,7 @@ import {
 } from "../../states";
 
 export type TradeDataLoaderProps = PropsWithChildren<{
-  chainId: CHAIN_ID;
+  chainId: Chain;
   address: string;
   // synchronize the price to rxjs when refetching the latest token info, used when the trading view is absent, default is false
   synchronizeTokenPrice?: boolean;
@@ -32,7 +32,7 @@ export function TradeDataLoader({
   // TODO report gtag { key: KLineFirstRender, name: "TradeDataLoader" }
 
   // switch to current token's chain
-  const setChain = useSetAtom(chainAtom);
+  const setChain = useSelectChain();
   useEffect(() => {
     setChain(chainId);
   }, [chainId, setChain]);

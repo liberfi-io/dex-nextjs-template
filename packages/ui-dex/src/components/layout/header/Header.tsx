@@ -5,7 +5,7 @@ import { HeaderLinks } from "./HeaderLinks";
 import { HeaderSearchInput } from "./HeaderSearchInput";
 import { HeaderSettingsMenu } from "./HeaderSettingsMenu";
 import { HeaderLaunchPadAction, HeaderLanguageAction } from "./actions";
-import { ChainSelectWidget } from "./chainselect/chain-select.widget";
+import { ChainSelectWidget } from "@liberfi.io/ui-chain-select";
 // import { useAtom } from "jotai";
 // import { chainAtom } from "@liberfi/ui-base";
 

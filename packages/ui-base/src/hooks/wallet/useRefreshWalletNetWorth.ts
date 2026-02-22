@@ -1,11 +1,12 @@
 import { useEffect } from "react";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useSetAtom } from "jotai";
 import { useWalletNetWorthQuery } from "@liberfi/react-dex";
-import { chainAtom, walletNetWorthAtom, walletNetWorthQueryStateAtom } from "../../states";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { walletNetWorthAtom, walletNetWorthQueryStateAtom } from "../../states";
 import { useCurrentWalletAddress } from "./useCurrentWalletAddress";
 
 export function useRefreshWalletNetWorth() {
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   // current active wallet address
   const walletAddress = useCurrentWalletAddress();

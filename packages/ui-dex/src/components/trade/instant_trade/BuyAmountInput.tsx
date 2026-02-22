@@ -1,9 +1,9 @@
 import { ChangeEvent, useCallback, useMemo } from "react";
 import clsx from "clsx";
-import { useAtomValue } from "jotai";
 import { NumberInput } from "@heroui/react";
 import { getPrimaryTokenDecimals, getPrimaryTokenSymbol } from "@liberfi/core";
-import { chainAtom, useTranslation } from "@liberfi/ui-base";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { useTranslation } from "@liberfi/ui-base";
 import { BuyAmountQuickInputs } from "./BuyAmountQuickInputs";
 
 export type BuyAmountInputProps = {
@@ -15,7 +15,7 @@ export type BuyAmountInputProps = {
 export function BuyAmountInput({ value, onChange, className }: BuyAmountInputProps) {
   const { t } = useTranslation();
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const primaryTokenSymbol = useMemo(() => getPrimaryTokenSymbol(chain), [chain]);
 

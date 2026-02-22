@@ -1,6 +1,6 @@
 import { isValidWalletAddress } from "../../libs";
 import BigNumber from "bignumber.js";
-import { CHAIN_ID } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
 import {
   createContext,
   PropsWithChildren,
@@ -12,8 +12,8 @@ import {
   useState,
 } from "react";
 import { Token, WalletNetWorthItemDTO } from "@chainstream-io/sdk";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
-  chainAtom,
   useAppSdk,
   useAuth,
   useTimerToast,
@@ -76,7 +76,7 @@ export function TransferProvider({
 
   const { user } = useAuth();
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   // 用户账户余额
   const walletNetWorth = useAtomValue(walletNetWorthAtom);
@@ -149,7 +149,7 @@ export function TransferProvider({
   const isWalletAddressValid = useMemo(() => {
     if (!walletAddress) return false;
     if (walletAddress === user?.solanaAddress) return false;
-    return isValidWalletAddress(CHAIN_ID.SOLANA, walletAddress);
+    return isValidWalletAddress(Chain.SOLANA, walletAddress);
   }, [walletAddress, user?.solanaAddress]);
 
   // 信息完备，可以创建交易

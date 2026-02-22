@@ -1,8 +1,8 @@
 import { ChangeEvent, useCallback, useMemo } from "react";
-import { useAtomValue } from "jotai";
 import { NumberInput } from "@heroui/react";
 import { getPrimaryTokenSymbol } from "@liberfi/core";
-import { chainAtom, useTranslation } from "@liberfi/ui-base";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { useTranslation } from "@liberfi/ui-base";
 
 export type MaxAutoFeeInputProps = {
   value: number | null;
@@ -12,7 +12,7 @@ export type MaxAutoFeeInputProps = {
 export function MaxAutoFeeInput({ value, onChange }: MaxAutoFeeInputProps) {
   const { t } = useTranslation();
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const primaryTokenSymbol = useMemo(() => getPrimaryTokenSymbol(chain), [chain]);
 

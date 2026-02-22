@@ -7,7 +7,7 @@ import { useTransferContext } from "./TransferContext";
 import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { debounce } from "lodash-es";
 import { isValidWalletAddress } from "../../libs";
-import { CHAIN_ID } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
 
 export function WalletAddressInput() {
   const { t } = useTranslation();
@@ -32,7 +32,7 @@ export function WalletAddressInput() {
         return;
       }
 
-      const isValid = isValidWalletAddress(CHAIN_ID.SOLANA, address);
+      const isValid = isValidWalletAddress(Chain.SOLANA, address);
       if (!isValid) {
         setError(t("extend.account.transfer_errors.invalid_wallet_address"));
       }

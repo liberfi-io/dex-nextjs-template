@@ -8,11 +8,12 @@ import {
   TokenListResolution,
   TokenListResolutionSelector,
 } from "@liberfi.io/ui-tokens";
-import { CHAIN_ID } from "@liberfi/core";
-import { chainAtom, ChevronUpIcon } from "@liberfi/ui-base";
+import { Chain } from "@liberfi/core";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { ChevronUpIcon } from "@liberfi/ui-base";
 import { InstantBuyAmountInput, SwitchWallet } from "@liberfi/ui-dex";
 import { Key, useCallback, useMemo, useState } from "react";
-import { useAtomValue } from "jotai";
+
 
 export type TokenListHeaderProps = {
   /** token list type */
@@ -51,7 +52,7 @@ export function TokenListHeader({
 }: TokenListHeaderProps) {
   const { t } = useTranslation();
 
-  const chainId = useAtomValue(chainAtom);
+  const { chain: chainId } = useCurrentChain();
 
   const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useState(false);
 
@@ -75,7 +76,7 @@ export function TokenListHeader({
         >
           <Tab key="trending" title={t("extend.token_list.discover.trending")} />
           {/* only show stocks tab on solana */}
-          {chainId === CHAIN_ID.SOLANA && (
+          {chainId === Chain.SOLANA && (
             <Tab key="stocks" title={t("extend.token_list.types.stocks")} />
           )}
         </StyledTabs>

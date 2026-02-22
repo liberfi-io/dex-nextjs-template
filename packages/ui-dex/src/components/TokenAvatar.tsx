@@ -1,5 +1,5 @@
 import { Avatar, Image } from "@heroui/react";
-import { CHAIN_ID } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
 import { ChainImage, MultiChainIcon } from "../assets";
 import clsx from "clsx";
 
@@ -34,7 +34,7 @@ export function TokenAvatar({ src, name, chainIds, size = 24, className }: Token
       )}
       <div className="absolute -bottom-0.5 -right-1">
         {chainIds?.length === 1 && (
-          <ChainImage chainId={`${chainIds[0]}` as CHAIN_ID} width={size / 2} height={size / 2} />
+          <ChainImage chainId={`${chainIds[0]}` as Chain} width={size / 2} height={size / 2} />
         )}
         {chainIds && chainIds.length > 1 && (
           <MultiChainIcon width={size / 2} height={size / 2} className="text-primary/80" />

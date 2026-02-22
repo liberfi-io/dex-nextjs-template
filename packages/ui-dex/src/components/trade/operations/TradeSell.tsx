@@ -1,4 +1,5 @@
-import { CHAIN_ID, chainSlugs } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
+import { chainSlug } from "@liberfi.io/utils";
 import PreviewModal from "../../swap/PreviewModal";
 import { SwapProvider } from "../../swap/SwapContext";
 import { useDisclosure } from "@heroui/react";
@@ -20,15 +21,15 @@ export function TradeSell({ classNames }: TradeSellProps) {
 
   const toTokenAddress = useMemo(() => {
     if (!token?.address) return undefined;
-    const primaryAddresses = PRIMARY_TOKEN_ADDRESSES[chainSlugs[CHAIN_ID.SOLANA]!];
+    const primaryAddresses = PRIMARY_TOKEN_ADDRESSES[chainSlug(Chain.SOLANA)!];
     const address = primaryAddresses.find(
       (it) =>
         // 不能和卖出代币相同
         it !== token.address &&
         // 不能是卖出代币的包装代币
-        it !== getWrappedAddress(CHAIN_ID.SOLANA, token.address) &&
+        it !== getWrappedAddress(Chain.SOLANA, token.address) &&
         // 不能是卖出代币的解包装代币
-        it !== getUnwrappedAddress(CHAIN_ID.SOLANA, token.address),
+        it !== getUnwrappedAddress(Chain.SOLANA, token.address),
     );
     if (address) return address;
     return undefined;

@@ -5,7 +5,8 @@ import { formatPercentage } from "../../../libs";
 import { Skeleton } from "@heroui/react";
 import { Number } from "../../Number";
 import { Virtuoso } from "react-virtuoso";
-import { CHAIN_ID, chainIdBySlug } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
+import { chainIdBySlug } from "@liberfi.io/utils";
 import { useMemo } from "react";
 import { useAtomValue } from "jotai";
 import { layoutAtom } from "@liberfi/ui-base";
@@ -19,7 +20,7 @@ export function HoldersList() {
 function Content({ token }: { token: Token }) {
   const layout = useAtomValue(layoutAtom);
 
-  const chain = useMemo(() => chainIdBySlug(token.chain) ?? CHAIN_ID.SOLANA, [token.chain]);
+  const chain = useMemo(() => chainIdBySlug(token.chain) ?? Chain.SOLANA, [token.chain]);
 
   const { data: holdersPage, isLoading } = useTokenHoldersQuery({
     chain,

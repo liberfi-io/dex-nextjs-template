@@ -1,11 +1,12 @@
 import { PnlDetailItemDTO, PnlDetailsPage, WalletNetWorthItemDTO, WalletNetWorthPage } from "@chainstream-io/sdk";
-import { CHAIN_ID, chainSlugs } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
+import { chainSlug } from "@liberfi.io/utils";
 import { PRIMARY_TOKENS_MAP } from "./tokenUtils";
 import { capitalize } from "lodash-es";
 import { PublicKey } from "@solana/web3.js";
 
 export function appendPrimaryTokenNetWorth(
-  chainId: CHAIN_ID,
+  chainId: Chain,
   inWalletNetWorth: WalletNetWorthPage,
 ): WalletNetWorthPage {
   const walletNetWorth = { ...inWalletNetWorth, data: [...(inWalletNetWorth.data ?? [])] };
@@ -29,7 +30,7 @@ export function appendPrimaryTokenNetWorth(
 }
 
 export function appendPrimaryTokenPnl(
-  chainId: CHAIN_ID,
+  chainId: Chain,
   inWalletPnl: PnlDetailsPage,
 ): PnlDetailsPage {
   const walletPnl = { ...inWalletPnl, data: [...(inWalletPnl.data ?? [])] };
@@ -56,7 +57,7 @@ export const getBuyTokenUrl = ({
   fiatCurrency = "usd",
   fiatAmount = "200",
 }: {
-  chainId: CHAIN_ID;
+  chainId: Chain;
   walletAddress: string;
   language?: string;
   token?: string;
@@ -68,7 +69,7 @@ export const getBuyTokenUrl = ({
     tradeType: "buy",
     cryptoCoin: token.toUpperCase(),
     walletAddress,
-    network: capitalize(chainSlugs[chainId]),
+    network: capitalize(chainSlug(chainId)),
     fiatCoin: fiatCurrency.toUpperCase(),
     fiatAmt: fiatAmount.toString(),
     locale: language,
@@ -85,7 +86,7 @@ export const getSellTokenUrl = ({
   fiatCurrency = "usd",
   fiatAmount = "200",
 }: {
-  chainId: CHAIN_ID;
+  chainId: Chain;
   walletAddress: string;
   language?: string;
   token?: string;
@@ -97,7 +98,7 @@ export const getSellTokenUrl = ({
     tradeType: "sell",
     cryptoCoin: token.toUpperCase(),
     walletAddress,
-    network: capitalize(chainSlugs[chainId]),
+    network: capitalize(chainSlug(chainId)),
     fiatCoin: fiatCurrency.toUpperCase(),
     fiatAmt: fiatAmount.toString(),
     locale: language,
@@ -105,30 +106,30 @@ export const getSellTokenUrl = ({
   return `https://opencrypto.pro/widget-page/mobileTran?${params.toString()}`;
 };
 
-export const getTxExplorerUrl = (chainId: CHAIN_ID, txHash: string) => {
+export const getTxExplorerUrl = (chainId: Chain, txHash: string) => {
   switch (chainId) {
-    case CHAIN_ID.SOLANA:
+    case Chain.SOLANA:
       return `https://solscan.io/tx/${txHash}`;
   }
   return undefined;
 };
 
 export const WRAPPED_ADDRESSES: Record<string, Record<string, string>> = {
-  [chainSlugs[CHAIN_ID.SOLANA]!]: {
+  [chainSlug(Chain.SOLANA)!]: {
     "11111111111111111111111111111111": "So11111111111111111111111111111111111111112",
   },
 };
 
-export const getWrappedAddress = (chainId: CHAIN_ID, tokenAddress: string) => {
-  const wrappedAddresses = WRAPPED_ADDRESSES[chainSlugs[chainId]!] ?? {};
+export const getWrappedAddress = (chainId: Chain, tokenAddress: string) => {
+  const wrappedAddresses = WRAPPED_ADDRESSES[chainSlug(chainId)!] ?? {};
   if (wrappedAddresses[tokenAddress]) {
     return wrappedAddresses[tokenAddress];
   }
   return undefined;
 };
 
-export const getUnwrappedAddress = (chainId: CHAIN_ID, tokenAddress: string) => {
-  const wrappedAddresses = WRAPPED_ADDRESSES[chainSlugs[chainId]!] ?? {};
+export const getUnwrappedAddress = (chainId: Chain, tokenAddress: string) => {
+  const wrappedAddresses = WRAPPED_ADDRESSES[chainSlug(chainId)!] ?? {};
   for (const [key, value] of Object.entries(wrappedAddresses)) {
     if (value === tokenAddress) {
       return key;
@@ -144,7 +145,7 @@ export const SOL_TOKEN_SYMBOL = "SOL";
 export const SOL_TOKEN_DECIMALS = 9;
 
 export const PRIMARY_TOKEN_ADDRESSES: Record<string, string[]> = {
-  [chainSlugs[CHAIN_ID.SOLANA]!]: [
+  [chainSlug(Chain.SOLANA)!]: [
     // sol
     SOL_TOKEN_ADDRESS,
     // usdc
@@ -154,9 +155,9 @@ export const PRIMARY_TOKEN_ADDRESSES: Record<string, string[]> = {
   ],
 };
 
-export const isValidWalletAddress = (chainId: CHAIN_ID, walletAddress: string) => {
+export const isValidWalletAddress = (chainId: Chain, walletAddress: string) => {
   switch (chainId) {
-    case CHAIN_ID.SOLANA:
+    case Chain.SOLANA:
       try {
         new PublicKey(walletAddress);
         return true;
@@ -169,9 +170,9 @@ export const isValidWalletAddress = (chainId: CHAIN_ID, walletAddress: string) =
   }
 };
 
-export const getBubbleMapUrl = (chainId: CHAIN_ID, tokenAddress: string) => {
+export const getBubbleMapUrl = (chainId: Chain, tokenAddress: string) => {
   switch (chainId) {
-    case CHAIN_ID.SOLANA:
+    case Chain.SOLANA:
       return `https://app.insightx.network/bubblemaps/solana/${tokenAddress}`;
     // return `https://faster100x.com/zh/embedded?tokenAddress=${tokenAddress}&tokenChain=sol`;
   }

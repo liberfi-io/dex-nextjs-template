@@ -1,7 +1,8 @@
 import { clsx } from "clsx";
 import { Link, Tooltip } from "@heroui/react";
 import { Token } from "@chainstream-io/sdk";
-import { chainIdBySlug, formatAmount, RecursivePartial } from "@liberfi/core";
+import { formatAmount, RecursivePartial } from "@liberfi/core";
+import { chainIdBySlug } from "@liberfi.io/utils";
 import {
   CrownIcon,
   KlineCandlesIcon,

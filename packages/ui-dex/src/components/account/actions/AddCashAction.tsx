@@ -2,7 +2,7 @@ import { CashInOutlinedIcon } from "../../../assets";
 import { AccountAction } from "./AccountAction";
 import { useAuthenticatedCallback, useTranslation, useAppSdk, useAuth } from "@liberfi/ui-base";
 import { getBuyTokenUrl } from "../../../libs";
-import { CHAIN_ID } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
 
 export function AddCashAction() {
   const { t, i18n } = useTranslation();
@@ -13,7 +13,7 @@ export function AddCashAction() {
 
   const onAction = useAuthenticatedCallback(async () => {
     const url = getBuyTokenUrl({
-      chainId: CHAIN_ID.SOLANA,
+      chainId: Chain.SOLANA,
       walletAddress: user?.solanaAddress ?? "",
       language: i18n.language,
     });

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Swap } from "../swap";
 import { ModalWrapper } from "../layout";
 import { ModalHeaderWrapper } from "../layout/ModalHeaderWrapper";
-import { CHAIN_ID } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
 import { useAtomValue } from "jotai";
 
 export default function SwapModal() {
@@ -16,7 +16,7 @@ export default function SwapModal() {
 
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
-  const [chainId, setChainId] = useState<CHAIN_ID | undefined>(undefined);
+  const [chainId, setChainId] = useState<Chain | undefined>(undefined);
   const [fromTokenAddress, setFromTokenAddress] = useState<string | undefined>(undefined);
   const [toTokenAddress, setToTokenAddress] = useState<string | undefined>(undefined);
 

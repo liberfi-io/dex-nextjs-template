@@ -8,25 +8,26 @@ import {
 import { useTranslation } from "@liberfi/ui-base";
 import { capitalize } from "../libs";
 import { Button, Popover, PopoverContent, PopoverTrigger, useDisclosure } from "@heroui/react";
-import { CHAIN_ID, chainSlugs } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
+import { chainSlug } from "@liberfi.io/utils";
 import clsx from "clsx";
 import { ReactNode, useCallback } from "react";
 
 export const CHAINS = [
-  CHAIN_ID.SOLANA,
-  CHAIN_ID.ETHEREUM,
-  CHAIN_ID.BINANCE,
-  // CHAIN_ID.BASE,
-  // CHAIN_ID.ARBITRUM,
-  // CHAIN_ID.AVALANCHE,
-  // CHAIN_ID.OPTIMISM,
-  // CHAIN_ID.POLYGON,
-  // CHAIN_ID.ZKSYNC_ERA,
+  Chain.SOLANA,
+  Chain.ETHEREUM,
+  Chain.BINANCE,
+  // Chain.BASE,
+  // Chain.ARBITRUM,
+  // Chain.AVALANCHE,
+  // Chain.OPTIMISM,
+  // Chain.POLYGON,
+  // Chain.ZKSYNC_ERA,
 ];
 
 export type ChainSelectProps = {
-  chainId: CHAIN_ID;
-  onSelect?: (chain: CHAIN_ID) => void;
+  chainId: Chain;
+  onSelect?: (chain: Chain) => void;
   trigger?: ReactNode;
 };
 
@@ -36,7 +37,7 @@ export function ChainSelect({ chainId, trigger, onSelect }: ChainSelectProps) {
   const { isOpen, onClose, onOpenChange } = useDisclosure();
 
   const handleSelect = useCallback(
-    (chain: CHAIN_ID) => {
+    (chain: Chain) => {
       onSelect?.(chain);
       onClose();
     },
@@ -56,7 +57,7 @@ export function ChainSelect({ chainId, trigger, onSelect }: ChainSelectProps) {
             className="flex w-auto min-w-[110px] min-h-0 gap-1.5 justify-end p-0 bg-transparent text-xs text-neutral"
             startContent={
               chainId ? (
-                <ChainImage chainId={chainId as CHAIN_ID} width={24} height={24} />
+                <ChainImage chainId={chainId as Chain} width={24} height={24} />
               ) : (
                 <div className="w-6 h-6 flex items-center justify-center">
                   <NetworkIcon width={20} height={20} />
@@ -73,7 +74,7 @@ export function ChainSelect({ chainId, trigger, onSelect }: ChainSelectProps) {
           >
             {!chainId
               ? t("extend.token_list.filters.chain.universal_chains")
-              : capitalize(chainSlugs[chainId as CHAIN_ID]!)}
+              : capitalize(chainSlug(chainId as Chain)!)}
           </Button>
         )}
       </PopoverTrigger>
@@ -83,7 +84,7 @@ export function ChainSelect({ chainId, trigger, onSelect }: ChainSelectProps) {
             <ChainOption
               key={chain}
               isSelected={chainId === chain}
-              label={capitalize(chainSlugs[chain as CHAIN_ID]!)}
+              label={capitalize(chainSlug(chain as Chain)!)}
               icon={<ChainImage chainId={chain} width={24} height={24} />}
               action={() => handleSelect(chain)}
             />

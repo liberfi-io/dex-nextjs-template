@@ -1,12 +1,12 @@
 import { ChainImage, CopyIcon } from "../assets";
-import { CHAIN_ID } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
 import { formatShortAddress } from "../libs";
 import clsx from "clsx";
 import { useCopyToClipboard } from "../hooks/useCopyToClipboard";
 
 type ChainAddressProps = {
   address: string;
-  chainId?: CHAIN_ID;
+  chainId?: Chain;
   showIcon?: boolean;
   className?: string;
 };

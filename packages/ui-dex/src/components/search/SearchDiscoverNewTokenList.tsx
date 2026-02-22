@@ -12,8 +12,8 @@ import clsx from "clsx";
 import { SearchDiscoverTokenListSkeleton } from "./SearchDiscoverTokenListSkeleton";
 import { tokenFilters, tokenSort } from "../../libs";
 import { SearchDiscoverTokenListItem } from "./SearchDiscoverTokenListItem";
-import { useAtomValue } from "jotai";
-import { chainAtom, useAuth } from "@liberfi/ui-base";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { useAuth } from "@liberfi/ui-base";
 import { useNewTokensQuery } from "@liberfi/react-dex";
 
 export type SearchDiscoverNewTokenListProps = {
@@ -29,7 +29,7 @@ export function SearchDiscoverNewTokenList({
 
   const { timeframe, filters, sort } = useTokenListContext();
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const params = useMemo(() => {
     const sortRequest = sort ? tokenSort(sort, timeframe) : undefined;

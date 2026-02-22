@@ -3,11 +3,12 @@
 import { RedPacketIcon } from "../icons";
 import { RedPacketDTO } from "@chainstream-io/sdk";
 import { Button, Link, Skeleton } from "@heroui/react";
-import { CONFIG, chainTxExplorer, ROUTES } from "@liberfi/core";
+import { CONFIG, ROUTES } from "@liberfi/core";
+import { txExplorerUrl } from "@liberfi.io/utils";
 import { useTokenQuery } from "@liberfi/react-dex";
 import { useRedPacketQuery } from "@liberfi/react-redpacket";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
-  chainAtom,
   ExternalLinkOutlinedIcon,
   useAppSdk,
   useCopyToClipboard,
@@ -16,7 +17,6 @@ import {
 import { TelegramIcon, TwitterIcon } from "@liberfi/ui-dex/assets/icons";
 import { TokenAvatar } from "@liberfi/ui-dex/components/TokenAvatar";
 import { BigNumber } from "bignumber.js";
-import { useAtomValue } from "jotai";
 import { useCallback, useMemo } from "react";
 
 export type ShareRedPacketProps = {
@@ -32,7 +32,7 @@ export function ShareRedPacket({
 
   const { t } = useTranslation();
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const copy = useCopyToClipboard();
 
@@ -170,7 +170,7 @@ export function ShareRedPacket({
       {/* view on explorer */}
       <Button
         as={Link}
-        href={chainTxExplorer(chain, redPacket.txHash)}
+        href={txExplorerUrl(chain, redPacket.txHash)}
         target="_blank"
         className="mt-2 bg-transparent text-xs text-neutral"
         endContent={<ExternalLinkOutlinedIcon width={12} height={12} className="text-neutral" />}

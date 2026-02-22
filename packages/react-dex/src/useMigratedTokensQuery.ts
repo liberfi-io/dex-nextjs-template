@@ -1,13 +1,13 @@
 import { ChainStreamClient, Token } from "@chainstream-io/sdk";
 import { useQuery, UseQueryOptions } from "@tanstack/react-query";
-import { CHAIN_ID } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
 import { useDexClient } from "./DexClientProvider";
 import { QueryKeys } from "./queryKeys";
 import { UseMigratedTokensQueryParams } from "./types";
 import { chainParam } from "./utils";
 
 const defaultParam: UseMigratedTokensQueryParams = {
-  chain: CHAIN_ID.SOLANA,
+  chain: Chain.SOLANA,
 };
 
 export async function fetchMigratedTokens(client: ChainStreamClient, param: UseMigratedTokensQueryParams) {

@@ -1,17 +1,17 @@
 import { useMemo } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { clsx } from "clsx";
-import { useAtomValue } from "jotai";
 import { Button, NumberInput, Tooltip } from "@heroui/react";
 import { getPrimaryTokenDecimals, getPrimaryTokenSymbol } from "@liberfi/core";
-import { chainAtom, InfoIcon, useTranslation, ZapFastIcon } from "@liberfi/ui-base";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { InfoIcon, useTranslation, ZapFastIcon } from "@liberfi/ui-base";
 
 export function PriorityFeeInput({ preset }: { preset: number }) {
   const { t } = useTranslation();
 
   const { control } = useFormContext();
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const primaryTokenSymbol = useMemo(() => getPrimaryTokenSymbol(chain), [chain]);
 

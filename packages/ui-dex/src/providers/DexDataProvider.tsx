@@ -1,7 +1,6 @@
 import { PropsWithChildren, useEffect } from "react";
-import { useAtomValue } from "jotai";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
-  chainAtom,
   useRefreshWalletNetWorth,
   useRefreshWalletPnl,
   useRefreshWalletPnlDetails,
@@ -10,7 +9,7 @@ import { setCurrentQuoteSymbol } from "../states";
 import { CHAIN_QUOTE_TOKEN_SYMBOLS } from "../libs";
 
 export function DexDataProvider({ children }: PropsWithChildren) {
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   // reset quote symbol when current chain changes
   useEffect(() => {

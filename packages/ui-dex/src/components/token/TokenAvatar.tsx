@@ -1,11 +1,12 @@
 import { MouseEvent, PropsWithChildren, useCallback, useMemo, useState } from "react";
-import { useAtomValue } from "jotai";
 import { clsx } from "clsx";
 import { BigNumber } from "bignumber.js";
 import { Avatar, Tooltip } from "@heroui/react";
 import { Token, TokenExtraDTO, TokenMarketData } from "@chainstream-io/sdk";
-import { chainIdBySlug, getTokenProtocol } from "@liberfi/core";
-import { CameraIcon, chainAtom } from "@liberfi/ui-base";
+import { getTokenProtocol } from "@liberfi/core";
+import { chainIdBySlug } from "@liberfi.io/utils";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { CameraIcon } from "@liberfi/ui-base";
 import { searchImageUrl } from "../../libs";
 
 type TokenProps = Pick<Partial<Token>, "chain" | "symbol" | "name" | "address" | "imageUrl"> & {
@@ -178,7 +179,7 @@ function TokenAvatarWrapper({
 }: PropsWithChildren<
   Pick<TokenAvatarProps, "token" | "showProgress" | "showLaunchedFrom" | "radius" | "classNames">
 >) {
-  const chainId = useAtomValue(chainAtom);
+  const { chain: chainId } = useCurrentChain();
 
   const completionRatio = useMemo(() => {
     return token.marketData?.completionRatio

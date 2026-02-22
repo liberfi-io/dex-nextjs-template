@@ -1,22 +1,23 @@
 import { PieActiveShape, PiePayload } from "../../chart";
 import { CHART_COLORS } from "../../../libs";
 import { Button } from "@heroui/react";
-import { CHAIN_ID, chainSlugs } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
+import { chainSlug } from "@liberfi.io/utils";
 import clsx from "clsx";
 import { useCallback, useMemo, useState } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 
 const skeletonData: PiePayload[] = [
-  CHAIN_ID.ETHEREUM,
-  // CHAIN_ID.ARBITRUM,
-  CHAIN_ID.SOLANA,
-  // CHAIN_ID.BASE,
-  // CHAIN_ID.OPTIMISM,
-  CHAIN_ID.BINANCE,
+  Chain.ETHEREUM,
+  // Chain.ARBITRUM,
+  Chain.SOLANA,
+  // Chain.BASE,
+  // Chain.OPTIMISM,
+  Chain.BINANCE,
 ].map((chainId) => ({
   key: chainId,
   value: 1,
-  name: chainSlugs[chainId]!,
+  name: chainSlug(chainId)!,
   formattedValue: "$0",
   formattedPercentage: "0%",
 }));

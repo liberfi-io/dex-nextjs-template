@@ -1,9 +1,9 @@
 import { PropsWithChildren, useCallback, useMemo } from "react";
 import { RedPacketDTO } from "@chainstream-io/sdk";
 import { useRedPacketQuery } from "@liberfi/react-redpacket";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
   BackwardOutlinedIcon,
-  chainAtom,
   ExternalLinkOutlinedIcon,
   ForwardOutlinedIcon,
   useAppSdk,
@@ -13,10 +13,9 @@ import { Button, Link, Skeleton } from "@heroui/react";
 import { RedPacketIcon, RedPacketMemoIcon } from "../icons";
 import { formatShortAddress } from "@liberfi/ui-dex/libs/format";
 import { useTokenQuery } from "@liberfi/react-dex";
-import { useAtomValue } from "jotai";
 import { TokenAvatar } from "@liberfi/ui-dex/components/TokenAvatar";
 import { BigNumber } from "bignumber.js";
-import { chainTxExplorer } from "@liberfi/core";
+import { txExplorerUrl } from "@liberfi.io/utils";
 import { getRedPacketStatus } from "../utils";
 
 export type RedPacketProps = {
@@ -36,7 +35,7 @@ export function RedPacket({
 
   const { t } = useTranslation();
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const { data: latestRedPacket } = useRedPacketQuery(redPacketId);
 
@@ -192,7 +191,7 @@ export function RedPacket({
       {/* view on explorer */}
       <Button
         as={Link}
-        href={chainTxExplorer(chain, redPacket.txHash)}
+        href={txExplorerUrl(chain, redPacket.txHash)}
         target="_blank"
         className="mt-2 bg-transparent text-xs text-neutral"
         endContent={<ExternalLinkOutlinedIcon width={12} height={12} className="text-neutral" />}

@@ -1,4 +1,4 @@
-import { CHAIN_ID } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
 import {
   UseHotTokensQueryParams,
   UseFinalStretchTokensQueryParams,
@@ -124,13 +124,13 @@ export const QueryKeys = {
     param.cursor ?? "",
     param.limit ? param.limit.toString() : "",
   ],
-  tokenMarketData: (chain: CHAIN_ID, tokenAddress: string) => [
+  tokenMarketData: (chain: Chain, tokenAddress: string) => [
     "tokenMarketData",
     chain,
     tokenAddress,
   ],
-  token: (chain: CHAIN_ID, tokenAddress: string) => ["token", chain, tokenAddress],
-  tokenSecurity: (chain: CHAIN_ID, tokenAddress: string) => ["tokenSecurity", chain, tokenAddress],
+  token: (chain: Chain, tokenAddress: string) => ["token", chain, tokenAddress],
+  tokenSecurity: (chain: Chain, tokenAddress: string) => ["tokenSecurity", chain, tokenAddress],
   tokens: (param: UseTokensQueryParams) => [
     "tokens",
     param.chain,
@@ -139,7 +139,7 @@ export const QueryKeys = {
     param.sortDirection ?? "",
     JSON.stringify(param.filterBy ?? {}),
   ],
-  tokenStats: (chain: CHAIN_ID, tokenAddress: string) => ["tokenStats", chain, tokenAddress],
+  tokenStats: (chain: Chain, tokenAddress: string) => ["tokenStats", chain, tokenAddress],
   tokenTrades: (param: UseTokenTradesQueryParams) => [
     "tokenTrades",
     param.chain,
@@ -148,17 +148,17 @@ export const QueryKeys = {
     param.limit ? param.limit.toString() : "",
     param.direction ?? "",
   ],
-  walletNetWorth: (chain: CHAIN_ID, walletAddress: string) => [
+  walletNetWorth: (chain: Chain, walletAddress: string) => [
     "walletNetWorth",
     chain,
     walletAddress,
   ],
-  walletPnl: (chain: CHAIN_ID, walletAddress: string) => [
+  walletPnl: (chain: Chain, walletAddress: string) => [
     "walletPnl",
     chain,
     walletAddress,
   ],
-  walletPnlDetails: (chain: CHAIN_ID, walletAddress: string) => [
+  walletPnlDetails: (chain: Chain, walletAddress: string) => [
     "walletPnl",
     chain,
     walletAddress,

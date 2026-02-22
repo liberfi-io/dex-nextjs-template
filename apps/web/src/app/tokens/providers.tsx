@@ -2,7 +2,7 @@
 
 import { useParams, redirect } from "next/navigation";
 import { PropsWithChildren, useMemo } from "react";
-import { chainIdBySlug } from "@liberfi/core";
+import { chainIdBySlug } from "@liberfi.io/utils";
 import { AppRoute } from "@liberfi/ui-dex/libs/routes";
 import { TradeDataLoader } from "@liberfi/ui-dex/components/trade";
 import { TradeDataProvider } from "@liberfi/ui-dex/components/trade/providers";

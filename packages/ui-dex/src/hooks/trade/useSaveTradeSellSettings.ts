@@ -1,10 +1,10 @@
 import { useCallback } from "react";
 import { useSetAtom } from "jotai";
-import { CHAIN_ID } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
 import { tradeSettingsAtom } from "../../states";
 import { SellSettingsValues } from "../../types";
 
-export function useSaveTradeSellSettings(chainId: CHAIN_ID) {
+export function useSaveTradeSellSettings(chainId: Chain) {
   const save = useSetAtom(tradeSettingsAtom);
   return useCallback(
     (settings: SellSettingsValues) => {

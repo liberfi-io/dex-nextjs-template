@@ -18,9 +18,9 @@ import {
 import { SearchDiscoverTokenListSkeleton } from "./SearchDiscoverTokenListSkeleton";
 import { tokenFilters, tokenSort } from "../../libs";
 import { Token } from "@chainstream-io/sdk";
-import { chainAtom, useAuth, useAuthenticatedCallback } from "@liberfi/ui-base";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { useAuth, useAuthenticatedCallback } from "@liberfi/ui-base";
 import { AuthGuard } from "../AuthGuard";
-import { useAtomValue } from "jotai";
 import { useTokensQuery } from "@liberfi/react-dex";
 
 export type SearchFavoriteTokenListProps = {
@@ -58,7 +58,7 @@ function SearchFavoriteTokenListContent({
 
   const { timeframe, filters, sort } = useTokenListContext();
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   // 标记可以重置展示的 tokens 列表
   const resetTokensRef = useRef(false);

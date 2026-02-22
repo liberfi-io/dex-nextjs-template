@@ -1,16 +1,15 @@
 import { useMemo, useState } from "react";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { Button, Form, Image, Link } from "@heroui/react";
-import { useAtomValue } from "jotai";
 import BigNumber from "bignumber.js";
 import { Token, WalletNetWorthItemDTO } from "@chainstream-io/sdk";
-import { chainIcon, chainTxExplorer } from "@liberfi/core";
+import { chainIcon, txExplorerUrl } from "@liberfi.io/utils";
 import {
   useCreateFixedAmountRedPacketMutation,
   useSendRedPacketTransactionMutation,
 } from "@liberfi/react-redpacket";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
-  chainAtom,
   useAppSdk,
   useAuth,
   useAuthenticatedCallback,
@@ -53,7 +52,7 @@ export function FixedRedPacketForm() {
 
   const walletInstance = useWallet();
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const formMethods = useForm<FixedRedPacketFormValues>({
     reValidateMode: "onBlur",
@@ -130,7 +129,7 @@ export function FixedRedPacketForm() {
         console.debug("send red packet transaction result", result);
 
         const txHash = result.signature;
-        const txExplorerUrl = chainTxExplorer(chain, txHash);
+        const txUrl = txExplorerUrl(chain, txHash);
         const chainIconUrl = chainIcon(chain) ?? "";
 
         toast({
@@ -157,7 +156,7 @@ export function FixedRedPacketForm() {
               endContent: (
                 <Button
                   as={Link}
-                  href={txExplorerUrl}
+                  href={txUrl}
                   target="_blank"
                   isIconOnly
                   className="bg-transparent w-6 min-w-0 h-6 min-h-0"
@@ -176,7 +175,7 @@ export function FixedRedPacketForm() {
               endContent: (
                 <Button
                   as={Link}
-                  href={txExplorerUrl}
+                  href={txUrl}
                   target="_blank"
                   isIconOnly
                   className="bg-transparent w-6 min-w-0 h-6 min-h-0"

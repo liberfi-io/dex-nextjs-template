@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CHAIN_ID } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
 import { getWrappedAddress, SOL_TOKEN_ADDRESS } from "@liberfi/ui-dex/libs";
 
 export const LaunchPadBasicFormSchema = z.object({
@@ -146,7 +146,7 @@ export const defaultRaydiumLaunchPadFormValues: RaydiumLaunchPadFormValues = {
   website: "",
   twitter: "",
   telegram: "",
-  quoteMint: getWrappedAddress(CHAIN_ID.SOLANA, SOL_TOKEN_ADDRESS) ?? SOL_TOKEN_ADDRESS,
+  quoteMint: getWrappedAddress(Chain.SOLANA, SOL_TOKEN_ADDRESS) ?? SOL_TOKEN_ADDRESS,
   supply: 1e9,
   raised: 85,
   sold: 80,

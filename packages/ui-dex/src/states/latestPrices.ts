@@ -3,7 +3,7 @@ import { BehaviorSubject, filter, map } from "rxjs";
 import { getDefaultStore } from "jotai";
 import BigNumber from "bignumber.js";
 import { throttle } from "lodash-es";
-import { CHAIN_ID } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
 import { chainParam, useDexClient } from "@liberfi/react-dex";
 import { stringifyTickerSymbol } from "../libs";
 import { tokenLatestMarketCapAtom, tokenLatestPriceAtom } from "./trade";
@@ -26,7 +26,7 @@ export const priceMapSubject = new BehaviorSubject(new Map<string, PriceInfo>())
  * @param address - the token address
  * @param price - the latest price
  */
-export function updateTokenLatestPrice(chainId: CHAIN_ID, address: string, price: number) {
+export function updateTokenLatestPrice(chainId: Chain, address: string, price: number) {
   const tickerSymbol = stringifyTickerSymbol(chainId, address);
   const priceMap = priceMapSubject.value;
   priceMap.set(tickerSymbol, { current: price, previous: priceMap.get(tickerSymbol)?.current });
@@ -39,7 +39,7 @@ export function updateTokenLatestPrice(chainId: CHAIN_ID, address: string, price
  * @param address - the token address
  * @returns the latest price of the token
  */
-function getTokenLatestPriceObservable(chainId: CHAIN_ID, address: string) {
+function getTokenLatestPriceObservable(chainId: Chain, address: string) {
   const tickerSymbol = stringifyTickerSymbol(chainId, address);
   return priceMapSubject.pipe(
     filter((priceMap) => {
@@ -57,7 +57,7 @@ function getTokenLatestPriceObservable(chainId: CHAIN_ID, address: string) {
  * @param throttleMs - the throttle time in milliseconds
  * @returns the latest price of the token
  */
-export function useTokenLatestPrice(chainId: CHAIN_ID, address: string, throttleMs?: number) {
+export function useTokenLatestPrice(chainId: Chain, address: string, throttleMs?: number) {
   const [price, setPrice] = useState(0);
   useEffect(() => {
     // reset price when chainId or address changes
@@ -104,7 +104,7 @@ const setTokenLatestMarketCapAtom = throttle(
  * @param totalSupply - The total supply of the token
  */
 export function useTokenLatestPriceUpdate(
-  chainId: CHAIN_ID,
+  chainId: Chain,
   address: string,
   price?: number,
   totalSupply?: number,
@@ -150,7 +150,7 @@ export function useTokenLatestPriceUpdate(
  * @param totalSupply - The total supply of the token
  */
 export function useTokenLatestPriceUpdateByTokenStats(
-  chainId: CHAIN_ID,
+  chainId: Chain,
   address: string,
   price?: number,
   totalSupply?: number,

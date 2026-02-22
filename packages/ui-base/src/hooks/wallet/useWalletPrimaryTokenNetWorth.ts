@@ -1,11 +1,12 @@
 import { useMemo } from "react";
 import { useAtomValue } from "jotai";
 import { getPrimaryTokenAddress } from "@liberfi/core";
-import { chainAtom, walletNetWorthAtom } from "../../states";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { walletNetWorthAtom } from "../../states";
 import { WalletNetWorthItemDTO } from "@chainstream-io/sdk";
 
 export function useWalletPrimaryTokenNetWorth() {
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
   const primaryTokenAddress = getPrimaryTokenAddress(chain);
   const walletNetWorth = useAtomValue(walletNetWorthAtom);
 

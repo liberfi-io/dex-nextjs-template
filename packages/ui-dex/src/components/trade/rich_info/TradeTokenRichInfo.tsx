@@ -5,7 +5,7 @@ import { TradeTokenAbout } from "./TradeTokenAbout";
 import { TradeTokenHolders } from "./TradeTokenHolders";
 import { TradeTokenTransactions } from "./TradeTokenTransactions";
 import { BubbleMapIcon } from "../../../assets";
-import { CHAIN_ID } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
 import { getBubbleMapUrl } from "../../../libs";
 import { tokenInfoAtom } from "../../../states";
 import { useAtomValue } from "jotai";
@@ -22,7 +22,7 @@ export function TradeTokenRichInfo() {
   const handleBubbleMap = useCallback(() => {
     if (!token?.chain || !token?.address) return;
 
-    const chainId = CHAIN_ID[token.chain.toUpperCase() as keyof typeof CHAIN_ID];
+    const chainId = Chain[token.chain.toUpperCase() as keyof typeof Chain];
     const url = getBubbleMapUrl(chainId, token.address);
 
     if (url) {

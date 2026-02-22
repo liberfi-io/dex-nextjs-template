@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { useAtom } from "jotai";
+import { useCurrentChain, useSelectChain } from "@liberfi.io/ui-chain-select";
 import {
-  chainAtom,
   useHideHeader,
   useSetBottomNavigationBarActiveKey,
   useShowBottomNavigationBar,
@@ -27,7 +26,8 @@ export function AccountPage() {
 
   const [tab, setTab] = useState<"assets" | "activities">("assets");
 
-  const [chainId, setChainId] = useAtom(chainAtom);
+  const { chain: chainId } = useCurrentChain();
+  const setChainId = useSelectChain();
 
   const [hideLowHoldingAssets, setHideLowHoldingAssets] = useState(false);
 

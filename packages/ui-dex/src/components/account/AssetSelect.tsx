@@ -1,5 +1,5 @@
 import { Listbox, ListboxItem, Skeleton } from "@heroui/react";
-import { CONFIG, CHAIN_ID } from "@liberfi/core";
+import { CONFIG, Chain } from "@liberfi/core";
 import { useTranslation, walletNetWorthAtom } from "@liberfi/ui-base";
 import BigNumber from "bignumber.js";
 import clsx from "clsx";
@@ -11,7 +11,7 @@ import { TokenAvatar } from "../TokenAvatar";
 import { WalletNetWorthItemDTO } from "@chainstream-io/sdk";
 
 type AssetSelectProps = {
-  chainId?: CHAIN_ID;
+  chainId?: Chain;
   exceptTokenAddresses?: string[];
   onSelect?: (tokenAddress: string) => void;
   onBuy?: () => void;

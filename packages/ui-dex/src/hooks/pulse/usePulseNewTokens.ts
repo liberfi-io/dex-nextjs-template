@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useAtomValue } from "jotai";
 import { omit, sortBy } from "lodash-es";
 import { Token } from "@chainstream-io/sdk";
 import {
@@ -18,13 +17,13 @@ import {
   useDexClient,
   useNewTokensQuery,
 } from "@liberfi/react-dex";
-import { chainAtom } from "@liberfi/ui-base";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { usePulseListContext } from "../../components/pulse/PulseListContext";
 import { useQuotePrice } from "../../states";
 import { getPrimaryTokenSymbol, RecursivePartial } from "@liberfi/core";
 
 export function usePulseWsNewTokens() {
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const dexClient = useDexClient();
 

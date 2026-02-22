@@ -1,10 +1,10 @@
 import { Key, useCallback, useMemo, useState } from "react";
-import { useAtomValue } from "jotai";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Form, Tab, Tabs } from "@heroui/react";
 import { getPrimaryTokenSymbol } from "@liberfi/core";
-import { chainAtom, useTranslation } from "@liberfi/ui-base";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { useTranslation } from "@liberfi/ui-base";
 import { BuySettingsSchema, BuySettingsValues, defaultBuySettingsValues } from "../../../types";
 import { CustomBuyAmountsInput } from "./CustomBuyAmountsInput";
 import { TradePresetForm } from "./TradePresetForm";
@@ -20,7 +20,7 @@ export function BuySettingsForm({ onSettings, preset: defaultPreset }: BuySettin
 
   const [preset, setPreset] = useState(defaultPreset === undefined ? "0" : `${defaultPreset}`);
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const primaryTokenSymbol = useMemo(() => getPrimaryTokenSymbol(chain), [chain]);
 

@@ -3,7 +3,7 @@ import { clsx } from "clsx";
 import { useAtomValue } from "jotai";
 import { BigNumber } from "bignumber.js";
 import { formatPrice, getPrimaryTokenSymbol, SOL_TOKEN_SYMBOL } from "@liberfi/core";
-import { chainAtom } from "@liberfi/ui-base";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { tokenInfoAtom, tokenLatestPriceAtom, useQuotePrice } from "../../../states";
 
 export type SellTokenAmountProps = {
@@ -12,7 +12,7 @@ export type SellTokenAmountProps = {
 };
 
 export function SellTokenAmount({ amount = 1, className }: SellTokenAmountProps) {
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const primaryTokenSymbol =
     useMemo(() => getPrimaryTokenSymbol(chain), [chain]) ?? SOL_TOKEN_SYMBOL;

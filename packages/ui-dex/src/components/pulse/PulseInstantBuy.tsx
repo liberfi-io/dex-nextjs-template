@@ -4,15 +4,15 @@ import { BigNumber } from "bignumber.js";
 import { Button } from "@heroui/react";
 import { Token } from "@chainstream-io/sdk";
 import {
-  chainIdBySlug,
   formatAmount,
   getPrimaryTokenAddress,
   getPrimaryTokenDecimals,
   getPrimaryTokenSymbol,
   RecursivePartial,
 } from "@liberfi/core";
+import { chainIdBySlug } from "@liberfi.io/utils";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
-  chainAtom,
   LightningIcon,
   useAppSdk,
   useAuthenticatedCallback,
@@ -37,7 +37,7 @@ export function PulseInstantBuy({ token }: PulseInstantBuyProps) {
 
   const { instantBuyAmount, type } = usePulseListContext();
 
-  const defaultChain = useAtomValue(chainAtom);
+  const { chain: defaultChain } = useCurrentChain();
 
   const chain = useMemo(
     () => chainIdBySlug(token.chain ?? "") ?? defaultChain,

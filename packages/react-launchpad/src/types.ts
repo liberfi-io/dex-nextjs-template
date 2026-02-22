@@ -1,6 +1,6 @@
 import { BigNumber } from "bignumber.js";
 import { CreateTokenInput } from "@chainstream-io/sdk";
-import { CHAIN_ID } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
 
 export enum LaunchPadPlatform {
   PUMPFUN = "pumpfun",
@@ -65,5 +65,5 @@ export interface LaunchPadConfigInfo {
 }
 
 export type CreateTokenParams = {
-  chain: CHAIN_ID;
+  chain: Chain;
 } & CreateTokenInput;

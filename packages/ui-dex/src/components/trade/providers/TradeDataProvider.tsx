@@ -5,7 +5,7 @@ import {
   useTokenAddressesInCollectionQuery,
 } from "@liberfi/react-backend";
 import { Token, TradeDetailDTO } from "@chainstream-io/sdk";
-import { CHAIN_ID } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
 import { reverse, sortBy, uniqBy } from "lodash-es";
 import { useAuth, useAuthenticatedCallback } from "@liberfi/ui-base";
 import { tokenInfoAtom } from "../../../states";
@@ -14,7 +14,7 @@ import { useTokensQuery, useTokenTradesQuery } from "@liberfi/react-dex";
 
 export type TradeDataContextType = {
   // token 所属链
-  chain: CHAIN_ID;
+  chain: Chain;
   // token 合约地址
   address: string;
   // 查看的 token 列表
@@ -31,7 +31,7 @@ export type TradeDataContextType = {
 };
 
 export const TradeDataContext = createContext<TradeDataContextType>({
-  chain: CHAIN_ID.SOLANA,
+  chain: Chain.SOLANA,
   address: "",
   viewTokens: undefined,
   isViewTokensLoading: true,
@@ -43,7 +43,7 @@ export const TradeDataContext = createContext<TradeDataContextType>({
 });
 
 export type TradeDataProviderProps = PropsWithChildren<{
-  chain: CHAIN_ID;
+  chain: Chain;
   address: string;
 }>;
 

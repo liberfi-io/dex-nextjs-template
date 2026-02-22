@@ -3,7 +3,7 @@ import { Modal, ModalBody, ModalContent, ModalHeader, useDisclosure } from "@her
 import { useCallback, useEffect, useState } from "react";
 import { AssetSelect } from "../account";
 import { getBuyTokenUrl } from "../../libs";
-import { CHAIN_ID } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
 
 export default function AssetSelectModal() {
   const { t, i18n } = useTranslation();
@@ -16,7 +16,7 @@ export default function AssetSelectModal() {
 
   const [requestId, setRequestId] = useState<number | undefined>(undefined);
 
-  const [chainId, setChainId] = useState<CHAIN_ID | undefined>(undefined);
+  const [chainId, setChainId] = useState<Chain | undefined>(undefined);
 
   const [exceptTokenAddresses, setExceptTokenAddresses] = useState<string[]>([]);
 
@@ -27,7 +27,7 @@ export default function AssetSelectModal() {
     }: {
       method: "select_asset";
       id?: number | undefined;
-      params: { chainId?: CHAIN_ID; except_token_addresses?: string[] };
+      params: { chainId?: Chain; except_token_addresses?: string[] };
     }) => {
       setRequestId(id);
       setChainId(params.chainId);
@@ -48,7 +48,7 @@ export default function AssetSelectModal() {
   const onBuy = useCallback(() => {
     onClose();
     const url = getBuyTokenUrl({
-      chainId: CHAIN_ID.SOLANA,
+      chainId: Chain.SOLANA,
       walletAddress: user?.solanaAddress ?? "",
       language: i18n.language,
     });

@@ -10,8 +10,8 @@ import {
   SOL_TOKEN_DECIMALS,
   SOL_TOKEN_SYMBOL,
 } from "@liberfi/core";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
-  chainAtom,
   useAuthenticatedCallback,
   useTranslation,
   useWalletTokenNetWorth,
@@ -30,7 +30,7 @@ export function MarketSellForm() {
   // sell amount
   const [amount, setAmount] = useState<number | undefined>();
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   // primary token symbol
   const primaryTokenSymbol =

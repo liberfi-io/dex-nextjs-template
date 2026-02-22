@@ -11,8 +11,8 @@ import { ListEmptyData } from "../ListEmptyData";
 import { tokenSort, tokenFilters } from "../../libs";
 import { DiscoverTokenListItem } from "./DiscoverTokenListItem";
 import { Virtuoso } from "react-virtuoso";
-import { useAtomValue } from "jotai";
-import { chainAtom, useAuth } from "@liberfi/ui-base";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { useAuth } from "@liberfi/ui-base";
 import {
   chainParam,
   convertStreamTokenHoldersToMarketData,
@@ -36,7 +36,7 @@ export function DiscoverTrendingTokenList() {
 
   const { timeframe, filters, sort } = useTokenListContext();
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const params = useMemo(() => {
     const sortRequest = sort ? tokenSort(sort, timeframe) : undefined;

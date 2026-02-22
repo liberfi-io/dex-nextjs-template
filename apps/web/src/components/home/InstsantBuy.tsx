@@ -7,8 +7,8 @@ import {
   getPrimaryTokenDecimals,
   getPrimaryTokenSymbol,
 } from "@liberfi/core";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
-  chainAtom,
   useAppSdk,
   useAuthenticatedCallback,
   useWalletPrimaryTokenNetWorth,
@@ -16,10 +16,10 @@ import {
 import { defaultTradePresetValues, useSwap, useTradeBuySettings } from "@liberfi/ui-dex";
 import { useMemo } from "react";
 import { useInstantBuy } from "./InstantBuyContext";
-import { useAtomValue } from "jotai";
+
 
 export function InstantBuy({ token }: TokenListActionsProps) {
-  const chainId = useAtomValue(chainAtom);
+  const { chain: chainId } = useCurrentChain();
 
   const { t } = useTranslation();
 

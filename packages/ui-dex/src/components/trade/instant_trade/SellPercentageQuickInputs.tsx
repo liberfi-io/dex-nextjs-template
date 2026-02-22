@@ -1,8 +1,8 @@
 import { ChangeEvent, useCallback, useMemo, useState } from "react";
 import { clsx } from "clsx";
-import { useAtomValue } from "jotai";
 import { Button, NumberInput } from "@heroui/react";
-import { chainAtom, CheckIcon, EditIcon } from "@liberfi/ui-base";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { CheckIcon, EditIcon } from "@liberfi/ui-base";
 import { useSaveTradeSellSettings, useTradeSellSettings } from "../../../hooks";
 import { defaultCustomSellPercentages, defaultSellSettingsValues } from "../../../types";
 
@@ -11,7 +11,7 @@ export type SellPercentageQuickInputsProps = {
 };
 
 export function SellPercentageQuickInputs({ onChange }: SellPercentageQuickInputsProps) {
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const settings = useTradeSellSettings(chain);
 

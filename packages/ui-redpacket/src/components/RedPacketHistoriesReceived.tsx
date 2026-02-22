@@ -1,8 +1,8 @@
 import { useTokensQuery } from "@liberfi/react-dex";
 import { useWalletClaimsQuery } from "@liberfi/react-redpacket";
-import { chainAtom, useAuth } from "@liberfi/ui-base";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { useAuth } from "@liberfi/ui-base";
 import { ListEmptyData } from "@liberfi/ui-dex/components/ListEmptyData";
-import { useAtomValue } from "jotai";
 import { keyBy } from "lodash-es";
 import { useMemo } from "react";
 import { Virtuoso } from "react-virtuoso";
@@ -10,7 +10,7 @@ import { RedPacketClaimHistory, RedPacketClaimHistoryProps } from "./RedPacketCl
 import { Skeleton } from "@heroui/react";
 
 export function RedPacketHistoriesReceived() {
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const { user } = useAuth();
 

@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from "react";
 import { useAtomValue } from "jotai";
-import { chainAtom } from "@liberfi/ui-base";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { tradeSellPresetAtom } from "../../../states";
 import { useSaveTradeSellSettings, useTradeSellSettings } from "../../../hooks";
 import { defaultSellSettingsValues, defaultTradePresetValues, TradePresetValues } from "../../../types";
@@ -11,7 +11,7 @@ export type SellTradeSettingsFormProps = {
 };
 
 export function SellTradeSettingsForm({ className }: SellTradeSettingsFormProps) {
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const preset = useAtomValue(tradeSellPresetAtom);
 

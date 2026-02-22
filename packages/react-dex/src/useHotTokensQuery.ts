@@ -1,13 +1,13 @@
 import { useQuery, UseQueryOptions } from "@tanstack/react-query";
 import { ChainStreamClient, Token } from "@chainstream-io/sdk";
-import { CHAIN_ID } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
 import { useDexClient } from "./DexClientProvider";
 import { chainParam } from "./utils";
 import { UseHotTokensQueryParams } from "./types";
 import { QueryKeys } from "./queryKeys";
 
 const defaultParam: UseHotTokensQueryParams = {
-  chain: CHAIN_ID.SOLANA,
+  chain: Chain.SOLANA,
   duration: "24h",
 };
 

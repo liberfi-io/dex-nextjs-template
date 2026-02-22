@@ -1,8 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
-import { useAtomValue } from "jotai";
 import { fetchSwapRoute, sendTransaction, useDexClient } from "@liberfi/react-dex";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
-  chainAtom,
   useAuth,
   useTimerToast,
   useTranslation,
@@ -15,7 +14,8 @@ import {
   SwapRouteInputSwapMode,
 } from "@chainstream-io/sdk";
 import { BigNumber } from "bignumber.js";
-import { chainIcon, getWrappedTokenAddress } from "@liberfi/core";
+import { getWrappedTokenAddress } from "@liberfi/core";
+import { chainIcon } from "@liberfi.io/utils";
 import { Button, Image, Link } from "@heroui/react";
 import { getTxExplorerUrl } from "../libs";
 
@@ -43,7 +43,7 @@ export function useSwap() {
 
   const dexClient = useDexClient();
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const { user } = useAuth();
 

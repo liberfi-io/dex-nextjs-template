@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { BehaviorSubject } from "rxjs";
-import { CHAIN_ID } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
 import { CHAIN_PRIMARY_TOKENS } from "../libs";
 import { dexClientSubject, queryClientSubject } from "@liberfi/ui-base";
 import { fetchTokenMarketData, QueryKeys } from "@liberfi/react-dex";
@@ -20,7 +20,7 @@ function setQuotePrice(symbol: string, price: number) {
   quotePricesSubject.next(new Map(quotePrices));
 }
 
-export async function fetchQuotePrice(chainId: CHAIN_ID, symbol: string): Promise<number | null> {
+export async function fetchQuotePrice(chainId: Chain, symbol: string): Promise<number | null> {
   const queryClient = queryClientSubject.value;
   if (!queryClient) throw new Error("QueryClient is not ready");
 
@@ -48,7 +48,7 @@ let timer: NodeJS.Timeout | null = null;
 const QUERY_KEY = "fetchQuotePrice";
 
 // reset current quote symbol and then fetch periodically
-export function setCurrentQuoteSymbol(chainId: CHAIN_ID, symbol: string) {
+export function setCurrentQuoteSymbol(chainId: Chain, symbol: string) {
   if (currentSymbol === symbol) return;
 
   const queryClient = queryClientSubject.value;

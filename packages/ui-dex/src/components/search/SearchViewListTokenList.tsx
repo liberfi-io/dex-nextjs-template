@@ -15,8 +15,8 @@ import { Token } from "@chainstream-io/sdk";
 import { SearchDiscoverTokenListSkeleton } from "./SearchDiscoverTokenListSkeleton";
 import { SearchDiscoverTokenListItem } from "./SearchDiscoverTokenListItem";
 import { AuthGuard } from "../AuthGuard";
-import { useAtomValue } from "jotai";
-import { chainAtom, useAuth } from "@liberfi/ui-base";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { useAuth } from "@liberfi/ui-base";
 import { useTokensQuery } from "@liberfi/react-dex";
 
 export type SearchViewListTokenListProps = {
@@ -54,7 +54,7 @@ function SearchViewListTokenListContent({
 
   const { timeframe, filters, sort } = useTokenListContext();
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   // 标记可以重置展示的 tokens 列表
   const resetTokensRef = useRef(false);

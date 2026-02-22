@@ -1,5 +1,5 @@
-import { chainAtom, useAuth } from "@liberfi/ui-base";
-import { useAtomValue } from "jotai";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { useAuth } from "@liberfi/ui-base";
 import { useWalletRedPacketsQuery } from "@liberfi/react-redpacket";
 import { useMemo } from "react";
 import { useTokensQuery } from "@liberfi/react-dex";
@@ -10,7 +10,7 @@ import { RedPacketHistory, RedPacketHistoryProps } from "./RedPacketHistory";
 import { Skeleton } from "@heroui/react";
 
 export function RedPacketHistoriesSent() {
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const { user } = useAuth();
 

@@ -13,7 +13,7 @@ import clsx from "clsx";
 import { reverse, sortBy } from "lodash-es";
 import { useCallback, useMemo, useState } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
-import { CHAIN_ID } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
 import { Number } from "../../Number";
 import { EmptyData } from "../../EmptyData";
 import { useAtomValue } from "jotai";
@@ -46,7 +46,7 @@ function Chart({ className, classNames, displayLegendValue = true }: PortfolioCh
   // append primary token balances
   const fullWalletNetWorth = useMemo(() => {
     if (!walletNetWorth) return undefined;
-    return appendPrimaryTokenNetWorth(CHAIN_ID.SOLANA, walletNetWorth);
+    return appendPrimaryTokenNetWorth(Chain.SOLANA, walletNetWorth);
   }, [walletNetWorth]);
 
   // current highlighted token index

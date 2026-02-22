@@ -1,12 +1,11 @@
 import { usePulseListContext } from "../../components/pulse/PulseListContext";
 import { Token } from "@chainstream-io/sdk";
 import { useMigratedTokensQuery } from "@liberfi/react-dex";
-import { chainAtom } from "@liberfi/ui-base";
-import { useAtomValue } from "jotai";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { useEffect, useMemo, useState } from "react";
 
 export function usePulseMigratedTokens() {
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const { isPaused } = usePulseListContext();
 

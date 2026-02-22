@@ -1,6 +1,5 @@
 import { ChangeEvent, useCallback, useMemo } from "react";
 import { clsx } from "clsx";
-import { useAtomValue } from "jotai";
 import { Avatar, Button, NumberInput, Tooltip } from "@heroui/react";
 import {
   formatPercent,
@@ -8,8 +7,8 @@ import {
   getPrimaryTokenAvatar,
   getPrimaryTokenDecimals,
 } from "@liberfi/core";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
-  chainAtom,
   CoinsIcon,
   LightningIcon,
   ShieldIcon,
@@ -54,7 +53,7 @@ export function InstantBuyAmountInput({
 
   const appSdk = useAppSdk();
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const primaryTokenDecimals = useMemo(() => getPrimaryTokenDecimals(chain), [chain]);
 

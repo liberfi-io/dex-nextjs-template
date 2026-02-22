@@ -15,13 +15,14 @@ import {
   tokenStatsAtom,
   useQuotePrice,
 } from "../../../states";
-import { chainAtom, useTranslation } from "@liberfi/ui-base";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { useTranslation } from "@liberfi/ui-base";
 import { BearishIcon, BullishIcon } from "../../../assets";
 
 export function TradeTokenPrice() {
   const { t } = useTranslation();
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   // chain quote token price
   const quotePrice = useQuotePrice(CHAIN_QUOTE_TOKEN_SYMBOLS[chain] ?? "");

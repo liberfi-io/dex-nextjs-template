@@ -6,35 +6,36 @@ import {
   GetStocksTokensParams,
   Token,
 } from "@chainstream-io/sdk";
-import { CHAIN_ID, chainIdBySlug, chainSlugs } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
+import { chainIdBySlug, chainSlug } from "@liberfi.io/utils";
 
-export function stringifyTickerSymbol(chainId: CHAIN_ID, address: string): string {
+export function stringifyTickerSymbol(chainId: Chain, address: string): string {
   switch (chainId) {
-    case CHAIN_ID.ETHEREUM:
+    case Chain.ETHEREUM:
       return `eth/${address}`;
-    case CHAIN_ID.BINANCE:
+    case Chain.BINANCE:
       return `bsc/${address}`;
     default:
       break;
   }
-  const chainSlug = chainSlugs[chainId];
-  if (!chainSlug) {
+  const slug = chainSlug(chainId);
+  if (!slug) {
     throw new Error(`Unknown chainId: ${chainId}`);
   }
-  return `${chainSlug}/${address}`;
+  return `${slug}/${address}`;
 }
 
 export function stringifyTickerSymbolByChainSlug(chainSlug: string, address: string): string {
   return `${chainSlug}/${address}`;
 }
 
-export function parseTickerSymbol(tickerSymbol: string): { chainId: CHAIN_ID; address: string } {
+export function parseTickerSymbol(tickerSymbol: string): { chainId: Chain; address: string } {
   const [chainSlug, address] = tickerSymbol.split("/");
   switch (chainSlug) {
     case "eth":
-      return { chainId: CHAIN_ID.ETHEREUM, address };
+      return { chainId: Chain.ETHEREUM, address };
     case "bsc":
-      return { chainId: CHAIN_ID.BINANCE, address };
+      return { chainId: Chain.BINANCE, address };
     default:
       break;
   }
@@ -46,27 +47,27 @@ export function parseTickerSymbol(tickerSymbol: string): { chainId: CHAIN_ID; ad
 }
 
 export const CHAIN_QUOTE_TOKEN_SYMBOLS: Partial<{
-  [key in CHAIN_ID]: string;
+  [key in Chain]: string;
 }> = {
-  [CHAIN_ID.SOLANA]: "SOL",
-  [CHAIN_ID.ETHEREUM]: "ETH",
-  [CHAIN_ID.BINANCE]: "BNB",
+  [Chain.SOLANA]: "SOL",
+  [Chain.ETHEREUM]: "ETH",
+  [Chain.BINANCE]: "BNB",
 };
 
 export const CHAIN_PRIMARY_TOKENS: Partial<{
-  [key in CHAIN_ID]: Record<string, string>;
+  [key in Chain]: Record<string, string>;
 }> = {
-  [CHAIN_ID.SOLANA]: {
+  [Chain.SOLANA]: {
     SOL: "11111111111111111111111111111111",
     USDC: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
     USDT: "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
   },
-  [CHAIN_ID.ETHEREUM]: {
+  [Chain.ETHEREUM]: {
     ETH: "0x0000000000000000000000000000000000000000",
     USDC: "0x0000000000000000000000000000000000000000",
     USDT: "0x0000000000000000000000000000000000000000",
   },
-  [CHAIN_ID.BINANCE]: {
+  [Chain.BINANCE]: {
     BNB: "0x0000000000000000000000000000000000000000",
     USDC: "0x0000000000000000000000000000000000000000",
     USDT: "0x0000000000000000000000000000000000000000",
@@ -379,9 +380,9 @@ export type SocialMedias = {
 };
 
 export const PRIMARY_TOKENS_MAP: Partial<{
-  [key in CHAIN_ID]: Pick<Token, "address" | "name" | "symbol" | "imageUrl">[];
+  [key in Chain]: Pick<Token, "address" | "name" | "symbol" | "imageUrl">[];
 }> = {
-  [CHAIN_ID.SOLANA]: [
+  [Chain.SOLANA]: [
     // {
     //   address: "0x0000000000000000000000000000000000000000",
     //   name: "Solana",

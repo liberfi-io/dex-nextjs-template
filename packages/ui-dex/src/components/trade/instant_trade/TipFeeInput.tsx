@@ -1,8 +1,8 @@
 import { ChangeEvent, useCallback, useMemo } from "react";
-import { useAtomValue } from "jotai";
 import { Button, NumberInput, Tooltip } from "@heroui/react";
 import { getPrimaryTokenDecimals, getPrimaryTokenSymbol } from "@liberfi/core";
-import { chainAtom, InfoIcon, useTranslation } from "@liberfi/ui-base";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { InfoIcon, useTranslation } from "@liberfi/ui-base";
 
 export type TipFeeInputProps = {
   value: number | null;
@@ -12,7 +12,7 @@ export type TipFeeInputProps = {
 export function TipFeeInput({ value, onChange }: TipFeeInputProps) {
   const { t } = useTranslation();
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const primaryTokenSymbol = useMemo(() => getPrimaryTokenSymbol(chain), [chain]);
 

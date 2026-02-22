@@ -3,7 +3,6 @@ import { atom } from "jotai";
 // import { atomWithStorage } from "jotai/utils";
 import { QueryClient, UseQueryResult } from "@tanstack/react-query";
 import { ChainStreamClient, PnlDetailsPage, WalletNetWorthPage, WalletPnlSummaryDTO } from "@chainstream-io/sdk";
-import { CHAIN_ID } from "@liberfi/core";
 import { Layout } from "./types";
 
 // queryClient for non-hooks usage
@@ -26,9 +25,6 @@ export const showBottomNavigationBarOnLayoutAtom = atom<Layout | null>(null);
 
 // current bottom navigation bar active key
 export const bottomNavigationBarActiveKeyAtom = atom<string>();
-
-// current chain
-export const chainAtom = atom(CHAIN_ID.SOLANA);
 
 export const walletNetWorthQueryStateAtom = atom<Pick<
   UseQueryResult<WalletNetWorthPage>,

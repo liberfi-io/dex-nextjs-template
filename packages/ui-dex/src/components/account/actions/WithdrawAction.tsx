@@ -2,7 +2,7 @@ import { WithdrawOutlinedIcon } from "../../../assets";
 import { AccountAction } from "./AccountAction";
 import { useAppSdk, useAuth, useAuthenticatedCallback, useTranslation } from "@liberfi/ui-base";
 import { getSellTokenUrl } from "../../../libs";
-import { CHAIN_ID } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
 
 export type WithdrawActionProps = {
   className?: string;
@@ -17,7 +17,7 @@ export function WithdrawAction({ className }: WithdrawActionProps) {
 
   const onAction = useAuthenticatedCallback(async () => {
     const url = getSellTokenUrl({
-      chainId: CHAIN_ID.SOLANA,
+      chainId: Chain.SOLANA,
       walletAddress: user?.solanaAddress ?? "",
       language: i18n.language,
     });

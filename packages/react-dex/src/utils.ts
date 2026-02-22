@@ -9,7 +9,8 @@ import {
   WsTokenMetadata as TokenMetadata,
 } from "@chainstream-io/sdk/stream";
 import { Token, TokenMarketData, TokenStat, ChainSymbol } from "@chainstream-io/sdk";
-import { CHAIN_ID, chainSlugs, RecursivePartial } from "@liberfi/core";
+import { Chain, RecursivePartial } from "@liberfi/core";
+import { chainSlug } from "@liberfi.io/utils";
 import { ChainParam, InvalidParamError, Timeframe } from "./types";
 
 /**
@@ -17,13 +18,13 @@ import { ChainParam, InvalidParamError, Timeframe } from "./types";
  * @param chain chain id
  * @returns dex api's chain param
  */
-export function chainParam(chain: CHAIN_ID): ChainParam {
+export function chainParam(chain: Chain): ChainParam {
   switch (chain) {
-    case CHAIN_ID.SOLANA:
+    case Chain.SOLANA:
       return ChainSymbol.sol;
-    case CHAIN_ID.BINANCE:
+    case Chain.BINANCE:
       return ChainSymbol.bsc;
-    case CHAIN_ID.ETHEREUM:
+    case Chain.ETHEREUM:
       return ChainSymbol.eth;
     default:
       throw new InvalidParamError("chain");
@@ -378,13 +379,13 @@ function convertStreamRankingTokenStats(timeframe: Timeframe, stat?: StreamToken
  * @returns unified token, if some value is not available, it will be set to undefined
  */
 export function convertStreamRankingToken(
-  chainId: CHAIN_ID,
+  chainId: Chain,
   rankingToken: RankingTokenList,
   quotePriceInUsd: BigNumber.Value,
 ): RecursivePartial<Token> {
   return {
     // metadata properties
-    chain: chainSlugs[chainId],
+    chain: chainSlug(chainId),
     address: rankingToken.metadata?.tokenAddress,
     symbol: rankingToken.metadata?.symbol,
     name: rankingToken.metadata?.name,
@@ -445,11 +446,11 @@ export function convertStreamRankingToken(
 }
 
 export function convertStreamNewToken(
-  chainId: CHAIN_ID,
+  chainId: Chain,
   newToken: NewToken,
 ): RecursivePartial<Token> {
   return {
-    chain: chainSlugs[chainId],
+    chain: chainSlug(chainId),
     address: newToken.tokenAddress,
     symbol: newToken.symbol,
     name: newToken.name,

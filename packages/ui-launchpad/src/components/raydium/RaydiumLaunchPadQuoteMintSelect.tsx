@@ -1,7 +1,7 @@
 import { Controller, useFormContext } from "react-hook-form";
 import clsx from "clsx";
 import { Avatar, Select, SelectItem } from "@heroui/react";
-import { CHAIN_ID, getPrimaryTokenAvatar } from "@liberfi/core";
+import { Chain, getPrimaryTokenAvatar } from "@liberfi/core";
 import { useTranslation } from "@liberfi/ui-base";
 import {
   formatShortAddress,
@@ -13,8 +13,8 @@ import {
 const options = [
   {
     name: SOL_TOKEN_SYMBOL,
-    address: getWrappedAddress(CHAIN_ID.SOLANA, SOL_TOKEN_ADDRESS),
-    image: getPrimaryTokenAvatar(CHAIN_ID.SOLANA),
+    address: getWrappedAddress(Chain.SOLANA, SOL_TOKEN_ADDRESS),
+    image: getPrimaryTokenAvatar(Chain.SOLANA),
   },
 ];
 

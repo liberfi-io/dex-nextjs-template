@@ -11,8 +11,8 @@ import { ListEmptyData } from "../ListEmptyData";
 import { tokenFilters, tokenSort } from "../../libs";
 import { DiscoverTokenListItem } from "./DiscoverTokenListItem";
 import { Virtuoso } from "react-virtuoso";
-import { useAtomValue } from "jotai";
-import { chainAtom, useAuth } from "@liberfi/ui-base";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { useAuth } from "@liberfi/ui-base";
 import {
   chainParam,
   convertStreamTokenHoldersToMarketData,
@@ -32,7 +32,8 @@ import {
   WsTokenStat,
   WsTokenSupply,
 } from "@chainstream-io/sdk/stream";
-import { CHAIN_ID, chainSlugs } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
+import { chainSlug } from "@liberfi.io/utils";
 import { reverse, sortBy } from "lodash-es";
 
 export function DiscoverWsNewTokenList() {
@@ -40,7 +41,7 @@ export function DiscoverWsNewTokenList() {
 
   const { timeframe, filters, sort } = useTokenListContext();
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const [tokens, setTokens] = useState<Token[]>([]);
 
@@ -75,7 +76,7 @@ export function DiscoverWsNewTokenList() {
         const tokens = [newToken].map(
           (it) =>
             ({
-              chain: chainSlugs[chain] ?? chainSlugs[CHAIN_ID.SOLANA],
+              chain: chainSlug(chain) ?? chainSlug(Chain.SOLANA),
               address: it.tokenAddress,
               name: it.name,
               symbol: it.symbol,

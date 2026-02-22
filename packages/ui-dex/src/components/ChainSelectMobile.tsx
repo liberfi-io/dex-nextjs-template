@@ -11,7 +11,8 @@ import {
   ModalHeader,
   useDisclosure,
 } from "@heroui/react";
-import { CHAIN_ID, chainSlugs } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
+import { chainSlug } from "@liberfi.io/utils";
 import { ChainOption, CHAINS } from "./ChainSelect";
 import { useCallback } from "react";
 import clsx from "clsx";
@@ -20,8 +21,8 @@ export type ChainSelectMobileProps = {
   classNames?: {
     trigger?: string;
   };
-  chainId?: CHAIN_ID | "";
-  onSelect?: (chain: CHAIN_ID | "") => void;
+  chainId?: Chain | "";
+  onSelect?: (chain: Chain | "") => void;
 };
 
 export function ChainSelectMobile({ classNames, chainId, onSelect }: ChainSelectMobileProps) {
@@ -30,7 +31,7 @@ export function ChainSelectMobile({ classNames, chainId, onSelect }: ChainSelect
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
   const handleSelect = useCallback(
-    (chain: CHAIN_ID | "") => {
+    (chain: Chain | "") => {
       onSelect?.(chain);
       onClose();
     },
@@ -49,7 +50,7 @@ export function ChainSelectMobile({ classNames, chainId, onSelect }: ChainSelect
         disableRipple
       >
         {chainId ? (
-          <ChainImage chainId={chainId as CHAIN_ID} width={22} height={22} />
+          <ChainImage chainId={chainId as Chain} width={22} height={22} />
         ) : (
           <NetworkIcon
             className="absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2"
@@ -97,7 +98,7 @@ export function ChainSelectMobile({ classNames, chainId, onSelect }: ChainSelect
                 {CHAINS.map((chain) => (
                   <ListboxItem
                     key={chain}
-                    textValue={capitalize(chainSlugs[chain as CHAIN_ID]!)}
+                    textValue={capitalize(chainSlug(chain as Chain)!)}
                     className={
                       "p-0 data-[selected=true]:focus:bg-transparent " +
                       "data-[hover=true]:opacity-hover data-[hover=true]:bg-transparent"
@@ -108,7 +109,7 @@ export function ChainSelectMobile({ classNames, chainId, onSelect }: ChainSelect
                       className="h-14"
                       classNames={{ label: "text-sm" }}
                       isSelected={chainId === chain}
-                      label={capitalize(chainSlugs[chain as CHAIN_ID]!)}
+                      label={capitalize(chainSlug(chain as Chain)!)}
                       icon={<ChainImage chainId={chain} width={24} height={24} />}
                     />
                   </ListboxItem>

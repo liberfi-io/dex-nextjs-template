@@ -2,7 +2,7 @@
  * Trade settings types
  */
 import { z } from "zod";
-import { CHAIN_ID } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
 
 export const TradePresetSchema = z.object({
   slippage: z.number().min(0).max(100).nullable(),
@@ -67,4 +67,4 @@ export type TradeSettingsValues = {
   sell: SellSettingsValues;
 };
 
-export type TradeSettingsValuesByChain = Partial<Record<CHAIN_ID, TradeSettingsValues>>;
+export type TradeSettingsValuesByChain = Partial<Record<Chain, TradeSettingsValues>>;

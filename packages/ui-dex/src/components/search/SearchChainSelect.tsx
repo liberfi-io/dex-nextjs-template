@@ -1,5 +1,5 @@
 import { ChainFilter, ChainFilterMobile, useTokenListContext } from "../tokens";
-import { CHAIN_ID } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
 import { Button } from "@heroui/react";
 import clsx from "clsx";
 import { ChainImage, NetworkIcon } from "../../assets";
@@ -24,7 +24,7 @@ export function SearchChainSelect() {
               disableRipple
             >
               {chainId ? (
-                <ChainImage chainId={chainId as CHAIN_ID} width={18} height={18} />
+                <ChainImage chainId={chainId as Chain} width={18} height={18} />
               ) : (
                 <NetworkIcon
                   className="absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2"

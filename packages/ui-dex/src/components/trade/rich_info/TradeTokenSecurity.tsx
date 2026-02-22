@@ -2,7 +2,8 @@ import { GoPlusIcon, TooltipIcon } from "../../../assets";
 import { useTranslation } from "@liberfi/ui-base";
 import { Token } from "@chainstream-io/sdk";
 import { Button, Link, Popover, PopoverContent, PopoverTrigger, Skeleton } from "@heroui/react";
-import { CHAIN_ID, chainIdBySlug } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
+import { chainIdBySlug } from "@liberfi.io/utils";
 import { useTokenSecurityQuery } from "@liberfi/react-dex";
 import clsx from "clsx";
 import { useMemo } from "react";
@@ -10,7 +11,7 @@ import { useMemo } from "react";
 const SECURITY_PROVIDER = "GoPlus";
 
 export function TradeTokenSecurity({ token }: { token: Token }) {
-  const chain = useMemo(() => chainIdBySlug(token.chain) ?? CHAIN_ID.SOLANA, [token.chain]);
+  const chain = useMemo(() => chainIdBySlug(token.chain) ?? Chain.SOLANA, [token.chain]);
 
   const { data, isLoading } = useTokenSecurityQuery(chain, token.address);
 

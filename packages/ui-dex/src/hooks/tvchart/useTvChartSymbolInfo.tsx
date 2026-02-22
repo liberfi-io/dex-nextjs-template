@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Token } from "@chainstream-io/sdk";
-import { chainIdBySlug } from "@liberfi/core";
+import { chainIdBySlug } from "@liberfi.io/utils";
 import { fetchTokenInfo } from "../../states";
 import { parseSymbol, TvChartSymbol, TvChartAreaManager } from "../../libs/tvchart";
 

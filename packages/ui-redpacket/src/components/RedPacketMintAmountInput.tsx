@@ -5,9 +5,9 @@ import { useAtomValue } from "jotai";
 import BigNumber from "bignumber.js";
 import { Button, Input } from "@heroui/react";
 import { useTokenQuery } from "@liberfi/react-dex";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
   ArrowDownOutlinedIcon,
-  chainAtom,
   useAppSdk,
   useAuthenticatedCallback,
   useTranslation,
@@ -33,7 +33,7 @@ export function RedPacketMintAmountInput() {
     };
   }>();
 
-  const chainId = useAtomValue(chainAtom);
+  const { chain: chainId } = useCurrentChain();
 
   const appSdk = useAppSdk();
 

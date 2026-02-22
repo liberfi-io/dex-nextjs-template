@@ -4,8 +4,8 @@ import {
   useTokenAddressesInCollectionQuery,
 } from "@liberfi/react-backend";
 import { MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
-  chainAtom,
   layoutAtom,
   useAuth,
   useAuthenticatedCallback,
@@ -54,7 +54,7 @@ function FavoriteTokenListContent() {
 
   const { timeframe, filters, sort } = useTokenListContext();
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   // 标记可以重置展示的 tokens 列表
   const resetTokensRef = useRef(false);

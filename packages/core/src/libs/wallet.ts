@@ -1,7 +1,7 @@
-import { CHAIN_ID } from "./chain";
+import { Chain } from "@liberfi.io/types";
 
 export interface IWallet {
-  chain: CHAIN_ID;
+  chain: Chain;
   address: string;
   signTransaction: (message: Uint8Array) => Promise<Uint8Array>;
 }

@@ -8,7 +8,8 @@ import {
   Token,
   WalletNetWorthItemDTO,
 } from "@chainstream-io/sdk";
-import { CHAIN_ID, chainIcon } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
+import { chainIcon } from "@liberfi.io/utils";
 import {
   fetchSwapRoute,
   useDexClient,
@@ -39,7 +40,7 @@ import { useAtomValue } from "jotai";
 
 export type SwapContextValue = {
   // 链 ID
-  chainId: CHAIN_ID;
+  chainId: Chain;
   // 支付代币地址
   fromTokenAddress?: string | null;
   // 支付代币余额
@@ -75,7 +76,7 @@ export type SwapContextValue = {
 };
 
 export const SwapContext = createContext<SwapContextValue>({
-  chainId: CHAIN_ID.SOLANA,
+  chainId: Chain.SOLANA,
   setFromTokenAddress: () => {},
   setToTokenAddress: () => {},
   setAmount: () => {},
@@ -85,14 +86,14 @@ export const SwapContext = createContext<SwapContextValue>({
 });
 
 export type SwapProviderProps = PropsWithChildren<{
-  chainId?: CHAIN_ID;
+  chainId?: Chain;
   fromTokenAddress?: string;
   toTokenAddress?: string;
   onComplete?: (options: any) => void;
 }>;
 
 export function SwapProvider({
-  chainId = CHAIN_ID.SOLANA,
+  chainId = Chain.SOLANA,
   fromTokenAddress: defaultFromTokenAddress,
   toTokenAddress: defaultToTokenAddress,
   onComplete,
@@ -224,7 +225,7 @@ export function SwapProvider({
     setIsRouting(true);
     try {
       const res = await fetchSwapRoute(dexClient, {
-        chain: CHAIN_ID.SOLANA,
+        chain: Chain.SOLANA,
         dex: SwapRouteInputDex.jupiter,
         userAddress: user.solanaAddress,
         amount: amountInDecimals,

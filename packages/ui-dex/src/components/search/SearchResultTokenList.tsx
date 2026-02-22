@@ -15,8 +15,8 @@ import { SearchDiscoverTokenListSkeleton } from "./SearchDiscoverTokenListSkelet
 import { SearchParams } from "@chainstream-io/sdk";
 import { tokenSort } from "../../libs";
 import { SearchDiscoverTokenListItem } from "./SearchDiscoverTokenListItem";
-import { useAtomValue } from "jotai";
-import { chainAtom, useAuth } from "@liberfi/ui-base";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { useAuth } from "@liberfi/ui-base";
 import { useSearchTokensQuery, UseSearchTokensQueryParams } from "@liberfi/react-dex";
 
 export type SearchResultTokenListProps = {
@@ -55,7 +55,7 @@ function SearchResultTokenListContent({
 
   const { keyword, sort, timeframe } = useTokenListContext();
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const param = useMemo(() => {
     const sortRequest = sort ? tokenSort(sort, timeframe) : undefined;

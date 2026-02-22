@@ -1,11 +1,12 @@
 import { SplitWindowIcon } from "../../assets";
-import { chainAtom, useAppSdk, useTranslation } from "@liberfi/ui-base";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { useAppSdk, useTranslation } from "@liberfi/ui-base";
 import { Button } from "@heroui/react";
 import clsx from "clsx";
 import { useTvChartContext } from "./TvChartProvider";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { stringifySymbol, TvChartLayout, TvChartPriceType, TvChartQuoteType } from "../../libs/tvchart";
-import { chainSlugs } from "@liberfi/core";
+import { chainSlug } from "@liberfi.io/utils";
 import { isPriceChartAtom, isUSDChartAtom } from "../../states";
 import { useAtomValue } from "jotai";
 import { CHAIN_QUOTE_TOKEN_SYMBOLS } from "../../libs";
@@ -15,13 +16,13 @@ export function TvChartMulticharts({ className }: { className?: string }) {
 
   const appSdk = useAppSdk();
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const isPriceChart = useAtomValue(isPriceChartAtom);
 
   const isUSDChart = useAtomValue(isUSDChartAtom);
 
-  const chainSlug = useMemo(() => chainSlugs[chain], [chain]);
+  const slug = useMemo(() => chainSlug(chain), [chain]);
 
   const { chartManager, chartSettings } = useTvChartContext();
 
@@ -88,7 +89,7 @@ export function TvChartMulticharts({ className }: { className?: string }) {
           chartManager.areas[chartCount].setSymbol(
             stringifySymbol({
               address: options.params.tokenAddress,
-              chain: chainSlug!,
+              chain: slug!,
               quote: isUSDChart
                 ? TvChartQuoteType.USD
                 : (CHAIN_QUOTE_TOKEN_SYMBOLS[chain] as TvChartQuoteType),
@@ -105,7 +106,7 @@ export function TvChartMulticharts({ className }: { className?: string }) {
     return () => {
       appSdk.events.off("response", handler);
     };
-  }, [appSdk, requestId, chartManager, chain, chainSlug, isUSDChart, isPriceChart]);
+  }, [appSdk, requestId, chartManager, chain, slug, isUSDChart, isPriceChart]);
 
   return (
     <Button

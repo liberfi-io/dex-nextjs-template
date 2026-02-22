@@ -1,11 +1,11 @@
-import { CHAIN_ID } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
 import { AssetList } from "../account";
 
 export function AccountAssetList() {
   return (
     <div className="flex-1 w-full pb-2.5 flex flex-col">
       <AssetList
-        chainId={CHAIN_ID.SOLANA}
+        chainId={Chain.SOLANA}
         hideLowHoldingAssets={false}
         compact
         classNames={{

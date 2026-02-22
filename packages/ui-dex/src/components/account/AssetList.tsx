@@ -1,4 +1,4 @@
-import { CHAIN_ID } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
 import { AssetListHeaders } from "./AssetListHeaders";
 import { useMemo, useState } from "react";
 import { useTokensQuery } from "@liberfi/react-dex";
@@ -28,7 +28,7 @@ import { Virtuoso } from "react-virtuoso";
 import { useAtomValue } from "jotai";
 
 export type AssetListProps = {
-  chainId?: CHAIN_ID;
+  chainId?: Chain;
   hideLowHoldingAssets: boolean;
   compact?: boolean;
   useWindowScroll?: boolean;
@@ -40,7 +40,7 @@ export type AssetListProps = {
 };
 
 export function AssetList({
-  chainId = CHAIN_ID.SOLANA,
+  chainId = Chain.SOLANA,
   hideLowHoldingAssets,
   classNames,
   compact,
@@ -75,7 +75,7 @@ export function AssetList({
 }
 
 type ContentProps = {
-  chainId?: CHAIN_ID;
+  chainId?: Chain;
   hideLowHoldingAssets: boolean;
   sort: Record<string, "asc" | "desc">;
   compact?: boolean;
@@ -87,7 +87,7 @@ type ContentProps = {
 };
 
 function Content({
-  chainId = CHAIN_ID.SOLANA,
+  chainId = Chain.SOLANA,
   hideLowHoldingAssets,
   sort,
   compact,
@@ -101,13 +101,13 @@ function Content({
   // append primary token balances
   const fullWalletNetWorth = useMemo(() => {
     if (!walletNetWorth) return undefined;
-    return appendPrimaryTokenNetWorth((chainId ?? CHAIN_ID.SOLANA) as CHAIN_ID, walletNetWorth);
+    return appendPrimaryTokenNetWorth((chainId ?? Chain.SOLANA) as Chain, walletNetWorth);
   }, [walletNetWorth, chainId]);
 
   // append primary token pnl details
   const fullWalletPnlDetails = useMemo(() => {
     if (!walletPnlDetails) return undefined;
-    return appendPrimaryTokenPnl((chainId ?? CHAIN_ID.SOLANA) as CHAIN_ID, walletPnlDetails);
+    return appendPrimaryTokenPnl((chainId ?? Chain.SOLANA) as Chain, walletPnlDetails);
   }, [walletPnlDetails, chainId]);
 
   const tokenAddresses = useMemo(() => {

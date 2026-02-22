@@ -1,10 +1,9 @@
 import { useCallback, useMemo } from "react";
-import { useAtomValue } from "jotai";
 import { clsx } from "clsx";
 import { Avatar, Button } from "@heroui/react";
 import { formatAmount, getPrimaryTokenAvatar } from "@liberfi/core";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
-  chainAtom,
   SettingsIcon,
   useAppSdk,
   useWalletPrimaryTokenNetWorth,
@@ -18,7 +17,7 @@ export type SwitchWalletProps = {
 export function SwitchWallet({ enableSettings = false }: SwitchWalletProps) {
   const appSdk = useAppSdk();
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const primaryTokenAvatar = useMemo(() => getPrimaryTokenAvatar(chain), [chain]);
 

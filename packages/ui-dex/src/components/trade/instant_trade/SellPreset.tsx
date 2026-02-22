@@ -2,7 +2,8 @@ import { useCallback, useMemo, useState } from "react";
 import { clsx } from "clsx";
 import { useAtomValue } from "jotai";
 import { Button } from "@heroui/react";
-import { chainAtom, ChevronDownIcon } from "@liberfi/ui-base";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { ChevronDownIcon } from "@liberfi/ui-base";
 import { useSaveTradeSellSettings, useTradeSellSettings } from "../../../hooks";
 import { tradeSellPresetAtom } from "../../../states";
 import { defaultSellSettingsValues, defaultTradePresetValues, TradePresetValues } from "../../../types";
@@ -14,7 +15,7 @@ export type SellPresetProps = {
 };
 
 export function SellPreset({ className }: SellPresetProps) {
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const preset = useAtomValue(tradeSellPresetAtom);
 

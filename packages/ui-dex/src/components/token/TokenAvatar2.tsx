@@ -1,6 +1,7 @@
 import { MouseEvent, PropsWithChildren, useCallback, useMemo, useState } from "react";
 import { Avatar, Image } from "@heroui/react";
-import { CHAIN_ID, chainIdBySlug, getTokenProtocol, SafeBigNumber } from "@liberfi/core";
+import { Chain, getTokenProtocol, SafeBigNumber } from "@liberfi/core";
+import { chainIdBySlug } from "@liberfi.io/utils";
 import { Token } from "@chainstream-io/sdk";
 import { searchImageUrl } from "../../libs";
 import clsx from "clsx";
@@ -65,7 +66,7 @@ export function TokenAvatar2({
     () =>
       token.extra?.launchFromProtocolFamily
         ? getTokenProtocol(
-            chainIdBySlug(token.chain) ?? CHAIN_ID.SOLANA,
+            chainIdBySlug(token.chain) ?? Chain.SOLANA,
             token.extra?.launchFromProtocolFamily,
           )
         : undefined,

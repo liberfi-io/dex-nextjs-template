@@ -1,13 +1,13 @@
 import { RedPacketIcon } from "../icons";
 import { RedPacketDTO } from "@chainstream-io/sdk";
 import { Button, Image, Link } from "@heroui/react";
-import { chainIcon, chainTxExplorer } from "@liberfi/core";
+import { chainIcon, txExplorerUrl } from "@liberfi.io/utils";
 import {
   useClaimRedPacketMutation,
   useSendRedPacketTransactionMutation,
 } from "@liberfi/react-redpacket";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
-  chainAtom,
   useAppSdk,
   useAuth,
   useAuthenticatedCallback,
@@ -17,7 +17,6 @@ import {
   useWallet,
 } from "@liberfi/ui-base";
 import { formatShortAddress } from "@liberfi/ui-dex/libs/format";
-import { useAtomValue } from "jotai";
 import { useState } from "react";
 
 export type ClaimRedPacketProps = {
@@ -30,7 +29,7 @@ export function ClaimRedPacket({ redPacket, onNavigateBack }: ClaimRedPacketProp
 
   const { t } = useTranslation();
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const toast = useTimerToast();
 
@@ -67,7 +66,7 @@ export function ClaimRedPacket({ redPacket, onNavigateBack }: ClaimRedPacketProp
       console.debug("send red packet claim transaction result", result);
 
       const txHash = result.signature;
-      const txExplorerUrl = chainTxExplorer(chain, txHash);
+      const txUrl = txExplorerUrl(chain, txHash);
       const chainIconUrl = chainIcon(chain) ?? "";
 
       toast({
@@ -92,7 +91,7 @@ export function ClaimRedPacket({ redPacket, onNavigateBack }: ClaimRedPacketProp
             endContent: (
               <Button
                 as={Link}
-                href={txExplorerUrl}
+                href={txUrl}
                 target="_blank"
                 isIconOnly
                 className="bg-transparent w-6 min-w-0 h-6 min-h-0"
@@ -116,7 +115,7 @@ export function ClaimRedPacket({ redPacket, onNavigateBack }: ClaimRedPacketProp
             endContent: (
               <Button
                 as={Link}
-                href={txExplorerUrl}
+                href={txUrl}
                 target="_blank"
                 isIconOnly
                 className="bg-transparent w-6 min-w-0 h-6 min-h-0"

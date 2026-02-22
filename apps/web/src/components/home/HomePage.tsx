@@ -1,14 +1,14 @@
 "use client";
 
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
   hideHeaderOnLayoutAtom,
   useRouter,
   useSetBottomNavigationBarActiveKey,
   useShowBottomNavigationBar,
-  chainAtom,
 } from "@liberfi/ui-base";
 import { clsx } from "@liberfi.io/ui";
-import { useSetAtom, useAtomValue } from "jotai";
+import { useSetAtom } from "jotai";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { TokenListHeader } from "./TokenListHeader";
 import { useResizeObserver } from "@liberfi.io/hooks";
@@ -19,13 +19,13 @@ import {
   TrendingTokenListWidget,
 } from "@liberfi.io/ui-tokens";
 import { chainSlug } from "@liberfi.io/utils";
-import { Chain, Token } from "@liberfi.io/types";
+import { Token } from "@liberfi.io/types";
 import { AppRoute } from "@liberfi/ui-dex/libs/routes";
 import { InstantBuyProvider } from "./InstantBuyContext";
 import { InstantBuy } from "./InstsantBuy";
 
 export function HomePage() {
-  const chainId = useAtomValue(chainAtom);
+  const { chain: chainId } = useCurrentChain();
 
   // hide header on mobile
   const setHideHeaderOnLayout = useSetAtom(hideHeaderOnLayoutAtom);
@@ -100,7 +100,7 @@ export function HomePage() {
         <div className="w-full min-h-0 flex-auto max-sm:px-1" ref={ref}>
           {tokenListType === "trending" && (
             <TrendingTokenListWidget
-              chain={chainId as unknown as Chain}
+              chain={chainId}
               resolution={resolution}
               filters={filters}
               height={height}
@@ -110,7 +110,7 @@ export function HomePage() {
           )}
           {tokenListType === "stocks" && (
             <StockTokenListWidget
-              chain={chainId as unknown as Chain}
+              chain={chainId}
               resolution={resolution}
               filters={filters}
               height={height}

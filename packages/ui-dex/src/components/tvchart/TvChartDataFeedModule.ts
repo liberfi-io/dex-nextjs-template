@@ -19,7 +19,8 @@ import {
 import { quotePricesSubject, updateTokenLatestPrice } from "../../states";
 import { Candle, Resolution, Token } from "@chainstream-io/sdk";
 import { Unsubscribable, WsCandle } from "@chainstream-io/sdk/stream";
-import { CONFIG, parseChainId } from "@liberfi/core";
+import { CONFIG } from "@liberfi/core";
+import { chainIdBySlug } from "@liberfi.io/utils";
 import { chainParam, fetchToken, fetchTokenCandles, QueryKeys } from "@liberfi/react-dex";
 import { dexClientSubject, queryClientSubject } from "@liberfi/ui-base";
 import BigNumber from "bignumber.js";
@@ -134,7 +135,7 @@ export class TvChartDataFeedModule implements ITvChartDataFeedModule {
       const queryClient = queryClientSubject.value;
       if (!queryClient) throw new Error("QueryClient is not ready");
 
-      const chainId = parseChainId(chain);
+      const chainId = chainIdBySlug(chain);
       if (!chainId) throw new Error(`Unsupported chain slug ${chain}`);
 
       // 基于 queryClient 进行查询，可以利用其缓存机制
@@ -175,7 +176,7 @@ export class TvChartDataFeedModule implements ITvChartDataFeedModule {
         const { token, quote, priceType } = symbolInfo as TvChartSymbolInfo;
         const { chain, address, marketData } = token;
         const { totalSupply } = marketData;
-        const chainId = parseChainId(chain);
+        const chainId = chainIdBySlug(chain);
         if (!chainId) throw new Error(`Unsupported chain slug ${token.chain}`);
 
         let latestPrice = lastBar.close;
@@ -216,7 +217,7 @@ export class TvChartDataFeedModule implements ITvChartDataFeedModule {
 
     const { token, priceType, quote } = symbolInfo as TvChartSymbolInfo;
     const chain = token.chain;
-    const chainId = parseChainId(chain);
+    const chainId = chainIdBySlug(chain);
     const address = token.address;
     if (!chainId) throw new Error("Invalid chain");
 
@@ -354,7 +355,7 @@ export class TvChartDataFeedModule implements ITvChartDataFeedModule {
     const { chain, address } = token;
     const resolution = getTvChartResolutionReverse(libraryChartResolution);
 
-    const chainId = parseChainId(chain);
+    const chainId = chainIdBySlug(chain);
     if (!chainId) throw new Error(`Unsupported chain slug ${chain}`);
 
     const unsub = dexClient.stream.subscribeTokenCandles({

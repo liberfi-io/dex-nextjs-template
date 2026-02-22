@@ -1,6 +1,6 @@
 // import { useAppContext, useTranslation } from "../../hooks";
 import { useTranslation } from "@liberfi/ui-base";
-import { CHAIN_ID } from "@liberfi/core";
+import { Chain } from "@liberfi/core";
 // import { ChainSelect } from "../ChainSelect";
 // import { ChainSelectMobile } from "../ChainSelectMobile";
 import { Button } from "@heroui/react";
@@ -8,8 +8,8 @@ import { SelectedIndicatorIcon, UnselectedIndicatorIcon } from "../../assets";
 import { useCallback } from "react";
 
 export type AssetTapProps = {
-  chainId?: CHAIN_ID | "";
-  onChainChange: (chainId: CHAIN_ID) => void;
+  chainId?: Chain | "";
+  onChainChange: (chainId: Chain) => void;
   hideLowHoldingAssets: boolean;
   onHideLowHoldingAssetsChange: (hideLowHoldingAssets: boolean) => void;
 };

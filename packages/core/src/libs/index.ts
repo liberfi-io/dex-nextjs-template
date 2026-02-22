@@ -1,6 +1,6 @@
 export * from "./appSdk";
 export * from "./authentication";
-export * from "./chain";
+export { Chain } from "@liberfi.io/types";
 export * from "./config";
 export * from "./number";
 export * from "./router";

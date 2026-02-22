@@ -2,12 +2,12 @@ import { Key, useCallback, useState } from "react";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Form, Tab, Tabs } from "@heroui/react";
-import { chainAtom, useTranslation } from "@liberfi/ui-base";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { useTranslation } from "@liberfi/ui-base";
 import { defaultSellSettingsValues, SellSettingsSchema, SellSettingsValues } from "../../../types";
 import { TradePresetForm } from "./TradePresetForm";
 import { CustomSellPercentagesInput } from "./CustomSellPercentagesInput";
 import { useSaveTradeSellSettings, useTradeSellSettings } from "../../../hooks";
-import { useAtomValue } from "jotai";
 
 export type SellSettingsFormProps = {
   onSettings?: (settings: SellSettingsValues) => void;
@@ -19,7 +19,7 @@ export function SellSettingsForm({ onSettings, preset: defaultPreset }: SellSett
 
   const [preset, setPreset] = useState(defaultPreset === undefined ? "0" : `${defaultPreset}`);
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const settings = useTradeSellSettings(chain);
 

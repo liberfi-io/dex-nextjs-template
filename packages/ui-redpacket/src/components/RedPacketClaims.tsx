@@ -2,9 +2,9 @@ import { PropsWithChildren, useCallback, useMemo } from "react";
 import { Button, Link, Skeleton } from "@heroui/react";
 import { ListEmptyData } from "@liberfi/ui-dex/components/ListEmptyData";
 import { useRedPacketClaimsQuery } from "@liberfi/react-redpacket";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
   BackwardOutlinedIcon,
-  chainAtom,
   ExternalLinkOutlinedIcon,
   useAuth,
   useTranslation,
@@ -12,10 +12,9 @@ import {
 import { RedPacketClaimDTO, Token } from "@chainstream-io/sdk";
 import { formatShortAddress } from "@liberfi/ui-dex/libs/format";
 import { useTokenQuery } from "@liberfi/react-dex";
-import { useAtomValue } from "jotai";
 import { TokenAvatar } from "@liberfi/ui-dex/components/TokenAvatar";
 import { BigNumber } from "bignumber.js";
-import { chainTxExplorer } from "@liberfi/core";
+import { txExplorerUrl } from "@liberfi.io/utils";
 
 export type RedPacketClaimsProps = {
   redPacketId: string;
@@ -23,7 +22,7 @@ export type RedPacketClaimsProps = {
 };
 
 export function RedPacketClaims({ redPacketId, onNavigateBack }: RedPacketClaimsProps) {
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const { data: claimsPage, isLoading: isLoadingClaims } = useRedPacketClaimsQuery({ redPacketId });
 
@@ -63,7 +62,7 @@ export function RedPacketClaims({ redPacketId, onNavigateBack }: RedPacketClaims
 function Item({ claim, token }: { claim: RedPacketClaimDTO; token: Token }) {
   const { t } = useTranslation();
 
-  const chain = useAtomValue(chainAtom);
+  const { chain } = useCurrentChain();
 
   const { user } = useAuth();
 
@@ -98,7 +97,7 @@ function Item({ claim, token }: { claim: RedPacketClaimDTO; token: Token }) {
             isIconOnly
             className="bg-transparent w-6 h-6 min-w-0 min-h-0"
             as={Link}
-            href={chainTxExplorer(chain, claim.txHash)}
+            href={txExplorerUrl(chain, claim.txHash)}
             target="_blank"
           >
             <ExternalLinkOutlinedIcon width={12} height={12} className="text-neutral" />
