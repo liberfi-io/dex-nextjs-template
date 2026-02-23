@@ -1,6 +1,6 @@
 "use client";
 
-import { PulsePage } from "@liberfi/ui-dex";
+import { PulsePage } from "../../components/pulse/PulsePage";
 
 export default function Page() {
   return <PulsePage />;

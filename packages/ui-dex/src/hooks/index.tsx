@@ -1,4 +1,3 @@
-export * from "./pulse";
 export * from "./trade";
 export * from "./useSwap";
 
