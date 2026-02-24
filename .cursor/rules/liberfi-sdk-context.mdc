@@ -1,0 +1,10 @@
+---
+description: LiberFi component source code location context
+alwaysApply: true
+---
+
+# LiberFi SDK Source Location
+
+The source code for liberfi.io related components (React SDK) is located at `../react-sdk` relative to this project.
+
+When investigating or modifying liberfi.io component internals, look for the corresponding source files under the `../react-sdk` directory.
