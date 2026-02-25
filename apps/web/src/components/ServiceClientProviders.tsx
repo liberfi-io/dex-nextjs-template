@@ -15,6 +15,8 @@ import { ChannelsProvider } from "@liberfi.io/ui-channels";
 import { PinataProvider as PinataProviderBase } from "@liberfi.io/ui";
 import { PredictProvider } from "@liberfi.io/ui-predict";
 import { PredictClient } from "@liberfi.io/ui-predict/client";
+import { PortfolioProvider } from "@liberfi.io/ui-portfolio";
+import { PortfolioClient } from "@liberfi.io/ui-portfolio/client";
 
 const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
 
@@ -95,13 +97,21 @@ function DexClientLoader({ children }: PropsWithChildren) {
     [],
   );
 
+  const portfolioClient = useMemo(
+    () =>
+      new PortfolioClient(baseUrl + process.env.NEXT_PUBLIC_DEX_AGGREGATOR_URL),
+    [],
+  );
+
   return (
     <DexClientProvider client={dexClient}>
       <APIClientProvider client={apiClient} subscribeClient={apiClient}>
         <MediaTrackProvider client={mediaTrackClient}>
           <ChannelsProvider client={channelsClient}>
             <PredictProvider client={predictClient}>
-              {children}
+              <PortfolioProvider client={portfolioClient}>
+                {children}
+              </PortfolioProvider>
             </PredictProvider>
           </ChannelsProvider>
         </MediaTrackProvider>

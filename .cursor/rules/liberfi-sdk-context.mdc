@@ -8,3 +8,12 @@ alwaysApply: true
 The source code for liberfi.io related components (React SDK) is located at `../react-sdk` relative to this project.
 
 When investigating or modifying liberfi.io component internals, look for the corresponding source files under the `../react-sdk` directory.
+
+# LiberFi SDK Version Update Rules
+
+When updating `@liberfi.io/*` SDK versions in `apps/web/package.json`, you MUST also update the corresponding `peerDependencies` and `devDependencies` in all workspace packages under `packages/`. Specifically:
+
+1. Search all `packages/*/package.json` for any `@liberfi.io/*` references in both `peerDependencies` and `devDependencies`.
+2. Update `peerDependencies` versions (using `>=` range) to match the new SDK version.
+3. Update `devDependencies` versions (using `^` range) to match the new SDK version.
+4. Run `pnpm install --no-frozen-lockfile` after all updates to sync the lockfile.

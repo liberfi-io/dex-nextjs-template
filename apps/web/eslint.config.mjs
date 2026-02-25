@@ -23,6 +23,15 @@ export default [
   ...tsConfigs.recommended,
   importPlugin.flatConfigs.recommended,
   importPlugin.flatConfigs.typescript,
+  {
+    settings: {
+      "import-x/resolver": {
+        typescript: {
+          project: "./tsconfig.json",
+        },
+      },
+    },
+  },
   jsdoc.configs["flat/recommended-typescript"],
   {
     plugins: {

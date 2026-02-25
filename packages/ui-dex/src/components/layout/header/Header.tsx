@@ -6,11 +6,10 @@ import { HeaderSearchInput } from "./HeaderSearchInput";
 import { HeaderSettingsMenu } from "./HeaderSettingsMenu";
 import { HeaderLaunchPadAction, HeaderLanguageAction } from "./actions";
 import { ChainSelectWidget } from "@liberfi.io/ui-chain-select";
-// import { useAtom } from "jotai";
-// import { chainAtom } from "@liberfi/ui-base";
+import { useSwitchChain } from "@liberfi.io/wallet-connector";
 
 export function Header() {
-  // const [chainId, setChainId] = useAtom(chainAtom);
+  const switchChain = useSwitchChain();
 
   return (
     <header className="w-full h-full px-4 lg:px-6 pb-2 flex justify-between items-center gap-10 bg-background">
@@ -27,8 +26,7 @@ export function Header() {
 
       {/* right */}
       <div className="shrink-0 flex justify-end items-center gap-4">
-        {/* <ChainSelect chainId={chainId} onSelect={setChainId} /> */}
-        <ChainSelectWidget size="sm"/>
+        <ChainSelectWidget size="sm" onSwitchChain={switchChain} />
         <HeaderLaunchPadAction />
         <HeaderLanguageAction />
         <HeaderAccountInfo />

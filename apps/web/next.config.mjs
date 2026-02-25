@@ -54,6 +54,14 @@ const nextConfig = {
         __dirname,
         "node_modules/@liberfi.io/ui-chain-select",
       ),
+      "@liberfi.io/ui-portfolio/client": path.resolve(
+        __dirname,
+        "node_modules/@liberfi.io/ui-portfolio/dist/client/index.js",
+      ),
+      "@liberfi.io/ui-portfolio": path.resolve(
+        __dirname,
+        "node_modules/@liberfi.io/ui-portfolio",
+      ),
     };
 
     config.module.rules.push({

@@ -67,10 +67,12 @@ export function setCurrentQuoteSymbol(chainId: Chain, symbol: string) {
 
   // start fetching new quote price
   const fetch = () => {
-    queryClient.fetchQuery({
-      queryKey: [QUERY_KEY, symbol],
-      queryFn: () => fetchQuotePrice(chainId, symbol),
-    });
+    queryClient
+      .fetchQuery({
+        queryKey: [QUERY_KEY, symbol],
+        queryFn: () => fetchQuotePrice(chainId, symbol),
+      })
+      .catch(() => {});
   };
 
   // fetch quote price immediately

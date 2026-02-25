@@ -25,10 +25,6 @@
     "@liberfi/ui-base": "workspace:*",
     "@privy-io/react-auth": "^3.0.1",
     "@react-aria/interactions": "^3.22.5",
-    "@solana-program/memo": "^0.7.0",
-    "@solana-program/system": "^0.7.0",
-    "@solana-program/token": "^0.5.1",
-    "@solana/kit": "^2.3.0",
     "@solana/web3.js": "^1.98.4",
     "@tanstack/react-query": "^5.90.2",
     "bignumber.js": "^9.1.2",
@@ -65,14 +61,16 @@
     "zod": "^3"
   },
   "peerDependencies": {
-    "@liberfi.io/ui": ">=0.1.17",
-    "@liberfi.io/ui-chain-select": ">=0.1.8",
-    "@liberfi.io/types": ">=0.1.17"
+    "@liberfi.io/ui": ">=0.1.20",
+    "@liberfi.io/ui-chain-select": ">=0.1.11",
+    "@liberfi.io/wallet-connector": ">=0.1.11",
+    "@liberfi.io/types": ">=0.1.20"
   },
   "devDependencies": {
-    "@liberfi.io/ui": "^0.1.17",
-    "@liberfi.io/ui-chain-select": "^0.1.8",
-    "@liberfi.io/types": "^0.1.17",
+    "@liberfi.io/ui": "^0.1.20",
+    "@liberfi.io/ui-chain-select": "^0.1.11",
+    "@liberfi.io/wallet-connector": "^0.1.11",
+    "@liberfi.io/types": "^0.1.20",
     "@chromatic-com/storybook": "^3.2.3",
     "@eslint/js": "^9.20.0",
     "@storybook/addon-essentials": "^8.4.7",

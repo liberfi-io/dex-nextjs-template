@@ -1,6 +1,7 @@
 "use client";
 
 import { PropsWithChildren, useCallback } from "react";
+import { mainnet, bsc } from "viem/chains";
 import {
   PrivyAuthProvider,
   PrivyWalletConnectorProvider,
@@ -20,6 +21,8 @@ export function AuthProviders({ children }: PropsWithChildren) {
     <PrivyWalletConnectorProvider
       privyAppId={process.env.NEXT_PUBLIC_PRIVY_APPID}
       privyClientConfig={{
+        defaultChain: mainnet,
+        supportedChains: [mainnet, bsc],
         appearance: {
           theme: "dark",
           accentColor: "#BCFF2E",
@@ -40,7 +43,7 @@ export function AuthProviders({ children }: PropsWithChildren) {
         },
         loginMethods: [
           "email",
-          // "google",
+          "google",
           "twitter",
           "discord",
           "github",
