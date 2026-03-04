@@ -7,8 +7,13 @@ import {
 import { useGenerateTweetMediaMemeMutation } from "@liberfi.io/ui-media-track";
 import clsx from "clsx";
 import { useState } from "react";
-import { GeneratedMemeInfo } from "@liberfi.io/types";
 import { StyledTooltip } from "@liberfi.io/ui";
+
+export interface GeneratedMemeInfo {
+  symbol: string;
+  name?: string;
+  image?: string;
+}
 
 export type MagicLaunchProps = {
   prompt?: string;

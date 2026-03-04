@@ -1,13 +1,14 @@
 import { TokenAvatar } from "../../../TokenAvatar";
 import { ListField } from "../../../ListField";
-import { Token, WalletNetWorthItemDTO } from "@chainstream-io/sdk";
+import { Token } from "@chainstream-io/sdk";
+import { PortfolioPnl } from "@liberfi.io/types";
 import { Number } from "../../../Number";
 import { useMemo } from "react";
 
 export interface TokenFieldProps {
   className?: string;
   token?: Token;
-  balance: WalletNetWorthItemDTO;
+  balance: PortfolioPnl;
   compact?: boolean;
 }
 

@@ -1,14 +1,13 @@
 import { Listbox, ListboxItem, Skeleton } from "@heroui/react";
 import { CONFIG, Chain } from "@liberfi/core";
-import { useTranslation, walletNetWorthAtom } from "@liberfi/ui-base";
+import { useTranslation, useWalletPortfolios } from "@liberfi/ui-base";
+import { Portfolio } from "@liberfi.io/types";
 import BigNumber from "bignumber.js";
 import clsx from "clsx";
-import { useAtomValue } from "jotai";
 import { useMemo } from "react";
 import { EmptyData } from "../EmptyData";
 import { Number } from "../Number";
 import { TokenAvatar } from "../TokenAvatar";
-import { WalletNetWorthItemDTO } from "@chainstream-io/sdk";
 
 type AssetSelectProps = {
   chainId?: Chain;
@@ -35,22 +34,22 @@ export function AssetSelect({
 }
 
 function List({ exceptTokenAddresses = [], onSelect, onBuy, onReceive }: AssetSelectProps) {
-  const walletNetWorth = useAtomValue(walletNetWorthAtom);
+  const { data: walletPortfolios } = useWalletPortfolios();
 
   const balances = useMemo(() => {
-    if (!walletNetWorth) return [];
+    if (!walletPortfolios) return [];
     return (
-      (walletNetWorth.data ?? [])
+      (walletPortfolios.portfolios ?? [])
         // 过滤掉余额为0
-        .filter((it) => new BigNumber(it.valueInUsd).gt(0))
+        .filter((it) => new BigNumber(it.amountInUsd).gt(0))
         // 过滤掉不可用的代币
-        .filter((it) => !exceptTokenAddresses.includes(it.tokenAddress))
+        .filter((it) => !exceptTokenAddresses.includes(it.address))
         // 按余额由多到少排序
-        .sort((a, b) => new BigNumber(b.valueInUsd).minus(a.valueInUsd).toNumber())
+        .sort((a, b) => new BigNumber(b.amountInUsd).minus(a.amountInUsd).toNumber())
     );
-  }, [walletNetWorth, exceptTokenAddresses]);
+  }, [walletPortfolios, exceptTokenAddresses]);
 
-  if (!walletNetWorth) {
+  if (!walletPortfolios) {
     return <Skeletons />;
   }
 
@@ -65,13 +64,13 @@ function List({ exceptTokenAddresses = [], onSelect, onBuy, onReceive }: AssetSe
     >
       {balances.map((it) => (
         <ListboxItem
-          key={it.tokenAddress}
+          key={it.address}
           className={clsx(
             "rounded-none p-0",
             "data-[hover=true]:bg-transparent",
             "data-[selectable=true]:focus:bg-transparent",
           )}
-          onPress={() => onSelect?.(it.tokenAddress)}
+          onPress={() => onSelect?.(it.address)}
         >
           <ListItem balance={it} />
         </ListboxItem>
@@ -81,15 +80,15 @@ function List({ exceptTokenAddresses = [], onSelect, onBuy, onReceive }: AssetSe
 }
 
 type ListItemProps = {
-  balance: WalletNetWorthItemDTO;
+  balance: Portfolio;
 };
 
 function ListItem({ balance }: ListItemProps) {
   return (
     <div className="w-full h-14 flex items-center gap-2">
-      {balance.logoUri ? (
+      {balance.image ? (
         <div className="flex-0">
-          <TokenAvatar src={balance.logoUri} name={balance.symbol} size={32} />
+          <TokenAvatar src={balance.image} name={balance.symbol} size={32} />
         </div>
       ) : (
         <Skeleton className="flex-0 w-8 h-8 rounded-full" />
@@ -98,7 +97,7 @@ function ListItem({ balance }: ListItemProps) {
         <div className="text-sm text-foreground font-medium">{balance.symbol}</div>
         <div className="flex flex-col items-end gap-2 text-xs">
           <div className="text-foreground">
-            <Number value={balance.valueInUsd ?? 0} abbreviate defaultCurrencySign="$" />
+            <Number value={balance.amountInUsd ?? 0} abbreviate defaultCurrencySign="$" />
           </div>
           <div className="text-neutral">
             <Number value={balance.amount ?? 0} abbreviate /> <span>{balance.symbol}</span>

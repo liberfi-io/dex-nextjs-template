@@ -1,8 +1,7 @@
 import BigNumber from "bignumber.js";
 import { PieActiveShape, PiePayload } from "../../chart";
-import { useTranslation, walletNetWorthAtom } from "@liberfi/ui-base";
+import { useTranslation, useWalletPortfolios } from "@liberfi/ui-base";
 import {
-  appendPrimaryTokenNetWorth,
   CHART_COLORS,
   formatAbbreviatingNumber2,
   formatPercentage,
@@ -13,10 +12,8 @@ import clsx from "clsx";
 import { reverse, sortBy } from "lodash-es";
 import { useCallback, useMemo, useState } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
-import { Chain } from "@liberfi/core";
 import { Number } from "../../Number";
 import { EmptyData } from "../../EmptyData";
-import { useAtomValue } from "jotai";
 
 export type PortfolioChartProps = {
   className?: string;
@@ -41,20 +38,13 @@ export function PortfolioChart({
 function Chart({ className, classNames, displayLegendValue = true }: PortfolioChartProps) {
   const { t } = useTranslation();
 
-  const walletNetWorth = useAtomValue(walletNetWorthAtom);
-
-  // append primary token balances
-  const fullWalletNetWorth = useMemo(() => {
-    if (!walletNetWorth) return undefined;
-    return appendPrimaryTokenNetWorth(Chain.SOLANA, walletNetWorth);
-  }, [walletNetWorth]);
+  const { data: walletPortfolios } = useWalletPortfolios();
 
   // current highlighted token index
   const [activeIndex, setActiveIndex] = useState(0);
 
-  // TODO wait for backend
   const data = useMemo<PiePayload[]>(() => {
-    if (!fullWalletNetWorth) {
+    if (!walletPortfolios) {
       return [
         {
           key: "primary_tokens",
@@ -66,17 +56,17 @@ function Chart({ className, classNames, displayLegendValue = true }: PortfolioCh
       ];
     }
 
-    const totalBalancesInUsd = new BigNumber(fullWalletNetWorth.totalValueInUsd ?? 0).toNumber();
+    const totalBalancesInUsd = new BigNumber(walletPortfolios.balanceInUsd ?? 0).toNumber();
 
-    // sort tokens by valueInUsd descending
+    // sort tokens by amountInUsd descending
     const allData = reverse(
       sortBy(
-        (fullWalletNetWorth.data ?? []).map((balance) => {
-          const value = new BigNumber(balance.valueInUsd ?? 0).toNumber();
+        (walletPortfolios.portfolios ?? []).map((portfolio) => {
+          const value = new BigNumber(portfolio.amountInUsd ?? 0).toNumber();
           return {
-            key: balance.tokenAddress,
+            key: portfolio.address,
             value,
-            name: balance.symbol,
+            name: portfolio.symbol,
             formattedValue: formatNumberInChart(value),
             formattedPercentage:
               totalBalancesInUsd > 0 ? formatPercentage(value / totalBalancesInUsd) : "0%",
@@ -105,7 +95,7 @@ function Chart({ className, classNames, displayLegendValue = true }: PortfolioCh
           totalBalancesInUsd > 0 ? formatPercentage(totalValue / totalBalancesInUsd) : "0%",
       },
     ];
-  }, [fullWalletNetWorth, t]);
+  }, [walletPortfolios, t]);
 
   const handlePieEnter = useCallback(
     (_: unknown, index: number) => {
@@ -114,7 +104,7 @@ function Chart({ className, classNames, displayLegendValue = true }: PortfolioCh
     [setActiveIndex],
   );
 
-  if (!fullWalletNetWorth) {
+  if (!walletPortfolios) {
     return (
       <Skeletons
         className={className}
@@ -124,7 +114,7 @@ function Chart({ className, classNames, displayLegendValue = true }: PortfolioCh
     );
   }
 
-  if (!fullWalletNetWorth.data || fullWalletNetWorth.data.length === 0) {
+  if (!walletPortfolios.portfolios || walletPortfolios.portfolios.length === 0) {
     return (
       <Empty
         className={className}

@@ -1,22 +1,22 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import clsx from "clsx";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
-import { useAtomValue } from "jotai";
 import BigNumber from "bignumber.js";
 import { Button, Input } from "@heroui/react";
 import { useTokenQuery } from "@liberfi/react-dex";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { Portfolio } from "@liberfi.io/types";
 import {
   ArrowDownOutlinedIcon,
   useAppSdk,
   useAuthenticatedCallback,
   useTranslation,
-  walletNetWorthAtom,
+  useWalletPortfolios,
 } from "@liberfi/ui-base";
 import { TokenAvatar } from "@liberfi/ui-dex/components/TokenAvatar";
 import { WithdrawOutlinedIcon } from "@liberfi/ui-dex/assets/icons";
 import { Number } from "@liberfi/ui-dex/components/Number";
-import { Token, WalletNetWorthItemDTO } from "@chainstream-io/sdk";
+import { Token } from "@chainstream-io/sdk";
 
 export function RedPacketMintAmountInput() {
   const {
@@ -29,7 +29,7 @@ export function RedPacketMintAmountInput() {
       address?: string;
       amount?: string;
       token?: Token;
-      balance?: WalletNetWorthItemDTO;
+      balance?: Portfolio;
     };
   }>();
 
@@ -48,23 +48,23 @@ export function RedPacketMintAmountInput() {
   const amount = useWatch({ control, name: "mint.amount" });
 
   // wallet balances
-  const walletNetWorth = useAtomValue(walletNetWorthAtom);
+  const { data: walletPortfolios } = useWalletPortfolios();
 
   // set default mint token address
   useEffect(() => {
-    if (!tokenAddress && walletNetWorth?.data && walletNetWorth.data.length > 0) {
-      const tokenAddress = walletNetWorth.data[0].tokenAddress;
-      setValue("mint.address", tokenAddress);
+    if (!tokenAddress && walletPortfolios?.portfolios && walletPortfolios.portfolios.length > 0) {
+      const address = walletPortfolios.portfolios[0].address;
+      setValue("mint.address", address);
     }
     // setValue should not be included in the dependency array
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [walletNetWorth, tokenAddress]);
+  }, [walletPortfolios, tokenAddress]);
 
   // mint token balance
   const tokenBalance = useMemo(
     () =>
-      (walletNetWorth?.data ?? []).find((it) => tokenAddress && it.tokenAddress === tokenAddress),
-    [walletNetWorth, tokenAddress],
+      (walletPortfolios?.portfolios ?? []).find((it) => tokenAddress && it.address === tokenAddress),
+    [walletPortfolios, tokenAddress],
   );
 
   useEffect(() => {
@@ -222,7 +222,7 @@ export function RedPacketMintAmountInput() {
               tokenBalance && (
                 <TokenAvatar
                   size={24}
-                  src={tokenBalance.logoUri ?? ""}
+                  src={tokenBalance.image ?? ""}
                   name={tokenBalance.symbol}
                 />
               )

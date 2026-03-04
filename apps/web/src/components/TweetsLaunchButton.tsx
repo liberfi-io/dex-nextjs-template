@@ -1,10 +1,16 @@
-import { TweetMedia } from "@liberfi.io/types";
 import { RocketIcon, StyledButton, StyledTooltip } from "@liberfi.io/ui";
 import { useAppSdk, useTranslation } from "@liberfi/ui-base";
 import { useCallback } from "react";
 
+interface TweetMediaData {
+  tweet: {
+    content: { text?: string };
+    user: { avatar?: string };
+  };
+}
+
 export type TweetsLaunchButtonProps = {
-  data: TweetMedia;
+  data: TweetMediaData;
 };
 
 export function TweetsLaunchButton({ data }: TweetsLaunchButtonProps) {

@@ -1,8 +1,8 @@
 import { BehaviorSubject } from "rxjs";
 import { atom } from "jotai";
 // import { atomWithStorage } from "jotai/utils";
-import { QueryClient, UseQueryResult } from "@tanstack/react-query";
-import { ChainStreamClient, PnlDetailsPage, WalletNetWorthPage, WalletPnlSummaryDTO } from "@chainstream-io/sdk";
+import { QueryClient } from "@tanstack/react-query";
+import { ChainStreamClient } from "@chainstream-io/sdk";
 import { Layout } from "./types";
 
 // queryClient for non-hooks usage
@@ -25,24 +25,3 @@ export const showBottomNavigationBarOnLayoutAtom = atom<Layout | null>(null);
 
 // current bottom navigation bar active key
 export const bottomNavigationBarActiveKeyAtom = atom<string>();
-
-export const walletNetWorthQueryStateAtom = atom<Pick<
-  UseQueryResult<WalletNetWorthPage>,
-  "error" | "isLoading" | "isFetching" | "isRefetching" | "refetch"
-> | null>(null);
-
-export const walletPnlQueryStateAtom = atom<Pick<
-  UseQueryResult<WalletPnlSummaryDTO>,
-  "error" | "isLoading" | "isFetching" | "isRefetching" | "refetch"
-> | null>(null);
-
-export const walletPnlDetailsQueryStateAtom = atom<Pick<
-  UseQueryResult<PnlDetailsPage>,
-  "error" | "isLoading" | "isFetching" | "isRefetching" | "refetch"
-> | null>(null);
-
-export const walletNetWorthAtom = atom<WalletNetWorthPage | null>(null);
-
-export const walletPnlAtom = atom<WalletPnlSummaryDTO | null>(null);
-
-export const walletPnlDetailsAtom = atom<PnlDetailsPage | null>(null);

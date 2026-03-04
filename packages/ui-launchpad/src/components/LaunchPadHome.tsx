@@ -9,7 +9,7 @@ import { PumpLaunchPadForm } from "./pump";
 import { RaydiumLaunchPadForm } from "./raydium";
 import { LaunchPadCurveAreaChart } from "./LaunchPadCurveAreaChart";
 import { MagicLaunch } from "./MagicLaunch";
-import { GeneratedMemeInfo } from "@liberfi.io/types";
+import { GeneratedMemeInfo } from "./MagicLaunch";
 
 const platforms = [
   {

@@ -6,10 +6,10 @@ import {
   SwapRouteInputSwapMode,
   SwapRouteResponse,
   Token,
-  WalletNetWorthItemDTO,
 } from "@chainstream-io/sdk";
 import { Chain } from "@liberfi/core";
 import { chainIcon } from "@liberfi.io/utils";
+import { Portfolio } from "@liberfi.io/types";
 import {
   fetchSwapRoute,
   useDexClient,
@@ -33,45 +33,27 @@ import {
   useTranslation,
   useWaitForTransactionConfirmation,
   useWallet,
-  walletNetWorthAtom,
+  useWalletPortfolios,
 } from "@liberfi/ui-base";
 import { Button, Image, Link } from "@heroui/react";
-import { useAtomValue } from "jotai";
 
 export type SwapContextValue = {
-  // 链 ID
   chainId: Chain;
-  // 支付代币地址
   fromTokenAddress?: string | null;
-  // 支付代币余额
-  fromTokenBalance?: WalletNetWorthItemDTO | null;
-  // 支付代币信息
+  fromTokenBalance?: Portfolio | null;
   fromToken?: Token | null;
-  // 设置支付代币地址
   setFromTokenAddress: (tokenAddress: string) => void;
-  // 获得代币地址
   toTokenAddress?: string | null;
-  // 获得代币当前余额
-  toTokenBalance?: WalletNetWorthItemDTO | null;
-  // 获得代币信息
+  toTokenBalance?: Portfolio | null;
   toToken?: Token | null;
-  // 设置获得代币地址
   setToTokenAddress: (tokenAddress: string) => void;
-  // 支付代币数量
   amount?: string;
-  // 支付代币金额
   amountInUsd?: string;
-  // 设置支付代币数量
   setAmount: (amount: string | undefined) => void;
-  // 正在计算兑换路由
   isRouting: boolean;
-  // 计算兑换路由错误
   routeError?: string | null;
-  // 兑换路由
   routeInfo?: SwapRouteResponse | null;
-  // 执行兑换
   swap: () => Promise<void>;
-  // 是否正在执行兑换
   isSwapping: boolean;
 };
 
@@ -107,8 +89,7 @@ export function SwapProvider({
 
   const { user } = useAuth();
 
-  // 用户余额
-  const walletNetWorth = useAtomValue(walletNetWorthAtom);
+  const { data: walletPortfolios } = useWalletPortfolios();
 
   // 支付代币地址
   const [fromTokenAddress, setFromTokenAddress] = useState(defaultFromTokenAddress ?? "");
@@ -142,8 +123,8 @@ export function SwapProvider({
 
   // 支付代币余额
   const fromTokenBalance = useMemo(
-    () => (walletNetWorth?.data ?? []).find((it) => it.tokenAddress === fromTokenAddress),
-    [walletNetWorth, fromTokenAddress],
+    () => (walletPortfolios?.portfolios ?? []).find((it) => it.address === fromTokenAddress) ?? null,
+    [walletPortfolios, fromTokenAddress],
   );
 
   // 支付代币数量
@@ -199,8 +180,8 @@ export function SwapProvider({
 
   // 获得代币余额
   const toTokenBalance = useMemo(
-    () => (walletNetWorth?.data ?? []).find((it) => it.tokenAddress === toTokenAddress),
-    [walletNetWorth, toTokenAddress],
+    () => (walletPortfolios?.portfolios ?? []).find((it) => it.address === toTokenAddress) ?? null,
+    [walletPortfolios, toTokenAddress],
   );
 
   // 信息完备，可以计算路由
@@ -457,7 +438,7 @@ export function SwapProvider({
       enabled,
       isRouting,
       routeError,
-      routeInfo: enabled ? routeInfo : undefined, // routeInfo 有可能是之前计算遗留的结果，因此要根据 enabled 来判断
+      routeInfo: enabled ? routeInfo : undefined,
       swap,
       isSwapping,
     }),

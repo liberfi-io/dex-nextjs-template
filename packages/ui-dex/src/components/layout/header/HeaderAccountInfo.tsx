@@ -1,5 +1,4 @@
 import { Key, useCallback, useMemo, useState } from "react";
-import { useAtomValue } from "jotai";
 import { clsx } from "clsx";
 import { BigNumber } from "bignumber.js";
 import {
@@ -24,10 +23,9 @@ import {
   UserIcon,
   useRouter,
   useTranslation,
-  walletNetWorthAtom,
   WalletIcon,
-  walletPnlAtom,
 } from "@liberfi/ui-base";
+import { useWalletSummary } from "@liberfi.io/ui-portfolio";
 
 export function HeaderAccountInfo() {
   const { status } = useAuth();
@@ -49,13 +47,11 @@ function Authenticated() {
 
   const { signOut } = useAuth();
 
-  const walletNetWorth = useAtomValue(walletNetWorthAtom);
-
-  const walletPnl = useAtomValue(walletPnlAtom);
+  const { data: walletSummary } = useWalletSummary();
 
   const bullish = useMemo(
-    () => new BigNumber(walletPnl?.totalProfitInUsd ?? 0).gte(0),
-    [walletPnl?.totalProfitInUsd],
+    () => new BigNumber(walletSummary?.totalProfitInUsd ?? 0).gte(0),
+    [walletSummary?.totalProfitInUsd],
   );
 
   const [isOpen, setIsOpen] = useState(false);
@@ -87,7 +83,7 @@ function Authenticated() {
     [handleOpenSettings, handleOpenWallet, signOut],
   );
 
-  if (!walletNetWorth || !walletPnl) {
+  if (!walletSummary) {
     return <Authenticating />;
   }
 
@@ -112,7 +108,7 @@ function Authenticated() {
           }
         >
           <div className="flex flex-col items-start">
-            <p className="text-xs">{formatAmountUSD(walletNetWorth?.totalValueInUsd ?? 0)}</p>
+            <p className="text-xs">{formatAmountUSD(walletSummary?.balanceInUsd ?? 0)}</p>
             <p
               className="flex items-center gap-0.5 text-xxs text-bearish data-[bullish=true]:text-bullish"
               data-bullish={bullish}
@@ -122,7 +118,7 @@ function Authenticated() {
               ) : (
                 <TriangleDownIcon width={8} height={8} />
               )}
-              <span>{formatAmountUSD(walletPnl?.totalProfitInUsd ?? 0)}</span>
+              <span>{formatAmountUSD(walletSummary?.totalProfitInUsd ?? 0)}</span>
             </p>
           </div>
         </Button>

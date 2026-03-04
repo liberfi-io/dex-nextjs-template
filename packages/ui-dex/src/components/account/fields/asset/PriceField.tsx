@@ -2,20 +2,20 @@ import { ListField } from "../../../ListField";
 import { formatPercentage } from "../../../../libs";
 import { useMemo } from "react";
 import { BearishIcon, BullishIcon } from "../../../../assets";
-import { Token, WalletNetWorthItemDTO } from "@chainstream-io/sdk";
+import { Token } from "@chainstream-io/sdk";
+import { PortfolioPnl } from "@liberfi.io/types";
 import BigNumber from "bignumber.js";
 import { Number } from "../../../Number";
 
 export interface PriceFieldProps {
   className?: string;
   token?: Token;
-  balance: WalletNetWorthItemDTO;
+  balance: PortfolioPnl;
 }
 
 export function PriceField({ className, token, balance }: PriceFieldProps) {
   const price = useMemo(() => {
     const price = token?.marketData?.priceInUsd ?? balance.priceInUsd;
-    // 价格为 0，说明没有价格信息
     return !price || price === "0" ? undefined : price;
   }, [token, balance]);
 

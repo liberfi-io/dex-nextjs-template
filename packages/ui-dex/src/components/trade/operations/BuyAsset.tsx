@@ -2,14 +2,13 @@ import { ArrowDownIcon, RefreshIcon } from "../../../assets";
 import { Number } from "../../Number";
 import { useSwapContext } from "../../swap/SwapContext";
 import { TokenAvatar } from "../../TokenAvatar";
-import { useAppSdk, walletNetWorthAtom, walletNetWorthQueryStateAtom } from "@liberfi/ui-base";
+import { useAppSdk, useWalletPortfolios } from "@liberfi/ui-base";
 import { getUnwrappedAddress, getWrappedAddress, PRIMARY_TOKEN_ADDRESSES } from "../../../libs";
 import { Chain } from "@liberfi/core";
 import { chainSlug } from "@liberfi.io/utils";
 import { Button, Skeleton } from "@heroui/react";
 import BigNumber from "bignumber.js";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useAtomValue } from "jotai";
 
 export function BuyAsset() {
   const appSdk = useAppSdk();
@@ -40,18 +39,7 @@ export function BuyAsset() {
     return addresses;
   }, [chainId, toTokenAddress]);
 
-  const walletNetWorth = useAtomValue(walletNetWorthAtom);
-
-  const walletBalancesQueryState = useAtomValue(walletNetWorthQueryStateAtom);
-
-  const isFetchingWallet = useMemo(
-    () => walletBalancesQueryState?.isFetching ?? false,
-    [walletBalancesQueryState],
-  );
-
-  const refetchWallet = useCallback(() => {
-    walletBalancesQueryState?.refetch();
-  }, [walletBalancesQueryState]);
+  const { data: walletPortfolios, isFetching: isFetchingWallet, refetch: refetchWallet } = useWalletPortfolios();
 
   // 购买代币发生变化，设置默认的支付代币
   useEffect(() => {
@@ -59,27 +47,27 @@ export function BuyAsset() {
     if (fromTokenAddress && !unavailableTokenAddresses.includes(fromTokenAddress)) return;
 
     // 优先支付余额多的代币
-    const balances = (walletNetWorth?.data ?? [])
-      .sort((a, b) => new BigNumber(b.valueInUsd).minus(a.valueInUsd).toNumber())
+    const balances = (walletPortfolios?.portfolios ?? [])
+      .sort((a, b) => new BigNumber(b.amountInUsd).minus(a.amountInUsd).toNumber())
       // 过滤掉无法使用的支付代币
       .filter(
         (it) =>
           unavailableTokenAddresses.length === 0 ||
-          !unavailableTokenAddresses.includes(it.tokenAddress),
+          !unavailableTokenAddresses.includes(it.address),
       );
 
     // 优先使用主流代币购买
     const primaryTokenAddresses = PRIMARY_TOKEN_ADDRESSES[chainSlug(chainId as Chain)!];
     const balance = balances.find((balance) =>
-      primaryTokenAddresses?.includes(balance.tokenAddress),
+      primaryTokenAddresses?.includes(balance.address),
     );
     if (balance) {
-      setFromTokenAddress(balance.tokenAddress);
+      setFromTokenAddress(balance.address);
       return;
     }
     // 如果主流代币都没有余额，则使用第余额最多的代币
     if (balances.length > 0) {
-      setFromTokenAddress(balances[0].tokenAddress);
+      setFromTokenAddress(balances[0].address);
       return;
     }
     // 如果是空钱包，则使用第一个可用的主流代币
@@ -91,7 +79,7 @@ export function BuyAsset() {
     }
   }, [
     chainId,
-    walletNetWorth?.data,
+    walletPortfolios?.portfolios,
     fromTokenAddress,
     setFromTokenAddress,
     toTokenAddress,
@@ -136,7 +124,7 @@ export function BuyAsset() {
     <div className="w-full h-8 flex items-center justify-between">
       <div
         className="flex items-center text-neutral text-xs cursor-pointer data-[disabled=true]:cursor-not-allowed"
-        data-disabled={!walletNetWorth?.data}
+        data-disabled={!walletPortfolios?.portfolios}
         onClick={handleSelectAsset}
       >
         <TokenAvatar size={24} src={fromToken?.imageUrl ?? ""} name={fromToken?.symbol} />
@@ -145,7 +133,7 @@ export function BuyAsset() {
           <Number value={fromTokenBalance?.amount ?? 0} abbreviate /> {fromToken?.symbol}{" "}
           {/* <span>
             (
-            <Number value={fromTokenBalance.valueInUsd} abbreviate defaultCurrencySign="$" />)
+            <Number value={fromTokenBalance.amountInUsd} abbreviate defaultCurrencySign="$" />)
           </span> */}
         </div>
         <ArrowDownIcon className="ml-2 text-neutral" width={12} height={12} />
@@ -154,7 +142,7 @@ export function BuyAsset() {
         className="flex ml-2 min-w-0 min-h-0 w-auto h-auto p-0 bg-transparent disabled:cursor-not-allowed"
         disableRipple
         isIconOnly
-        onPress={refetchWallet}
+        onPress={() => refetchWallet()}
       >
         <RefreshIcon
           width={24}

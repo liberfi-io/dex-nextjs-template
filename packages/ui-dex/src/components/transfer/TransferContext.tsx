@@ -11,7 +11,8 @@ import {
   useRef,
   useState,
 } from "react";
-import { Token, WalletNetWorthItemDTO } from "@chainstream-io/sdk";
+import { Token } from "@chainstream-io/sdk";
+import { Portfolio } from "@liberfi.io/types";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
   useAppSdk,
@@ -19,10 +20,9 @@ import {
   useTimerToast,
   useTranslation,
   useWallet,
-  walletNetWorthAtom,
+  useWalletPortfolios,
 } from "@liberfi/ui-base";
 import { ClientError } from "graphql-request";
-import { useAtomValue } from "jotai";
 import {
   UnsignedTransactionDto,
   useCreateTransferTransactionMutation,
@@ -32,7 +32,7 @@ import { useTokenQuery } from "@liberfi/react-dex";
 
 export type TransferContextValue = {
   tokenAddress?: string | null;
-  tokenBalance?: WalletNetWorthItemDTO | null;
+  tokenBalance?: Portfolio | null;
   token?: Token | null;
   setTokenAddress: (tokenAddress: string) => void;
   walletAddress?: string | null;
@@ -78,8 +78,7 @@ export function TransferProvider({
 
   const { chain } = useCurrentChain();
 
-  // 用户账户余额
-  const walletNetWorth = useAtomValue(walletNetWorthAtom);
+  const { data: walletPortfolios } = useWalletPortfolios();
 
   // 代币地址
   const [tokenAddress, setTokenAddress] = useState(defaultTokenAddress ?? "");
@@ -111,8 +110,8 @@ export function TransferProvider({
 
   // 代币余额
   const tokenBalance = useMemo(
-    () => (walletNetWorth?.data ?? []).find((it) => it.tokenAddress === tokenAddress),
-    [walletNetWorth, tokenAddress],
+    () => (walletPortfolios?.portfolios ?? []).find((it) => it.address === tokenAddress) ?? null,
+    [walletPortfolios, tokenAddress],
   );
 
   // 转账代币数量

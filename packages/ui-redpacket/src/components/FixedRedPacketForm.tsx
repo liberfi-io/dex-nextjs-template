@@ -2,7 +2,8 @@ import { useMemo, useState } from "react";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { Button, Form, Image, Link } from "@heroui/react";
 import BigNumber from "bignumber.js";
-import { Token, WalletNetWorthItemDTO } from "@chainstream-io/sdk";
+import { Token } from "@chainstream-io/sdk";
+import { Portfolio } from "@liberfi.io/types";
 import { chainIcon, txExplorerUrl } from "@liberfi.io/utils";
 import {
   useCreateFixedAmountRedPacketMutation,
@@ -30,7 +31,7 @@ export type FixedRedPacketFormValues = {
     address?: string;
     amount?: string;
     token?: Token;
-    balance?: WalletNetWorthItemDTO;
+    balance?: Portfolio;
   };
   maxClaims: string;
   memo?: string;

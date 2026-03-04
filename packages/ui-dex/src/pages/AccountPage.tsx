@@ -27,7 +27,7 @@ export function AccountPage() {
   const [tab, setTab] = useState<"assets" | "activities">("assets");
 
   const { chain: chainId } = useCurrentChain();
-  const setChainId = useSelectChain();
+  const { selectChain: setChainId } = useSelectChain();
 
   const [hideLowHoldingAssets, setHideLowHoldingAssets] = useState(false);
 

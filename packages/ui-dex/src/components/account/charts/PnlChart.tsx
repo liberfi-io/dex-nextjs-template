@@ -1,12 +1,12 @@
 import { LineTooltip } from "../../chart/LineTooltip";
 import { Number } from "../../Number";
 import { interpolateTimes } from "../../../libs";
-import { useTranslation, walletPnlAtom } from "@liberfi/ui-base";
+import { useTranslation } from "@liberfi/ui-base";
+import { useWalletSummary } from "@liberfi.io/ui-portfolio";
 import { Skeleton, Spinner, Tab, Tabs } from "@heroui/react";
 import clsx from "clsx";
 import { Key, useMemo, useState } from "react";
 import { Line, LineChart, ResponsiveContainer, Tooltip, YAxis } from "recharts";
-import { useAtomValue } from "jotai";
 
 export type PnlChartProps = {
   className?: string;
@@ -28,7 +28,7 @@ function Chart({
 }) {
   const { t } = useTranslation();
 
-  const walletPnl = useAtomValue(walletPnlAtom);
+  const { data: walletSummary } = useWalletSummary();
 
   // TODO wait for backend
   const data = useMemo(() => {
@@ -43,7 +43,7 @@ function Chart({
     return [Math.min(...data.map((d) => d.value)), Math.max(...data.map((d) => d.value))];
   }, [data]);
 
-  if (!walletPnl) {
+  if (!walletSummary) {
     return <Skeletons className={className} time={time} setTime={setTime} />;
   }
 
@@ -54,7 +54,7 @@ function Chart({
           <span className="text-xs text-neutral">{t("extend.account.pnl")}</span>
 
           <span className="text-sm">
-            <Number value={walletPnl?.totalProfitInUsd ?? 0} abbreviate defaultCurrencySign="$" />
+            <Number value={walletSummary?.totalProfitInUsd ?? 0} abbreviate defaultCurrencySign="$" />
           </span>
         </div>
 

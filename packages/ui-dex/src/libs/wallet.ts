@@ -1,52 +1,7 @@
-import { PnlDetailItemDTO, PnlDetailsPage, WalletNetWorthItemDTO, WalletNetWorthPage } from "@chainstream-io/sdk";
 import { Chain } from "@liberfi/core";
 import { chainSlug } from "@liberfi.io/utils";
-import { PRIMARY_TOKENS_MAP } from "./tokenUtils";
 import { capitalize } from "lodash-es";
 import { PublicKey } from "@solana/web3.js";
-
-export function appendPrimaryTokenNetWorth(
-  chainId: Chain,
-  inWalletNetWorth: WalletNetWorthPage,
-): WalletNetWorthPage {
-  const walletNetWorth = { ...inWalletNetWorth, data: [...(inWalletNetWorth.data ?? [])] };
-  (PRIMARY_TOKENS_MAP[chainId] ?? []).forEach((token) => {
-    const balance = walletNetWorth.data.find((it) => it.tokenAddress === token.address);
-    if (!balance) {
-      walletNetWorth.data.push({
-        tokenAddress: token.address,
-        name: token.name,
-        symbol: token.symbol,
-        logoUri: token.imageUrl,
-        amount: "0",
-        valueInUsd: "0",
-        valueInNative: "0",
-        priceInUsd: "0",
-        priceInNative: "0",
-      } as WalletNetWorthItemDTO);
-    }
-  });
-  return walletNetWorth;
-}
-
-export function appendPrimaryTokenPnl(
-  chainId: Chain,
-  inWalletPnl: PnlDetailsPage,
-): PnlDetailsPage {
-  const walletPnl = { ...inWalletPnl, data: [...(inWalletPnl.data ?? [])] };
-  (PRIMARY_TOKENS_MAP[chainId] ?? []).forEach((token) => {
-    const details = walletPnl.data.find((it) => it.tokenAddress === token.address);
-    if (!details) {
-      walletPnl.data.push({
-        tokenAddress: token.address,
-        name: token.name,
-        symbol: token.symbol,
-        logoUri: token.imageUrl,
-      } as PnlDetailItemDTO);
-    }
-  });
-  return walletPnl;
-}
 
 // 示例: https://opencrypto.pro/widget-page/mobileTran?widgetId=STlhSHJkZEc&tradeType=buy&cryptoCoin=USDT&network=Solana&walletAddress=2efnxsDRZRoFgdPRk2CadaN8SvmiZMHChd285AAjPU86&locale=en&fiatCoin=USD&fiatAmt=200
 export const getBuyTokenUrl = ({

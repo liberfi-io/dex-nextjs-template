@@ -1,18 +1,16 @@
 import { useMemo } from "react";
-import { useAtomValue } from "jotai";
 import { getPrimaryTokenAddress } from "@liberfi/core";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
-import { walletNetWorthAtom } from "../../states";
-import { WalletNetWorthItemDTO } from "@chainstream-io/sdk";
+import { useWalletPortfolios } from "./useWalletPortfolios";
 
 export function useWalletPrimaryTokenNetWorth() {
   const { chain } = useCurrentChain();
   const primaryTokenAddress = getPrimaryTokenAddress(chain);
-  const walletNetWorth = useAtomValue(walletNetWorthAtom);
+  const { data: walletPortfolios } = useWalletPortfolios();
 
-  const primaryTokenNetWorth = useMemo(
-    () => walletNetWorth?.data?.find((b: WalletNetWorthItemDTO) => b.tokenAddress === primaryTokenAddress),
-    [walletNetWorth, primaryTokenAddress],
+  const primaryTokenPortfolio = useMemo(
+    () => walletPortfolios?.portfolios?.find((p) => p.address === primaryTokenAddress),
+    [walletPortfolios, primaryTokenAddress],
   );
-  return primaryTokenNetWorth;
+  return primaryTokenPortfolio;
 }

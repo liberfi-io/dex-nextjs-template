@@ -1,20 +1,20 @@
 import { ListField } from "../../../ListField";
 import { Number } from "../../../Number";
-import { Token, WalletNetWorthItemDTO } from "@chainstream-io/sdk";
+import { Token } from "@chainstream-io/sdk";
+import { PortfolioPnl } from "@liberfi.io/types";
 import { useMemo } from "react";
 
 export interface BalanceFieldProps {
   className?: string;
   token?: Token;
-  balance: WalletNetWorthItemDTO;
+  balance: PortfolioPnl;
   compact?: boolean;
 }
 
 export function BalanceField({ className, token, balance, compact = false }: BalanceFieldProps) {
   const valueInUsd = useMemo(() => {
     const price = token?.marketData?.priceInUsd ?? balance.priceInUsd;
-    // 价格为 0，说明没有价格信息
-    return !price || price === "0" ? undefined : balance.valueInUsd;
+    return !price || price === "0" ? undefined : balance.amountInUsd;
   }, [balance, token]);
 
   return (

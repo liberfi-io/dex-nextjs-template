@@ -2,10 +2,9 @@ import { useSwapContext } from "../../swap/SwapContext";
 import { getBuyTokenUrl } from "../../../libs";
 import { Button, Input } from "@heroui/react";
 import { CONFIG } from "@liberfi/core";
-import { useAppSdk, useAuth, useTranslation, walletNetWorthAtom } from "@liberfi/ui-base";
+import { useAppSdk, useAuth, useTranslation, useWalletPortfolios } from "@liberfi/ui-base";
 import BigNumber from "bignumber.js";
 import clsx from "clsx";
-import { useAtomValue } from "jotai";
 import { debounce } from "lodash-es";
 import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { TradeInputSkeletons } from "./TradeInputSkeletons";
@@ -24,14 +23,13 @@ export function TradeInput({ type, displayEmptyWalletError = false }: TradeInput
 
   const { setAmount, fromToken, fromTokenBalance, routeError } = useSwapContext();
 
-  // 钱包余额
-  const walletNetWorth = useAtomValue(walletNetWorthAtom);
+  const { data: walletPortfolios } = useWalletPortfolios();
 
   // 钱包是否为空
   const isWalletEmpty = useMemo(() => {
-    if (!walletNetWorth || !walletNetWorth.data || walletNetWorth.data.length === 0) return true;
-    return walletNetWorth.data.every((balance) => new BigNumber(balance.amount ?? 0).eq(0));
-  }, [walletNetWorth]);
+    if (!walletPortfolios || !walletPortfolios.portfolios || walletPortfolios.portfolios.length === 0) return true;
+    return walletPortfolios.portfolios.every((p) => new BigNumber(p.amount ?? 0).eq(0));
+  }, [walletPortfolios]);
 
   // 错误信息
   const [error, setError] = useState<string | undefined>(undefined);

@@ -1,12 +1,13 @@
 import { ListField } from "../../../ListField";
 import { Button } from "@heroui/react";
 import { ShareIcon } from "../../../../assets";
-import { Token, WalletNetWorthItemDTO } from "@chainstream-io/sdk";
+import { Token } from "@chainstream-io/sdk";
+import { PortfolioPnl } from "@liberfi.io/types";
 
 export interface ActionsFieldProps {
   className?: string;
   token?: Token;
-  balance?: WalletNetWorthItemDTO;
+  balance?: PortfolioPnl;
 }
 
 export function ActionsField({ className }: ActionsFieldProps) {

@@ -1,6 +1,4 @@
 export * from "./useCurrentWalletAddress";
-export * from "./useRefreshWalletNetWorth";
-export * from "./useRefreshWalletPnl";
-export * from "./useRefreshWalletPnlDetails";
+export * from "./useWalletPortfolios";
 export * from "./useWalletPrimaryTokenNetWorth";
 export * from "./useWalletTokenNetWorth";

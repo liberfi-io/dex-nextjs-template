@@ -160,7 +160,7 @@ export function TokenAmountInput() {
                 tokenBalance && (
                   <TokenAvatar
                     size={24}
-                    src={tokenBalance.logoUri ?? token?.imageUrl ?? ""}
+                    src={tokenBalance.image ?? token?.imageUrl ?? ""}
                     name={tokenBalance.symbol}
                   />
                 )

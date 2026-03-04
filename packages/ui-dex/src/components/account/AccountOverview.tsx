@@ -4,13 +4,9 @@ import { Button, Image } from "@heroui/react";
 import { CONFIG } from "@liberfi/core";
 import {
   useTranslation,
-  walletNetWorthAtom,
-  walletNetWorthQueryStateAtom,
-  walletPnlAtom,
-  walletPnlQueryStateAtom,
 } from "@liberfi/ui-base";
+import { useWalletSummary, useRefetchWalletSummary } from "@liberfi.io/ui-portfolio";
 import clsx from "clsx";
-import { useAtomValue } from "jotai";
 import { useCallback, useMemo, useState } from "react";
 import { Number } from "../Number";
 import { AccountActions } from "./AccountActions";
@@ -21,24 +17,8 @@ import { HeaderBalanceChart } from "./charts";
 export function AccountOverview() {
   const { t } = useTranslation();
 
-  const walletNetWorth = useAtomValue(walletNetWorthAtom);
-
-  const walletPnl = useAtomValue(walletPnlAtom);
-
-  const walletNetWorthQueryState = useAtomValue(walletNetWorthQueryStateAtom);
-
-  const walletPnlQueryState = useAtomValue(walletPnlQueryStateAtom);
-
-  const isFetchingWallet = useMemo(
-    () =>
-      (walletNetWorthQueryState?.isFetching ?? false) || (walletPnlQueryState?.isFetching ?? false),
-    [walletNetWorthQueryState, walletPnlQueryState],
-  );
-
-  const refetchWallet = useCallback(() => {
-    walletNetWorthQueryState?.refetch();
-    walletPnlQueryState?.refetch();
-  }, [walletNetWorthQueryState, walletPnlQueryState]);
+  const { data: walletSummary, isFetching: isFetchingWallet } = useWalletSummary();
+  const refetchWallet = useRefetchWalletSummary();
 
   // TODO wait for backend
   const bullish = useMemo(() => true, []);
@@ -53,7 +33,7 @@ export function AccountOverview() {
     setIsOpenCharts((prev) => !prev);
   }, []);
 
-  if (!walletNetWorth || !walletPnl) {
+  if (!walletSummary) {
     return <AccountOverviewSkeleton />;
   }
 
@@ -84,7 +64,7 @@ export function AccountOverview() {
               {/* balance value */}
               <span>
                 <Number
-                  value={walletNetWorth?.totalValueInUsd ?? 0}
+                  value={walletSummary?.balanceInUsd ?? 0}
                   abbreviate
                   defaultCurrencySign="$"
                 />
@@ -95,7 +75,7 @@ export function AccountOverview() {
                 isIconOnly
                 className="flex min-w-0 w-7 min-h-0 h-7 bg-transparent rounded-full text-neutral"
                 disableRipple
-                onPress={refetchWallet}
+                onPress={() => refetchWallet()}
               >
                 <RefreshIcon
                   width={24}
@@ -113,7 +93,7 @@ export function AccountOverview() {
             >
               <span>
                 <Number
-                  value={walletPnl?.totalProfitInUsd ?? 0}
+                  value={walletSummary?.totalProfitInUsd ?? 0}
                   abbreviate
                   defaultCurrencySign="$"
                 />

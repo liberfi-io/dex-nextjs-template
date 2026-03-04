@@ -7,10 +7,8 @@ import {
   useAuthenticatedCallback,
   useRouter,
   useTranslation,
-  walletNetWorthAtom,
-  walletPnlAtom,
 } from "@liberfi/ui-base";
-import { useAtomValue } from "jotai";
+import { useWalletSummary } from "@liberfi.io/ui-portfolio";
 import { useMemo } from "react";
 import { HeaderBalanceChart } from "../account/charts";
 import { Number } from "../Number";
@@ -37,9 +35,7 @@ function AccountOverviewContent() {
 
   const { navigate } = useRouter();
 
-  const walletNetWorth = useAtomValue(walletNetWorthAtom);
-
-  const walletPnl = useAtomValue(walletPnlAtom);
+  const { data: walletSummary } = useWalletSummary();
 
   // TODO wait for backend
   const bullish = useMemo(() => true, []);
@@ -51,7 +47,7 @@ function AccountOverviewContent() {
     navigate(AppRoute.account);
   }, [navigate]);
 
-  if (!walletNetWorth || !walletPnl) {
+  if (!walletSummary) {
     return <AccountOverviewSkeleton />;
   }
 
@@ -69,7 +65,7 @@ function AccountOverviewContent() {
 
           <p className="text-2xl font-semibold">
             <Number
-              value={walletNetWorth?.totalValueInUsd ?? 0}
+              value={walletSummary?.balanceInUsd ?? 0}
               abbreviate
               defaultCurrencySign="$"
             />
@@ -79,7 +75,7 @@ function AccountOverviewContent() {
             data-bullish={bullish}
           >
             <span>
-              <Number value={walletPnl?.totalProfitInUsd ?? 0} abbreviate defaultCurrencySign="$" />
+              <Number value={walletSummary?.totalProfitInUsd ?? 0} abbreviate defaultCurrencySign="$" />
             </span>
             <span className="flex items-center gap-1">
               (

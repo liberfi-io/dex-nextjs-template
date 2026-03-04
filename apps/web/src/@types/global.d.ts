@@ -35,6 +35,8 @@ declare global {
       JWT_SECRET: string;
       JWT_EXPIRES_IN: string;
       JWT_COOKIE_NAME: string;
+      USE_LOCAL_SDK: string | undefined;
+      LOCAL_SDK_ROOT: string | undefined;
     }
   }
 

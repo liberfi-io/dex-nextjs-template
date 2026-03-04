@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useTokensQuery } from "@liberfi/react-dex";
 import { ListEmptyData } from "../ListEmptyData";
 import { AssetListSkeleton } from "./AssetListSkeleton";
-import { appendPrimaryTokenNetWorth, appendPrimaryTokenPnl, AppRoute } from "../../libs";
+import { AppRoute } from "../../libs";
 import clsx from "clsx";
 import {
   TokenField,
@@ -15,17 +15,15 @@ import {
   // ContractField,
   PriceHistoryField,
 } from "./fields/asset";
-import {
-  PnlDetailItemDTO,
-  PnlDetailsPage,
-  Token,
-  WalletNetWorthItemDTO,
-} from "@chainstream-io/sdk";
+import { Token } from "@chainstream-io/sdk";
+import { PortfolioPnl } from "@liberfi.io/types";
+import { useWalletPortfolioPnlsInfiniteQuery } from "@liberfi.io/react";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { keyBy } from "lodash-es";
 import BigNumber from "bignumber.js";
-import { useAuth, useRouter, walletNetWorthAtom, walletPnlDetailsAtom } from "@liberfi/ui-base";
+import { useAuth, useRouter } from "@liberfi/ui-base";
+import { useCurrentWalletAddress } from "@liberfi/ui-base";
 import { Virtuoso } from "react-virtuoso";
-import { useAtomValue } from "jotai";
 
 export type AssetListProps = {
   chainId?: Chain;
@@ -94,49 +92,45 @@ function Content({
   classNames,
   useWindowScroll = false,
 }: ContentProps) {
-  const walletNetWorth = useAtomValue(walletNetWorthAtom);
+  const { chain } = useCurrentChain();
+  const walletAddress = useCurrentWalletAddress();
 
-  const walletPnlDetails = useAtomValue(walletPnlDetailsAtom);
+  // TODO: 当前先假设一页可以取完所有 token，后续提供按 token 批量查询 portfolios 接口后再替换
+  const { data: pnlsData, hasNextPage, fetchNextPage } = useWalletPortfolioPnlsInfiniteQuery(
+    { chain: chainId ?? chain, address: walletAddress ?? "" },
+    { enabled: !!walletAddress },
+  );
 
-  // append primary token balances
-  const fullWalletNetWorth = useMemo(() => {
-    if (!walletNetWorth) return undefined;
-    return appendPrimaryTokenNetWorth((chainId ?? Chain.SOLANA) as Chain, walletNetWorth);
-  }, [walletNetWorth, chainId]);
+  const portfolioPnls = useMemo(
+    () => pnlsData?.pages?.flatMap((page) => page.portfolios ?? []) ?? [],
+    [pnlsData],
+  );
 
-  // append primary token pnl details
-  const fullWalletPnlDetails = useMemo(() => {
-    if (!walletPnlDetails) return undefined;
-    return appendPrimaryTokenPnl((chainId ?? Chain.SOLANA) as Chain, walletPnlDetails);
-  }, [walletPnlDetails, chainId]);
-
-  const tokenAddresses = useMemo(() => {
-    if (!fullWalletNetWorth) return [];
-    return (fullWalletNetWorth.data ?? []).map((it) => it.tokenAddress);
-  }, [fullWalletNetWorth]);
+  const tokenAddresses = useMemo(
+    () => portfolioPnls.map((it) => it.address),
+    [portfolioPnls],
+  );
 
   const { data: tokens } = useTokensQuery({ chain: chainId, tokenAddresses });
 
   const tokenMap = useMemo(() => keyBy(tokens ?? [], "address"), [tokens]);
 
   const balances = useMemo(() => {
-    if (!fullWalletNetWorth) return [];
-    return (fullWalletNetWorth.data ?? [])
+    return portfolioPnls
       .filter((it) => new BigNumber(it.amount).gt(0))
-      .filter((it) => !hideLowHoldingAssets || new BigNumber(it.valueInUsd).gte(0.1))
+      .filter((it) => !hideLowHoldingAssets || new BigNumber(it.amountInUsd).gte(0.1))
       .sort((a, b) =>
         compareBalances(
           a,
-          tokenMap[a.tokenAddress],
+          tokenMap[a.address],
           b,
-          tokenMap[b.tokenAddress],
+          tokenMap[b.address],
           sort,
-          fullWalletPnlDetails,
         ),
       );
-  }, [fullWalletNetWorth, fullWalletPnlDetails, hideLowHoldingAssets, sort, tokenMap]);
+  }, [portfolioPnls, hideLowHoldingAssets, sort, tokenMap]);
 
-  if (!fullWalletNetWorth) {
+  if (!pnlsData) {
     return <AssetListSkeleton compact={compact} classNames={classNames} />;
   }
 
@@ -150,13 +144,15 @@ function Content({
       useWindowScroll={useWindowScroll}
       fixedItemHeight={64}
       data={balances}
+      endReached={() => {
+        if (hasNextPage) {
+          fetchNextPage();
+        }
+      }}
       itemContent={(_, balance) => (
         <AssetItem
           balance={balance}
-          pnlDetail={fullWalletPnlDetails?.data?.find(
-            (it) => it.tokenAddress === balance.tokenAddress,
-          )}
-          token={tokenMap[balance.tokenAddress]}
+          token={tokenMap[balance.address]}
           compact={compact}
           classNames={classNames}
         />
@@ -166,8 +162,7 @@ function Content({
 }
 
 type AssetItemProps = {
-  balance: WalletNetWorthItemDTO;
-  pnlDetail?: PnlDetailItemDTO;
+  balance: PortfolioPnl;
   token?: Token;
   compact?: boolean;
   classNames?: {
@@ -176,7 +171,7 @@ type AssetItemProps = {
   };
 };
 
-function AssetItem({ balance, pnlDetail, token, compact = false, classNames }: AssetItemProps) {
+function AssetItem({ balance, token, compact = false, classNames }: AssetItemProps) {
   const { navigate } = useRouter();
 
   return (
@@ -214,7 +209,6 @@ function AssetItem({ balance, pnlDetail, token, compact = false, classNames }: A
         <PnlField
           token={token}
           balance={balance}
-          pnlDetail={pnlDetail}
           compact={compact}
           className="lg:group-data-[compact=false]:w-[110px] max-lg:flex-1 lg:group-data-[compact=true]:flex-1"
         />
@@ -234,19 +228,15 @@ function AssetItem({ balance, pnlDetail, token, compact = false, classNames }: A
 }
 
 function compareBalances(
-  a: WalletNetWorthItemDTO,
+  a: PortfolioPnl,
   aToken: Token | undefined,
-  b: WalletNetWorthItemDTO,
+  b: PortfolioPnl,
   bToken: Token | undefined,
   sort: Record<string, "asc" | "desc">,
-  fullWalletPnlDetails: PnlDetailsPage | undefined,
 ) {
-  const aPnlDetail = fullWalletPnlDetails?.data?.find((it) => it.tokenAddress === a.tokenAddress);
-  const bPnlDetail = fullWalletPnlDetails?.data?.find((it) => it.tokenAddress === b.tokenAddress);
-
   if (sort["balance"]) {
-    const aValueInUSD = new BigNumber(a.valueInUsd);
-    const bValueInUSD = new BigNumber(b.valueInUsd);
+    const aValueInUSD = new BigNumber(a.amountInUsd);
+    const bValueInUSD = new BigNumber(b.amountInUsd);
     return sort["balance"] === "asc"
       ? aValueInUSD.minus(bValueInUSD).toNumber()
       : bValueInUSD.minus(aValueInUSD).toNumber();
@@ -261,16 +251,16 @@ function compareBalances(
   }
 
   if (sort["pnl"]) {
-    const aProfitInUsd = new BigNumber(aPnlDetail?.realizedProfitInUsd ?? 0);
-    const bProfitInUsd = new BigNumber(bPnlDetail?.realizedProfitInUsd ?? 0);
+    const aProfitInUsd = new BigNumber(a.realizedProfitInUsd ?? 0);
+    const bProfitInUsd = new BigNumber(b.realizedProfitInUsd ?? 0);
     return sort["pnl"] === "asc"
       ? aProfitInUsd.minus(bProfitInUsd).toNumber()
       : bProfitInUsd.minus(aProfitInUsd).toNumber();
   }
 
   if (sort["pnl_change"]) {
-    const aProfitRatio = new BigNumber(aPnlDetail?.realizedProfitRatio ?? 0);
-    const bProfitRatio = new BigNumber(bPnlDetail?.realizedProfitRatio ?? 0);
+    const aProfitRatio = new BigNumber(a.realizedProfitRatio ?? 0);
+    const bProfitRatio = new BigNumber(b.realizedProfitRatio ?? 0);
     return sort["pnl_change"] === "asc"
       ? aProfitRatio.minus(bProfitRatio).toNumber()
       : bProfitRatio.minus(aProfitRatio).toNumber();

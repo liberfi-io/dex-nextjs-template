@@ -12,10 +12,9 @@ export async function POST(request: NextRequest) {
     const { accessToken, identityToken } = (await request.json()) as PrivyAuthRequest;
 
     const verifiedClaims = await privyClient.verifyAuthToken(accessToken);
-    console.info("privy verifiedClaims: ", verifiedClaims);
+    console.info("privy access token verified: ", verifiedClaims.userId);
 
     const privyUser = await privyClient.getUser({ idToken: identityToken });
-    console.info("privy user: ", verifiedClaims);
 
     const user = {
       id: privyUser.id,

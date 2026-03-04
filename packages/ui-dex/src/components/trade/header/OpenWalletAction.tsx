@@ -2,11 +2,10 @@ import { WithdrawOutlinedIcon } from "../../../assets";
 import { Number } from "../../Number";
 import { Button } from "@heroui/react";
 import clsx from "clsx";
-import { useAtomValue } from "jotai";
-import { walletNetWorthAtom } from "@liberfi/ui-base";
+import { useWalletSummary } from "@liberfi.io/ui-portfolio";
 
 export function OpenWalletAction({ className }: { className?: string }) {
-  const walletNetWorth = useAtomValue(walletNetWorthAtom);
+  const { data: walletSummary } = useWalletSummary();
 
   return (
     <Button
@@ -17,7 +16,7 @@ export function OpenWalletAction({ className }: { className?: string }) {
       disableRipple
       startContent={<WithdrawOutlinedIcon width={14} height={14} className="text-neutral" />}
     >
-      <Number value={walletNetWorth?.totalValueInUsd ?? 0} abbreviate defaultCurrencySign="$" />
+      <Number value={walletSummary?.balanceInUsd ?? 0} abbreviate defaultCurrencySign="$" />
     </Button>
   );
 }

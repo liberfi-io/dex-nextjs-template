@@ -32,10 +32,10 @@ export function TradeDataLoader({
   // TODO report gtag { key: KLineFirstRender, name: "TradeDataLoader" }
 
   // switch to current token's chain
-  const setChain = useSelectChain();
+  const { selectChain } = useSelectChain();
   useEffect(() => {
-    setChain(chainId);
-  }, [chainId, setChain]);
+    selectChain(chainId);
+  }, [chainId, selectChain]);
 
   // switch to current token's address
   const setTokenAddress = useSetAtom(tokenAddressAtom);

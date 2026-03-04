@@ -1,10 +1,5 @@
 import { PropsWithChildren, useEffect } from "react";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
-import {
-  useRefreshWalletNetWorth,
-  useRefreshWalletPnl,
-  useRefreshWalletPnlDetails,
-} from "@liberfi/ui-base";
 import { setCurrentQuoteSymbol } from "../states";
 import { CHAIN_QUOTE_TOKEN_SYMBOLS } from "../libs";
 
@@ -18,13 +13,6 @@ export function DexDataProvider({ children }: PropsWithChildren) {
       setCurrentQuoteSymbol(chain, symbol);
     }
   }, [chain]);
-
-  // keep wallet balances updated
-  useRefreshWalletNetWorth();
-
-  useRefreshWalletPnl();
-
-  useRefreshWalletPnlDetails();
 
   return children;
 }

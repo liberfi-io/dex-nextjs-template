@@ -3,23 +3,13 @@ import { Number } from "../../Number";
 import { useSwapContext } from "../../swap/SwapContext";
 import { TokenAvatar } from "../../TokenAvatar";
 import { Button, Skeleton } from "@heroui/react";
-import { walletNetWorthQueryStateAtom } from "@liberfi/ui-base";
-import { useAtomValue } from "jotai";
+import { useWalletPortfolios } from "@liberfi/ui-base";
 import { useCallback, useMemo } from "react";
 
 export function SellAsset() {
   const { fromToken, fromTokenBalance } = useSwapContext();
 
-  const walletBalancesQueryState = useAtomValue(walletNetWorthQueryStateAtom);
-
-  const isFetchingWallet = useMemo(
-    () => walletBalancesQueryState?.isFetching ?? false,
-    [walletBalancesQueryState],
-  );
-
-  const refetchWallet = useCallback(() => {
-    walletBalancesQueryState?.refetch();
-  }, [walletBalancesQueryState]);
+  const { isFetching: isFetchingWallet, refetch: refetchWallet } = useWalletPortfolios();
 
   if (!fromToken) {
     return <Skeleton className="w-full h-8 rounded-lg" />;
@@ -34,7 +24,7 @@ export function SellAsset() {
           <Number value={fromTokenBalance?.amount ?? 0} abbreviate /> {fromToken.symbol}{" "}
           {/* <span>
             (
-            <Number value={fromTokenBalance.valueInUsd} abbreviate defaultCurrencySign="$" />)
+            <Number value={fromTokenBalance.amountInUsd} abbreviate defaultCurrencySign="$" />)
           </span> */}
         </div>
       </div>
@@ -42,7 +32,7 @@ export function SellAsset() {
         className="flex ml-2 min-w-0 min-h-0 w-auto h-auto p-0 bg-transparent disabled:cursor-not-allowed"
         disableRipple
         isIconOnly
-        onPress={refetchWallet}
+        onPress={() => refetchWallet()}
         disabled={!fromTokenBalance}
       >
         <RefreshIcon

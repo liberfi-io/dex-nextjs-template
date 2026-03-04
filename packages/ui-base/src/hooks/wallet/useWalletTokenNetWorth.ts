@@ -1,13 +1,11 @@
 import { useMemo } from "react";
-import { useAtomValue } from "jotai";
-import { walletNetWorthAtom } from "../../states";
-import { WalletNetWorthItemDTO } from "@chainstream-io/sdk";
+import { useWalletPortfolios } from "./useWalletPortfolios";
 
 export function useWalletTokenNetWorth(tokenAddress: string) {
-  const walletNetWorth = useAtomValue(walletNetWorthAtom);
-  const tokenNetWorth = useMemo(
-    () => walletNetWorth?.data?.find((b: WalletNetWorthItemDTO) => b.tokenAddress === tokenAddress),
-    [walletNetWorth, tokenAddress],
+  const { data: walletPortfolios } = useWalletPortfolios();
+  const tokenPortfolio = useMemo(
+    () => walletPortfolios?.portfolios?.find((p) => p.address === tokenAddress),
+    [walletPortfolios, tokenAddress],
   );
-  return tokenNetWorth;
+  return tokenPortfolio;
 }

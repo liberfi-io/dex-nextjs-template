@@ -6,17 +6,19 @@ import { ChainStreamClient } from "@chainstream-io/sdk";
 import { DexClientProvider } from "@liberfi/react-dex";
 import { PinataProvider, useDexTokenProvider } from "@liberfi/ui-base";
 import { pinata } from "../libs/pinata";
-import { DexClientProvider as APIClientProvider, Client } from "@liberfi.io/client";
+import { Client } from "@liberfi.io/client";
+import { DexClientProvider as APIClientProvider } from "@liberfi.io/react";
 import { MediaTrackClient } from "@liberfi.io/ui-media-track/client";
 import { MediaTrackProvider } from "@liberfi.io/ui-media-track";
-import { useAuth } from "@liberfi.io/wallet-connector";
+import { useAuth, useWallets } from "@liberfi.io/wallet-connector";
 import { ChannelsClient } from "@liberfi.io/ui-channels/client";
 import { ChannelsProvider } from "@liberfi.io/ui-channels";
 import { PinataProvider as PinataProviderBase } from "@liberfi.io/ui";
 import { PredictProvider } from "@liberfi.io/ui-predict";
 import { PredictClient } from "@liberfi.io/ui-predict/client";
-import { PortfolioProvider } from "@liberfi.io/ui-portfolio";
+import { PortfolioClientProvider, PortfolioProvider } from "@liberfi.io/ui-portfolio";
 import { PortfolioClient } from "@liberfi.io/ui-portfolio/client";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 
 const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
 
@@ -103,15 +105,21 @@ function DexClientLoader({ children }: PropsWithChildren) {
     [],
   );
 
+  const { chain } = useCurrentChain()
+  const wallets = useWallets()
+  const wallet = wallets.find((w) => w.chain === chain && w.isConnected)
+
   return (
     <DexClientProvider client={dexClient}>
       <APIClientProvider client={apiClient} subscribeClient={apiClient}>
         <MediaTrackProvider client={mediaTrackClient}>
           <ChannelsProvider client={channelsClient}>
             <PredictProvider client={predictClient}>
-              <PortfolioProvider client={portfolioClient}>
-                {children}
-              </PortfolioProvider>
+              <PortfolioClientProvider client={portfolioClient}>
+                <PortfolioProvider chain={chain} address={wallet?.address ?? ""}>
+                  {children}
+                </PortfolioProvider>
+              </PortfolioClientProvider>
             </PredictProvider>
           </ChannelsProvider>
         </MediaTrackProvider>
