@@ -1,9 +1,9 @@
 "use client";
 
-import { PredictDetailPage } from "../../../../components/PredictDetailPage";
 import { useParams } from "next/navigation";
+import { ChannelsInfoPage } from "../../../../components/page/ChannelsInfoPage";
 
 export default function Page() {
   const { id } = useParams<{ id: string }>();
-  return <PredictDetailPage id={id} />;
+  return <ChannelsInfoPage id={id} />;
 }

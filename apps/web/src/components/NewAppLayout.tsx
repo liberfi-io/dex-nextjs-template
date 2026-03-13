@@ -48,7 +48,7 @@ import {
   MiniLogoIcon,
   RocketIcon,
   SignalIcon,
-  TradeIcon,
+  // TradeIcon,
   TranslateIcon,
   WalletIcon,
   cn,
