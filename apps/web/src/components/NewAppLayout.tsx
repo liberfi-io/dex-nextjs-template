@@ -59,6 +59,7 @@ import {
   ScaffoldFooter,
   Logo,
   type NavItem,
+  DraggablePanelProvider,
 } from "@liberfi.io/ui-scaffold";
 import { SearchTokensButton, SearchModal } from "@liberfi.io/ui-tokens";
 import { capitalize, chainSlug } from "@liberfi.io/utils";
@@ -83,6 +84,9 @@ import { PresetFormModal } from "@liberfi.io/ui-trade";
 import { useAsyncModal } from "@liberfi.io/ui-scaffold";
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/react";
 import { LaunchPadModal, LAUNCHPAD_MODAL_ID } from "./modals/LaunchPadModal";
+import { AppBottomToolbar } from "./AppBottomToolbar";
+import { BottomTweets } from "./BottomTweets";
+import { BottomAICopilot } from "./BottomAICopilot";
 
 const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
 
@@ -279,6 +283,8 @@ function PageShell({ children }: PropsWithChildren) {
       onNavigate={onNavigate}
       headerVisible={["desktop", "tablet", "mobile"]}
       footerVisible={["mobile"]}
+      toolbar={<AppBottomToolbar />}
+      toolbarVisible={["desktop"]}
       header={
         <ScaffoldHeader
           left={<Logo icon={<LogoIcon />} miniIcon={<MiniLogoIcon />} />}
@@ -323,7 +329,30 @@ function PageShell({ children }: PropsWithChildren) {
       }
       footer={<ScaffoldFooter navItems={navItems} />}
     >
-      {children}
+      <DraggablePanelProvider
+        contents={[
+          {
+            id: "mediaTrack",
+            title: t("extend.toolbar.media_track_tooltip"),
+            children: <BottomTweets />,
+            modalMaxWidth: 440,
+            modalMinWidth: 320,
+            panelMinWidth: 320,
+            panelMaxWidth: 440,
+          },
+          {
+            id: "aiCopilot",
+            title: t("extend.toolbar.ai_copilot"),
+            children: <BottomAICopilot />,
+            modalMaxWidth: 440,
+            modalMinWidth: 320,
+            panelMinWidth: 320,
+            panelMaxWidth: 440,
+          },
+        ]}
+      >
+        {children}
+      </DraggablePanelProvider>
     </Scaffold>
   );
 }
@@ -365,7 +394,11 @@ function LanguageButton() {
   );
 
   return (
-    <Dropdown placement="bottom-end" size="sm" classNames={{ content: "bg-content1 border border-border" }}>
+    <Dropdown
+      placement="bottom-end"
+      size="sm"
+      classNames={{ content: "bg-content1 border border-border" }}
+    >
       <DropdownTrigger>
         <Button
           isIconOnly
