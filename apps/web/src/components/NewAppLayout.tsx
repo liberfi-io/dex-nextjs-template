@@ -13,14 +13,21 @@
  *               └─ PageShell     (withPage + withToast + withModals)
  */
 
-import { PropsWithChildren, useCallback, useEffect, useMemo, useState } from "react";
+import { Key, PropsWithChildren, useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { Chain } from "@liberfi.io/types";
 import { Client } from "@liberfi.io/client";
 import { DexClientProvider } from "@liberfi.io/react";
-import { LocaleCode, LocaleProvider, useTranslation } from "@liberfi.io/i18n";
+import {
+  LocaleCode,
+  LocaleProvider,
+  useTranslation,
+  useLocale,
+  useChangeLocale,
+  useLocaleContext,
+} from "@liberfi.io/i18n";
 import { useAuth, useConnectedWallet, useSwitchChain } from "@liberfi.io/wallet-connector";
 import { ChainSelectWidget, useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { MediaTrackClient } from "@liberfi.io/ui-media-track/client";
@@ -30,10 +37,7 @@ import { ChannelsProvider } from "@liberfi.io/ui-channels";
 import { PredictClient } from "@liberfi.io/ui-predict/client";
 import { PredictProvider } from "@liberfi.io/ui-predict";
 import { PortfolioClient } from "@liberfi.io/ui-portfolio/client";
-import {
-  PortfolioClientProvider,
-  PortfolioProvider,
-} from "@liberfi.io/ui-portfolio";
+import { PortfolioClientProvider, PortfolioProvider } from "@liberfi.io/ui-portfolio";
 import { AccountInfoWidget } from "@liberfi.io/ui-portfolio";
 import {
   StyledToaster,
@@ -42,9 +46,12 @@ import {
   HomeIcon,
   LogoIcon,
   MiniLogoIcon,
+  RocketIcon,
   SignalIcon,
   TradeIcon,
+  TranslateIcon,
   WalletIcon,
+  cn,
 } from "@liberfi.io/ui";
 import {
   Scaffold,
@@ -73,6 +80,9 @@ import zh from "@liberfi/locales/locales/zh/translation.json";
 import en2 from "@liberfi.io/i18n/locales/en.json";
 import zh2 from "@liberfi.io/i18n/locales/zh.json";
 import { PresetFormModal } from "@liberfi.io/ui-trade";
+import { useAsyncModal } from "@liberfi.io/ui-scaffold";
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/react";
+import { LaunchPadModal, LAUNCHPAD_MODAL_ID } from "./modals/LaunchPadModal";
 
 const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
 
@@ -88,10 +98,7 @@ const navItemsConfig: Omit<NavItem, "label">[] = [
 // Root
 // ---------------------------------------------------------------------------
 
-export function NewAppLayout({
-  children,
-  locale,
-}: PropsWithChildren<{ locale: LocaleCode }>) {
+export function NewAppLayout({ children, locale }: PropsWithChildren<{ locale: LocaleCode }>) {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProviders>
@@ -106,10 +113,11 @@ export function NewAppLayout({
           <ServiceProviders>
             <LegacyBridge>
               <PageShell>{children}</PageShell>
+              <LaunchPadModal />
+              <StyledToaster />
+              <SearchModal />
+              <PresetFormModal />
             </LegacyBridge>
-            <StyledToaster />
-            <SearchModal />
-            <PresetFormModal />
           </ServiceProviders>
         </LocaleProvider>
       </AuthProviders>
@@ -180,10 +188,7 @@ function ServiceProviders({ children }: PropsWithChildren) {
   );
 
   const portfolioClient = useMemo(
-    () =>
-      new PortfolioClient(
-        baseUrl + process.env.NEXT_PUBLIC_DEX_AGGREGATOR_URL,
-      ),
+    () => new PortfolioClient(baseUrl + process.env.NEXT_PUBLIC_DEX_AGGREGATOR_URL),
     [],
   );
 
@@ -196,10 +201,7 @@ function ServiceProviders({ children }: PropsWithChildren) {
         <ChannelsProvider client={channelsClient}>
           <PredictProvider client={predictClient}>
             <PortfolioClientProvider client={portfolioClient}>
-              <PortfolioProvider
-                chain={chain}
-                address={wallet?.address ?? ""}
-              >
+              <PortfolioProvider chain={chain} address={wallet?.address ?? ""}>
                 {children}
               </PortfolioProvider>
             </PortfolioClientProvider>
@@ -281,7 +283,7 @@ function PageShell({ children }: PropsWithChildren) {
         <ScaffoldHeader
           left={<Logo icon={<LogoIcon />} miniIcon={<MiniLogoIcon />} />}
           navItems={navItems}
-            right={
+          right={
             <>
               <SearchTokensButton
                 chains={[chain]}
@@ -292,6 +294,7 @@ function PageShell({ children }: PropsWithChildren) {
                   }
                 }}
               />
+
               <ChainSelectWidget
                 size="sm"
                 className="max-sm:hidden"
@@ -305,13 +308,14 @@ function PageShell({ children }: PropsWithChildren) {
                   )
                 }
                 onError={(e) =>
-                  toast.error(
-                    e instanceof Error
-                      ? e.message
-                      : t("common.chainSwitchFailed"),
-                  )
+                  toast.error(e instanceof Error ? e.message : t("common.chainSwitchFailed"))
                 }
               />
+
+              <LaunchPadButton />
+
+              <LanguageButton />
+
               <AccountInfoWidget />
             </>
           }
@@ -321,5 +325,80 @@ function PageShell({ children }: PropsWithChildren) {
     >
       {children}
     </Scaffold>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Header action buttons
+// ---------------------------------------------------------------------------
+
+function LaunchPadButton() {
+  const { t } = useTranslation();
+  const { onOpen } = useAsyncModal(LAUNCHPAD_MODAL_ID);
+
+  const handleLaunchpad = useCallback(() => {
+    onOpen();
+  }, [onOpen]);
+
+  return (
+    <Button
+      isIconOnly
+      className="bg-content2 w-8 min-w-0 h-8 min-h-0 rounded-full text-bullish"
+      onPress={handleLaunchpad}
+      disableRipple
+      aria-label={t("extend.header.launchpad")}
+    >
+      <RocketIcon width={16} height={16} />
+    </Button>
+  );
+}
+
+function LanguageButton() {
+  const { t } = useTranslation();
+  const locale = useLocale();
+  const changeLocale = useChangeLocale();
+  const { languages } = useLocaleContext();
+
+  const handleChangeLanguage = useCallback(
+    (key: Key) => changeLocale(key as LocaleCode),
+    [changeLocale],
+  );
+
+  return (
+    <Dropdown placement="bottom-end" size="sm" classNames={{ content: "rounded-lg" }}>
+      <DropdownTrigger>
+        <Button
+          isIconOnly
+          className="bg-content2 w-8 min-w-0 h-8 min-h-0 rounded-full"
+          disableRipple
+          aria-label={t("extend.header.language")}
+        >
+          <TranslateIcon width={16} height={16} />
+        </Button>
+      </DropdownTrigger>
+      <DropdownMenu
+        aria-label={t("extend.header.language")}
+        selectionMode="single"
+        selectedKeys={[locale]}
+        onAction={handleChangeLanguage}
+        classNames={{ list: "gap-1" }}
+        itemClasses={{
+          base: cn("rounded-md px-3 h-8"),
+        }}
+      >
+        {languages.map((lang) => (
+          <DropdownItem
+            key={lang.localCode}
+            className={cn(
+              lang.localCode === locale ? "bg-content2 text-foreground" : "text-neutral",
+              "data-[hover=true]:bg-content2 data-[hover=true]:text-foreground",
+              "data-[selectable=true]:focus:bg-content2 data-[selectable=true]:focus:text-foreground",
+            )}
+          >
+            {lang.displayName}
+          </DropdownItem>
+        ))}
+      </DropdownMenu>
+    </Dropdown>
   );
 }
