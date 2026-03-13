@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useResizeObserver } from "@liberfi.io/hooks";
 import { useTranslation } from "@liberfi.io/i18n";
-import { Chain, SOLANA_TOKEN_PROTOCOLS } from "@liberfi.io/types";
+import { Chain, SOLANA_TOKEN_PROTOCOLS, Token } from "@liberfi.io/types";
 import { Button, cn, HorizontalScrollContainer, SettingsIcon, toast } from "@liberfi.io/ui";
 import { ChainSelectWidget, useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
@@ -84,6 +84,16 @@ export function CombinedTokenList() {
     [openPresetModal, chain],
   );
 
+  const handleSelectToken = useCallback(
+    (token: Token) => {
+      const slug = chainSlug(token.chain);
+      if (slug) {
+        router.push(`/tokens/${slug}/${token.address}`);
+      }
+    },
+    [router],
+  );
+
   const showTokenListControls = activeTab !== "pulse";
 
   const tokenListContent = useMemo(() => {
@@ -94,6 +104,7 @@ export function CombinedTokenList() {
         return (
           <TrendingTokenListWidget
             {...commonProps}
+            onSelectToken={handleSelectToken}
             ActionsComponent={({ token }) => (
               <div className="w-full h-full relative">
                 {nativeToken && (
@@ -115,6 +126,7 @@ export function CombinedTokenList() {
         return (
           <StockTokenListWidget
             {...commonProps}
+            onSelectToken={handleSelectToken}
             ActionsComponent={({ token }) => (
               <div className="w-full h-full relative">
                 {nativeToken && (
@@ -136,6 +148,7 @@ export function CombinedTokenList() {
         return (
           <NewTokenListWidget
             {...commonProps}
+            onSelectToken={handleSelectToken}
             ActionsComponent={({ token }) => (
               <div className="w-full h-full relative">
                 {nativeToken && (
@@ -154,9 +167,9 @@ export function CombinedTokenList() {
           />
         );
       case "pulse":
-        return <CombinedPulseList chain={chain} />;
+        return <CombinedPulseList chain={chain} onSelectToken={handleSelectToken} />;
     }
-  }, [activeTab, chain, resolution, filters, height]);
+  }, [activeTab, chain, resolution, filters, height, nativeToken, handleSelectToken]);
 
   return (
     <div className="w-full h-full flex flex-col gap-3 sm:gap-4 p-4">

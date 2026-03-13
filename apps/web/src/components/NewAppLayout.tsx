@@ -88,7 +88,7 @@ const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
 
 const navItemsConfig: Omit<NavItem, "label">[] = [
   { key: "discover", href: "/", icon: <HomeIcon width={20} height={20} /> },
-  { key: "perpetuals", href: "/perpetuals", icon: <TradeIcon width={20} height={20} /> },
+  // { key: "perpetuals", href: "/perpetuals", icon: <TradeIcon width={20} height={20} /> },
   { key: "predict", href: "/predict", icon: <CoinsIcon width={20} height={20} /> },
   { key: "channels", href: "/channels", icon: <SignalIcon width={20} height={20} /> },
   { key: "portfolio", href: "/portfolio", icon: <WalletIcon width={20} height={20} /> },
@@ -365,7 +365,7 @@ function LanguageButton() {
   );
 
   return (
-    <Dropdown placement="bottom-end" size="sm" classNames={{ content: "rounded-lg" }}>
+    <Dropdown placement="bottom-end" size="sm" classNames={{ content: "bg-content1 border border-border" }}>
       <DropdownTrigger>
         <Button
           isIconOnly

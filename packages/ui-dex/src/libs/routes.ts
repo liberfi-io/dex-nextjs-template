@@ -5,5 +5,5 @@ export enum AppRoute {
   account = "/account",
   invite = "/invite",
   holdings = "/holdings",
-  discover = "/discover",
+  discover = "/",
 }

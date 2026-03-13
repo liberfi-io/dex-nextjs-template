@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useTranslation } from "@liberfi.io/i18n";
-import { Chain } from "@liberfi.io/types";
+import { Chain, Token } from "@liberfi.io/types";
 import { cn, useScreen } from "@liberfi.io/ui";
 import {
   PulseFinalStretchListWidget,
@@ -23,9 +23,10 @@ const PULSE_TAB_I18N_KEYS = {
 
 export interface CombinedPulseListProps {
   chain: Chain;
+  onSelectToken?: (token: Token) => void;
 }
 
-export function CombinedPulseList({ chain }: CombinedPulseListProps) {
+export function CombinedPulseList({ chain, onSelectToken }: CombinedPulseListProps) {
   const { t } = useTranslation();
   const { isMobile } = useScreen();
   const [type, setType] = useState<PulseType>("new");
@@ -60,6 +61,7 @@ export function CombinedPulseList({ chain }: CombinedPulseListProps) {
             title={t("tokens.pulse.new")}
             className="min-w-115 lg:border-r-0 rounded-lg lg:rounded-r-none"
             hideHeader={isMobile}
+            onSelectToken={onSelectToken}
             renderItemAction={(token) =>
               nativeToken && (
                 <InstantTradeListButtonWidget
@@ -85,6 +87,7 @@ export function CombinedPulseList({ chain }: CombinedPulseListProps) {
             title={t("tokens.pulse.finalStretch")}
             className="min-w-115 lg:border-r-0 rounded-lg lg:rounded-none"
             hideHeader={isMobile}
+            onSelectToken={onSelectToken}
             renderItemAction={(token) =>
               nativeToken && (
                 <InstantTradeListButtonWidget
@@ -110,6 +113,7 @@ export function CombinedPulseList({ chain }: CombinedPulseListProps) {
             title={t("tokens.pulse.migrated")}
             className="min-w-115 rounded-lg lg:rounded-l-none"
             hideHeader={isMobile}
+            onSelectToken={onSelectToken}
             renderItemAction={(token) =>
               nativeToken && (
                 <InstantTradeListButtonWidget
