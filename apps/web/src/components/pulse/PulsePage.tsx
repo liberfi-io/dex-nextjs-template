@@ -2,7 +2,7 @@
 
 import { Key, useCallback, useMemo, useState } from "react";
 import { Tab, Tabs } from "@heroui/react";
-import { clsx } from "@liberfi.io/ui";
+import { cn } from "@liberfi.io/ui";
 import { useTranslation } from "@liberfi.io/i18n";
 import { Token } from "@liberfi.io/types";
 import { chainSlug } from "@liberfi.io/utils";
@@ -66,7 +66,7 @@ export function PulsePage() {
 
   return (
     <div
-      className={clsx(
+      className={cn(
         "max-w-[1920px] mx-auto px-1 lg:px-6",
         "h-[calc(100vh-var(--header-height)-0.625rem)]",
         "lg:h-[calc(100vh-var(--header-height)-2.875rem)]",
@@ -110,7 +110,7 @@ export function PulsePage() {
 
           {/* three-column list layout */}
           <div className="flex-1 min-h-0 w-full flex justify-between">
-            <div className={clsx("flex-1 h-full", { "max-lg:hidden": type !== "new" })}>
+            <div className={cn("flex-1 h-full", { "max-lg:hidden": type !== "new" })}>
               <PulseInstantBuyProvider type="new">
                 <PulseNewListWidget
                   chain={chainId}
@@ -123,7 +123,7 @@ export function PulsePage() {
               </PulseInstantBuyProvider>
             </div>
             <div
-              className={clsx("flex-1 h-full", {
+              className={cn("flex-1 h-full", {
                 "max-lg:hidden": type !== "final_stretch",
               })}
             >
@@ -138,7 +138,7 @@ export function PulsePage() {
                 />
               </PulseInstantBuyProvider>
             </div>
-            <div className={clsx("flex-1 h-full", { "max-lg:hidden": type !== "migrated" })}>
+            <div className={cn("flex-1 h-full", { "max-lg:hidden": type !== "migrated" })}>
               <PulseInstantBuyProvider type="migrated">
                 <PulseMigratedListWidget
                   chain={chainId}

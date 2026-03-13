@@ -8,7 +8,7 @@ import {
   WsNewToken as NewToken,
   WsTokenMetadata as TokenMetadata,
 } from "@chainstream-io/sdk/stream";
-import { Token, TokenMarketData, TokenStat, ChainSymbol } from "@chainstream-io/sdk";
+import { Token, TokenMarketData, TokenStats, ChainSymbol } from "@chainstream-io/sdk";
 import { Chain, RecursivePartial } from "@liberfi/core";
 import { chainSlug } from "@liberfi.io/utils";
 import { ChainParam, InvalidParamError, Timeframe } from "./types";
@@ -31,11 +31,11 @@ export function chainParam(chain: Chain): ChainParam {
   }
 }
 
-export function convertStreamTokenStat(stat: StreamTokenStat): Partial<TokenStat> {
+export function convertStreamTokenStat(stat: StreamTokenStat): Partial<TokenStats> {
   const statRecord = stat as unknown as Record<string, number | string | undefined>;
   const timeframes: Timeframe[] = ["1m", "5m", "15m", "30m", "1h", "4h", "24h"];
 
-  const periods: TokenStat["periods"] = {} as TokenStat["periods"];
+  const periods: TokenStats["periods"] = {} as TokenStats["periods"];
 
   for (const timeframe of timeframes) {
     const buys = statRecord[`buys${timeframe}`] as number | undefined;
@@ -150,13 +150,13 @@ export function convertStreamTokenStat(stat: StreamTokenStat): Partial<TokenStat
       liquidityChangeRatio: undefined,
       buySellRatio: undefined,
       updatedAt: stat.timestamp?.toString(),
-    } as TokenStat["periods"][string];
+    } as TokenStats["periods"][string];
   }
 
   return {
     address: stat.address,
     periods,
-  } as Partial<TokenStat>;
+  } as Partial<TokenStats>;
 }
 
 export function convertStreamTokenStatToMarketData(

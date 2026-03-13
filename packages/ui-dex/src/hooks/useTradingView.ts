@@ -5,7 +5,7 @@
 /* eslint-disable unused-imports/no-unused-vars */
 import { formatLongNumber, getNumberDefaultPrecision, objectKeys } from "../libs";
 import { tokenInfoAtom } from "../states";
-import { ChainStreamClient, Candle, Resolution, Token } from "@chainstream-io/sdk";
+import { ChainStreamClient, TokenCandle, Resolution, Token } from "@chainstream-io/sdk";
 import { StreamApi, WsCandle } from "@chainstream-io/sdk/stream";
 import { CONFIG } from "@liberfi/core";
 import { useDexClient } from "@liberfi/react-dex";
@@ -225,7 +225,7 @@ const getDatafeed = ({
     // TODO 应该在这里去取 对应 symbol 数据
 
     // 根据实时价格获得展示的精度
-    const precision = getNumberDefaultPrecision(token.marketData.priceInUsd, true);
+    const precision = getNumberDefaultPrecision(token.marketData?.priceInUsd ?? 0, true);
 
     const symbolInfo = {
       // TODO
@@ -341,14 +341,9 @@ const getDatafeed = ({
   },
 });
 
-export const mapCandle = ({
-  low,
-  high,
-  open,
-  close,
-  volume,
-  time,
-}: Candle | WsCandle): TradingViewChartBar => {
+export const mapCandle = (candle: TokenCandle | WsCandle): TradingViewChartBar => {
+  const { low, high, open, close, volume } = candle;
+  const candleTime = 'timestamp' in candle ? candle.timestamp : candle.time;
   const tradeOpen = parseFloat(open);
   const tradeClose = parseFloat(close);
   const tradeLow = parseFloat(low);
@@ -360,7 +355,7 @@ export const mapCandle = ({
     low: tradeLow,
     high: tradeHigh,
     volume: Number(volume),
-    time: new Date(time).getTime(),
+    time: new Date(candleTime).getTime(),
     tradeOpen,
     tradeClose,
     tradeLow,

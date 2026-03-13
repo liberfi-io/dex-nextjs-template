@@ -1,5 +1,5 @@
 import { useQuery, UseQueryOptions } from "@tanstack/react-query";
-import { ChainStreamClient, RedPacketDTO } from "@chainstream-io/sdk";
+import { ChainStreamClient, RedPacket } from "@chainstream-io/sdk";
 import { useDexClient } from "@liberfi/react-dex";
 import { QueryKeys } from "./queryKeys";
 
@@ -10,7 +10,7 @@ export async function fetchRedPacket(client: ChainStreamClient, idOrShareId: str
 export function useRedPacketQuery(
   idOrShareId: string,
   options: Omit<
-    UseQueryOptions<RedPacketDTO, Error, RedPacketDTO, string[]>,
+    UseQueryOptions<RedPacket, Error, RedPacket, string[]>,
     "queryKey" | "queryFn"
   > = {},
 ) {

@@ -1,4 +1,4 @@
-import { RedPacketClaimDTO, Token } from "@chainstream-io/sdk";
+import { RedPacketClaim, Token } from "@chainstream-io/sdk";
 import { ForwardOutlinedIcon, useAppSdk, useAuth, useTranslation } from "@liberfi/ui-base";
 import { TokenAvatar } from "@liberfi/ui-dex/components/TokenAvatar";
 import { formatShortAddress } from "@liberfi/ui-dex/libs/format";
@@ -6,7 +6,7 @@ import { useCallback, useMemo } from "react";
 import BigNumber from "bignumber.js";
 
 export type RedPacketClaimHistoryProps = {
-  claim: RedPacketClaimDTO;
+  claim: RedPacketClaim;
   token: Token;
 };
 
@@ -46,11 +46,11 @@ export function RedPacketClaimHistory({ claim, token }: RedPacketClaimHistoryPro
               className="data-[self=true]:bg-primary data-[self=true]:rounded data-[self=true]:px-1 data-[self=true]:text-default data-[self=true]:font-medium"
               data-self={self}
             >
-              {self ? t("extend.redpacket.histories.received.self") : formatShortAddress(claim.creator)}
+              {self ? t("extend.redpacket.histories.received.self") : formatShortAddress(claim.creator ?? "")}
             </span>
           </p>
           {/* time */}
-          <p className="text-xs text-neutral">{new Date(claim.claimedAt).toLocaleString()}</p>
+          <p className="text-xs text-neutral">{new Date(claim.claimedAt ?? 0).toLocaleString()}</p>
         </div>
         {/* red packet info */}
         <div className="flex items-center justify-between">

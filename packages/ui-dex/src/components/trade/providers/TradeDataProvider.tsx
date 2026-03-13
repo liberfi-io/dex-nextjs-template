@@ -4,7 +4,7 @@ import {
   useRemoveTokenFromCollectionMutation,
   useTokenAddressesInCollectionQuery,
 } from "@liberfi/react-backend";
-import { Token, TradeDetailDTO } from "@chainstream-io/sdk";
+import { Token, TradeDetail } from "@chainstream-io/sdk";
 import { Chain } from "@liberfi/core";
 import { reverse, sortBy, uniqBy } from "lodash-es";
 import { useAuth, useAuthenticatedCallback } from "@liberfi/ui-base";
@@ -26,7 +26,7 @@ export type TradeDataContextType = {
   // 切换关注状态
   toggleFavorite: () => Promise<void>;
   // TODO deprecated
-  trades: TradeDetailDTO[];
+  trades: TradeDetail[];
   isTradesLoading: boolean;
 };
 
@@ -127,7 +127,7 @@ export function TradeDataProvider({
     tokenAddress: address,
   });
 
-  const [trades, setTrades] = useState<TradeDetailDTO[]>([]);
+  const [trades, setTrades] = useState<TradeDetail[]>([]);
 
   // merge new trades with existing trades
   useEffect(() => {

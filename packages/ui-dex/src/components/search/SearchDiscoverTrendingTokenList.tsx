@@ -39,7 +39,7 @@ export function SearchDiscoverTrendingTokenList({
       duration: timeframe as "1m" | "5m" | "1h" | "4h" | "24h",
       sortBy: sortRequest?.sortBy,
       sortDirection: sortRequest?.sortDirection,
-      filterBy: filterRequest?.filterBy,
+      rangeFilters: filterRequest?.rangeFilters,
     };
   }, [timeframe, filters, sort, chain]);
 

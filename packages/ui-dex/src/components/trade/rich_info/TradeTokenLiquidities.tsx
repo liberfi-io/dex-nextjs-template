@@ -11,7 +11,8 @@ import { useCallback, useState } from "react";
 export function TradeTokenLiquidities({ token }: { token: Token }) {
   const { t } = useTranslation();
 
-  const [expanded, setExpanded] = useState(token.liquidity ? token.liquidity.length <= 3 : true);
+  const liquidity = (token as any).liquidity as { poolAddress: string; protocolFamily: string; tvlInUsd?: string | number }[] | undefined;
+  const [expanded, setExpanded] = useState(liquidity ? liquidity.length <= 3 : true);
   const toggleExpanded = useCallback(() => setExpanded((prev) => !prev), [setExpanded]);
 
   return (
@@ -20,20 +21,20 @@ export function TradeTokenLiquidities({ token }: { token: Token }) {
         <div className="text-sm font-medium text-foreground">{t("extend.trade.about.liquidity")}</div>
       </div>
 
-      {token.liquidity && token.liquidity.length > 0 && (
+      {liquidity && liquidity.length > 0 && (
         <>
           <div className="flex items-center justify-between">
             <div className="text-xs font-medium leading-3 text-neutral">
               {t("extend.trade.about.available_liquidity")}
             </div>
-            {token.marketData.totalTvlInUsd && (
+            {token.marketData?.totalTvlInUsd && (
               <div className="text-right text-xs font-medium leading-3 text-foreground">
                 <Number value={token.marketData.totalTvlInUsd} abbreviate defaultCurrencySign="$" />
               </div>
             )}
           </div>
           <div className="flex flex-col gap-5">
-            {token.liquidity.map((it, index) => (
+            {liquidity.map((it, index) => (
               <div
                 key={it.poolAddress}
                 className={clsx(
@@ -56,7 +57,7 @@ export function TradeTokenLiquidities({ token }: { token: Token }) {
               </div>
             ))}
           </div>
-          {token.liquidity.length > 3 && (
+          {liquidity.length > 3 && (
             <div className="flex justify-center mt-3">
               <Button
                 size="sm"
@@ -78,7 +79,7 @@ export function TradeTokenLiquidities({ token }: { token: Token }) {
         </>
       )}
 
-      {!token.liquidity || (token.liquidity.length === 0 && <EmptyData />)}
+      {!liquidity || (liquidity.length === 0 && <EmptyData />)}
 
       <Divider className="border-content3" />
     </section>

@@ -72,7 +72,7 @@ export function DiscoverWsNewTokenList2({ height }: { height?: number }) {
       duration: timeframe,
       sortBy: sortRequest?.sortBy,
       sortDirection: sortRequest?.sortDirection,
-      filterBy: filterRequest?.filterBy,
+      rangeFilters: filterRequest?.rangeFilters,
     };
   }, [timeframe, filters, sort, chain]);
 
@@ -136,7 +136,7 @@ export function DiscoverWsNewTokenList2({ height }: { height?: number }) {
           // token.stats = { ...token.stats, ...convertStreamWsTokenStat(stat) };
           token.marketData = {
             ...token.marketData,
-            ...convertStreamTokenStatToMarketData(stat, token.marketData?.totalSupply),
+            ...convertStreamTokenStatToMarketData(stat, token.marketData?.totalSupply ?? undefined),
           };
         }
       });
@@ -166,7 +166,7 @@ export function DiscoverWsNewTokenList2({ height }: { height?: number }) {
         if (token) {
           token.marketData = {
             ...token.marketData,
-            ...convertStreamTokenSupplyToMarketData(supply, token.marketData?.priceInUsd),
+            ...convertStreamTokenSupplyToMarketData(supply, token.marketData?.priceInUsd ?? undefined),
           };
         }
       });

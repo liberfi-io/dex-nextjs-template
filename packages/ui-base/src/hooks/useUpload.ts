@@ -8,8 +8,8 @@ export const useUpload = () => {
 
   const upload = useCallback(
     async (file: File) => {
-      const signedURL = await fetchUploadPresign(dexClient);
-      const res = await pinata.upload.public.file(file).url(signedURL);
+      const presignResponse = await fetchUploadPresign(dexClient);
+      const res = await pinata.upload.public.file(file).url(presignResponse.presignUrl);
       return `https://ipfs.io/ipfs/${res.cid}`;
     },
     [pinata, dexClient],

@@ -13,17 +13,17 @@ export function HoldersField({ className, token }: HoldersFieldProps) {
     <ListField width={184} className={className}>
       <div className="flex gap-1 text-xs">
         <div className="text-foreground">
-          {token.marketData.holders ? <Number value={token.marketData.holders} abbreviate /> : "-"}
+          {token.marketData?.holders ? <Number value={token.marketData.holders} abbreviate /> : "-"}
         </div>
         /
         <div>
-          {token.marketData.top10HoldingsRatio
+          {token.marketData?.top10HoldingsRatio
             ? formatPercentage(token.marketData.top10HoldingsRatio)
             : "-"}
         </div>
         /
         <div>
-          {token.marketData.top100HoldingsRatio
+          {token.marketData?.top100HoldingsRatio
             ? formatPercentage(token.marketData.top100HoldingsRatio)
             : "-"}
         </div>

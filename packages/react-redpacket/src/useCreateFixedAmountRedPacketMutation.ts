@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
-import { ChainStreamClient, RedPacketReply } from "@chainstream-io/sdk";
+import { ChainStreamClient, CreateRedPacketResponse } from "@chainstream-io/sdk";
 import { chainParam, useDexClient } from "@liberfi/react-dex";
 import { CreateFixedAmountRedPacketParams } from "./types";
 
@@ -9,7 +9,6 @@ export async function createFixedAmountRedPacket(
 ) {
   const chain = chainParam(params.chain);
   return await client.redPacket.createRedpacket(chain, {
-    chain,
     creator: params.creator,
     mint: params.mint,
     maxClaims: params.maxClaims,
@@ -22,7 +21,7 @@ export async function createFixedAmountRedPacket(
 
 export function useCreateFixedAmountRedPacketMutation(
   options: Omit<
-    UseMutationOptions<RedPacketReply, Error, CreateFixedAmountRedPacketParams>,
+    UseMutationOptions<CreateRedPacketResponse, Error, CreateFixedAmountRedPacketParams>,
     "mutationFn"
   > = {},
 ) {

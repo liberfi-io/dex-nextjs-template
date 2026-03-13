@@ -13,7 +13,7 @@ import { MediaTrackProvider } from "@liberfi.io/ui-media-track";
 import { useAuth, useWallets } from "@liberfi.io/wallet-connector";
 import { ChannelsClient } from "@liberfi.io/ui-channels/client";
 import { ChannelsProvider } from "@liberfi.io/ui-channels";
-import { PinataProvider as PinataProviderBase } from "@liberfi.io/ui";
+
 import { PredictProvider } from "@liberfi.io/ui-predict";
 import { PredictClient } from "@liberfi.io/ui-predict/client";
 import { PortfolioClientProvider, PortfolioProvider } from "@liberfi.io/ui-portfolio";
@@ -26,7 +26,7 @@ export function ServiceClientProviders({ children }: PropsWithChildren) {
   return (
     <DexClientLoader>
       <PinataProvider client={pinata}>
-        <PinataProviderBase client={pinata}>{children}</PinataProviderBase>
+        {children}
       </PinataProvider>
     </DexClientLoader>
   );

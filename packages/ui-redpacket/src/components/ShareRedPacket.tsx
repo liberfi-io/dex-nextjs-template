@@ -1,7 +1,7 @@
 "use client";
 
 import { RedPacketIcon } from "../icons";
-import { RedPacketDTO } from "@chainstream-io/sdk";
+import { RedPacket } from "@chainstream-io/sdk";
 import { Button, Link, Skeleton } from "@heroui/react";
 import { CONFIG, ROUTES } from "@liberfi/core";
 import { txExplorerUrl } from "@liberfi.io/utils";
@@ -20,7 +20,7 @@ import { BigNumber } from "bignumber.js";
 import { useCallback, useMemo } from "react";
 
 export type ShareRedPacketProps = {
-  redPacket?: RedPacketDTO;
+  redPacket?: RedPacket;
   redPacketId: string;
 };
 
@@ -57,7 +57,7 @@ export function ShareRedPacket({
       window.location.protocol +
       "//" +
       window.location.host +
-      ROUTES.redPacket.home(redPacket?.shareId),
+      ROUTES.redPacket.home(redPacket?.shareId ?? undefined),
     [redPacket?.shareId],
   );
 
@@ -170,7 +170,7 @@ export function ShareRedPacket({
       {/* view on explorer */}
       <Button
         as={Link}
-        href={txExplorerUrl(chain, redPacket.txHash)}
+        href={txExplorerUrl(chain, redPacket.txHash ?? "")}
         target="_blank"
         className="mt-2 bg-transparent text-xs text-neutral"
         endContent={<ExternalLinkOutlinedIcon width={12} height={12} className="text-neutral" />}

@@ -25,7 +25,7 @@ export function TradeHeaderTokenPrice({ token }: { token: Token }) {
         className="text-3xl font-medium text-bullish data-[bearish=true]:text-bearish overflow-hidden text-ellipsis whitespace-nowrap"
         data-bearish={bearish}
       >
-        {token.marketData.priceInUsd ? (
+        {token.marketData?.priceInUsd ? (
           <Number value={token.marketData.priceInUsd} defaultCurrencySign="$" />
         ) : (
           "-"
@@ -45,7 +45,7 @@ export function TradeHeaderTokenPrice({ token }: { token: Token }) {
       <div className="mt-2 flex items-center gap-2 text-sm font-medium text-foreground">
         <span className="text-neutral">{t("extend.token_list.attributes.market_cap")}</span>
         <div>
-          {token.marketData.marketCapInUsd ? (
+          {token.marketData?.marketCapInUsd ? (
             <Number value={token.marketData.marketCapInUsd} abbreviate defaultCurrencySign="$" />
           ) : (
             "-"

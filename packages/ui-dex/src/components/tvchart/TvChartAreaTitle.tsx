@@ -191,7 +191,7 @@ export function TvChartAreaTitle({ chartManager }: TvChartAreaTitleProps) {
           <div style={{ width: "20px", height: "20px", position: "relative" }}>
             <img
               style={{ width: "20px", height: "20px", objectFit: "cover", borderRadius: "50%" }}
-              src={symbolInfo.token.imageUrl}
+              src={symbolInfo.token.imageUrl ?? undefined}
               alt={symbolInfo.token.symbol}
             />
           </div>
@@ -201,7 +201,7 @@ export function TvChartAreaTitle({ chartManager }: TvChartAreaTitleProps) {
             {symbolInfo.token.symbol}
           </span>
           <div style={{ fontSize: "12px", color: defaultTheme.colors.neutral }}>
-            ${formatLongNumber(symbolInfo.token.marketData.priceInUsd)}
+            ${formatLongNumber(symbolInfo.token.marketData?.priceInUsd ?? 0)}
             <span
               style={{
                 color: bearish ? defaultTheme.colors.bearish : defaultTheme.colors.bullish,

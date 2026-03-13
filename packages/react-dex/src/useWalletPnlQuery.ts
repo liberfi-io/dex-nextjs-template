@@ -1,5 +1,5 @@
 import { useQuery, UseQueryOptions } from "@tanstack/react-query";
-import { ChainStreamClient, WalletPnlSummaryDTO } from "@chainstream-io/sdk";
+import { ChainStreamClient, WalletPnlSummary } from "@chainstream-io/sdk";
 import { Chain } from "@liberfi/core";
 import { useDexClient } from "./DexClientProvider";
 import { QueryKeys } from "./queryKeys";
@@ -17,7 +17,7 @@ export function useWalletPnlQuery(
   chain: Chain,
   walletAddress: string,
   options: Omit<
-    UseQueryOptions<WalletPnlSummaryDTO, Error, WalletPnlSummaryDTO, string[]>,
+    UseQueryOptions<WalletPnlSummary, Error, WalletPnlSummary, string[]>,
     "queryKey" | "queryFn"
   > = {},
 ) {

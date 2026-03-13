@@ -1,6 +1,6 @@
 "use client";
 
-import { clsx, PauseIcon } from "@liberfi.io/ui";
+import { cn, PauseIcon } from "@liberfi.io/ui";
 import { TweetsWidget } from "@liberfi.io/ui-media-track";
 import {
   useSetBottomNavigationBarActiveKey,
@@ -29,7 +29,7 @@ export function MediaTrackPage() {
 
   return (
     <div
-      className={clsx(
+      className={cn(
         "max-w-[480px] mx-auto px-1 lg:px-6 overflow-auto",
         // tablet & desktop: full height
         "h-[calc(100vh-var(--header-height)-0.625rem)]",

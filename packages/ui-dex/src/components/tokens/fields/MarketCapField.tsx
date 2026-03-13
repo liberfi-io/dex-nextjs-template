@@ -12,7 +12,7 @@ export function MarketCapField({ className, token }: MarketCapFieldProps) {
     <ListField width={146} className={className}>
       <div className="flex gap-1 text-xs">
         <div className="text-foreground">
-          {token.marketData.marketCapInUsd ? (
+          {token.marketData?.marketCapInUsd ? (
             <Number value={token.marketData.marketCapInUsd} abbreviate defaultCurrencySign="$" />
           ) : (
             "-"
@@ -20,7 +20,7 @@ export function MarketCapField({ className, token }: MarketCapFieldProps) {
         </div>
         /
         <div>
-          {token.marketData.totalTvlInUsd ? (
+          {token.marketData?.totalTvlInUsd ? (
             <Number value={token.marketData.totalTvlInUsd} abbreviate defaultCurrencySign="$" />
           ) : (
             "-"

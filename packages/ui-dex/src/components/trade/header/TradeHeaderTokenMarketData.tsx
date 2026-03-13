@@ -48,7 +48,7 @@ export function TradeHeaderTokenMarketData({ token }: { token: Token }) {
         )} / ${t("extend.token_list.attributes.holders_distribution.top_100")}`}</div>
         <div>
           <span className="text-foreground">
-            {token.marketData.holders ? (
+            {token.marketData?.holders ? (
               <Number value={token.marketData.holders} abbreviate />
             ) : (
               "-"
@@ -56,13 +56,13 @@ export function TradeHeaderTokenMarketData({ token }: { token: Token }) {
           </span>{" "}
           /{" "}
           <span>
-            {token.marketData.top10HoldingsRatio
+            {token.marketData?.top10HoldingsRatio
               ? formatPercentage(token.marketData.top10HoldingsRatio)
               : "-"}
           </span>{" "}
           /{" "}
           <span>
-            {token.marketData.top100HoldingsRatio
+            {token.marketData?.top100HoldingsRatio
               ? formatPercentage(token.marketData.top100HoldingsRatio)
               : "-"}
           </span>
@@ -74,7 +74,7 @@ export function TradeHeaderTokenMarketData({ token }: { token: Token }) {
         <div>{`${t("extend.token_list.attributes.liquidity")} / ${t("extend.token_list.attributes.age")}`}</div>
         <div>
           <span className="text-foreground">
-            {token.marketData.totalTvlInUsd ? (
+            {token.marketData?.totalTvlInUsd ? (
               <Number value={token.marketData.totalTvlInUsd} abbreviate defaultCurrencySign="$" />
             ) : (
               "-"

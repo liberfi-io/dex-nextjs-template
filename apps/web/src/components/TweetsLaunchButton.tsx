@@ -1,4 +1,4 @@
-import { RocketIcon, StyledButton, StyledTooltip } from "@liberfi.io/ui";
+import { RocketIcon, Button, StyledTooltip } from "@liberfi.io/ui";
 import { useAppSdk, useTranslation } from "@liberfi/ui-base";
 import { useCallback } from "react";
 
@@ -27,7 +27,7 @@ export function TweetsLaunchButton({ data }: TweetsLaunchButtonProps) {
 
   return (
     <StyledTooltip closeDelay={0} content={t("extend.toolbar.launch_token")}>
-      <StyledButton
+      <Button
         isIconOnly
         color="primary"
         className="w-7 min-w-0 h-7 min-h-0 rounded"
@@ -36,7 +36,7 @@ export function TweetsLaunchButton({ data }: TweetsLaunchButtonProps) {
         aria-label={t("extend.toolbar.launch_token")}
       >
         <RocketIcon width={16} height={16} />
-      </StyledButton>
+      </Button>
     </StyledTooltip>
   );
 }

@@ -1,4 +1,4 @@
-import { RedPacketDTO, Token } from "@chainstream-io/sdk";
+import { RedPacket, Token } from "@chainstream-io/sdk";
 import { ForwardOutlinedIcon, useAppSdk, useTranslation } from "@liberfi/ui-base";
 import { TokenAvatar } from "@liberfi/ui-dex/components/TokenAvatar";
 import { useCallback, useMemo } from "react";
@@ -6,7 +6,7 @@ import BigNumber from "bignumber.js";
 import { getRedPacketStatus } from "../utils";
 
 export type RedPacketHistoryProps = {
-  redPacket: RedPacketDTO;
+  redPacket: RedPacket;
   token: Token;
 };
 
@@ -45,7 +45,7 @@ export function RedPacketHistory({ redPacket, token }: RedPacketHistoryProps) {
             {t(`extend.redpacket.histories.sent.status.${status}`)}
           </span>
           {/* time */}
-          <span className="text-neutral">{new Date(redPacket.createdAt).toLocaleString()}</span>
+          <span className="text-neutral">{new Date(redPacket.createdAt ?? 0).toLocaleString()}</span>
         </p>
         {/* red packet info */}
         <div className="flex items-center justify-between">

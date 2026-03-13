@@ -41,10 +41,10 @@ export function CompositeMobileField({ className, token }: CompositeMobileFieldP
               </div>
             )}
           </div>
-          {(token.marketData.marketCapInUsd || token.marketData.totalTvlInUsd) && (
+          {(token.marketData?.marketCapInUsd || token.marketData?.totalTvlInUsd) && (
             <div className="w-full flex shrink-0 items-center gap-2 overflow-hidden text-xs text-neutral">
               <div className="overflow-hidden text-ellipsis whitespace-nowrap">
-                {token.marketData.marketCapInUsd ? (
+                {token.marketData?.marketCapInUsd ? (
                   <Number
                     value={token.marketData.marketCapInUsd}
                     abbreviate
@@ -56,7 +56,7 @@ export function CompositeMobileField({ className, token }: CompositeMobileFieldP
               </div>
               <div>•</div>
               <div className="overflow-hidden text-ellipsis whitespace-nowrap">
-                {token.marketData.totalTvlInUsd ? (
+                {token.marketData?.totalTvlInUsd ? (
                   <Number value={token.marketData.totalTvlInUsd} abbreviate defaultCurrencySign="$" />
                 ) : (
                   "-"

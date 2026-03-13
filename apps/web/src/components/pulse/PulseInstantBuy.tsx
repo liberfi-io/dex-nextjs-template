@@ -1,5 +1,5 @@
 import { memo, useCallback } from "react";
-import { LightningIcon, StyledButton } from "@liberfi.io/ui";
+import { LightningIcon, Button } from "@liberfi.io/ui";
 import { Token } from "@liberfi.io/types";
 import { formatPrice } from "@liberfi.io/utils";
 import { usePulseInstantBuy } from "./PulseInstantBuyContext";
@@ -17,7 +17,7 @@ export const PulseInstantBuy = memo(function PulseInstantBuy({
   );
 
   return (
-    <StyledButton
+    <Button
       color="primary"
       radius="full"
       size="sm"
@@ -30,6 +30,6 @@ export const PulseInstantBuy = memo(function PulseInstantBuy({
       className="absolute right-0 -bottom-3 w-auto min-w-0 h-auto min-h-0 px-2 py-1 gap-0.5 text-xs font-bold"
     >
       {formatPrice(amount ?? 0)}
-    </StyledButton>
+    </Button>
   );
 });

@@ -1,5 +1,5 @@
 import { useQuery, UseQueryOptions } from "@tanstack/react-query";
-import { ChainStreamClient, TradePage } from "@chainstream-io/sdk";
+import { ChainStreamClient, PageResponseTradeDetail } from "@chainstream-io/sdk";
 import { useDexClient } from "./DexClientProvider";
 import { QueryKeys } from "./queryKeys";
 import { chainParam } from "./utils";
@@ -16,7 +16,7 @@ export async function fetchTokenTrades(client: ChainStreamClient, param: UseToke
 export function useTokenTradesQuery(
   param: UseTokenTradesQueryParams,
   options: Omit<
-    UseQueryOptions<TradePage, Error, TradePage, string[]>,
+    UseQueryOptions<PageResponseTradeDetail, Error, PageResponseTradeDetail, string[]>,
     "queryKey" | "queryFn"
   > = {},
 ) {

@@ -19,7 +19,7 @@ export function TradeTokenMCap({ token }: { token: Token }) {
     <div className="flex flex-col items-start gap-0.5 justify-center">
       <div className="text-xs text-neutral font-medium">
         <span className="text-foreground">
-          {token.marketData.marketCapInUsd ? (
+          {token.marketData?.marketCapInUsd ? (
             <Number value={token.marketData.marketCapInUsd} abbreviate defaultCurrencySign="$" />
           ) : (
             "-"
@@ -27,7 +27,7 @@ export function TradeTokenMCap({ token }: { token: Token }) {
         </span>{" "}
         /{" "}
         <span>
-          {token.marketData.totalTvlInUsd ? (
+          {token.marketData?.totalTvlInUsd ? (
             <Number value={token.marketData.totalTvlInUsd} abbreviate defaultCurrencySign="$" />
           ) : (
             "-"

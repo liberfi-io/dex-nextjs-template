@@ -1,4 +1,4 @@
-import { RedPacketSendTxInput } from "@chainstream-io/sdk";
+import { RedPacketSendTxRequest } from "@chainstream-io/sdk";
 import { Chain } from "@liberfi/core";
 
 export interface CreateFixedAmountRedPacketParams {
@@ -51,6 +51,6 @@ export interface FetchWalletRedPacketsParams {
   limit?: number;
 }
 
-export type SendRedPacketTransactionParams = RedPacketSendTxInput & {
+export type SendRedPacketTransactionParams = RedPacketSendTxRequest & {
   chain: Chain;
 };

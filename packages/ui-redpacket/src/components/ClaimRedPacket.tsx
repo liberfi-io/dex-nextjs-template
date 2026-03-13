@@ -1,5 +1,5 @@
 import { RedPacketIcon } from "../icons";
-import { RedPacketDTO } from "@chainstream-io/sdk";
+import { RedPacket } from "@chainstream-io/sdk";
 import { Button, Image, Link } from "@heroui/react";
 import { chainIcon, txExplorerUrl } from "@liberfi.io/utils";
 import {
@@ -20,7 +20,7 @@ import { formatShortAddress } from "@liberfi/ui-dex/libs/format";
 import { useState } from "react";
 
 export type ClaimRedPacketProps = {
-  redPacket: RedPacketDTO;
+  redPacket: RedPacket;
   onNavigateBack?: () => void;
 };
 
@@ -53,7 +53,7 @@ export function ClaimRedPacket({ redPacket, onNavigateBack }: ClaimRedPacketProp
       // build tx
       const { txSerialize } = await claimRedPacket({
         chain,
-        shareId: redPacket.shareId,
+        shareId: redPacket.shareId ?? "",
         claimer: user.solanaAddress,
       });
 

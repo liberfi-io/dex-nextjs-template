@@ -2,7 +2,7 @@ import { Button, Link } from "@heroui/react";
 import { TwitterIcon, TelegramIcon, WebsiteIcon } from "../../../assets";
 import { useMemo } from "react";
 import { ListField } from "../../ListField";
-import { Token, TokenSocialMediasDTO } from "@chainstream-io/sdk";
+import { Token, TokenSocialMedias } from "@chainstream-io/sdk";
 
 interface SocialMediaFieldProps {
   className?: string;
@@ -10,7 +10,7 @@ interface SocialMediaFieldProps {
 }
 
 export function SocialMediaField({ className, token }: SocialMediaFieldProps) {
-  const { website, twitter, telegram } = useMemo<TokenSocialMediasDTO>(() => {
+  const { website, twitter, telegram } = useMemo<TokenSocialMedias>(() => {
     try {
       return typeof token.socialMedias === "string"
         ? JSON.parse(token.socialMedias ?? "{}")

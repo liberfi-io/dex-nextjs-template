@@ -1,5 +1,5 @@
 import { useQuery, UseQueryOptions } from "@tanstack/react-query";
-import { ChainStreamClient, Candle } from "@chainstream-io/sdk";
+import { ChainStreamClient, TokenCandle } from "@chainstream-io/sdk";
 import { useDexClient } from "./DexClientProvider";
 import { QueryKeys } from "./queryKeys";
 import { chainParam } from "./utils";
@@ -14,7 +14,7 @@ export async function fetchTokenCandles(
 
 export function useTokenCandlesQuery(
   param: UseTokenCandlesQueryParams,
-  options: Omit<UseQueryOptions<Candle[], Error, Candle[], string[]>, "queryKey" | "queryFn"> = {},
+  options: Omit<UseQueryOptions<TokenCandle[], Error, TokenCandle[], string[]>, "queryKey" | "queryFn"> = {},
 ) {
   const client = useDexClient();
   return useQuery({

@@ -55,7 +55,7 @@ function StockTokenListContent() {
       chain,
       sortBy: sortRequest?.sortBy,
       sortDirection: sortRequest?.sortDirection,
-      filterBy: filterRequest?.filterBy,
+      rangeFilters: filterRequest?.rangeFilters,
     };
   }, [timeframe, filters, sort, chain]);
 
@@ -86,7 +86,7 @@ function StockTokenListContent() {
           // token.stats = { ...token.stats, ...convertStreamWsTokenStat(stat) };
           token.marketData = {
             ...token.marketData,
-            ...convertStreamTokenStatToMarketData(stat, token.marketData?.totalSupply),
+            ...convertStreamTokenStatToMarketData(stat, token.marketData?.totalSupply ?? undefined),
           };
         } else {
           console.debug(`subscribe token stats: ${stat.address} isn't in the list`);
@@ -122,7 +122,7 @@ function StockTokenListContent() {
             ...token.marketData,
             ...convertStreamTokenSupplyToMarketData(
               supply,
-              token.marketData?.priceInUsd,
+              token.marketData?.priceInUsd ?? undefined,
             ),
           };
         } else {

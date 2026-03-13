@@ -1,5 +1,5 @@
 import { useQuery, UseQueryOptions } from "@tanstack/react-query";
-import { ChainStreamClient, TokenStat } from "@chainstream-io/sdk";
+import { ChainStreamClient, TokenStats } from "@chainstream-io/sdk";
 import { Chain } from "@liberfi/core";
 import { useDexClient } from "./DexClientProvider";
 import { QueryKeys } from "./queryKeys";
@@ -13,7 +13,7 @@ export function useTokenStatsQuery(
   chain: Chain,
   tokenAddress: string,
   options: Omit<
-    UseQueryOptions<TokenStat | null, Error, TokenStat | null, string[]>,
+    UseQueryOptions<TokenStats | null, Error, TokenStats | null, string[]>,
     "queryKey" | "queryFn"
   > = {},
 ) {

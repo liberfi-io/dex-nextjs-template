@@ -25,7 +25,7 @@ export function PriceMobileField({ className, token }: PriceFieldProps) {
     <ListField grow={false} width={80} className={className}>
       <div className="flex flex-col items-end justify-center gap-1">
         <span className="text-xs font-medium text-foreground">
-          {token.marketData.priceInUsd ? (
+          {token.marketData?.priceInUsd ? (
             <Number value={token.marketData.priceInUsd} defaultCurrencySign="$" />
           ) : (
             "-"

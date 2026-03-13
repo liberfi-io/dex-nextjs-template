@@ -3,7 +3,7 @@
  */
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
-import { Token, TokenStat } from "@chainstream-io/sdk";
+import { Token, TokenStats } from "@chainstream-io/sdk";
 import { TradeSettingsValuesByChain } from "../types";
 
 // current token address
@@ -13,7 +13,7 @@ export const tokenAddressAtom = atom<string | null>(null);
 export const tokenInfoAtom = atom<Token | null>(null);
 
 // current token stats, used for the stats that are not real-time, such as volume, liquidity, holders, traders etc.
-export const tokenStatsAtom = atom<TokenStat | null>(null);
+export const tokenStatsAtom = atom<TokenStats | null>(null);
 
 // current token latest price
 export const tokenLatestPriceAtom = atom<number | null>(null);

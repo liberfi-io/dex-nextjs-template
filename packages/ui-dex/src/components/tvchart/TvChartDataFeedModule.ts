@@ -17,7 +17,7 @@ import {
   TvChartSymbolInfo,
 } from "../../libs/tvchart";
 import { quotePricesSubject, updateTokenLatestPrice } from "../../states";
-import { Candle, Resolution, Token } from "@chainstream-io/sdk";
+import { TokenCandle, Resolution, Token } from "@chainstream-io/sdk";
 import { Unsubscribable, WsCandle } from "@chainstream-io/sdk/stream";
 import { CONFIG } from "@liberfi/core";
 import { chainIdBySlug } from "@liberfi.io/utils";
@@ -175,7 +175,7 @@ export class TvChartDataFeedModule implements ITvChartDataFeedModule {
 
         const { token, quote, priceType } = symbolInfo as TvChartSymbolInfo;
         const { chain, address, marketData } = token;
-        const { totalSupply } = marketData;
+        const totalSupply = marketData?.totalSupply;
         const chainId = chainIdBySlug(chain);
         if (!chainId) throw new Error(`Unsupported chain slug ${token.chain}`);
 
@@ -188,7 +188,7 @@ export class TvChartDataFeedModule implements ITvChartDataFeedModule {
         }
 
         if (priceType === TvChartPriceType.MarketCap) {
-          latestPrice = new BigNumber(latestPrice).div(totalSupply).toNumber();
+          latestPrice = new BigNumber(latestPrice).div(totalSupply ?? 0).toNumber();
         }
 
         updateTokenLatestPrice(chainId, address, latestPrice);
@@ -236,7 +236,7 @@ export class TvChartDataFeedModule implements ITvChartDataFeedModule {
 
     let limit = Math.min(200, ticks);
     let timestamp = toTimestamp;
-    let results: Candle[] = [];
+    let results: TokenCandle[] = [];
 
     while (true) {
       try {
@@ -262,8 +262,8 @@ export class TvChartDataFeedModule implements ITvChartDataFeedModule {
           retryDelay: options.retryDelay,
         });
 
-        const minTime = candles.length > 0 ? minBy(candles, "time")!.time : 0;
-        results = uniqBy([...results, ...candles], "time");
+        const minTime = candles.length > 0 ? minBy(candles, "timestamp")!.timestamp : 0;
+        results = uniqBy([...results, ...candles], "timestamp");
 
         if (candles.length < limit) {
           // 没有更多数据了
@@ -303,14 +303,15 @@ export class TvChartDataFeedModule implements ITvChartDataFeedModule {
     return bars;
   }
   mapCandleToBar(
-    candle: Candle | WsCandle,
+    candle: TokenCandle | WsCandle,
     token: Token,
     quote: TvChartQuoteType,
     priceType: TvChartPriceType,
   ): Bar {
     // in usd
+    const candleTime = 'timestamp' in candle ? candle.timestamp : candle.time;
     const bar = {
-      time: typeof candle.time === "string" ? new Date(candle.time).getTime() : candle.time,
+      time: typeof candleTime === "string" ? new Date(candleTime).getTime() : candleTime,
       high: new BigNumber(candle.high).toNumber(),
       low: new BigNumber(candle.low).toNumber(),
       open: new BigNumber(candle.open).toNumber(),
@@ -320,7 +321,7 @@ export class TvChartDataFeedModule implements ITvChartDataFeedModule {
 
     // TODO Historical market cap K-line should be obtained from backend instead of frontend calculation, because the total supply may change
     if (priceType === TvChartPriceType.MarketCap) {
-      const totalSupply = token.marketData.totalSupply;
+      const totalSupply = token.marketData?.totalSupply ?? 0;
       bar.high = new BigNumber(bar.high).times(totalSupply).toNumber();
       bar.low = new BigNumber(bar.low).times(totalSupply).toNumber();
       bar.open = new BigNumber(bar.open).times(totalSupply).toNumber();
@@ -452,14 +453,14 @@ function tokenSymbolInfo(
   const price =
     quote === TvChartQuoteType.USD
       ? priceType === TvChartPriceType.Price
-        ? token.marketData.priceInUsd
-        : token.marketData.marketCapInUsd
+        ? token.marketData?.priceInUsd ?? undefined
+        : token.marketData?.marketCapInUsd ?? undefined
       : priceType === TvChartPriceType.Price
-        ? token.marketData.priceInSol ?? 0
-        : token.marketData.marketCapInSol ?? 0;
+        ? token.marketData?.priceInSol ?? 0
+        : token.marketData?.marketCapInSol ?? 0;
 
   // 根据实际价格推算精度
-  const precision = calculateDecimalPrecision(price, { precision: true });
+  const precision = calculateDecimalPrecision(price ?? 0, { precision: true });
 
   return {
     address: token.address,

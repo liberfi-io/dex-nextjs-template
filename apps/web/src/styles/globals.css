@@ -1,4 +1,5 @@
 @import "@liberfi.io/ui/tailwind/tailwind.css";
+@import "@liberfi.io/ui-tokens/tailwind/tailwind.css";
 @import "./theme.css";
 
 @source "../../src/**/*.{js,ts,jsx,tsx,mdx}";
@@ -15,6 +16,8 @@
 @source "../../../../node_modules/@liberfi.io/ui-channels/dist/**/*.{js,ts,jsx,tsx}";
 @source "../../../../node_modules/@liberfi.io/ui-chain-select/dist/**/*.{js,ts,jsx,tsx}";
 @source "../../../../node_modules/@liberfi.io/ui-predict/dist/**/*.{js,ts,jsx,tsx}";
+@source "../../../../node_modules/@liberfi.io/ui-portfolio/dist/**/*.{js,ts,jsx,tsx}";
+@source "../../../../node_modules/@liberfi.io/ui-trade/dist/**/*.{js,ts,jsx,tsx}";
 @source "../../../../node_modules/@agent-widget/react/dist/**/*.{js,ts,jsx,tsx}";
 
 @layer base {

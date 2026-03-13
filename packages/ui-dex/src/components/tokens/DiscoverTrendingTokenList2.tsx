@@ -65,7 +65,7 @@ export function DiscoverTrendingTokenList2({ height }: { height?: number }) {
       duration: timeframe as "1m" | "5m" | "1h" | "4h" | "24h",
       sortBy: sortRequest?.sortBy,
       sortDirection: sortRequest?.sortDirection,
-      filterBy: filterRequest?.filterBy,
+      rangeFilters: filterRequest?.rangeFilters,
     };
   }, [timeframe, filters, sort, chain]);
 
@@ -98,7 +98,7 @@ export function DiscoverTrendingTokenList2({ height }: { height?: number }) {
           // token.stats = { ...token.stats, ...convertStreamWsTokenStat(stat) };
           token.marketData = {
             ...token.marketData,
-            ...convertStreamTokenStatToMarketData(stat, token.marketData?.totalSupply),
+            ...convertStreamTokenStatToMarketData(stat, token.marketData?.totalSupply ?? undefined),
           };
         } else {
           console.debug(`subscribe token stats: ${stat.address} isn't in the list`);
@@ -132,7 +132,7 @@ export function DiscoverTrendingTokenList2({ height }: { height?: number }) {
         if (token) {
           token.marketData = {
             ...token.marketData,
-            ...convertStreamTokenSupplyToMarketData(supply, token.marketData?.priceInUsd),
+            ...convertStreamTokenSupplyToMarketData(supply, token.marketData?.priceInUsd ?? undefined),
           };
         } else {
           console.debug(`subscribe token supply: ${supply.tokenAddress} isn't in the list`);

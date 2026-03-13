@@ -1,5 +1,5 @@
 import { useQuery, UseQueryOptions } from "@tanstack/react-query";
-import { ChainStreamClient, TokenHolderPage } from "@chainstream-io/sdk";
+import { ChainStreamClient, PageResponseTokenHolder } from "@chainstream-io/sdk";
 import { useDexClient } from "./DexClientProvider";
 import { QueryKeys } from "./queryKeys";
 import { chainParam } from "./utils";
@@ -16,7 +16,7 @@ export async function fetchTokenHolders(client: ChainStreamClient, param: UseTok
 export function useTokenHoldersQuery(
   param: UseTokenHoldersQueryParams,
   options: Omit<
-    UseQueryOptions<TokenHolderPage, Error, TokenHolderPage, string[]>,
+    UseQueryOptions<PageResponseTokenHolder, Error, PageResponseTokenHolder, string[]>,
     "queryKey" | "queryFn"
   > = {},
 ) {

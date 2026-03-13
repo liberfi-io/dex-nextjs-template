@@ -7,11 +7,11 @@ import {
   RedditIcon,
   GithubIcon,
 } from "../../../assets";
-import { Token, TokenSocialMediasDTO } from "@chainstream-io/sdk";
+import { Token, TokenSocialMedias } from "@chainstream-io/sdk";
 import { useMemo } from "react";
 
 export function TradeTokenSocialMedia({ token }: { token: Token }) {
-  const socials = useMemo<TokenSocialMediasDTO>(() => {
+  const socials = useMemo<TokenSocialMedias>(() => {
     try {
       return typeof token.socialMedias === "string"
         ? JSON.parse(token.socialMedias ?? "{}")

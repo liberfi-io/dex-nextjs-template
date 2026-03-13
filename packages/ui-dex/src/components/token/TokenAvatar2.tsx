@@ -81,9 +81,9 @@ export function TokenAvatar2({
   const displayProgress = useMemo(
     () =>
       showProgress &&
-      token.marketData.completionRatio &&
+      token.marketData?.completionRatio &&
       new SafeBigNumber(token.marketData.completionRatio).lt(100),
-    [showProgress, token.marketData.completionRatio],
+    [showProgress, token.marketData?.completionRatio],
   );
 
   const displaySearch = useMemo(
@@ -139,7 +139,7 @@ export function TokenAvatar2({
               formattedProtocolFamily ? `text-${formattedProtocolFamily}` : "text-bullish",
               classNames?.progress,
             )}
-            progress={token.marketData.completionRatio ?? "0"}
+            progress={token.marketData?.completionRatio ?? "0"}
           />
         </div>
       )}
@@ -175,7 +175,7 @@ export function TokenAvatar2({
             {/* avatar */}
             <Avatar
               showFallback
-              src={token.imageUrl}
+              src={token.imageUrl ?? undefined}
               name={fallbackName}
               className={clsx(
                 "w-full h-full bg-content1 text-neutral text-2xl",
@@ -318,7 +318,7 @@ function Preview({
     >
       <Avatar
         showFallback
-        src={token.imageUrl}
+        src={token.imageUrl ?? undefined}
         name={fallbackName}
         className={clsx(
           "w-full h-full bg-content1 text-neutral text-3xl",

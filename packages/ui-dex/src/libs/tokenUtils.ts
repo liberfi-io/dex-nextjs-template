@@ -1,6 +1,5 @@
 import {
-  FilterCondition,
-  FilterConditionField,
+  RangeFilterCondition,
   GetHotTokensParams,
   GetNewTokensParams,
   GetStocksTokensParams,
@@ -348,24 +347,24 @@ export function tokenSort(
 export function tokenFilters(
   filters: Record<string, string>,
   timeframe: string,
-): { filterBy: Array<FilterCondition> } | undefined {
-  const filterBy: FilterCondition[] = [];
+): { rangeFilters: Array<RangeFilterCondition> } | undefined {
+  const rangeFilters: RangeFilterCondition[] = [];
 
   Object.entries(filters).forEach(([key, value]) => {
-    const field = tokenFieldsByKey(key, timeframe) as FilterConditionField;
+    const field = tokenFieldsByKey(key, timeframe);
     if (!field) return;
     if (value.includes(":")) {
       const [min, max] = value.split(":");
-      filterBy.push({ field, min, max });
+      rangeFilters.push({ field, min, max });
     } else {
       if (key === "age") {
-        filterBy.push({ field, max: value });
+        rangeFilters.push({ field, max: value });
       } else {
-        filterBy.push({ field, min: value });
+        rangeFilters.push({ field, min: value });
       }
     }
   });
-  return filterBy.length > 0 ? { filterBy } : undefined;
+  return rangeFilters.length > 0 ? { rangeFilters } : undefined;
 }
 
 export type SocialMedias = {

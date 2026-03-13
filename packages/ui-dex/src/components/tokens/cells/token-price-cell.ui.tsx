@@ -22,7 +22,7 @@ export function TokenPriceCell({ token }: { token: Token }) {
   return (
     <div className="flex flex-col gap-1 justify-center items-start">
       <span>
-        {token.marketData.priceInUsd ? formatPriceUSD(token.marketData.priceInUsd) : "--"}
+        {token.marketData?.priceInUsd ? formatPriceUSD(token.marketData.priceInUsd) : "--"}
       </span>
       <span
         className={clsx(

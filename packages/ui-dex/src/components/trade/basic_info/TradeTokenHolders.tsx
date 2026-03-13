@@ -9,17 +9,17 @@ export function TradeTokenHolders({ token }: { token: Token }) {
     <div className="flex flex-col items-start gap-0.5 justify-center">
       <div className="text-xs text-neutral font-medium">
         <span className="text-foreground">
-          {token.marketData.holders ? <Number value={token.marketData.holders} abbreviate /> : "-"}
+          {token.marketData?.holders ? <Number value={token.marketData.holders} abbreviate /> : "-"}
         </span>{" "}
         /{" "}
         <span>
-          {token.marketData.top10HoldingsRatio
+          {token.marketData?.top10HoldingsRatio
             ? formatPercentage(token.marketData.top10HoldingsRatio)
             : "-"}
         </span>{" "}
         /{" "}
         <span>
-          {token.marketData.top100HoldingsRatio
+          {token.marketData?.top100HoldingsRatio
             ? formatPercentage(token.marketData.top100HoldingsRatio)
             : "-"}
         </span>

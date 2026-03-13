@@ -2,7 +2,7 @@ import { MouseEvent, PropsWithChildren, useCallback, useMemo, useState } from "r
 import { clsx } from "clsx";
 import { BigNumber } from "bignumber.js";
 import { Avatar, Tooltip } from "@heroui/react";
-import { Token, TokenExtraDTO, TokenMarketData } from "@chainstream-io/sdk";
+import { Token, TokenExtra, TokenMarketData } from "@chainstream-io/sdk";
 import { getTokenProtocol } from "@liberfi/core";
 import { chainIdBySlug } from "@liberfi.io/utils";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
@@ -11,7 +11,7 @@ import { searchImageUrl } from "../../libs";
 
 type TokenProps = Pick<Partial<Token>, "chain" | "symbol" | "name" | "address" | "imageUrl"> & {
   marketData?: Pick<TokenMarketData, "completionRatio">;
-  extra?: Pick<TokenExtraDTO, "launchFromProtocolFamily" | "launchFromProgramAddress">;
+  extra?: Pick<TokenExtra, "launchFromProtocolFamily" | "launchFromProgramAddress">;
 };
 
 export type TokenAvatarProps = {
@@ -144,7 +144,7 @@ function TokenAvatarViewer({
     >
       <Avatar
         showFallback
-        src={token.imageUrl}
+        src={token.imageUrl ?? undefined}
         name={fallbackName}
         className={clsx(
           `rounded-${radius} bg-content2 text-neutral`,

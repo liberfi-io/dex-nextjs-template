@@ -5,7 +5,7 @@ import {
   hideHeaderOnLayoutAtom,
   showBottomNavigationBarOnLayoutAtom,
 } from "@liberfi/ui-base";
-import { clsx } from "@liberfi.io/ui";
+import { cn } from "@liberfi.io/ui";
 import { DraggablePanelProvider } from "@liberfi.io/ui-scaffold";
 import { BottomTweets } from "./BottomTweets";
 import { BottomAICopilot } from "./BottomAICopilot";
@@ -40,7 +40,7 @@ export function Page({
   return (
     // wrapper
     <div
-      className={clsx(
+      className={cn(
         "w-full h-screen max-sm:h-dvh relative flex flex-col",
         classNames?.wrapper,
         className,
@@ -49,7 +49,7 @@ export function Page({
       {/* header */}
       {header && (
         <nav
-          className={clsx(
+          className={cn(
             "w-full h-[var(--header-height)] sticky top-0 z-50 flex-none",
             {
               // always hide header
@@ -68,7 +68,7 @@ export function Page({
 
       {/* content */}
       <div
-        className={clsx(
+        className={cn(
           "w-full flex-auto min-h-0 relative",
           {
             // always hide bottom navigation bar
@@ -126,7 +126,7 @@ export function Page({
       {/* bottom tool bar */}
       {bottomToolBar && (
         <div
-          className={clsx(
+          className={cn(
             "fixed inset-x-0 bottom-0 h-9 z-50",
             {
               // always hide bottom tool bar
@@ -146,7 +146,7 @@ export function Page({
       {/* bottom navigation bar */}
       {bottomNavigationBar && (
         <div
-          className={clsx(
+          className={cn(
             "fixed inset-x-0 bottom-0 h-[var(--footer-height)] z-50",
             {
               // always hide bottom navigation bar

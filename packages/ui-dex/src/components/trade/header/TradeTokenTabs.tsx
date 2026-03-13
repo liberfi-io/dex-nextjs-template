@@ -278,7 +278,7 @@ function TradeTokenTab({ token, active, onRemove, onSelect }: TradeTokenTabProps
         className="max-xl:hidden text-bullish data-[bearish=true]:text-bearish"
         data-bearish={bearish}
       >
-        {token.marketData.priceInUsd ? (
+        {token.marketData?.priceInUsd ? (
           <Number value={token.marketData.priceInUsd} defaultCurrencySign="$" />
         ) : (
           "-"

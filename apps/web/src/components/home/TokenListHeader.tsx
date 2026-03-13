@@ -1,12 +1,12 @@
 import { useTranslation } from "@liberfi.io/i18n";
 import { SOLANA_TOKEN_PROTOCOLS } from "@liberfi.io/types";
-import { clsx, SettingsIcon, StyledBadge, StyledButton, StyledTabs, Tab } from "@liberfi.io/ui";
+import { cn, SettingsIcon, StyledBadge, Button, StyledPlainTabs, Tab } from "@liberfi.io/ui";
 import {
   TokenListFilterModal,
   TokenListFilterPopover,
   TokenListFiltersType,
   TokenListResolution,
-  TokenListResolutionSelector,
+  TokenListResolutionSelectorWidget,
 } from "@liberfi.io/ui-tokens";
 import { Chain } from "@liberfi/core";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
@@ -68,8 +68,7 @@ export function TokenListHeader({
     <div className="flex-none flex flex-col w-full max-sm:pt-2.5 max-w-379 sm:max-w-403 mx-auto">
       <div className="w-full flex justify-between items-center relative bg-background z-10 max-sm:px-3 overflow-x-scroll">
         {/* switch token list type */}
-        <StyledTabs
-          variant="plain"
+        <StyledPlainTabs
           selectedKey={type}
           onSelectionChange={onTypeChange as (key: Key) => void}
           classNames={{ tabContent: "text-base sm:text-xl" }}
@@ -79,12 +78,12 @@ export function TokenListHeader({
           {chainId === Chain.SOLANA && (
             <Tab key="stocks" title={t("extend.token_list.types.stocks")} />
           )}
-        </StyledTabs>
+        </StyledPlainTabs>
 
         {/* desktop filters & resolution selector etc... */}
         <div className="max-sm:hidden flex-none flex justify-end items-center gap-4">
           {/* desktop resolution selector */}
-          <TokenListResolutionSelector
+          <TokenListResolutionSelectorWidget
             resolution={resolution}
             onResolutionChange={onResolutionChange}
           />
@@ -110,12 +109,12 @@ export function TokenListHeader({
         </div>
 
         {/* toggle settings menu on mobile */}
-        <StyledButton
+        <Button
           variant="bordered"
           size="sm"
           radius="full"
           onPress={handleSettingsMenuToggle}
-          className={clsx(
+          className={cn(
             "sm:hidden border-border text-neutral",
             isSettingsMenuOpen && "w-8 min-w-8 h-8 min-h-8 p-0",
           )}
@@ -143,19 +142,19 @@ export function TokenListHeader({
               {t(`extend.trade.settings.p${(instantBuyPreset ?? 0) + 1}`)}
             </span>
           )}
-        </StyledButton>
+        </Button>
       </div>
 
       {/* settings menu on mobile */}
       <div
-        className={clsx("w-full overflow-hidden flex flex-col gap-4 sm:hidden", {
+        className={cn("w-full overflow-hidden flex flex-col gap-4 sm:hidden", {
           "max-h-full translate-y-0 opacity-100": isSettingsMenuOpen,
           "max-h-0 -translate-y-4 opacity-0": !isSettingsMenuOpen,
         })}
       >
         <div className="w-fit flex justify-end items-center gap-4 max-sm:pl-3">
           {/* mobile resolution selector */}
-          <TokenListResolutionSelector
+          <TokenListResolutionSelectorWidget
             resolution={resolution}
             onResolutionChange={onResolutionChange}
           />

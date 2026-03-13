@@ -1,6 +1,6 @@
 "use client";
 
-import { clsx } from "@liberfi.io/ui";
+import { cn } from "@liberfi.io/ui";
 import {
   ChannelEditButton,
   ChannelsHomePage,
@@ -28,7 +28,7 @@ export function ChannelsPage() {
 
   return (
     <div
-      className={clsx(
+      className={cn(
         "px-4 max-sm:px-0 flex flex-col gap-2.5 overflow-y-auto",
         // desktop: reserved space for toolbar
         "h-[calc(100vh-var(--header-height)-2.875rem)]",

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Modal, ModalContent, useDisclosure } from "@heroui/react";
 import { useAppSdk } from "@liberfi/ui-base";
-import { RedPacketDTO } from "@chainstream-io/sdk";
+import { RedPacket } from "@chainstream-io/sdk";
 import { ClaimRedPacket } from "./ClaimRedPacket";
 
 export function ClaimRedPacketModal() {
@@ -9,10 +9,10 @@ export function ClaimRedPacketModal() {
 
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
-  const [redPacket, setRedPacket] = useState<RedPacketDTO | null>(null);
+  const [redPacket, setRedPacket] = useState<RedPacket | null>(null);
 
   useEffect(() => {
-    const handler = ({ redPacket }: { redPacket: RedPacketDTO }) => {
+    const handler = ({ redPacket }: { redPacket: RedPacket }) => {
       setRedPacket(redPacket);
       onOpen();
     };

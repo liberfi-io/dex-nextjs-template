@@ -35,7 +35,7 @@ export function PriceField({ className, token }: PriceFieldProps) {
         )}
       >
         <div>
-          {token.marketData.priceInUsd ? (
+          {token.marketData?.priceInUsd ? (
             <Number value={token.marketData.priceInUsd} defaultCurrencySign="$" />
           ) : (
             "-"

@@ -9,14 +9,14 @@ import { Number } from "../../Number";
 import { Skeleton } from "@heroui/react";
 import { Virtuoso } from "react-virtuoso";
 import { useAtomValue } from "jotai";
-import { TradeDetailDTO } from "@chainstream-io/sdk";
+import { TradeDetail } from "@chainstream-io/sdk";
 
 export function RealtimeTradeList() {
   const { isTradesLoading, trades } = useTradeDataContext();
   return isTradesLoading ? <Skeletons /> : <Content trades={trades} />;
 }
 
-function Content({ trades }: { trades: TradeDetailDTO[] }) {
+function Content({ trades }: { trades: TradeDetail[] }) {
   const layout = useAtomValue(layoutAtom);
 
   const { t } = useTranslation();
@@ -51,7 +51,7 @@ function Content({ trades }: { trades: TradeDetailDTO[] }) {
 }
 
 type RealTimeTradeItemProps = {
-  trade: TradeDetailDTO;
+  trade: TradeDetail;
   now: number;
 };
 

@@ -9,7 +9,7 @@ import {
   useAuth,
   useTranslation,
 } from "@liberfi/ui-base";
-import { RedPacketClaimDTO, Token } from "@chainstream-io/sdk";
+import { RedPacketClaim, Token } from "@chainstream-io/sdk";
 import { formatShortAddress } from "@liberfi/ui-dex/libs/format";
 import { useTokenQuery } from "@liberfi/react-dex";
 import { TokenAvatar } from "@liberfi/ui-dex/components/TokenAvatar";
@@ -59,7 +59,7 @@ export function RedPacketClaims({ redPacketId, onNavigateBack }: RedPacketClaims
   );
 }
 
-function Item({ claim, token }: { claim: RedPacketClaimDTO; token: Token }) {
+function Item({ claim, token }: { claim: RedPacketClaim; token: Token }) {
   const { t } = useTranslation();
 
   const { chain } = useCurrentChain();
@@ -83,7 +83,7 @@ function Item({ claim, token }: { claim: RedPacketClaimDTO; token: Token }) {
           <p className="text-xs">
             {self ? t("extend.redpacket.claims.self") : formatShortAddress(claim.claimer)}
           </p>
-          <p className="text-xs text-neutral">{new Date(claim.claimedAt).toLocaleString()}</p>
+          <p className="text-xs text-neutral">{new Date(claim.claimedAt ?? 0).toLocaleString()}</p>
         </div>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -97,7 +97,7 @@ function Item({ claim, token }: { claim: RedPacketClaimDTO; token: Token }) {
             isIconOnly
             className="bg-transparent w-6 h-6 min-w-0 min-h-0"
             as={Link}
-            href={txExplorerUrl(chain, claim.txHash)}
+            href={txExplorerUrl(chain, claim.txHash ?? "")}
             target="_blank"
           >
             <ExternalLinkOutlinedIcon width={12} height={12} className="text-neutral" />

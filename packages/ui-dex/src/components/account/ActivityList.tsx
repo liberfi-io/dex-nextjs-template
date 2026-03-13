@@ -8,7 +8,7 @@ import { useAuth, useTranslation } from "@liberfi/ui-base";
 import { useMemo } from "react";
 import { Number } from "../Number";
 import { Virtuoso } from "react-virtuoso";
-import { TradeDetailDTO } from "@chainstream-io/sdk";
+import { TradeDetail } from "@chainstream-io/sdk";
 
 export type ActivityListProps = {
   chainId?: Chain;
@@ -55,7 +55,7 @@ export function ActivityList({
 }
 
 type TradeItemProps = {
-  trade: TradeDetailDTO;
+  trade: TradeDetail;
   compact?: boolean;
   classNames?: {
     itemWrapper?: string;
@@ -85,7 +85,7 @@ function TradeItem({ trade, compact = false, classNames }: TradeItemProps) {
         )}
       >
         <div className="flex-none">
-          <TokenAvatar src={trade.tokenImageUrl} size={32} />
+          <TokenAvatar src={trade.tokenImageUrl ?? ""} size={32} />
         </div>
         <div className="flex-1 flex flex-col justify-center gap-0.5">
           <div className="flex items-center gap-1">

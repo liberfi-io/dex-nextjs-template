@@ -1,5 +1,5 @@
 import { useTranslation } from "@liberfi.io/i18n";
-import { LightningIcon, StyledButton, toast } from "@liberfi.io/ui";
+import { LightningIcon, Button, toast } from "@liberfi.io/ui";
 import { TokenListActionsProps } from "@liberfi.io/ui-tokens";
 import { formatPrice, SafeBigNumber } from "@liberfi.io/utils";
 import {
@@ -102,7 +102,7 @@ export function InstantBuy({ token }: TokenListActionsProps) {
 
   return (
     <div className="w-full h-full relative">
-      <StyledButton
+      <Button
         color="primary"
         radius="full"
         size="sm"
@@ -114,7 +114,7 @@ export function InstantBuy({ token }: TokenListActionsProps) {
         className="absolute right-0 top-1/2 -translate-y-1/2"
       >
         {formatPrice(amount ?? 0)}
-      </StyledButton>
+      </Button>
     </div>
   );
 }

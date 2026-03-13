@@ -7,7 +7,7 @@ import {
   DiscordIcon,
   Divider,
   SettingsIcon,
-  StyledButton,
+  Button,
   StyledTooltip,
   TwitterIcon,
 } from "@liberfi.io/ui";
@@ -36,14 +36,14 @@ export function BottomToolBar() {
     <div className="max-lg:hidden w-full h-full border-t border-border bg-background px-6 flex items-center justify-between gap-4">
       <div className="flex items-center justify-start gap-4">
         {/* preset */}
-        <StyledButton
+        <Button
           size="sm"
           className="px-2 h-6 min-h-0 gap-1 bg-primary/20 text-primary"
           startContent={<SettingsIcon width={16} height={16} />}
           onPress={handlePresetSettings}
         >
           {t(`extend.trade.settings.preset${preset + 1}`)}
-        </StyledButton>
+        </Button>
 
         {/* wallet */}
         <BottomToolBarWallet />
@@ -51,7 +51,7 @@ export function BottomToolBar() {
         <Divider orientation="vertical" className="h-6 bg-content3" />
 
         <StyledTooltip content={t("extend.toolbar.media_track_tooltip")} closeDelay={0}>
-          <StyledButton
+          <Button
             size="sm"
             className="relative h-6 min-h-0 px-1 gap-1 bg-transparent hover:bg-content1 text-neutral text-xs overflow-visible"
             startContent={<TwitterIcon width={16} height={16} className="text-neutral" />}
@@ -59,11 +59,11 @@ export function BottomToolBar() {
           >
             {t("extend.toolbar.media_track")}
             <div className="w-2 h-2 rounded-full bg-danger absolute top-0 right-0 translate-x-px -translate-y-px" />
-          </StyledButton>
+          </Button>
         </StyledTooltip>
 
         <StyledTooltip content={t("extend.toolbar.ai_copilot_tooltip")} closeDelay={0}>
-          <StyledButton
+          <Button
             size="sm"
             className="relative h-6 min-h-0 px-2 gap-1 bg-transparent hover:bg-content1 text-neutral text-xs overflow-visible"
             startContent={<RobotIcon width={18} height={18} className="text-neutral" />}
@@ -71,7 +71,7 @@ export function BottomToolBar() {
           >
             {t("extend.toolbar.ai_copilot")}
             <div className="w-2 h-2 rounded-full bg-danger absolute top-0 right-0 translate-x-px -translate-y-px" />
-          </StyledButton>
+          </Button>
         </StyledTooltip>
 
         <Divider orientation="vertical" className="h-6 bg-content3" />
@@ -81,7 +81,7 @@ export function BottomToolBar() {
         <BottomNetworkStatus />
         <Divider orientation="vertical" className="h-6 bg-content3" />
         <StyledTooltip content={t("extend.toolbar.discord")} closeDelay={0}>
-          <StyledButton
+          <Button
             isIconOnly
             className="w-5 h-5 min-w-5 min-h-5 bg-transparent"
             onPress={() => window.open("https://discord.gg/TxB2bXcsnE", "_blank")}
@@ -91,10 +91,10 @@ export function BottomToolBar() {
               height={18}
               className="text-neutral hover:opacity-80 cursor-pointer"
             />
-          </StyledButton>
+          </Button>
         </StyledTooltip>
         <StyledTooltip content={t("extend.toolbar.twitter")} closeDelay={0}>
-          <StyledButton
+          <Button
             isIconOnly
             className="w-5 h-5 min-w-5 min-h-5 bg-transparent"
             onPress={() => window.open("https://x.com/liberfi_io", "_blank")}
@@ -104,7 +104,7 @@ export function BottomToolBar() {
               height={18}
               className="text-neutral hover:opacity-80 cursor-pointer"
             />
-          </StyledButton>
+          </Button>
         </StyledTooltip>
         <StyledTooltip content={t("extend.toolbar.docs")} closeDelay={0}>
           <UserGuideIcon

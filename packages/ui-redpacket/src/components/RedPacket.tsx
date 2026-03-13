@@ -1,5 +1,5 @@
 import { PropsWithChildren, useCallback, useMemo } from "react";
-import { RedPacketDTO } from "@chainstream-io/sdk";
+import type { RedPacket as RedPacketType } from "@chainstream-io/sdk";
 import { useRedPacketQuery } from "@liberfi/react-redpacket";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
@@ -20,7 +20,7 @@ import { getRedPacketStatus } from "../utils";
 
 export type RedPacketProps = {
   perspective: "received" | "sent";
-  redPacket?: RedPacketDTO;
+  redPacket?: RedPacketType;
   redPacketId: string;
   onNavigateBack?: () => void;
 };
@@ -121,7 +121,7 @@ export function RedPacket({
             <div className="flex items-center justify-between">
               <h3 className="text-xs text-foreground">{t("extend.redpacket.info.total_title")}</h3>
               <p className="text-xs text-neutral">
-                {new Date(redPacket.createdAt).toLocaleString()}
+                {new Date(redPacket.createdAt ?? 0).toLocaleString()}
               </p>
             </div>
             {/* total amount & max claims */}
@@ -166,9 +166,9 @@ export function RedPacket({
               </div>
               {/* claimed count */}
               <p className="text-xs text-neutral">
-                {redPacket.claimedCount > 1
-                  ? t("extend.redpacket.info.n_red_packets", { count: redPacket.claimedCount })
-                  : t("extend.redpacket.info.1_red_packet", { count: redPacket.claimedCount })}
+                {(redPacket.claimedCount ?? 0) > 1
+                  ? t("extend.redpacket.info.n_red_packets", { count: redPacket.claimedCount ?? 0 })
+                  : t("extend.redpacket.info.1_red_packet", { count: redPacket.claimedCount ?? 0 })}
               </p>
             </div>
           </div>
@@ -191,7 +191,7 @@ export function RedPacket({
       {/* view on explorer */}
       <Button
         as={Link}
-        href={txExplorerUrl(chain, redPacket.txHash)}
+        href={txExplorerUrl(chain, redPacket.txHash ?? "")}
         target="_blank"
         className="mt-2 bg-transparent text-xs text-neutral"
         endContent={<ExternalLinkOutlinedIcon width={12} height={12} className="text-neutral" />}
