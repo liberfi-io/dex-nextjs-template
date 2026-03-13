@@ -1,8 +1,6 @@
 "use client";
 
-import { useAppSdk, UserGuideIcon, useTranslation, RobotIcon } from "@liberfi/ui-base";
-import { tradeBuyPresetAtom } from "@liberfi/ui-dex";
-import { useAtomValue } from "jotai";
+import { UserGuideIcon, useTranslation, RobotIcon } from "@liberfi/ui-base";
 import {
   DiscordIcon,
   Divider,
