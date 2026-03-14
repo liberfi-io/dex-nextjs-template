@@ -9,6 +9,13 @@ The source code for liberfi.io related components (React SDK) is located at `../
 
 When investigating or modifying liberfi.io component internals, look for the corresponding source files under the `../react-sdk` directory.
 
+# LiberFi SDK Version Check Rules
+
+When checking the latest version of `@liberfi.io/*` packages, follow this priority order:
+
+1. **Local source code first**: Read `../react-sdk/packages/*/package.json` to get the `version` field. This is the most up-to-date source of truth during active development.
+2. **npm registry fallback**: If the local source is unavailable or you need to verify the published version, run `npm view @liberfi.io/<package-name> version` (ensure registry is set to the official npm source first).
+
 # LiberFi SDK Version Update Rules
 
 When updating `@liberfi.io/*` SDK versions in `apps/web/package.json`, you MUST also update the corresponding `peerDependencies` and `devDependencies` in all workspace packages under `packages/`. Specifically:

@@ -2,10 +2,11 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useResizeObserver } from "@liberfi.io/hooks";
+import { useResizeObserver, useValueRef } from "@liberfi.io/hooks";
 import { useTranslation } from "@liberfi.io/i18n";
+import { useDexClient } from "@liberfi.io/react";
 import { Chain, SOLANA_TOKEN_PROTOCOLS, Token } from "@liberfi.io/types";
-import { Button, cn, HorizontalScrollContainer, SettingsIcon, toast } from "@liberfi.io/ui";
+import { Button, cn, HorizontalScrollContainer, Link, SettingsIcon, toast } from "@liberfi.io/ui";
 import { ChainSelectWidget, useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
   NewTokenListWidget,
@@ -16,7 +17,7 @@ import {
   TokenListResolutionSelectorWidget,
   TrendingTokenListWidget,
 } from "@liberfi.io/ui-tokens";
-import { capitalize, chainSlug, getNativeToken } from "@liberfi.io/utils";
+import { capitalize, chainSlug, getNativeToken, txExplorerUrl } from "@liberfi.io/utils";
 import { useSwitchChain } from "@liberfi.io/wallet-connector";
 import { CombinedPulseList } from "./CombinedPulseList";
 import { useAsyncModal } from "@liberfi.io/ui-scaffold";
@@ -24,7 +25,9 @@ import {
   AmountPresetInputWidget,
   InstantTradeListButtonWidget,
   InstantTradeSwapProvider,
-  PresetFormModalParams,
+  type PresetFormModalParams,
+  type SwapResult,
+  type SwapPhase,
 } from "@liberfi.io/ui-trade";
 
 type ListTab = "trending" | "pulse" | "stocks" | "new";
@@ -55,7 +58,10 @@ export function CombinedTokenList() {
 
   const router = useRouter();
 
+  const { client } = useDexClient();
+
   const { chain } = useCurrentChain();
+  const chainRef = useValueRef(chain);
 
   const switchChain = useSwitchChain();
 
@@ -82,6 +88,71 @@ export function CombinedTokenList() {
       });
     },
     [openPresetModal, chain],
+  );
+
+  const handleSwapError = useCallback(
+    (error: Error, phase: SwapPhase) => {
+      const phaseLabel = t(`trade.swap.phase.${phase}`);
+      const message = error.message
+        ? t("trade.swap.error", { phase: phaseLabel, reason: error.message })
+        : t("trade.swap.errorUnknown", { phase: phaseLabel });
+      toast.error(message);
+    },
+    [t],
+  );
+
+  const handleSwapSubmitted = useCallback(
+    (result: SwapResult) => {
+      const currentChain = chainRef.current;
+      if (!currentChain) return;
+
+      const { txHash } = result;
+      const jobId = (result.extra?.jobId as string) ?? txHash;
+
+      toast.progress({
+        id: txHash,
+        type: "success",
+        message: t("trade.swap.transactionSubmitted"),
+        progress: true,
+        duration: 65_000,
+      });
+
+      const explorerAction = (
+        <Button
+          variant="solid"
+          color="default"
+          as={Link}
+          href={txExplorerUrl(currentChain, txHash)}
+          target="_blank"
+          size="sm"
+        >
+          {t("trade.swap.viewOnExplorer")}
+        </Button>
+      );
+
+      client
+        .checkTxSuccess(currentChain, jobId)
+        .then((success) => {
+          toast.update(txHash, {
+            type: success ? "success" : "error",
+            message: success
+              ? t("trade.swap.transactionConfirmed")
+              : t("trade.swap.transactionFailed"),
+            action: explorerAction,
+            duration: 5_000,
+          });
+        })
+        .catch((err: unknown) => {
+          const reason = err instanceof Error ? err.message : undefined;
+          toast.update(txHash, {
+            type: "error",
+            message: reason ?? t("trade.swap.transactionFailed"),
+            action: explorerAction,
+            duration: 5_000,
+          });
+        });
+    },
+    [client, t],
   );
 
   const handleSelectToken = useCallback(
@@ -172,105 +243,109 @@ export function CombinedTokenList() {
   }, [activeTab, chain, resolution, filters, height, nativeToken, handleSelectToken]);
 
   return (
-    <div className="w-full h-full flex flex-col gap-3 sm:gap-4 p-4">
-      <div
-        className={cn(
-          "w-full mx-auto flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0 flex-none sm:h-8",
-          "max-w-379 sm:max-w-403",
-        )}
-      >
-        <div className="flex justify-between items-center w-full sm:w-auto gap-4">
-          <HorizontalScrollContainer
-            className="flex-auto min-w-0 max-sm:h-8"
-            classNames={{
-              content: "items-center gap-4 sm:gap-6 whitespace-nowrap",
-              leftArrow: "from-content1/60",
-              rightArrow: "from-content1/60",
-            }}
-          >
-            {tabs.map((tab) => (
-              <button
-                key={tab}
-                type="button"
-                onClick={() => setActiveTab(tab)}
-                className={cn(
-                  "text-sm sm:text-base font-medium transition-colors cursor-pointer",
-                  activeTab === tab ? "text-foreground" : "text-neutral hover:text-foreground/80",
-                )}
-              >
-                {t(TAB_I18N_KEYS[tab])}
-              </button>
-            ))}
-          </HorizontalScrollContainer>
-
-          <div className="flex-none sm:hidden flex justify-end items-center gap-2">
-            <ChainSelectWidget
-              size="sm"
-              className="sm:hidden"
-              onSwitchChain={switchChain}
-              candidates={[Chain.SOLANA, Chain.ETHEREUM, Chain.BINANCE]}
-              onSuccess={(c) =>
-                toast.success(
-                  t("common.chainSwitched", {
-                    chain: capitalize(chainSlug(c) ?? "") ?? "",
-                  }),
-                )
-              }
-              onError={(e) =>
-                toast.error(e instanceof Error ? e.message : t("common.chainSwitchFailed"))
-              }
-            />
-            <Button
-              isIconOnly
-              radius="full"
-              size="sm"
-              aria-label={t("tokens.listHeader.filter")}
-              onPress={() => setIsMobileControlsOpen((prev) => !prev)}
-              className="sm:hidden text-neutral hover:text-foreground transition-colors bg-transparent"
+    <InstantTradeSwapProvider
+      chain={chain}
+      onSwapSubmitted={handleSwapSubmitted}
+      onSwapError={handleSwapError}
+    >
+      <div className="w-full h-full flex flex-col gap-3 sm:gap-4 p-4">
+        <div
+          className={cn(
+            "w-full mx-auto flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0 flex-none sm:h-8",
+            "max-w-379 sm:max-w-403",
+          )}
+        >
+          <div className="flex justify-between items-center w-full sm:w-auto gap-4">
+            <HorizontalScrollContainer
+              className="flex-auto min-w-0 max-sm:h-8"
+              classNames={{
+                content: "items-center gap-4 sm:gap-6 whitespace-nowrap",
+                leftArrow: "from-content1/60",
+                rightArrow: "from-content1/60",
+              }}
             >
-              <SettingsIcon width={20} height={20} />
-            </Button>
+              {tabs.map((tab) => (
+                <button
+                  key={tab}
+                  type="button"
+                  onClick={() => setActiveTab(tab)}
+                  className={cn(
+                    "text-sm sm:text-base font-medium transition-colors cursor-pointer",
+                    activeTab === tab ? "text-foreground" : "text-neutral hover:text-foreground/80",
+                  )}
+                >
+                  {t(TAB_I18N_KEYS[tab])}
+                </button>
+              ))}
+            </HorizontalScrollContainer>
+
+            <div className="flex-none sm:hidden flex justify-end items-center gap-2">
+              <ChainSelectWidget
+                size="sm"
+                className="sm:hidden"
+                onSwitchChain={switchChain}
+                candidates={[Chain.SOLANA, Chain.ETHEREUM, Chain.BINANCE]}
+                onSuccess={(c) =>
+                  toast.success(
+                    t("common.chainSwitched", {
+                      chain: capitalize(chainSlug(c) ?? "") ?? "",
+                    }),
+                  )
+                }
+                onError={(e) =>
+                  toast.error(e instanceof Error ? e.message : t("common.chainSwitchFailed"))
+                }
+              />
+              <Button
+                isIconOnly
+                radius="full"
+                size="sm"
+                aria-label={t("tokens.listHeader.filter")}
+                onPress={() => setIsMobileControlsOpen((prev) => !prev)}
+                className="sm:hidden text-neutral hover:text-foreground transition-colors bg-transparent"
+              >
+                <SettingsIcon width={20} height={20} />
+              </Button>
+            </div>
+          </div>
+
+          <div
+            className={cn(
+              "justify-start sm:justify-end items-center gap-2 sm:gap-6",
+              isMobileControlsOpen ? "flex" : "hidden sm:flex",
+            )}
+          >
+            {showTokenListControls && (
+              <>
+                <TokenListResolutionSelectorWidget
+                  resolution={resolution}
+                  onResolutionChange={setResolution}
+                />
+                <TokenListFilterWidget
+                  protocols={chain === Chain.SOLANA ? SOLANA_TOKEN_PROTOCOLS : undefined}
+                  resolution={resolution}
+                  filters={filters}
+                  onFiltersChange={setFilters}
+                />
+              </>
+            )}
+            {nativeToken && (
+              <AmountPresetInputWidget
+                id="token-list"
+                chain={chain}
+                token={nativeToken}
+                size="sm"
+                className="max-w-55"
+                onPresetClick={handlePresetClick}
+              />
+            )}
           </div>
         </div>
 
-        <div
-          className={cn(
-            "justify-start sm:justify-end items-center gap-2 sm:gap-6",
-            isMobileControlsOpen ? "flex" : "hidden sm:flex",
-          )}
-        >
-          {showTokenListControls && (
-            <>
-              <TokenListResolutionSelectorWidget
-                resolution={resolution}
-                onResolutionChange={setResolution}
-              />
-              <TokenListFilterWidget
-                protocols={chain === Chain.SOLANA ? SOLANA_TOKEN_PROTOCOLS : undefined}
-                resolution={resolution}
-                filters={filters}
-                onFiltersChange={setFilters}
-              />
-            </>
-          )}
-          {nativeToken && (
-            <AmountPresetInputWidget
-              id="token-list"
-              chain={chain}
-              token={nativeToken}
-              size="sm"
-              className="max-w-55"
-              onPresetClick={handlePresetClick}
-            />
-          )}
-        </div>
-      </div>
-
-      <InstantTradeSwapProvider chain={chain}>
         <div className="w-full flex-auto flex flex-col min-h-0" ref={ref}>
           {tokenListContent}
         </div>
-      </InstantTradeSwapProvider>
-    </div>
+      </div>
+    </InstantTradeSwapProvider>
   );
 }
