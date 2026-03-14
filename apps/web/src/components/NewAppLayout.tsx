@@ -17,9 +17,11 @@ import { Key, PropsWithChildren, useCallback, useEffect, useMemo, useState } fro
 import { usePathname, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { QueryClientProvider, useQueryClient } from "@tanstack/react-query";
+import { ChainStreamClient } from "@chainstream-io/sdk";
 import { Chain } from "@liberfi.io/types";
 import { Client } from "@liberfi.io/client";
-import { DexClientProvider } from "@liberfi.io/react";
+import { DexClientProvider as APIClientProvider } from "@liberfi.io/react";
+import { DexClientProvider } from "@liberfi/react-dex";
 import {
   LocaleCode,
   LocaleProvider,
@@ -152,6 +154,14 @@ function ServiceProviders({ children }: PropsWithChildren) {
 
   const dexTokenProvider = useDexTokenProvider(loader);
 
+  const dexClient = useMemo(
+    () =>
+      new ChainStreamClient(dexTokenProvider, {
+        serverUrl: baseUrl + process.env.NEXT_PUBLIC_DEX_AGGREGATOR_URL,
+      }),
+    [dexTokenProvider],
+  );
+
   const apiClient = useMemo(
     () =>
       new Client(dexTokenProvider, {
@@ -173,7 +183,9 @@ function ServiceProviders({ children }: PropsWithChildren) {
   const { user } = useAuth();
 
   const channelsTokenProvider = useMemo(
-    () => ({ getToken: async () => Promise.resolve(user?.accessToken) }),
+    () => ({
+      getToken: async () => Promise.resolve(user?.accessToken ?? null),
+    }),
     [user],
   );
 
@@ -181,7 +193,7 @@ function ServiceProviders({ children }: PropsWithChildren) {
     () =>
       new ChannelsClient({
         endpoint: baseUrl + process.env.NEXT_PUBLIC_CHANNELS_URL,
-        accessToken: channelsTokenProvider,
+        accessToken: channelsTokenProvider ?? { getToken: async () => Promise.resolve(null) },
       }),
     [channelsTokenProvider],
   );
@@ -200,18 +212,20 @@ function ServiceProviders({ children }: PropsWithChildren) {
   const wallet = useConnectedWallet(chain);
 
   return (
-    <DexClientProvider client={apiClient} subscribeClient={apiClient}>
-      <MediaTrackProvider client={mediaTrackClient}>
-        <ChannelsProvider client={channelsClient}>
-          <PredictProvider client={predictClient}>
-            <PortfolioClientProvider client={portfolioClient}>
-              <PortfolioProvider chain={chain} address={wallet?.address ?? ""}>
-                {children}
-              </PortfolioProvider>
-            </PortfolioClientProvider>
-          </PredictProvider>
-        </ChannelsProvider>
-      </MediaTrackProvider>
+    <DexClientProvider client={dexClient}>
+      <APIClientProvider client={apiClient} subscribeClient={apiClient}>
+        <MediaTrackProvider client={mediaTrackClient}>
+          <ChannelsProvider client={channelsClient}>
+            <PredictProvider client={predictClient}>
+              <PortfolioClientProvider client={portfolioClient}>
+                <PortfolioProvider chain={chain} address={wallet?.address ?? ""}>
+                  {children}
+                </PortfolioProvider>
+              </PortfolioClientProvider>
+            </PredictProvider>
+          </ChannelsProvider>
+        </MediaTrackProvider>
+      </APIClientProvider>
     </DexClientProvider>
   );
 }

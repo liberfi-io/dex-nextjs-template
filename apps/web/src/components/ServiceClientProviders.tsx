@@ -80,7 +80,9 @@ function DexClientLoader({ children }: PropsWithChildren) {
   const { user } = useAuth();
 
   const channelsTokenProvider = useMemo(
-    () => ({ getToken: async () => Promise.resolve(user?.accessToken) }),
+    () => ({
+      getToken: async () => Promise.resolve(user?.accessToken ?? null),
+    }),
     [user],
   );
 
@@ -88,7 +90,7 @@ function DexClientLoader({ children }: PropsWithChildren) {
     () =>
       new ChannelsClient({
         endpoint: baseUrl + process.env.NEXT_PUBLIC_CHANNELS_URL,
-        accessToken: channelsTokenProvider,
+        accessToken: channelsTokenProvider ?? { getToken: async () => Promise.resolve(null) },
       }),
     [channelsTokenProvider],
   );
