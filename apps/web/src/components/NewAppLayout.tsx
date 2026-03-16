@@ -13,7 +13,7 @@
  *               └─ PageShell     (withPage + withToast + withModals)
  */
 
-import { Key, PropsWithChildren, useCallback, useEffect, useMemo, useState } from "react";
+import { Key, PropsWithChildren, Suspense, lazy, useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { QueryClientProvider, useQueryClient } from "@tanstack/react-query";
@@ -90,6 +90,15 @@ import { AppBottomToolbar } from "./AppBottomToolbar";
 import { BottomTweets } from "./BottomTweets";
 import { BottomAICopilot } from "./BottomAICopilot";
 
+const LegacyModals = [
+  lazy(() => import("@liberfi/ui-dex/components/modals/WebviewModal")),
+  lazy(() => import("@liberfi/ui-dex/components/modals/ReceiveModal")),
+  lazy(() => import("@liberfi/ui-dex/components/modals/AssetSelectModal")),
+  lazy(() => import("@liberfi/ui-dex/components/modals/TokenSelectModal")),
+  lazy(() => import("@liberfi/ui-dex/components/modals/SwapModal")),
+  lazy(() => import("@liberfi/ui-dex/components/modals/TransferModal")),
+];
+
 const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
 
 const navItemsConfig: Omit<NavItem, "label">[] = [
@@ -123,6 +132,11 @@ export function NewAppLayout({ children, locale }: PropsWithChildren<{ locale: L
               <StyledToaster />
               <SearchModal />
               <PresetFormModal />
+              <Suspense>
+                {LegacyModals.map((Modal, i) => (
+                  <Modal key={i} />
+                ))}
+              </Suspense>
             </LegacyBridge>
           </ServiceProviders>
         </LocaleProvider>

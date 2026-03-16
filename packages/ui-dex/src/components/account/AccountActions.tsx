@@ -21,7 +21,7 @@ export function AccountActions({ className }: AccountActionsProps) {
       <SendAction />
       <ReceiveAction />
       <ConvertAction />
-      <TradeAction />
+      {/* <TradeAction /> */}
       <RedPacketAction />
     </div>
   );
