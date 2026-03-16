@@ -32,7 +32,7 @@ export function AccountPage() {
   const [hideLowHoldingAssets, setHideLowHoldingAssets] = useState(false);
 
   return (
-    <div className="w-full max-w-[860px] h-full mx-auto lg:px-6 overflow-auto">
+    <div className="w-full max-w-[860px] h-full mx-auto lg:p-6 overflow-auto">
       <AccountHeader />
 
       {/* 账户信息 */}

@@ -1,5 +1,10 @@
+import { PortfolioAuthGuard } from "../../../components/PortfolioAuthGuard";
 import { PortfolioPage } from "../../../components/page/PortfolioPage";
 
 export default function Page() {
-  return <PortfolioPage />;
+  return (
+    <PortfolioAuthGuard>
+      <PortfolioPage />
+    </PortfolioAuthGuard>
+  );
 }
