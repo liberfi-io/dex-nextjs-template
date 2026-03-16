@@ -19,7 +19,7 @@ export function AccountCharts({ className }: AccountChartsProps) {
   return (
     <section
       className={clsx(
-        "w-full h-[243px] lg:h-full lg:w-[480px]",
+        "w-full h-[243px] lg:h-full min-w-0 min-h-0",
         "flex flex-col lg:rounded-lg lg:bg-content1 px-0 lg:px-4 py-2",
         className,
       )}

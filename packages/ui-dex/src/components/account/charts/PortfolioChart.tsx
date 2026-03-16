@@ -128,7 +128,7 @@ function Chart({ className, classNames, displayLegendValue = true }: PortfolioCh
     <section className={clsx("w-full", className)}>
       <div className="w-full h-full flex items-center justify-center">
         <div className={clsx("flex w-[calc(50%-4px)] h-full items-center", classNames?.chart)}>
-          <ResponsiveContainer>
+          <ResponsiveContainer minWidth={1} minHeight={1}>
             <PieChart>
               <Pie
                 activeIndex={activeIndex}

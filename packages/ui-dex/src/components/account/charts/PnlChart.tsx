@@ -61,7 +61,7 @@ function Chart({
         <TimeTabs time={time} setTime={setTime} />
       </div>
       <div className="flex-1 flex items-center justify-center">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
           <LineChart data={data}>
             <YAxis domain={domain} hide={true} />
             <Line
