@@ -13,7 +13,16 @@
  *               └─ PageShell     (withPage + withToast + withModals)
  */
 
-import { Key, PropsWithChildren, Suspense, lazy, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  Key,
+  PropsWithChildren,
+  Suspense,
+  lazy,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
@@ -44,6 +53,7 @@ import {
   PredictClientV2,
   SearchEventsButton,
   PredictSearchModal,
+  PREDICT_SEARCH_MODAL_ID,
   eventByIdQueryKey,
   fetchEventById,
   usePredictClient,
@@ -326,6 +336,8 @@ function PageShell({ children }: PropsWithChildren) {
 
   const isPredictPage = pathname.startsWith("/predict");
 
+  const { onClose: closePredictSearch } = useAsyncModal(PREDICT_SEARCH_MODAL_ID);
+
   const queryClient = useQueryClient();
   const predictClient = usePredictClient();
 
@@ -333,8 +345,7 @@ function PageShell({ children }: PropsWithChildren) {
     (event: V2Event) => {
       queryClient.prefetchQuery({
         queryKey: eventByIdQueryKey({ id: event.slug, withNestedMarkets: true }),
-        queryFn: () =>
-          fetchEventById(predictClient, { id: event.slug, withNestedMarkets: true }),
+        queryFn: () => fetchEventById(predictClient, { id: event.slug, withNestedMarkets: true }),
         staleTime: 30_000,
       });
     },
@@ -359,11 +370,15 @@ function PageShell({ children }: PropsWithChildren) {
                 <SearchEventsButton
                   onSelectEvent={(event) => {
                     router.push(`/predict/${event.slug}`);
+                    closePredictSearch();
                   }}
                   modalParams={{
                     source: "dflow",
                     getEventHref: (event) => `/predict/${event.slug}`,
-                    LinkComponent: Link as React.ComponentType<{ href: string; children: React.ReactNode }>,
+                    LinkComponent: Link as React.ComponentType<{
+                      href: string;
+                      children: React.ReactNode;
+                    }>,
                     onHover: handlePredictHover,
                   }}
                 />
