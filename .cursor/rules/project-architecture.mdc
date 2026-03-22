@@ -1,0 +1,100 @@
+---
+description: Monorepo architecture — structure, tech stack, providers, routing patterns
+alwaysApply: true
+---
+
+# Project Architecture
+
+## Overview
+
+pnpm workspace monorepo with Turbo, hosting a Next.js 15 (App Router) DEX web application. Heavily depends on `@liberfi.io/*` packages from the sibling `react-sdk` repo.
+
+## Monorepo Structure
+
+| Layer | Path | Purpose |
+|-------|------|---------|
+| App | `apps/web/` | Next.js 15 application (App Router) |
+| Core utils | `packages/core/` | Shared utilities, config, types |
+| Locales | `packages/locales/` | i18n translations (gulp build) |
+| Data hooks | `packages/react-backend/` | GraphQL client |
+| Data hooks | `packages/react-dex/` | DEX API hooks |
+| Data hooks | `packages/react-launchpad/` | Launchpad hooks |
+| Data hooks | `packages/react-redpacket/` | RedPacket hooks |
+| UI | `packages/ui-base/` | Base UI components |
+| UI | `packages/ui-dex/` | DEX-specific UI |
+| UI | `packages/ui-launchpad/` | Launchpad UI |
+| UI | `packages/ui-redpacket/` | RedPacket UI |
+
+## Tech Stack
+
+| Concern | Choice |
+|---------|--------|
+| Language | TypeScript 5.7 |
+| Framework | Next.js 15 (App Router) |
+| Package manager | pnpm 9.5.0 |
+| Build orchestration | Turbo |
+| State management | Jotai + TanStack React Query 5 |
+| UI library | HeroUI + Tailwind CSS 4 + Framer Motion |
+| Authentication | Privy (`@liberfi.io/wallet-connector-privy`) |
+| Blockchain | `@chainstream-io/sdk`, Solana Web3, viem |
+| i18n | next-international + i18next + `@liberfi.io/i18n` |
+| Monitoring | Sentry (`@sentry/nextjs`) |
+| GraphQL | graphql-request + graphql-codegen |
+
+## Routing (App Router)
+
+Route groups separate new and legacy implementations:
+
+| Group | Purpose |
+|-------|---------|
+| `app/(new)/` | New layout and pages |
+| `app/(legacy)/` | Legacy pages using older providers |
+
+Key routes:
+
+| Route | Page |
+|-------|------|
+| `/` | Discovery (token list) |
+| `/tokens/[[...slug]]` | Token detail |
+| `/predict` | Prediction market list |
+| `/predict/[id]` | Prediction detail |
+| `/channels`, `/channels/[id]` | Signal channels |
+| `/portfolio` | Portfolio |
+| `/redpacket` | RedPacket |
+| `/discover` | Discovery |
+
+## Provider Hierarchy
+
+```
+QueryClientProvider
+└─ AuthProviders (Privy)
+    └─ LocaleProvider
+        └─ ServiceProviders
+            ├─ DexClientProvider / APIClientProvider
+            ├─ MediaTrackProvider
+            ├─ ChannelsProvider
+            ├─ PredictProvider
+            └─ PortfolioProvider
+                └─ LegacyBridge
+                    └─ PageShell (Scaffold)
+```
+
+When adding new providers, insert them at the **ServiceProviders** level.
+
+## Module Singleton Guarantee
+
+`next.config.mjs` uses webpack aliases to ensure monorepo-wide singletons for Jotai, @liberfi.io/ui-chain-select, etc. When adding a new package that holds global state, add its alias to `next.config.mjs` → `resolve.alias`.
+
+## Relationship to react-sdk
+
+- `@liberfi.io/*` packages come from the sibling `../react-sdk` monorepo
+- Version source of truth: `../react-sdk/packages/*/package.json`
+- When upgrading `@liberfi.io/*`, update ALL workspace packages (apps + packages) — see `.cursor/rules/liberfi-sdk-context.mdc`
+- `@liberfi/*` (this repo) wraps and extends `@liberfi.io/*` (react-sdk) for template-specific needs
+
+## Styling
+
+- Tailwind CSS 4 via `@tailwindcss/postcss`
+- Global styles: `apps/web/src/styles/globals.css`
+- `@source` directives in `globals.css` scan package dist files for class detection
+- UI packages produce their own CSS via PostCSS

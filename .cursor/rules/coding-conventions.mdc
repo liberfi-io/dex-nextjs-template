@@ -1,0 +1,74 @@
+---
+description: Code style, formatting, naming, and development conventions
+alwaysApply: true
+---
+
+# Coding Conventions
+
+## Package Manager
+
+- Use **pnpm 9.5.0** exclusively
+- Run `pnpm install` before development
+- Use `pnpm install --no-frozen-lockfile` only when updating dependencies
+
+## Code Formatting & Linting
+
+- **ESLint 9** (flat config) — each package has its own `eslint.config.mjs`
+- Plugins: `typescript-eslint`, `import-x`, `jsx-a11y`, `react`, `react-hooks`, `i18next`, `unused-imports`, `@next/eslint-plugin-next`, `jsdoc`
+- **Prettier** via `eslint-plugin-prettier` integration
+- lint-staged runs on pre-commit
+
+### Commands
+
+```bash
+pnpm lint          # lint all packages (via Turbo)
+pnpm lint:fix      # auto-fix lint errors
+pnpm build         # build all packages
+pnpm dev           # start Next.js dev server
+```
+
+## Naming Conventions
+
+| Element | Convention | Example |
+|---------|-----------|---------|
+| Package scope (this repo) | `@liberfi/` | `@liberfi/core`, `@liberfi/ui-dex` |
+| Package scope (SDK) | `@liberfi.io/` | `@liberfi.io/client`, `@liberfi.io/ui-trade` |
+| Component | PascalCase | `TokenListWidget` |
+| Hook | `useXxx` | `useDexClient` |
+| Route group | `(name)` | `(new)`, `(legacy)` |
+| Page file | `page.tsx` | Next.js App Router convention |
+| Layout file | `layout.tsx` | Next.js App Router convention |
+
+## Comments
+
+- All code comments MUST be written in **English** (see `english-comments.mdc`)
+- Use JSDoc for public API functions and components
+
+## Dependencies
+
+### Adding @liberfi.io/* packages
+
+When updating `@liberfi.io/*` versions:
+
+1. Switch npm registry to official source (`nrm use npm` or `npm config set registry https://registry.npmjs.org/`)
+2. Update `apps/web/package.json`
+3. Update ALL `packages/*/package.json` (both `peerDependencies` and `devDependencies`)
+4. Sync `@chainstream-io/sdk` version to match `@liberfi.io/client`'s dependency
+5. Run `pnpm install --no-frozen-lockfile`
+6. Switch registry back to mirror (`nrm use taobao`)
+
+See `.cursor/rules/liberfi-sdk-context.mdc` for full rules.
+
+### Singleton dependencies
+
+These must use webpack alias in `next.config.mjs` to guarantee a single instance:
+
+- `jotai`
+- `@liberfi.io/ui-chain-select`
+- Any package holding React Context or global state
+
+## Environment Variables
+
+- Prefix client-side vars with `NEXT_PUBLIC_`
+- Define env vars in `turbo.json` → `globalEnv` / `env` for proper cache invalidation
+- Never commit `.env.local`; reference `.env.example` for available variables

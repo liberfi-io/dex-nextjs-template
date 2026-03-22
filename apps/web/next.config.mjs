@@ -31,6 +31,10 @@ const nextConfig = {
         source: "/predict-api/:path*",
         destination: process.env.PREDICT_URL + "/:path*",
       },
+      {
+        source: "/predict-v2-api/:path*",
+        destination: process.env.PREDICT_V2_URL + "/:path*",
+      },
     ];
   },
   webpack(config) {

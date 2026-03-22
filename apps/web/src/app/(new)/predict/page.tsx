@@ -1,5 +1,5 @@
-import { PredictListPage } from "../../../components/page/PredictListPage";
+import { PredictListPageV2 } from "src/components/page/PredictListPageV2";
 
 export default function Page() {
-  return <PredictListPage />;
+  return <PredictListPageV2 />;
 }

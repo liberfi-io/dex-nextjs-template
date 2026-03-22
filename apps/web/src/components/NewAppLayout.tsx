@@ -37,7 +37,7 @@ import { MediaTrackProvider } from "@liberfi.io/ui-media-track";
 import { ChannelsClient } from "@liberfi.io/ui-channels/client";
 import { ChannelsProvider } from "@liberfi.io/ui-channels";
 import { PredictClient } from "@liberfi.io/ui-predict/client";
-import { PredictProvider } from "@liberfi.io/ui-predict";
+import { PredictProvider, PredictV2Provider, PredictClientV2 } from "@liberfi.io/ui-predict";
 import { PortfolioClient } from "@liberfi.io/ui-portfolio/client";
 import { PortfolioClientProvider, PortfolioProvider } from "@liberfi.io/ui-portfolio";
 import { AccountInfoWidget } from "@liberfi.io/ui-portfolio";
@@ -217,6 +217,11 @@ function ServiceProviders({ children }: PropsWithChildren) {
     [],
   );
 
+  const predictV2Client = useMemo(
+    () => new PredictClientV2(baseUrl + process.env.NEXT_PUBLIC_PREDICT_V2_URL),
+    [],
+  );
+
   const portfolioClient = useMemo(
     () => new PortfolioClient(baseUrl + process.env.NEXT_PUBLIC_DEX_AGGREGATOR_URL),
     [],
@@ -231,11 +236,13 @@ function ServiceProviders({ children }: PropsWithChildren) {
         <MediaTrackProvider client={mediaTrackClient}>
           <ChannelsProvider client={channelsClient}>
             <PredictProvider client={predictClient}>
-              <PortfolioClientProvider client={portfolioClient}>
-                <PortfolioProvider chain={chain} address={wallet?.address ?? ""}>
-                  {children}
-                </PortfolioProvider>
-              </PortfolioClientProvider>
+              <PredictV2Provider client={predictV2Client}>
+                <PortfolioClientProvider client={portfolioClient}>
+                  <PortfolioProvider chain={chain} address={wallet?.address ?? ""}>
+                    {children}
+                  </PortfolioProvider>
+                </PortfolioClientProvider>
+              </PredictV2Provider>
             </PredictProvider>
           </ChannelsProvider>
         </MediaTrackProvider>
