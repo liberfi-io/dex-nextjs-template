@@ -50,12 +50,13 @@ pnpm dev           # start Next.js dev server
 
 When updating `@liberfi.io/*` versions:
 
-1. Switch npm registry to official source (`nrm use npm` or `npm config set registry https://registry.npmjs.org/`)
-2. Update `apps/web/package.json`
-3. Update ALL `packages/*/package.json` (both `peerDependencies` and `devDependencies`)
-4. Sync `@chainstream-io/sdk` version to match `@liberfi.io/client`'s dependency
-5. Run `pnpm install --no-frozen-lockfile`
-6. Switch registry back to mirror (`nrm use taobao`)
+1. Update `apps/web/package.json`
+2. Update ALL `packages/*/package.json` (both `peerDependencies` and `devDependencies`)
+3. Sync `@chainstream-io/sdk` version to match `@liberfi.io/client`'s dependency
+4. **Stop here** — tell the user to run the following themselves:
+   ```bash
+   nrm use npm && pnpm install --no-frozen-lockfile && pnpm build && nrm use taobao
+   ```
 
 See `.cursor/rules/liberfi-sdk-context.mdc` for full rules.
 

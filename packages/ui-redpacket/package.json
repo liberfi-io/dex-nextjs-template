@@ -24,7 +24,7 @@
     "@liberfi/react-redpacket": "workspace:*",
     "@liberfi/ui-base": "workspace:*",
     "@liberfi/ui-dex": "workspace:*",
-    "@privy-io/react-auth": "^3.0.1",
+    "@privy-io/react-auth": "^3.16.0",
     "@react-aria/interactions": "^3.22.5",
     "@solana/web3.js": "^1.98.4",
     "@tanstack/react-query": "^5.90.2",
@@ -32,7 +32,7 @@
     "clsx": "^2.1.1",
     "copy-to-clipboard": "^3.3.3",
     "fastestsmallesttextencoderdecoder": "^1.0.22",
-    "framer-motion": "^11.15.0",
+    "framer-motion": "^12.0.0",
     "graphql-request": "^7.1.2",
     "i18next": "^24.2.2",
     "jotai": "^2.15.1",
@@ -59,16 +59,16 @@
     "tailwindcss": "^4.1.11"
   },
   "peerDependencies": {
-    "@liberfi.io/client": ">=0.1.78",
-    "@liberfi.io/types": ">=0.1.68",
-    "@liberfi.io/ui-portfolio": ">=0.1.50"
+    "@liberfi.io/client": ">=0.1.81",
+    "@liberfi.io/types": ">=0.1.71",
+    "@liberfi.io/ui-portfolio": ">=0.1.53"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^3.2.3",
     "@eslint/js": "^9.20.0",
-    "@liberfi.io/client": "^0.1.78",
-    "@liberfi.io/types": "^0.1.68",
-    "@liberfi.io/ui-portfolio": "^0.1.50",
+    "@liberfi.io/client": "^0.1.81",
+    "@liberfi.io/types": "^0.1.71",
+    "@liberfi.io/ui-portfolio": "^0.1.53",
     "@storybook/addon-essentials": "^8.4.7",
     "@storybook/addon-interactions": "^8.4.7",
     "@storybook/addon-styling-webpack": "^1.0.1",

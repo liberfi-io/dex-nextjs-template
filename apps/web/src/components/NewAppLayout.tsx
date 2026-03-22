@@ -14,6 +14,7 @@
  */
 
 import { Key, PropsWithChildren, Suspense, lazy, useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { QueryClientProvider, useQueryClient } from "@tanstack/react-query";
@@ -37,7 +38,17 @@ import { MediaTrackProvider } from "@liberfi.io/ui-media-track";
 import { ChannelsClient } from "@liberfi.io/ui-channels/client";
 import { ChannelsProvider } from "@liberfi.io/ui-channels";
 import { PredictClient } from "@liberfi.io/ui-predict/client";
-import { PredictProvider, PredictV2Provider, PredictClientV2 } from "@liberfi.io/ui-predict";
+import {
+  PredictProvider,
+  PredictV2Provider,
+  PredictClientV2,
+  SearchEventsButton,
+  PredictSearchModal,
+  eventByIdQueryKey,
+  fetchEventById,
+  usePredictClient,
+  type V2Event,
+} from "@liberfi.io/ui-predict";
 import { PortfolioClient } from "@liberfi.io/ui-portfolio/client";
 import { PortfolioClientProvider, PortfolioProvider } from "@liberfi.io/ui-portfolio";
 import { AccountInfoWidget } from "@liberfi.io/ui-portfolio";
@@ -131,6 +142,7 @@ export function NewAppLayout({ children, locale }: PropsWithChildren<{ locale: L
               <LaunchPadModal />
               <StyledToaster />
               <SearchModal />
+              <PredictSearchModal />
               <PresetFormModal />
               <Suspense>
                 {LegacyModals.map((Modal, i) => (
@@ -312,6 +324,23 @@ function PageShell({ children }: PropsWithChildren) {
   const { chain } = useCurrentChain();
   const switchChain = useSwitchChain();
 
+  const isPredictPage = pathname.startsWith("/predict");
+
+  const queryClient = useQueryClient();
+  const predictClient = usePredictClient();
+
+  const handlePredictHover = useCallback(
+    (event: V2Event) => {
+      queryClient.prefetchQuery({
+        queryKey: eventByIdQueryKey({ id: event.slug, withNestedMarkets: true }),
+        queryFn: () =>
+          fetchEventById(predictClient, { id: event.slug, withNestedMarkets: true }),
+        staleTime: 30_000,
+      });
+    },
+    [queryClient, predictClient],
+  );
+
   return (
     <Scaffold
       pathname={pathname}
@@ -326,15 +355,29 @@ function PageShell({ children }: PropsWithChildren) {
           navItems={navItems}
           right={
             <>
-              <SearchTokensButton
-                chains={[chain]}
-                onSelectToken={(token) => {
-                  const slug = chainSlug(token.chain);
-                  if (slug) {
-                    router.push(`/tokens/${slug}/${token.address}`);
-                  }
-                }}
-              />
+              {isPredictPage ? (
+                <SearchEventsButton
+                  onSelectEvent={(event) => {
+                    router.push(`/predict/${event.slug}`);
+                  }}
+                  modalParams={{
+                    source: "dflow",
+                    getEventHref: (event) => `/predict/${event.slug}`,
+                    LinkComponent: Link as React.ComponentType<{ href: string; children: React.ReactNode }>,
+                    onHover: handlePredictHover,
+                  }}
+                />
+              ) : (
+                <SearchTokensButton
+                  chains={[chain]}
+                  onSelectToken={(token) => {
+                    const slug = chainSlug(token.chain);
+                    if (slug) {
+                      router.push(`/tokens/${slug}/${token.address}`);
+                    }
+                  }}
+                />
+              )}
 
               <ChainSelectWidget
                 size="sm"
