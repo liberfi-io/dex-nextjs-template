@@ -3,21 +3,13 @@
 import { useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@liberfi.io/ui";
-import {
-  EventsPageV2,
-  eventV2QueryKey,
-  fetchEventV2,
-  usePredictV2Client,
-} from "@liberfi.io/ui-predict";
+import { EventsPageV2 } from "@liberfi.io/ui-predict";
 import type { V2Event, V2Market } from "@liberfi.io/ui-predict";
 import { predictEventHref } from "./predict-source";
 
 export function PredictListPageV2() {
   const router = useRouter();
-  const queryClient = useQueryClient();
-  const v2Client = usePredictV2Client();
 
   const handleSelect = (event: V2Event) => {
     router.push(predictEventHref(event));
@@ -33,13 +25,9 @@ export function PredictListPageV2() {
 
   const handleHover = useCallback(
     (event: V2Event) => {
-      queryClient.prefetchQuery({
-        queryKey: eventV2QueryKey(event.slug, event.source),
-        queryFn: () => fetchEventV2(v2Client, event.slug, event.source),
-        staleTime: 30_000,
-      });
+      router.prefetch(predictEventHref(event));
     },
-    [queryClient, v2Client],
+    [router],
   );
 
   return (
