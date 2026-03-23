@@ -54,11 +54,12 @@ import {
   SearchEventsButton,
   PredictSearchModal,
   PREDICT_SEARCH_MODAL_ID,
-  eventByIdQueryKey,
-  fetchEventById,
-  usePredictClient,
+  eventV2QueryKey,
+  fetchEventV2,
+  usePredictV2Client,
   type V2Event,
 } from "@liberfi.io/ui-predict";
+import { predictEventHref } from "./page/predict-source";
 import { PortfolioClient } from "@liberfi.io/ui-portfolio/client";
 import { PortfolioClientProvider, PortfolioProvider } from "@liberfi.io/ui-portfolio";
 import { AccountInfoWidget } from "@liberfi.io/ui-portfolio";
@@ -339,17 +340,17 @@ function PageShell({ children }: PropsWithChildren) {
   const { onClose: closePredictSearch } = useAsyncModal(PREDICT_SEARCH_MODAL_ID);
 
   const queryClient = useQueryClient();
-  const predictClient = usePredictClient();
+  const v2Client = usePredictV2Client();
 
   const handlePredictHover = useCallback(
     (event: V2Event) => {
       queryClient.prefetchQuery({
-        queryKey: eventByIdQueryKey({ id: event.slug, withNestedMarkets: true }),
-        queryFn: () => fetchEventById(predictClient, { id: event.slug, withNestedMarkets: true }),
+        queryKey: eventV2QueryKey(event.slug, event.source),
+        queryFn: () => fetchEventV2(v2Client, event.slug, event.source),
         staleTime: 30_000,
       });
     },
-    [queryClient, predictClient],
+    [queryClient, v2Client],
   );
 
   return (
@@ -369,12 +370,12 @@ function PageShell({ children }: PropsWithChildren) {
               {isPredictPage ? (
                 <SearchEventsButton
                   onSelectEvent={(event) => {
-                    router.push(`/predict/${event.slug}`);
+                    router.push(predictEventHref(event));
                     closePredictSearch();
                   }}
                   modalParams={{
                     source: "dflow",
-                    getEventHref: (event) => `/predict/${event.slug}`,
+                    getEventHref: (event) => predictEventHref(event),
                     LinkComponent: Link as React.ComponentType<{
                       href: string;
                       children: React.ReactNode;
