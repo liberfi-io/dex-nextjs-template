@@ -4,9 +4,12 @@ import { useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cn } from "@liberfi.io/ui";
+import type { LinkComponentType } from "@liberfi.io/ui";
 import { EventsPageV2 } from "@liberfi.io/ui-predict";
 import type { V2Event, V2Market } from "@liberfi.io/ui-predict";
 import { predictEventHref } from "./predict-source";
+
+const NoPrefetchLink: LinkComponentType = (props) => <Link prefetch={false} {...props} />;
 
 export function PredictListPageV2() {
   const router = useRouter();
@@ -15,11 +18,7 @@ export function PredictListPageV2() {
     router.push(predictEventHref(event));
   };
 
-  const handleSelectOutcome = (
-    event: V2Event,
-    _market: V2Market,
-    _side: "yes" | "no",
-  ) => {
+  const handleSelectOutcome = (event: V2Event, _market: V2Market, _side: "yes" | "no") => {
     router.push(predictEventHref(event));
   };
 
@@ -35,7 +34,7 @@ export function PredictListPageV2() {
       <div className="p-2 sm:p-4 w-full h-full max-w-[1550px] mx-auto">
         <EventsPageV2
           getEventHref={(event: V2Event) => predictEventHref(event)}
-          LinkComponent={Link as React.ComponentType<{ href: string; children: React.ReactNode }>}
+          LinkComponent={NoPrefetchLink}
           onHover={handleHover}
           onSelect={handleSelect}
           onSelectOutcome={handleSelectOutcome}
