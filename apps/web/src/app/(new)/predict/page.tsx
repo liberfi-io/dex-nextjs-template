@@ -12,10 +12,14 @@ export default async function Page() {
   const queryClient = createServerQueryClient();
   const client = getServerPredictV2Client();
 
-  // resolveEventsV2Params() with no args produces the same default params
-  // as the client-side useEventsV2 hook's initial render, guaranteeing
-  // the prefetched data lands in the same cache slot.
-  const params = resolveEventsV2Params();
+  // Must match the client-side defaults in EventsPageV2:
+  //   DEFAULT_FILTER_STATE.source = "dflow"
+  //   SORT_PRESETS["trending"]    = { sort_by: "volume_24h", sort_asc: false }
+  const params = resolveEventsV2Params({
+    source: "dflow",
+    sort_by: "volume_24h",
+    sort_asc: false,
+  });
 
   await queryClient.prefetchInfiniteQuery({
     queryKey: eventsV2InfiniteQueryKey(params),
