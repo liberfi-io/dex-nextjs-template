@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@liberfi.io/ui";
 
 function Bone({ className }: { className?: string }) {
