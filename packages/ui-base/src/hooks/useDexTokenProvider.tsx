@@ -17,8 +17,8 @@ export function useDexTokenProvider(loader: DexTokenLoader) {
   // if renew is ongoing
   const renewRef = useRef(false);
 
-  // renew the dex token
   const renewDexToken = useCallback(async () => {
+    if (typeof window === "undefined") return;
     if (renewRef.current) return;
     renewRef.current = true;
 
@@ -53,7 +53,8 @@ export function useDexTokenProvider(loader: DexTokenLoader) {
   const tokenProvider = useMemo(() => {
     return {
       getToken: async () => {
-        // if the token is not expired, use it
+        if (typeof window === "undefined") return "";
+
         const dexToken = await loader.get();
         if (dexToken) {
           return dexToken;

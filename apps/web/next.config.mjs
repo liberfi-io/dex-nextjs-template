@@ -54,6 +54,10 @@ const nextConfig = {
     config.resolve.alias = {
       ...config.resolve.alias,
       jotai: path.resolve(__dirname, "node_modules/jotai"),
+      "react-hook-form": path.resolve(
+        __dirname,
+        "node_modules/react-hook-form",
+      ),
       "@liberfi.io/ui-chain-select": path.resolve(
         __dirname,
         "node_modules/@liberfi.io/ui-chain-select",
@@ -66,6 +70,11 @@ const nextConfig = {
         __dirname,
         "node_modules/@liberfi.io/ui-portfolio",
       ),
+    };
+
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      "@farcaster/mini-app-solana": false,
     };
 
     config.module.rules.push({
