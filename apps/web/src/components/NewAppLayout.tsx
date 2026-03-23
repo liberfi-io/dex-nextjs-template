@@ -325,6 +325,14 @@ function PageShell({ children }: PropsWithChildren) {
     [t],
   );
 
+  useEffect(() => {
+    navItemsConfig.forEach((item) => {
+      if (item.href !== pathname) {
+        router.prefetch(item.href);
+      }
+    });
+  }, [router, pathname]);
+
   const onNavigate = useCallback(
     (href: string) => {
       router.push(href);
