@@ -54,13 +54,12 @@ import {
   SearchEventsButton,
   PredictSearchModal,
   PREDICT_SEARCH_MODAL_ID,
-  eventV2QueryKey,
-  fetchEventV2,
-  usePredictV2Client,
   type V2Event,
 } from "@liberfi.io/ui-predict";
 import { predictEventHref } from "./page/predict-source";
 import { PortfolioClient } from "@liberfi.io/ui-portfolio/client";
+
+const NoPrefetchLink: LinkComponentType = (props) => <Link prefetch={false} {...props} />;
 import { PortfolioClientProvider, PortfolioProvider } from "@liberfi.io/ui-portfolio";
 import { AccountInfoWidget } from "@liberfi.io/ui-portfolio";
 import {
@@ -77,6 +76,7 @@ import {
   WalletIcon,
   cn,
 } from "@liberfi.io/ui";
+import type { LinkComponentType } from "@liberfi.io/ui";
 import {
   Scaffold,
   ScaffoldHeader,
@@ -339,18 +339,11 @@ function PageShell({ children }: PropsWithChildren) {
 
   const { onClose: closePredictSearch } = useAsyncModal(PREDICT_SEARCH_MODAL_ID);
 
-  const queryClient = useQueryClient();
-  const v2Client = usePredictV2Client();
-
   const handlePredictHover = useCallback(
     (event: V2Event) => {
-      queryClient.prefetchQuery({
-        queryKey: eventV2QueryKey(event.slug, event.source),
-        queryFn: () => fetchEventV2(v2Client, event.slug, event.source),
-        staleTime: 30_000,
-      });
+      router.prefetch(predictEventHref(event));
     },
-    [queryClient, v2Client],
+    [router],
   );
 
   return (
@@ -376,10 +369,7 @@ function PageShell({ children }: PropsWithChildren) {
                   modalParams={{
                     source: "dflow",
                     getEventHref: (event) => predictEventHref(event),
-                    LinkComponent: Link as React.ComponentType<{
-                      href: string;
-                      children: React.ReactNode;
-                    }>,
+                    LinkComponent: NoPrefetchLink,
                     onHover: handlePredictHover,
                   }}
                 />
