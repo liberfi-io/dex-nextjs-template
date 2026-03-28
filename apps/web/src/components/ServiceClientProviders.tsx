@@ -14,8 +14,7 @@ import { useAuth, useWallets } from "@liberfi.io/wallet-connector";
 import { ChannelsClient } from "@liberfi.io/ui-channels/client";
 import { ChannelsProvider } from "@liberfi.io/ui-channels";
 
-import { PredictProvider } from "@liberfi.io/ui-predict";
-import { PredictClient } from "@liberfi.io/ui-predict/client";
+import { PredictProvider, PredictClient } from "@liberfi.io/react-predict";
 import { PortfolioClientProvider, PortfolioProvider } from "@liberfi.io/ui-portfolio";
 import { PortfolioClient } from "@liberfi.io/ui-portfolio/client";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
@@ -97,7 +96,7 @@ function DexClientLoader({ children }: PropsWithChildren) {
 
   const predictClient = useMemo(
     () =>
-      new PredictClient(baseUrl + process.env.NEXT_PUBLIC_PREDICT_URL),
+      new PredictClient(baseUrl + process.env.NEXT_PUBLIC_PREDICT_V2_URL),
     [],
   );
 

@@ -1,30 +1,30 @@
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import {
-  resolveEventsV2Params,
-  eventsV2InfiniteQueryKey,
-  fetchEventsV2Page,
-} from "@liberfi.io/ui-predict/server";
-import { getServerPredictV2Client } from "src/libs/server/predictClient";
+  resolveEventsParams,
+  infiniteEventsQueryKey,
+  fetchEventsPage,
+} from "@liberfi.io/react-predict/server";
+import { getServerPredictClient } from "src/libs/server/predictClient";
 import { createServerQueryClient } from "src/libs/server/queryClient";
 import { PredictListPageV2 } from "src/components/page/PredictListPageV2";
 
 export default async function Page() {
   const queryClient = createServerQueryClient();
-  const client = getServerPredictV2Client();
+  const client = getServerPredictClient();
 
-  // Must match the client-side defaults in EventsPageV2:
+  // Must match the client-side defaults in EventsPage:
   //   DEFAULT_FILTER_STATE.source = "dflow"
   //   SORT_PRESETS["trending"]    = { sort_by: "volume_24h", sort_asc: false }
-  const params = resolveEventsV2Params({
+  const params = resolveEventsParams({
     source: "dflow",
     sort_by: "volume_24h",
     sort_asc: false,
   });
 
   await queryClient.prefetchInfiniteQuery({
-    queryKey: eventsV2InfiniteQueryKey(params),
+    queryKey: infiniteEventsQueryKey(params),
     queryFn: ({ pageParam }) =>
-      fetchEventsV2Page(client, {
+      fetchEventsPage(client, {
         ...params,
         ...(pageParam ? { cursor: pageParam } : {}),
       }),

@@ -46,15 +46,12 @@ import { MediaTrackClient } from "@liberfi.io/ui-media-track/client";
 import { MediaTrackProvider } from "@liberfi.io/ui-media-track";
 import { ChannelsClient } from "@liberfi.io/ui-channels/client";
 import { ChannelsProvider } from "@liberfi.io/ui-channels";
-import { PredictClient } from "@liberfi.io/ui-predict/client";
+import { PredictClient, PredictProvider } from "@liberfi.io/react-predict";
+import type { PredictEvent } from "@liberfi.io/react-predict";
 import {
-  PredictProvider,
-  PredictV2Provider,
-  PredictClientV2,
   SearchEventsButton,
   PredictSearchModal,
   PREDICT_SEARCH_MODAL_ID,
-  type V2Event,
 } from "@liberfi.io/ui-predict";
 import { predictEventHref } from "./page/predict-source";
 import { PortfolioClient } from "@liberfi.io/ui-portfolio/client";
@@ -236,12 +233,7 @@ function ServiceProviders({ children }: PropsWithChildren) {
   );
 
   const predictClient = useMemo(
-    () => new PredictClient(baseUrl + process.env.NEXT_PUBLIC_PREDICT_URL),
-    [],
-  );
-
-  const predictV2Client = useMemo(
-    () => new PredictClientV2(baseUrl + process.env.NEXT_PUBLIC_PREDICT_V2_URL),
+    () => new PredictClient(baseUrl + process.env.NEXT_PUBLIC_PREDICT_V2_URL),
     [],
   );
 
@@ -259,13 +251,11 @@ function ServiceProviders({ children }: PropsWithChildren) {
         <MediaTrackProvider client={mediaTrackClient}>
           <ChannelsProvider client={channelsClient}>
             <PredictProvider client={predictClient}>
-              <PredictV2Provider client={predictV2Client}>
                 <PortfolioClientProvider client={portfolioClient}>
                   <PortfolioProvider chain={chain} address={wallet?.address ?? ""}>
                     {children}
                   </PortfolioProvider>
                 </PortfolioClientProvider>
-              </PredictV2Provider>
             </PredictProvider>
           </ChannelsProvider>
         </MediaTrackProvider>
@@ -348,7 +338,7 @@ function PageShell({ children }: PropsWithChildren) {
   const { onClose: closePredictSearch } = useAsyncModal(PREDICT_SEARCH_MODAL_ID);
 
   const handlePredictHover = useCallback(
-    (event: V2Event) => {
+    (event: PredictEvent) => {
       router.prefetch(predictEventHref(event));
     },
     [router],
