@@ -233,7 +233,7 @@ function ServiceProviders({ children }: PropsWithChildren) {
   );
 
   const predictClient = useMemo(
-    () => new PredictClient(baseUrl + process.env.NEXT_PUBLIC_PREDICT_V2_URL),
+    () => new PredictClient(baseUrl + process.env.NEXT_PUBLIC_PREDICT_URL),
     [],
   );
 
