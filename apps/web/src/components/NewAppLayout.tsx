@@ -46,7 +46,7 @@ import { MediaTrackClient } from "@liberfi.io/ui-media-track/client";
 import { MediaTrackProvider } from "@liberfi.io/ui-media-track";
 import { ChannelsClient } from "@liberfi.io/ui-channels/client";
 import { ChannelsProvider } from "@liberfi.io/ui-channels";
-import { PredictClient, PredictProvider } from "@liberfi.io/react-predict";
+import { PredictClient, PredictProvider, createPredictWsClient } from "@liberfi.io/react-predict";
 import type { PredictEvent } from "@liberfi.io/react-predict";
 import {
   SearchEventsButton,
@@ -237,6 +237,12 @@ function ServiceProviders({ children }: PropsWithChildren) {
     [],
   );
 
+  const predictWsClient = useMemo(() => {
+    const wsUrl = process.env.NEXT_PUBLIC_PREDICT_WS_URL;
+    if (!wsUrl) return null;
+    return createPredictWsClient({ wsUrl, autoConnect: true, autoReconnect: true });
+  }, []);
+
   const portfolioClient = useMemo(
     () => new PortfolioClient(baseUrl + process.env.NEXT_PUBLIC_DEX_AGGREGATOR_URL),
     [],
@@ -250,7 +256,7 @@ function ServiceProviders({ children }: PropsWithChildren) {
       <APIClientProvider client={apiClient} subscribeClient={apiClient}>
         <MediaTrackProvider client={mediaTrackClient}>
           <ChannelsProvider client={channelsClient}>
-            <PredictProvider client={predictClient}>
+            <PredictProvider client={predictClient} wsClient={predictWsClient}>
                 <PortfolioClientProvider client={portfolioClient}>
                   <PortfolioProvider chain={chain} address={wallet?.address ?? ""}>
                     {children}

@@ -14,7 +14,7 @@ import { useAuth, useWallets } from "@liberfi.io/wallet-connector";
 import { ChannelsClient } from "@liberfi.io/ui-channels/client";
 import { ChannelsProvider } from "@liberfi.io/ui-channels";
 
-import { PredictProvider, PredictClient } from "@liberfi.io/react-predict";
+import { PredictProvider, PredictClient, createPredictWsClient } from "@liberfi.io/react-predict";
 import { PortfolioClientProvider, PortfolioProvider } from "@liberfi.io/ui-portfolio";
 import { PortfolioClient } from "@liberfi.io/ui-portfolio/client";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
@@ -100,6 +100,12 @@ function DexClientLoader({ children }: PropsWithChildren) {
     [],
   );
 
+  const predictWsClient = useMemo(() => {
+    const wsUrl = process.env.NEXT_PUBLIC_PREDICT_WS_URL;
+    if (!wsUrl) return null;
+    return createPredictWsClient({ wsUrl, autoConnect: true, autoReconnect: true });
+  }, []);
+
   const portfolioClient = useMemo(
     () =>
       new PortfolioClient(baseUrl + process.env.NEXT_PUBLIC_DEX_AGGREGATOR_URL),
@@ -115,7 +121,7 @@ function DexClientLoader({ children }: PropsWithChildren) {
       <APIClientProvider client={apiClient} subscribeClient={apiClient}>
         <MediaTrackProvider client={mediaTrackClient}>
           <ChannelsProvider client={channelsClient}>
-            <PredictProvider client={predictClient}>
+            <PredictProvider client={predictClient} wsClient={predictWsClient}>
               <PortfolioClientProvider client={portfolioClient}>
                 <PortfolioProvider chain={chain} address={wallet?.address ?? ""}>
                   {children}

@@ -18,6 +18,7 @@ declare global {
       NEXT_PUBLIC_CHANNELS_URL: string;
       NEXT_PUBLIC_AI_COPILOT_URL: string;
       NEXT_PUBLIC_PREDICT_URL: string;
+      NEXT_PUBLIC_PREDICT_WS_URL: string | undefined;
       SENTRY_AUTH_TOKEN: string | undefined;
       GRAPHQL_SERVER_ENDPOINT: string;
       DEX_AGGREGATOR_URL: string;
