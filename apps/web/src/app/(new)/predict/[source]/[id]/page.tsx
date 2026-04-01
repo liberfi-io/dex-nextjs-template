@@ -16,10 +16,18 @@ export default async function Page({ params }: PageProps) {
   const queryClient = createServerQueryClient();
   const client = getServerPredictClient();
 
-  await queryClient.prefetchQuery({
-    queryKey: eventQueryKey(id, apiSource),
-    queryFn: () => fetchEvent(client, id, apiSource),
-  });
+  // Race the prefetch against a 3 s timeout so a slow prediction backend
+  // never blocks the server response. On timeout the page still renders and
+  // the client fetches the data itself.
+  await Promise.race([
+    queryClient.prefetchQuery({
+      queryKey: eventQueryKey(id, apiSource),
+      queryFn: () => fetchEvent(client, id, apiSource),
+    }),
+    new Promise<void>((_, reject) =>
+      setTimeout(() => reject(new Error("prefetch timeout")), 3000),
+    ),
+  ]).catch(() => {});
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

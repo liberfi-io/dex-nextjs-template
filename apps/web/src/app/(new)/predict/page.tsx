@@ -21,20 +21,28 @@ export default async function Page() {
     sort_asc: false,
   });
 
-  await queryClient.prefetchInfiniteQuery({
-    queryKey: infiniteEventsQueryKey(params),
-    queryFn: ({ pageParam }) =>
-      fetchEventsPage(client, {
-        ...params,
-        ...(pageParam ? { cursor: pageParam } : {}),
-      }),
-    initialPageParam: undefined as string | undefined,
-    getNextPageParam: (lastPage: { has_more?: boolean; next_cursor?: string }) =>
-      lastPage.has_more && lastPage.next_cursor
-        ? lastPage.next_cursor
-        : undefined,
-    pages: 1,
-  });
+  // Race the prefetch against a 3 s timeout so a slow prediction backend
+  // never blocks the server response. On timeout the page still renders and
+  // the client fetches the data itself.
+  await Promise.race([
+    queryClient.prefetchInfiniteQuery({
+      queryKey: infiniteEventsQueryKey(params),
+      queryFn: ({ pageParam }) =>
+        fetchEventsPage(client, {
+          ...params,
+          ...(pageParam ? { cursor: pageParam } : {}),
+        }),
+      initialPageParam: undefined as string | undefined,
+      getNextPageParam: (lastPage: { has_more?: boolean; next_cursor?: string }) =>
+        lastPage.has_more && lastPage.next_cursor
+          ? lastPage.next_cursor
+          : undefined,
+      pages: 1,
+    }),
+    new Promise<void>((_, reject) =>
+      setTimeout(() => reject(new Error("prefetch timeout")), 3000),
+    ),
+  ]).catch(() => {});
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
