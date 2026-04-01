@@ -96,14 +96,17 @@ function DexClientLoader({ children }: PropsWithChildren) {
 
   const predictClient = useMemo(
     () =>
-      new PredictClient(baseUrl + process.env.NEXT_PUBLIC_PREDICT_V2_URL),
+      new PredictClient(baseUrl + process.env.NEXT_PUBLIC_PREDICT_URL),
     [],
   );
 
   const predictWsClient = useMemo(() => {
     const wsUrl = process.env.NEXT_PUBLIC_PREDICT_WS_URL;
     if (!wsUrl) return null;
-    return createPredictWsClient({ wsUrl, autoConnect: true, autoReconnect: true });
+    // Do NOT auto-connect here — the WS connection is established lazily by
+    // PredictWsConnector inside the /predict layout, so non-predict pages
+    // never open a prediction WebSocket.
+    return createPredictWsClient({ wsUrl, autoConnect: false, autoReconnect: true });
   }, []);
 
   const portfolioClient = useMemo(
