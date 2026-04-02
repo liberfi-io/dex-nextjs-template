@@ -52,6 +52,7 @@ import {
   SearchEventsButton,
   PredictSearchModal,
   PREDICT_SEARCH_MODAL_ID,
+  PredictWalletProvider,
 } from "@liberfi.io/ui-predict";
 import { predictEventHref } from "./page/predict-source";
 import { PortfolioClient } from "@liberfi.io/ui-portfolio/client";
@@ -108,6 +109,8 @@ import { LaunchPadModal, LAUNCHPAD_MODAL_ID } from "./modals/LaunchPadModal";
 import { AppBottomToolbar } from "./AppBottomToolbar";
 import { BottomTweets } from "./BottomTweets";
 import { BottomAICopilot } from "./BottomAICopilot";
+import { PredictDepositButton } from "./PredictDepositButton";
+import { PredictAccountButton } from "./PredictAccountButton";
 
 const LegacyModals = [
   lazy(() => import("@liberfi/ui-dex/components/modals/WebviewModal")),
@@ -260,11 +263,11 @@ function ServiceProviders({ children }: PropsWithChildren) {
         <MediaTrackProvider client={mediaTrackClient}>
           <ChannelsProvider client={channelsClient}>
             <PredictProvider client={predictClient} wsClient={predictWsClient}>
-                <PortfolioClientProvider client={portfolioClient}>
-                  <PortfolioProvider chain={chain} address={wallet?.address ?? ""}>
-                    {children}
-                  </PortfolioProvider>
-                </PortfolioClientProvider>
+              <PortfolioClientProvider client={portfolioClient}>
+                <PortfolioProvider chain={chain} address={wallet?.address ?? ""}>
+                  {children}
+                </PortfolioProvider>
+              </PortfolioClientProvider>
             </PredictProvider>
           </ChannelsProvider>
         </MediaTrackProvider>
@@ -354,97 +357,105 @@ function PageShell({ children }: PropsWithChildren) {
   );
 
   return (
-    <Scaffold
-      pathname={pathname}
-      onNavigate={onNavigate}
-      headerVisible={["desktop", "tablet", "mobile"]}
-      footerVisible={["mobile"]}
-      toolbar={<AppBottomToolbar />}
-      toolbarVisible={["desktop"]}
-      header={
-        <ScaffoldHeader
-          left={<Logo icon={<LogoIcon />} miniIcon={<MiniLogoIcon />} />}
-          navItems={navItems}
-          right={
-            <>
-              {isPredictPage ? (
-                <SearchEventsButton
-                  onSelectEvent={(event) => {
-                    router.push(predictEventHref(event));
-                    closePredictSearch();
-                  }}
-                  modalParams={{
-                    source: "dflow",
-                    getEventHref: (event) => predictEventHref(event),
-                    LinkComponent: NoPrefetchLink,
-                    onHover: handlePredictHover,
-                  }}
-                />
-              ) : (
-                <SearchTokensButton
-                  chains={[chain]}
-                  onSelectToken={(token) => {
-                    const slug = chainSlug(token.chain);
-                    if (slug) {
-                      router.push(`/tokens/${slug}/${token.address}`);
+    // PredictWalletProvider is enabled only on /predict routes to avoid
+    // polling USDC balances on every page. It must live here (inside
+    // PageShell) so the header buttons can also access the context.
+    <PredictWalletProvider enabled={isPredictPage}>
+      <Scaffold
+        pathname={pathname}
+        onNavigate={onNavigate}
+        headerVisible={["desktop", "tablet", "mobile"]}
+        footerVisible={["mobile"]}
+        toolbar={<AppBottomToolbar />}
+        toolbarVisible={["desktop"]}
+        header={
+          <ScaffoldHeader
+            left={<Logo icon={<LogoIcon />} miniIcon={<MiniLogoIcon />} />}
+            navItems={navItems}
+            right={
+              <>
+                {isPredictPage ? (
+                  <SearchEventsButton
+                    onSelectEvent={(event) => {
+                      router.push(predictEventHref(event));
+                      closePredictSearch();
+                    }}
+                    modalParams={{
+                      getEventHref: (event) => predictEventHref(event),
+                      LinkComponent: NoPrefetchLink,
+                      onHover: handlePredictHover,
+                    }}
+                  />
+                ) : (
+                  <SearchTokensButton
+                    chains={[chain]}
+                    onSelectToken={(token) => {
+                      const slug = chainSlug(token.chain);
+                      if (slug) {
+                        router.push(`/tokens/${slug}/${token.address}`);
+                      }
+                    }}
+                  />
+                )}
+
+                {!isPredictPage && (
+                  <ChainSelectWidget
+                    size="sm"
+                    className="max-sm:hidden"
+                    onSwitchChain={switchChain}
+                    candidates={[Chain.SOLANA, Chain.ETHEREUM, Chain.BINANCE]}
+                    onSuccess={(c) =>
+                      toast.success(
+                        t("common.chainSwitched", {
+                          chain: capitalize(chainSlug(c) ?? "") ?? "",
+                        }),
+                      )
                     }
-                  }}
-                />
-              )}
+                    onError={(e) =>
+                      toast.error(e instanceof Error ? e.message : t("common.chainSwitchFailed"))
+                    }
+                  />
+                )}
 
-              <ChainSelectWidget
-                size="sm"
-                className="max-sm:hidden"
-                onSwitchChain={switchChain}
-                candidates={[Chain.SOLANA, Chain.ETHEREUM, Chain.BINANCE]}
-                onSuccess={(c) =>
-                  toast.success(
-                    t("common.chainSwitched", {
-                      chain: capitalize(chainSlug(c) ?? "") ?? "",
-                    }),
-                  )
-                }
-                onError={(e) =>
-                  toast.error(e instanceof Error ? e.message : t("common.chainSwitchFailed"))
-                }
-              />
+                {!isPredictPage && <LaunchPadButton />}
 
-              <LaunchPadButton />
+                {isPredictPage && <PredictDepositButton />}
 
-              <LanguageButton />
+                <LanguageButton />
 
-              <AccountInfoWidget />
-            </>
-          }
-        />
-      }
-      footer={<ScaffoldFooter navItems={navItems} />}
-    >
-      <DraggablePanelProvider
-        contents={[
-          {
-            id: "mediaTrack",
-            title: t("extend.toolbar.media_track_tooltip"),
-            children: <BottomTweets />,
-            modalMaxWidth: 440,
-            modalMinWidth: 320,
-            panelMinWidth: 320,
-            panelMaxWidth: 440,
-          },
-          {
-            id: "aiCopilot",
-            title: t("extend.toolbar.ai_copilot"),
-            children: <BottomAICopilot />,
-            modalMaxWidth: 440,
-            modalMinWidth: 320,
-            panelMinWidth: 320,
-            panelMaxWidth: 440,
-          },
-        ]}
+                {isPredictPage ? <PredictAccountButton /> : <AccountInfoWidget />}
+              </>
+            }
+          />
+        }
+        footer={<ScaffoldFooter navItems={navItems} />}
       >
-        {children}
-      </DraggablePanelProvider>
-    </Scaffold>
+        <DraggablePanelProvider
+          contents={[
+            {
+              id: "mediaTrack",
+              title: t("extend.toolbar.media_track_tooltip"),
+              children: <BottomTweets />,
+              modalMaxWidth: 440,
+              modalMinWidth: 320,
+              panelMinWidth: 320,
+              panelMaxWidth: 440,
+            },
+            {
+              id: "aiCopilot",
+              title: t("extend.toolbar.ai_copilot"),
+              children: <BottomAICopilot />,
+              modalMaxWidth: 440,
+              modalMinWidth: 320,
+              panelMinWidth: 320,
+              panelMaxWidth: 440,
+            },
+          ]}
+        >
+          {children}
+        </DraggablePanelProvider>
+      </Scaffold>
+    </PredictWalletProvider>
   );
 }
 

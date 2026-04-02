@@ -648,6 +648,18 @@ export default {
       "buys_explained": "1h買入數",
       "sells_explained": "1h賣出數",
       "bonding": "進度"
+    },
+    "predict": {
+      "account": {
+        "totalBalance": "USDC 總餘額"
+      },
+      "deposit": {
+        "title": "充值",
+        "copy": "複製地址",
+        "walletNotConnected": "錢包未連接",
+        "polymarketNote": "向此地址發送 Polygon 網絡上的 USDC。",
+        "kalshiNote": "向此地址發送 Solana 網絡上的 USDC。"
+      }
     }
   }
 } as const;

@@ -648,6 +648,18 @@
       "buys_explained": "1h Buys",
       "sells_explained": "1h Sells",
       "bonding": "Bonding"
+    },
+    "predict": {
+      "account": {
+        "totalBalance": "Total USDC"
+      },
+      "deposit": {
+        "title": "Deposit",
+        "copy": "Copy address",
+        "walletNotConnected": "Wallet not connected",
+        "polymarketNote": "Send USDC on Polygon network to this address.",
+        "kalshiNote": "Send USDC on Solana network to this address."
+      }
     }
   }
 }
