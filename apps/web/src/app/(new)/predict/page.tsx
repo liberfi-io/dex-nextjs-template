@@ -13,10 +13,10 @@ export default async function Page() {
   const client = getServerPredictClient();
 
   // Must match the client-side defaults in EventsPage:
-  //   DEFAULT_FILTER_STATE.source = "dflow"
+  //   DEFAULT_FILTER_STATE.source = "kalshi"
   //   SORT_PRESETS["trending"]    = { sort_by: "volume_24h", sort_asc: false }
   const params = resolveEventsParams({
-    source: "dflow",
+    source: "kalshi",
     sort_by: "volume_24h",
     sort_asc: false,
   });
