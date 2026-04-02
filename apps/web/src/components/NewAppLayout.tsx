@@ -46,7 +46,7 @@ import { MediaTrackClient } from "@liberfi.io/ui-media-track/client";
 import { MediaTrackProvider } from "@liberfi.io/ui-media-track";
 import { ChannelsClient } from "@liberfi.io/ui-channels/client";
 import { ChannelsProvider } from "@liberfi.io/ui-channels";
-import { PredictClient, PredictProvider, createPredictWsClient } from "@liberfi.io/react-predict";
+import { PredictClient, PredictProvider } from "@liberfi.io/react-predict";
 import type { PredictEvent } from "@liberfi.io/react-predict";
 import {
   SearchEventsButton,
@@ -343,8 +343,10 @@ function PageShell({ children }: PropsWithChildren) {
 
   const { chain } = useCurrentChain();
   const switchChain = useSwitchChain();
+  const { status: authStatus } = useAuth();
 
   const isPredictPage = pathname.startsWith("/predict");
+  const isAuthenticated = authStatus === "authenticated";
 
   const { onClose: closePredictSearch } = useAsyncModal(PREDICT_SEARCH_MODAL_ID);
 
@@ -418,7 +420,7 @@ function PageShell({ children }: PropsWithChildren) {
 
                 {!isPredictPage && <LaunchPadButton />}
 
-                {isPredictPage && <PredictDepositButton />}
+                {isPredictPage && isAuthenticated && <PredictDepositButton />}
 
                 <LanguageButton />
 
