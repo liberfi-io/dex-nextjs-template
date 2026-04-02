@@ -240,14 +240,13 @@ function ServiceProviders({ children }: PropsWithChildren) {
     [],
   );
 
-  const predictWsClient = useMemo(() => {
-    const wsUrl = process.env.NEXT_PUBLIC_PREDICT_WS_URL;
-    if (!wsUrl) return null;
-    // Do NOT auto-connect here — the WS connection is established lazily by
-    // PredictWsConnector inside the /predict layout, so non-predict pages
-    // never open a prediction WebSocket.
-    return createPredictWsClient({ wsUrl, autoConnect: false, autoReconnect: true });
-  }, []);
+  // TODO: re-enable when prediction WS backend is ready
+  const predictWsClient = null;
+  // const predictWsClient = useMemo(() => {
+  //   const wsUrl = process.env.NEXT_PUBLIC_PREDICT_WS_URL;
+  //   if (!wsUrl) return null;
+  //   return createPredictWsClient({ wsUrl, autoConnect: false, autoReconnect: true });
+  // }, []);
 
   const portfolioClient = useMemo(
     () => new PortfolioClient(baseUrl + process.env.NEXT_PUBLIC_DEX_AGGREGATOR_URL),
