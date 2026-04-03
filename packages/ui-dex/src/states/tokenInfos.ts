@@ -155,9 +155,12 @@ async function fetchTokenInfoInBatch(chainId: Chain, address: string) {
   batchTimer = setTimeout(async () => {
     const resolvers = Array.from(batchResolversMap.entries());
     try {
+      const validTickerSymbols = Array.from(batchTickerSymbols).filter(
+        (ts) => parseTickerSymbol(ts) !== null,
+      );
       const groupedTickerSymbols = groupBy(
-        Array.from(batchTickerSymbols),
-        (tickerSymbol) => parseTickerSymbol(tickerSymbol).chainId,
+        validTickerSymbols,
+        (tickerSymbol) => parseTickerSymbol(tickerSymbol)!.chainId,
       );
 
       const tokenInfos = flatten(
@@ -165,7 +168,7 @@ async function fetchTokenInfoInBatch(chainId: Chain, address: string) {
           Object.entries(groupedTickerSymbols).map(([chainId, tickerSymbols]) =>
             fetchTokenInfos(
               chainId as Chain,
-              tickerSymbols.map((tickerSymbol) => parseTickerSymbol(tickerSymbol).address),
+              tickerSymbols.map((tickerSymbol) => parseTickerSymbol(tickerSymbol)!.address),
             ),
           ),
         ),
@@ -226,11 +229,10 @@ export function useTvChartMultiTokens(chainId: Chain, address: string) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         tvChartAreas.forEach((area: any) => {
           if (area.dataReady) {
-            const { chainId: areaChainId, address: areaAddress } = parseTickerSymbol(
-              area.tickerSymbol,
-            );
-            fetchTokenInfo(areaChainId, areaAddress, "batch");
-            if (areaChainId === chainId && areaAddress === address) {
+            const parsed = parseTickerSymbol(area.tickerSymbol);
+            if (!parsed) return;
+            fetchTokenInfo(parsed.chainId, parsed.address, "batch");
+            if (parsed.chainId === chainId && parsed.address === address) {
               fetched = true;
             }
           }

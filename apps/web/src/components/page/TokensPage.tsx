@@ -6,7 +6,7 @@ import { chainIdBySlug } from "@liberfi.io/utils";
 import { AppRoute } from "@liberfi/ui-dex/libs/routes";
 import { TradeDataLoader } from "@liberfi/ui-dex/components/trade";
 import { TradeDataProvider } from "@liberfi/ui-dex/components/trade/providers";
-import { TradePage } from "@liberfi/ui-dex";
+import { AxiomTradePage } from "./token-detail/AxiomTradePage";
 
 export function TokensPage() {
   const { slug } = useParams();
@@ -24,7 +24,7 @@ export function TokensPage() {
   return (
     <TradeDataLoader chainId={chainId} address={address}>
       <TradeDataProvider address={address} chain={chainId}>
-        <TradePage />
+        <AxiomTradePage />
       </TradeDataProvider>
     </TradeDataLoader>
   );

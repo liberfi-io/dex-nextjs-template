@@ -19,13 +19,15 @@ export function useTvChartSymbolInfo(areaManager: TvChartAreaManager | null) {
       try {
         const { chain, address } = symbolInfo;
         const chainId = chainIdBySlug(chain);
-        if (!chainId) throw new Error("Invalid chain");
+        if (!chainId) {
+          // Non-DEX ticker format (e.g. perpetuals "BTC-USDC") — skip token fetch
+          return;
+        }
 
-        // fetch token info, and set it to tokens state
         const token = await fetchTokenInfo(chainId, address);
         setToken(token);
       } catch (error) {
-        console.error("useTvChartSymbolInfo.fetchSymbolInfo", error);
+        console.warn("useTvChartSymbolInfo.fetchSymbolInfo", error);
       }
     };
 

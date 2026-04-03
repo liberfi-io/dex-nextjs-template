@@ -18,6 +18,7 @@
 @source "../../../../node_modules/@liberfi.io/ui-predict/dist/**/*.{js,ts,jsx,tsx}";
 @source "../../../../node_modules/@liberfi.io/ui-portfolio/dist/**/*.{js,ts,jsx,tsx}";
 @source "../../../../node_modules/@liberfi.io/ui-trade/dist/**/*.{js,ts,jsx,tsx}";
+@source "../../../../node_modules/@liberfi.io/ui-perpetuals/dist/**/*.{js,ts,jsx,tsx}";
 @source "../../../../node_modules/@agent-widget/react/dist/**/*.{js,ts,jsx,tsx}";
 
 @layer base {
@@ -122,4 +123,85 @@
 .agui-chat-widget-container > div {
   bottom: 0 !important;
   right: 0 !important;
+}
+
+/* Axiom-style: Buy/Sell tablist (bg-content2 identifies the primary tab pair) */
+.axiom-trade-panel [role="tablist"][class*="bg-content2"] {
+  gap: 4px !important;
+  padding: 4px !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  background-color: transparent !important;
+}
+.axiom-trade-panel [role="tablist"][class*="bg-content2"] [role="tab"] {
+  min-height: 32px !important;
+  height: 32px !important;
+  font-size: 16px !important;
+  border-radius: 4px !important;
+  padding: 4px !important;
+  line-height: 24px !important;
+}
+.axiom-trade-panel [role="tablist"][class*="bg-content2"] [role="tab"][data-selected="true"] {
+  font-weight: 700 !important;
+  background-color: rgb(47, 227, 172) !important;
+  color: rgb(9, 9, 9) !important;
+}
+.axiom-trade-panel [role="tablist"][class*="bg-content2"] [role="tab"]:not([data-selected="true"]) {
+  font-weight: 500 !important;
+  background-color: transparent !important;
+  color: rgb(200, 201, 209) !important;
+}
+
+/* Axiom-style: Market/Limit/Adv tab (rounded-none tablist) — no green bg */
+.axiom-trade-panel [role="tablist"][class*="rounded-none"] {
+  height: 24px !important;
+  min-height: 24px !important;
+  gap: 16px !important;
+  padding: 0 !important;
+}
+.axiom-trade-panel [role="tablist"][class*="rounded-none"] [role="tab"] {
+  font-size: 16px !important;
+  line-height: 24px !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 0 8px !important;
+}
+.axiom-trade-panel [role="tablist"][class*="rounded-none"] [role="tab"][data-selected="true"] {
+  background-color: transparent !important;
+  font-weight: 400 !important;
+  color: rgb(252, 252, 252) !important;
+}
+.axiom-trade-panel [role="tablist"][class*="rounded-none"] [role="tab"]:not([data-selected="true"]) {
+  background-color: transparent !important;
+  font-weight: 400 !important;
+  color: rgb(200, 201, 209) !important;
+}
+
+/* Hide SDK's built-in preset tabs — duplicated by our custom PRESET row below position stats */
+.axiom-trade-panel [role="tablist"][class*="shadow-xs"] {
+  display: none !important;
+}
+.axiom-trade-panel :has(> [data-slot="base"]:has([role="tablist"][class*="shadow-xs"])) {
+  display: none !important;
+  margin: 0 !important;
+  height: 0 !important;
+}
+
+/* Axiom-style main Buy/Sell action button — target only the large submit button */
+.axiom-trade-panel button[class*="bg-success"],
+.axiom-trade-panel button[class*="bg-danger"],
+.axiom-trade-panel button[class*="bg-primary"][class*="w-full"] {
+  min-height: 36px !important;
+  max-height: 36px !important;
+  border-radius: 9999px !important;
+  font-size: 16px !important;
+  font-weight: 400 !important;
+  line-height: 24px !important;
+  display: flex !important;
+  flex: 1 !important;
+  width: 100% !important;
+  background-color: rgb(47, 227, 172) !important;
+  color: rgb(252, 252, 252) !important;
 }

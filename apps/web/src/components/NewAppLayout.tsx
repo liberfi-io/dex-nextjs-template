@@ -46,6 +46,7 @@ import { MediaTrackClient } from "@liberfi.io/ui-media-track/client";
 import { MediaTrackProvider } from "@liberfi.io/ui-media-track";
 import { ChannelsClient } from "@liberfi.io/ui-channels/client";
 import { ChannelsProvider } from "@liberfi.io/ui-channels";
+import { PerpetualsProvider, HyperliquidPerpetualsClient } from "@liberfi.io/ui-perpetuals";
 import { PredictClient, PredictProvider } from "@liberfi.io/react-predict";
 import type { PredictEvent } from "@liberfi.io/react-predict";
 import {
@@ -68,8 +69,8 @@ import {
   LogoIcon,
   MiniLogoIcon,
   RocketIcon,
-  SignalIcon,
-  // TradeIcon,
+  // SignalIcon,
+  TradeIcon,
   TranslateIcon,
   WalletIcon,
   cn,
@@ -125,9 +126,9 @@ const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
 
 const navItemsConfig: Omit<NavItem, "label">[] = [
   { key: "discover", href: "/", icon: <HomeIcon width={20} height={20} /> },
-  // { key: "perpetuals", href: "/perpetuals", icon: <TradeIcon width={20} height={20} /> },
+  { key: "perpetuals", href: "/perpetuals", icon: <TradeIcon width={20} height={20} /> },
   { key: "predict", href: "/predict", icon: <CoinsIcon width={20} height={20} /> },
-  { key: "channels", href: "/channels", icon: <SignalIcon width={20} height={20} /> },
+  // { key: "channels", href: "/channels", icon: <SignalIcon width={20} height={20} /> },
   { key: "portfolio", href: "/portfolio", icon: <WalletIcon width={20} height={20} /> },
 ];
 
@@ -253,6 +254,11 @@ function ServiceProviders({ children }: PropsWithChildren) {
     [],
   );
 
+  const perpetualsClient = useMemo(
+    () => new HyperliquidPerpetualsClient({ environment: "mainnet" }),
+    [],
+  );
+
   const { chain } = useCurrentChain();
   const wallet = useConnectedWallet(chain);
 
@@ -264,7 +270,9 @@ function ServiceProviders({ children }: PropsWithChildren) {
             <PredictProvider client={predictClient} wsClient={predictWsClient}>
               <PortfolioClientProvider client={portfolioClient}>
                 <PortfolioProvider chain={chain} address={wallet?.address ?? ""}>
-                  {children}
+                  <PerpetualsProvider client={perpetualsClient}>
+                    {children}
+                  </PerpetualsProvider>
                 </PortfolioProvider>
               </PortfolioClientProvider>
             </PredictProvider>

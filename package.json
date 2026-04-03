@@ -10,7 +10,10 @@
     "lint": "turbo run lint --parallel",
     "lint-fix": "turbo run lint-fix --parallel",
     "lint-staged": "lint-staged",
-    "tsconfig-paths": "tsx scripts/tsconfigPaths.ts"
+    "tsconfig-paths": "tsx scripts/tsconfigPaths.ts",
+    "sdk:link": "node scripts/sdk-link.mjs link",
+    "sdk:unlink": "node scripts/sdk-link.mjs unlink",
+    "sdk:status": "node scripts/sdk-link.mjs status"
   },
   "workspaces": [
     "packages/*",

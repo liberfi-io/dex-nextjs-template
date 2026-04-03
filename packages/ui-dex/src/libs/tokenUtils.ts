@@ -28,8 +28,12 @@ export function stringifyTickerSymbolByChainSlug(chainSlug: string, address: str
   return `${chainSlug}/${address}`;
 }
 
-export function parseTickerSymbol(tickerSymbol: string): { chainId: Chain; address: string } {
-  const [chainSlug, address] = tickerSymbol.split("/");
+export function parseTickerSymbol(
+  tickerSymbol: string,
+): { chainId: Chain; address: string } | null {
+  const parts = tickerSymbol.split("/");
+  if (parts.length < 2 || !parts[1]) return null;
+  const [chainSlug, address] = parts;
   switch (chainSlug) {
     case "eth":
       return { chainId: Chain.ETHEREUM, address };
@@ -39,9 +43,7 @@ export function parseTickerSymbol(tickerSymbol: string): { chainId: Chain; addre
       break;
   }
   const chainId = chainIdBySlug(chainSlug);
-  if (!chainId) {
-    throw new Error(`Unknown chainSlug: ${chainSlug}`);
-  }
+  if (!chainId) return null;
   return { chainId, address };
 }
 
