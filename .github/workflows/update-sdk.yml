@@ -145,3 +145,9 @@ jobs:
           git add -A
           git commit -m "chore: update @liberfi.io/* SDK dependencies"
           git push
+
+      - name: Trigger deploy
+        if: steps.update.outputs.has_updates == 'true'
+        run: gh workflow run deploy.yml
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
