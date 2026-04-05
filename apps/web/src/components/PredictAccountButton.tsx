@@ -94,10 +94,10 @@ function BalanceRow({
 export function PredictAccountButton() {
   const { t } = useTranslation();
   const { status, signIn, signOut } = useAuth();
-  const { dflowUsdcBalance, polymarketUsdcBalance, isLoading } = usePredictWallet();
+  const { kalshiUsdcBalance, polymarketUsdcBalance, isLoading } = usePredictWallet();
   const { isOpen, onOpenChange, onClose } = useDisclosure();
 
-  const totalBalance = dflowUsdcBalance + polymarketUsdcBalance;
+  const totalBalance = (kalshiUsdcBalance ?? 0) + (polymarketUsdcBalance ?? 0);
 
   const handleSignOut = useCallback(async () => {
     onClose();
@@ -196,13 +196,13 @@ export function PredictAccountButton() {
               }
               chainIcon={<PolygonIcon size={12} />}
               chainName="Polygon"
-              balance={polymarketUsdcBalance}
+              balance={polymarketUsdcBalance ?? 0}
             />
             <BalanceRow
               label={<KalshiIcon width={46} height={14} />}
               chainIcon={<SolanaIcon width={12} height={12} />}
               chainName="Solana"
-              balance={dflowUsdcBalance}
+              balance={kalshiUsdcBalance ?? 0}
             />
           </div>
 

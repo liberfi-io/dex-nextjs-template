@@ -103,7 +103,7 @@ export const TV_CHART_INTERESTED_DOM_EVENTS = [
 export const TV_CHART_THEME_COLORS = {
   decrease: CONFIG.colors.bearish,
   increase: CONFIG.colors.bullish,
-  chartBg: "#1A1A1A",
+  chartBg: "#06070b",
   card: "#242424",
 };
 

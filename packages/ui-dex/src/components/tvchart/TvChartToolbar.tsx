@@ -14,7 +14,7 @@ import { TvChartQuoteTypeSwitch } from "./TvChartQuoteTypeSwitch";
 export const TvChartToolbar = memo(() => {
   return (
     <TvChartToolbarProvider>
-      <div className="flex-none h-9 px-4 w-full flex bg-content1">
+      <div className="flex-none h-9 px-4 w-full flex">
         <div className="flex-1 flex justify-start items-center gap-2.5">
           <TvChartResolutions />
           <Divider orientation="vertical" className="max-sm:hidden h-4 border-content3" />

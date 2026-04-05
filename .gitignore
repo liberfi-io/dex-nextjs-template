@@ -49,6 +49,13 @@ Thumbs.db
 # SDK link state
 .sdk-link-state.json
 
+# Screenshots and temp files
+*.png
+sdk-status-tee.txt
+
+# Cursor IDE
+.cursor/
+
 # next.js
 .next/
 .vercel
