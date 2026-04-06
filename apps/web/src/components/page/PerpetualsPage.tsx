@@ -127,7 +127,7 @@ export function PerpetualsPage() {
               className="absolute top-full left-0 z-50 flex flex-col overflow-hidden shadow-2xl"
               style={{
                 width: 800,
-                maxHeight: 400,
+                height: 400,
                 backgroundColor: '#18181a',
                 border: '1px solid #323542',
                 borderRadius: 4,
