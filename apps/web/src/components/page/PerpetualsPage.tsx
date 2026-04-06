@@ -124,7 +124,7 @@ export function PerpetualsPage() {
               aria-label="Close search"
             />
             <div
-              className="absolute top-full left-0 z-50 overflow-hidden shadow-2xl"
+              className="absolute top-full left-0 z-50 flex flex-col overflow-hidden shadow-2xl"
               style={{
                 width: 800,
                 maxHeight: 400,
