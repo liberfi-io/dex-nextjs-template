@@ -71,7 +71,7 @@ export function PerpetualsPage() {
 
   if (isMobile) {
     return (
-      <div className="flex flex-col w-full h-full min-h-0 text-white overflow-hidden" style={{ backgroundColor: '#06070b' }}>
+      <div className="flex flex-col w-full h-full min-h-0 text-white overflow-hidden" style={{ backgroundColor: '#000000' }}>
         {/* Ticker strip */}
         <TickerStrip
           activeSymbol={tokenSymbol}
@@ -96,12 +96,12 @@ export function PerpetualsPage() {
           {mobileMainTab === "chart" && (
             <>
               {/* Chart takes ~60% of available height */}
-              <div className="flex-[3] min-h-[200px] flex flex-col" style={{ borderBottom: '1px solid #22242d' }}>
+              <div className="flex-[3] min-h-[200px] flex flex-col" style={{ borderBottom: '1px solid #1c1c1c' }}>
                 <PerpetualsChart symbol={symbol} />
               </div>
 
               {/* Positions / Orders / History tab bar */}
-              <div className="flex-none flex items-center" style={{ height: 36, padding: '0 8px', borderBottom: '1px solid #22242d' }}>
+              <div className="flex-none flex items-center" style={{ height: 36, padding: '0 8px', borderBottom: '1px solid #1c1c1c' }}>
                 {(
                   [
                     { key: "positions", label: "Positions" },
@@ -119,10 +119,10 @@ export function PerpetualsPage() {
                       height: 36,
                       fontSize: 13,
                       fontWeight: 500,
-                      color: activeTab === tab.key ? '#fcfcfc' : '#777a8c',
+                      color: activeTab === tab.key ? '#ffffff' : '#6b6b6b',
                       background: 'none',
                       border: 'none',
-                      borderBottom: activeTab === tab.key ? '2px solid #fcfcfc' : '2px solid transparent',
+                      borderBottom: activeTab === tab.key ? '2px solid #ffffff' : '2px solid transparent',
                     }}
                   >
                     {tab.label}
@@ -131,7 +131,7 @@ export function PerpetualsPage() {
               </div>
 
               {/* Positions content — fills remaining ~40% */}
-              <div className="flex-[2] min-h-0 overflow-auto" style={{ backgroundColor: '#06070b' }}>
+              <div className="flex-[2] min-h-0 overflow-auto" style={{ backgroundColor: '#000000' }}>
                 {activeTab === "positions" && <PositionsWidget symbol={symbol} />}
                 {activeTab === "openOrders" && <OpenOrdersWidget symbol={symbol} />}
                 {activeTab === "tradeHistory" && (
@@ -155,7 +155,7 @@ export function PerpetualsPage() {
         </div>
 
         {/* Sticky bottom: Long / Short buttons */}
-        <div className="flex-none flex" style={{ padding: '8px 12px', gap: 8, borderTop: '1px solid #22242d', backgroundColor: '#06070b' }}>
+        <div className="flex-none flex" style={{ padding: '8px 12px', gap: 8, borderTop: '1px solid #1c1c1c', backgroundColor: '#000000' }}>
           <button
             type="button"
             className="flex-1 cursor-pointer transition-colors"
@@ -164,8 +164,8 @@ export function PerpetualsPage() {
               fontSize: 16,
               fontWeight: 700,
               borderRadius: 9999,
-              backgroundColor: '#2fe3ac',
-              color: '#090909',
+              backgroundColor: '#C7FF2E',
+              color: '#000000',
               border: 'none',
             }}
             onClick={() => setShowMobileOrder(true)}
@@ -180,8 +180,8 @@ export function PerpetualsPage() {
               fontSize: 16,
               fontWeight: 700,
               borderRadius: 9999,
-              backgroundColor: '#ec397a',
-              color: '#090909',
+              backgroundColor: '#F76816',
+              color: '#000000',
               border: 'none',
             }}
             onClick={() => setShowMobileOrder(true)}
@@ -202,7 +202,7 @@ export function PerpetualsPage() {
   }
 
   return (
-    <div className="flex flex-col w-full h-full min-h-0 text-white overflow-hidden" style={{ backgroundColor: '#06070b' }}>
+    <div className="flex flex-col w-full h-full min-h-0 text-white overflow-hidden" style={{ backgroundColor: '#000000' }}>
       {/* Ticker strip */}
       <TickerStrip
         activeSymbol={tokenSymbol}
@@ -225,13 +225,13 @@ export function PerpetualsPage() {
           {/* Top half: Chart + OB/Trades side by side */}
           <div className="flex-1 min-h-0 flex">
             {/* Chart */}
-            <div className="flex-1 min-w-0 flex flex-col" style={{ borderRight: '1px solid #22242d' }}>
+            <div className="flex-1 min-w-0 flex flex-col" style={{ borderRight: '1px solid #1c1c1c' }}>
               <PerpetualsChart symbol={symbol} />
             </div>
 
             {/* OB / Trades */}
             <div className="flex flex-col overflow-hidden" style={{ width: 290, minWidth: 290 }}>
-              <div className="flex-none flex items-center" style={{ height: 36, padding: '0 16px 0 8px', borderBottom: '1px solid #22242d' }}>
+              <div className="flex-none flex items-center" style={{ height: 36, padding: '0 16px 0 8px', borderBottom: '1px solid #1c1c1c' }}>
                 {(
                   [
                     { key: "orderBook", label: "Order Book" },
@@ -244,7 +244,7 @@ export function PerpetualsPage() {
                       height: 36,
                       display: 'flex',
                       alignItems: 'center',
-                      borderBottom: middleTab === tab.key ? '2px solid #fcfcfc' : '2px solid transparent',
+                      borderBottom: middleTab === tab.key ? '2px solid #ffffff' : '2px solid transparent',
                       padding: '2px 0 0',
                       cursor: 'pointer',
                     }}
@@ -257,7 +257,7 @@ export function PerpetualsPage() {
                         padding: '0 8px',
                         fontSize: 14,
                         fontWeight: 500,
-                        color: middleTab === tab.key ? '#fcfcfc' : '#c8c9d1',
+                        color: middleTab === tab.key ? '#ffffff' : '#b5b5b5',
                         background: 'none',
                         border: 'none',
                       }}
@@ -282,7 +282,7 @@ export function PerpetualsPage() {
 
           {/* Bottom half: Positions / Open Orders / Trades */}
           <div className="flex-none flex flex-col" style={{ height: bottomHeight }}>
-            <div className="flex-none flex items-center" style={{ height: 36, padding: '0 16px 0 8px', borderBottom: '1px solid #22242d' }}>
+            <div className="flex-none flex items-center" style={{ height: 36, padding: '0 16px 0 8px', borderBottom: '1px solid #1c1c1c' }}>
               {(
                 [
                   { key: "positions", label: "Positions" },
@@ -296,7 +296,7 @@ export function PerpetualsPage() {
                     height: 36,
                     display: 'flex',
                     alignItems: 'center',
-                    borderBottom: activeTab === tab.key ? '2px solid #fcfcfc' : '2px solid transparent',
+                    borderBottom: activeTab === tab.key ? '2px solid #ffffff' : '2px solid transparent',
                     padding: '2px 0 0',
                     cursor: 'pointer',
                   }}
@@ -309,7 +309,7 @@ export function PerpetualsPage() {
                       padding: '0 8px',
                       fontSize: 14,
                       fontWeight: 500,
-                      color: activeTab === tab.key ? '#fcfcfc' : '#c8c9d1',
+                      color: activeTab === tab.key ? '#ffffff' : '#b5b5b5',
                       background: 'none',
                       border: 'none',
                     }}
@@ -319,7 +319,7 @@ export function PerpetualsPage() {
                 </div>
               ))}
             </div>
-            <div className="flex-1 min-h-0 overflow-auto" style={{ backgroundColor: '#06070b' }}>
+            <div className="flex-1 min-h-0 overflow-auto" style={{ backgroundColor: '#000000' }}>
               {activeTab === "positions" && <PositionsWidget symbol={symbol} />}
               {activeTab === "openOrders" && <OpenOrdersWidget symbol={symbol} />}
               {activeTab === "tradeHistory" && (
@@ -330,7 +330,7 @@ export function PerpetualsPage() {
         </div>
 
         {/* Right: PlaceOrder (full height, fixed 320px) */}
-        <div className="flex flex-col overflow-hidden" style={{ width: 320, minWidth: 320, maxWidth: 320, borderLeft: '1px solid #22242d' }}>
+        <div className="flex flex-col overflow-hidden" style={{ width: 320, minWidth: 320, maxWidth: 320, borderLeft: '1px solid #1c1c1c' }}>
           <PlaceOrderFormWidget symbol={symbol} className="h-full" />
         </div>
       </div>
@@ -356,7 +356,7 @@ function CoinSelectorBar({
   isMobile?: boolean;
 }) {
   return (
-    <div className="flex-none relative" style={{ height: isMobile ? 48 : 64, borderBottom: '1px solid #22242d' }}>
+    <div className="flex-none relative" style={{ height: isMobile ? 48 : 64, borderBottom: '1px solid #1c1c1c' }}>
       <div className="flex items-center h-full">
         <button
           type="button"
@@ -373,10 +373,10 @@ function CoinSelectorBar({
               (e.target as HTMLImageElement).style.display = "none";
             }}
           />
-          <span style={{ fontSize: isMobile ? 16 : 18, fontWeight: 500, color: '#fcfcfc' }}>{tokenSymbol}</span>
+          <span style={{ fontSize: isMobile ? 16 : 18, fontWeight: 500, color: '#ffffff' }}>{tokenSymbol}</span>
           <svg
             className={cn("transition-transform", showSearch && "rotate-180")}
-            style={{ color: '#c8c9d1', width: 12, height: 12 }}
+            style={{ color: '#b5b5b5', width: 12, height: 12 }}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -405,8 +405,8 @@ function CoinSelectorBar({
             style={{
               width: isMobile ? '100vw' : 800,
               height: isMobile ? '60vh' : 400,
-              backgroundColor: '#18181a',
-              border: '1px solid #323542',
+              backgroundColor: '#1A1A1A',
+              border: '1px solid #2a2a2a',
               borderRadius: isMobile ? 0 : 4,
             }}
           >
@@ -433,10 +433,10 @@ function MobileTabBar({
   ];
 
   return (
-    <div className="flex-none flex items-center" style={{ padding: '4px 8px', borderBottom: '1px solid #22242d' }}>
+    <div className="flex-none flex items-center" style={{ padding: '4px 8px', borderBottom: '1px solid #1c1c1c' }}>
       <div
         className="relative flex w-full items-center rounded-full"
-        style={{ height: 32, backgroundColor: 'rgba(34,36,45,0.5)', padding: 2 }}
+        style={{ height: 32, backgroundColor: 'rgba(26,26,26,0.5)', padding: 2 }}
       >
         {tabs.map((tab) => (
           <button
@@ -447,8 +447,8 @@ function MobileTabBar({
               height: 28,
               fontSize: 13,
               fontWeight: activeTab === tab.key ? 600 : 400,
-              color: activeTab === tab.key ? '#fcfcfc' : '#777a8c',
-              backgroundColor: activeTab === tab.key ? '#323542' : 'transparent',
+              color: activeTab === tab.key ? '#ffffff' : '#6b6b6b',
+              backgroundColor: activeTab === tab.key ? '#2a2a2a' : 'transparent',
               border: 'none',
             }}
             onClick={() => onTabChange(tab.key)}
@@ -483,15 +483,15 @@ function MobilePlaceOrderSheet({
         className="relative z-10 flex flex-col overflow-hidden"
         style={{
           maxHeight: '85vh',
-          backgroundColor: '#06070b',
+          backgroundColor: '#000000',
           borderTopLeftRadius: 16,
           borderTopRightRadius: 16,
-          borderTop: '1px solid #22242d',
+          borderTop: '1px solid #1c1c1c',
         }}
       >
         {/* Drag indicator */}
         <div className="flex justify-center" style={{ padding: '8px 0 4px' }}>
-          <div style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: '#323542' }} />
+          <div style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: '#2a2a2a' }} />
         </div>
 
         {/* Close button */}
@@ -499,7 +499,7 @@ function MobilePlaceOrderSheet({
           <button
             type="button"
             className="cursor-pointer"
-            style={{ color: '#777a8c', background: 'none', border: 'none', padding: 4 }}
+            style={{ color: '#6b6b6b', background: 'none', border: 'none', padding: 4 }}
             onClick={onClose}
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -563,12 +563,12 @@ function SplitHandle({
         style={{
           height: 4,
           gap: 4,
-          backgroundColor: isResizing ? '#5B6075' : 'rgba(34,36,45,0.8)',
+          backgroundColor: isResizing ? '#464646' : 'rgba(26,26,26,0.8)',
         }}
       >
-        <i style={{ width: 2, height: 2, borderRadius: '50%', backgroundColor: '#777a8c' }} />
-        <i style={{ width: 2, height: 2, borderRadius: '50%', backgroundColor: '#777a8c' }} />
-        <i style={{ width: 2, height: 2, borderRadius: '50%', backgroundColor: '#777a8c' }} />
+        <i style={{ width: 2, height: 2, borderRadius: '50%', backgroundColor: '#6b6b6b' }} />
+        <i style={{ width: 2, height: 2, borderRadius: '50%', backgroundColor: '#6b6b6b' }} />
+        <i style={{ width: 2, height: 2, borderRadius: '50%', backgroundColor: '#6b6b6b' }} />
 
         {/* Expanded hit area */}
         <div
@@ -579,7 +579,7 @@ function SplitHandle({
       </div>
 
       <style>{`
-        .perp-split-handle:hover .perp-split-bar { background-color: #5B6075 !important; }
+        .perp-split-handle:hover .perp-split-bar { background-color: #464646 !important; }
       `}</style>
 
       {isResizing && (
@@ -611,7 +611,7 @@ function TickerStrip({
   }, [markets]);
 
   return (
-    <div className="flex-none flex items-center overflow-x-auto" style={{ height: 28, gap: 16, padding: '0 12px', borderBottom: '1px solid #22242d', backgroundColor: '#101114' }}>
+    <div className="flex-none flex items-center overflow-x-auto" style={{ height: 28, gap: 16, padding: '0 12px', borderBottom: '1px solid #1c1c1c', backgroundColor: '#0e0e0e' }}>
       {tickerData.map(({ coin, change }) => {
         const isPositive = change >= 0;
         const changeStr = `${isPositive ? "+" : ""}${change.toFixed(2)}%`;
@@ -627,7 +627,7 @@ function TickerStrip({
               borderRadius: 4,
               fontSize: 12,
               fontWeight: 500,
-              color: '#c8c9d1',
+              color: '#b5b5b5',
               backgroundColor: activeSymbol === coin ? 'rgba(255,255,255,0.05)' : 'transparent',
               border: 'none',
             }}
@@ -641,7 +641,7 @@ function TickerStrip({
               }}
             />
             <span>{coin}</span>
-            <span style={{ color: isPositive ? '#2fe3ac' : '#ec397a' }}>
+            <span style={{ color: isPositive ? '#C7FF2E' : '#F76816' }}>
               {changeStr}
             </span>
           </button>
