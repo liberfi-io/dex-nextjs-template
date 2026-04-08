@@ -13,7 +13,7 @@ import {
   usePerpetualsClient,
   useMarketsQuery,
 } from "@liberfi.io/ui-perpetuals";
-import { cn } from "@liberfi.io/ui";
+import { cn, useScreen } from "@liberfi.io/ui";
 import { useHideBottomNavigationBar, useHideHeader } from "@liberfi/ui-base";
 import {
   TvChart,
@@ -33,6 +33,7 @@ import { PerpetualsTvChartDataFeedModule } from "./perpetuals/PerpetualsTvChartD
 
 type BottomTab = "positions" | "openOrders" | "tradeHistory";
 type MiddleTab = "orderBook" | "trades";
+type MobileMainTab = "chart" | "orderBook" | "trades";
 
 const TICKER_COINS = ["BTC", "ETH", "SOL"];
 
@@ -44,11 +45,16 @@ export function PerpetualsPage() {
   useHideHeader("tablet");
   useHideBottomNavigationBar();
 
+  const { isMobile } = useScreen();
+
   const [symbol, setSymbol] = useState("BTC-USDC");
   const [activeTab, setActiveTab] = useState<BottomTab>("positions");
   const [middleTab, setMiddleTab] = useState<MiddleTab>("orderBook");
   const [showSearch, setShowSearch] = useState(false);
   const [bottomHeight, setBottomHeight] = useState(BOTTOM_PANEL_DEFAULT);
+
+  const [mobileMainTab, setMobileMainTab] = useState<MobileMainTab>("chart");
+  const [showMobileOrder, setShowMobileOrder] = useState(false);
 
   const { client } = usePerpetualsClient();
 
@@ -63,6 +69,138 @@ export function PerpetualsPage() {
 
   const tokenSymbol = symbol.split("-")[0];
 
+  if (isMobile) {
+    return (
+      <div className="flex flex-col w-full h-full min-h-0 text-white overflow-hidden" style={{ backgroundColor: '#06070b' }}>
+        {/* Ticker strip */}
+        <TickerStrip
+          activeSymbol={tokenSymbol}
+          onSelectCoin={(coin) => setSymbol(`${coin}-USDC`)}
+        />
+
+        {/* Compact coin selector + info */}
+        <CoinSelectorBar
+          tokenSymbol={tokenSymbol}
+          symbol={symbol}
+          showSearch={showSearch}
+          setShowSearch={setShowSearch}
+          handleSelectCoin={handleSelectCoin}
+          isMobile
+        />
+
+        {/* Mobile tab bar: Chart | Order Book | Trades */}
+        <MobileTabBar activeTab={mobileMainTab} onTabChange={setMobileMainTab} />
+
+        {/* Content area — flex col fills remaining space */}
+        <div className="flex-1 min-h-0 flex flex-col">
+          {mobileMainTab === "chart" && (
+            <>
+              {/* Chart takes ~60% of available height */}
+              <div className="flex-[3] min-h-[200px] flex flex-col" style={{ borderBottom: '1px solid #22242d' }}>
+                <PerpetualsChart symbol={symbol} />
+              </div>
+
+              {/* Positions / Orders / History tab bar */}
+              <div className="flex-none flex items-center" style={{ height: 36, padding: '0 8px', borderBottom: '1px solid #22242d' }}>
+                {(
+                  [
+                    { key: "positions", label: "Positions" },
+                    { key: "openOrders", label: "Open Orders" },
+                    { key: "tradeHistory", label: "Trades" },
+                  ] as const
+                ).map((tab) => (
+                  <button
+                    key={tab.key}
+                    type="button"
+                    onClick={() => setActiveTab(tab.key)}
+                    className="cursor-pointer transition-colors"
+                    style={{
+                      padding: '0 8px',
+                      height: 36,
+                      fontSize: 13,
+                      fontWeight: 500,
+                      color: activeTab === tab.key ? '#fcfcfc' : '#777a8c',
+                      background: 'none',
+                      border: 'none',
+                      borderBottom: activeTab === tab.key ? '2px solid #fcfcfc' : '2px solid transparent',
+                    }}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Positions content — fills remaining ~40% */}
+              <div className="flex-[2] min-h-0 overflow-auto" style={{ backgroundColor: '#06070b' }}>
+                {activeTab === "positions" && <PositionsWidget symbol={symbol} />}
+                {activeTab === "openOrders" && <OpenOrdersWidget symbol={symbol} />}
+                {activeTab === "tradeHistory" && (
+                  <TradeHistoryWidget symbol={symbol} initialTimeRange="7d" pageSize={50} />
+                )}
+              </div>
+            </>
+          )}
+
+          {mobileMainTab === "orderBook" && (
+            <div className="flex-1 min-h-0 overflow-auto">
+              <OrderBookWidget symbol={symbol} className="h-full" />
+            </div>
+          )}
+
+          {mobileMainTab === "trades" && (
+            <div className="flex-1 min-h-0 overflow-auto">
+              <TradesWidget symbol={symbol} limit={50} className="h-full" />
+            </div>
+          )}
+        </div>
+
+        {/* Sticky bottom: Long / Short buttons */}
+        <div className="flex-none flex" style={{ padding: '8px 12px', gap: 8, borderTop: '1px solid #22242d', backgroundColor: '#06070b' }}>
+          <button
+            type="button"
+            className="flex-1 cursor-pointer transition-colors"
+            style={{
+              height: 44,
+              fontSize: 16,
+              fontWeight: 700,
+              borderRadius: 9999,
+              backgroundColor: '#2fe3ac',
+              color: '#090909',
+              border: 'none',
+            }}
+            onClick={() => setShowMobileOrder(true)}
+          >
+            Long
+          </button>
+          <button
+            type="button"
+            className="flex-1 cursor-pointer transition-colors"
+            style={{
+              height: 44,
+              fontSize: 16,
+              fontWeight: 700,
+              borderRadius: 9999,
+              backgroundColor: '#ec397a',
+              color: '#090909',
+              border: 'none',
+            }}
+            onClick={() => setShowMobileOrder(true)}
+          >
+            Short
+          </button>
+        </div>
+
+        {/* Mobile place order bottom sheet */}
+        {showMobileOrder && (
+          <MobilePlaceOrderSheet
+            symbol={symbol}
+            onClose={() => setShowMobileOrder(false)}
+          />
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col w-full h-full min-h-0 text-white overflow-hidden" style={{ backgroundColor: '#06070b' }}>
       {/* Ticker strip */}
@@ -72,72 +210,13 @@ export function PerpetualsPage() {
       />
 
       {/* Coin selector + CoinInfo stats */}
-      <div className="flex-none relative" style={{ height: 64, borderBottom: '1px solid #22242d' }}>
-        <div className="flex items-center" style={{ height: 64 }}>
-          <button
-            type="button"
-            className="flex items-center cursor-pointer"
-            style={{
-              gap: 8,
-              padding: '0 16px',
-              height: 32,
-            }}
-            onClick={() => setShowSearch((v) => !v)}
-          >
-            <img
-              src={`https://app.hyperliquid.xyz/coins/${tokenSymbol}.svg`}
-              alt={tokenSymbol}
-              className="rounded-full"
-              style={{ width: 32, height: 32 }}
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = "none";
-              }}
-            />
-            <span style={{ fontSize: 18, fontWeight: 500, lineHeight: '23px', letterSpacing: '-0.36px', color: '#fcfcfc' }}>{tokenSymbol}</span>
-            <svg
-              className={cn(
-                "transition-transform",
-                showSearch && "rotate-180",
-              )}
-              style={{ color: '#c8c9d1', width: 12, height: 12 }}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-          <div className="flex-1 min-w-0">
-            <CoinInfoWidget symbol={symbol} />
-          </div>
-        </div>
-
-        {showSearch && (
-          <>
-            <div
-              className="fixed inset-0 z-40"
-              onClick={() => setShowSearch(false)}
-              onKeyDown={(e) => e.key === "Escape" && setShowSearch(false)}
-              role="button"
-              tabIndex={-1}
-              aria-label="Close search"
-            />
-            <div
-              className="absolute top-full left-0 z-50 flex flex-col overflow-hidden shadow-2xl"
-              style={{
-                width: 800,
-                height: 400,
-                backgroundColor: '#18181a',
-                border: '1px solid #323542',
-                borderRadius: 4,
-              }}
-            >
-              <SearchCoinsWidget onSelectCoin={handleSelectCoin} />
-            </div>
-          </>
-        )}
-      </div>
+      <CoinSelectorBar
+        tokenSymbol={tokenSymbol}
+        symbol={symbol}
+        showSearch={showSearch}
+        setShowSearch={setShowSearch}
+        handleSelectCoin={handleSelectCoin}
+      />
 
       {/* Main content: Left (chart+OB / split / positions) | Right (PlaceOrder) */}
       <div className="flex-1 min-h-0 flex">
@@ -256,6 +335,183 @@ export function PerpetualsPage() {
         </div>
       </div>
 
+    </div>
+  );
+}
+
+/** Coin selector bar — shared between mobile and desktop */
+function CoinSelectorBar({
+  tokenSymbol,
+  symbol,
+  showSearch,
+  setShowSearch,
+  handleSelectCoin,
+  isMobile,
+}: {
+  tokenSymbol: string;
+  symbol: string;
+  showSearch: boolean;
+  setShowSearch: (v: boolean | ((prev: boolean) => boolean)) => void;
+  handleSelectCoin: (s: string) => void;
+  isMobile?: boolean;
+}) {
+  return (
+    <div className="flex-none relative" style={{ height: isMobile ? 48 : 64, borderBottom: '1px solid #22242d' }}>
+      <div className="flex items-center h-full">
+        <button
+          type="button"
+          className="flex items-center cursor-pointer shrink-0"
+          style={{ gap: 6, padding: isMobile ? '0 10px' : '0 16px', height: 32 }}
+          onClick={() => setShowSearch((v: boolean) => !v)}
+        >
+          <img
+            src={`https://app.hyperliquid.xyz/coins/${tokenSymbol}.svg`}
+            alt={tokenSymbol}
+            className="rounded-full"
+            style={{ width: isMobile ? 24 : 32, height: isMobile ? 24 : 32 }}
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = "none";
+            }}
+          />
+          <span style={{ fontSize: isMobile ? 16 : 18, fontWeight: 500, color: '#fcfcfc' }}>{tokenSymbol}</span>
+          <svg
+            className={cn("transition-transform", showSearch && "rotate-180")}
+            style={{ color: '#c8c9d1', width: 12, height: 12 }}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div className="flex-1 min-w-0 overflow-x-auto">
+          <CoinInfoWidget symbol={symbol} />
+        </div>
+      </div>
+
+      {showSearch && (
+        <>
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setShowSearch(false)}
+            onKeyDown={(e) => e.key === "Escape" && setShowSearch(false)}
+            role="button"
+            tabIndex={-1}
+            aria-label="Close search"
+          />
+          <div
+            className="absolute top-full left-0 z-50 flex flex-col overflow-hidden shadow-2xl"
+            style={{
+              width: isMobile ? '100vw' : 800,
+              height: isMobile ? '60vh' : 400,
+              backgroundColor: '#18181a',
+              border: '1px solid #323542',
+              borderRadius: isMobile ? 0 : 4,
+            }}
+          >
+            <SearchCoinsWidget onSelectCoin={handleSelectCoin} />
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+/** Mobile main tab bar: Chart | Order Book | Trades */
+function MobileTabBar({
+  activeTab,
+  onTabChange,
+}: {
+  activeTab: MobileMainTab;
+  onTabChange: (tab: MobileMainTab) => void;
+}) {
+  const tabs: { key: MobileMainTab; label: string }[] = [
+    { key: "chart", label: "Chart" },
+    { key: "orderBook", label: "Order Book" },
+    { key: "trades", label: "Trades" },
+  ];
+
+  return (
+    <div className="flex-none flex items-center" style={{ padding: '4px 8px', borderBottom: '1px solid #22242d' }}>
+      <div
+        className="relative flex w-full items-center rounded-full"
+        style={{ height: 32, backgroundColor: 'rgba(34,36,45,0.5)', padding: 2 }}
+      >
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            type="button"
+            className="flex-1 flex items-center justify-center cursor-pointer transition-colors rounded-full"
+            style={{
+              height: 28,
+              fontSize: 13,
+              fontWeight: activeTab === tab.key ? 600 : 400,
+              color: activeTab === tab.key ? '#fcfcfc' : '#777a8c',
+              backgroundColor: activeTab === tab.key ? '#323542' : 'transparent',
+              border: 'none',
+            }}
+            onClick={() => onTabChange(tab.key)}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Mobile place order bottom sheet */
+function MobilePlaceOrderSheet({
+  symbol,
+  onClose,
+}: {
+  symbol: string;
+  onClose: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col justify-end">
+      <div
+        className="absolute inset-0 bg-black/60"
+        onClick={onClose}
+        onKeyDown={(e) => e.key === "Escape" && onClose()}
+        role="button"
+        tabIndex={-1}
+        aria-label="Close"
+      />
+      <div
+        className="relative z-10 flex flex-col overflow-hidden"
+        style={{
+          maxHeight: '85vh',
+          backgroundColor: '#06070b',
+          borderTopLeftRadius: 16,
+          borderTopRightRadius: 16,
+          borderTop: '1px solid #22242d',
+        }}
+      >
+        {/* Drag indicator */}
+        <div className="flex justify-center" style={{ padding: '8px 0 4px' }}>
+          <div style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: '#323542' }} />
+        </div>
+
+        {/* Close button */}
+        <div className="flex justify-end" style={{ padding: '0 12px' }}>
+          <button
+            type="button"
+            className="cursor-pointer"
+            style={{ color: '#777a8c', background: 'none', border: 'none', padding: 4 }}
+            onClick={onClose}
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-auto">
+          <PlaceOrderFormWidget symbol={symbol} />
+        </div>
+      </div>
     </div>
   );
 }
