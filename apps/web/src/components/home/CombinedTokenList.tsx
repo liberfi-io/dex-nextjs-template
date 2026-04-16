@@ -252,7 +252,7 @@ export function CombinedTokenList() {
         <div className="flex-1 flex flex-col gap-3 sm:gap-4 p-4 min-h-0">
         <div
           className={cn(
-            "w-full mx-auto flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0 flex-none sm:h-8",
+            "w-full mx-auto flex flex-col sm:flex-row sm:justify-between sm:items-center sm:gap-0 flex-none sm:h-8",
             "max-w-379 sm:max-w-403",
           )}
         >
@@ -340,21 +340,12 @@ export function CombinedTokenList() {
             )}
           </div>
 
-          {/* mobile: expand/collapse — GPU-only opacity+transform, no layout animation */}
+          {/* mobile: expand/collapse — instant toggle */}
           <div
             className={cn(
               "sm:hidden flex justify-end items-center gap-2 pt-2 relative z-20",
-              !isMobileControlsOpen && "invisible h-0 overflow-hidden",
+              !isMobileControlsOpen && "hidden",
             )}
-            style={{
-              opacity: isMobileControlsOpen ? 1 : 0,
-              transform: isMobileControlsOpen
-                ? "translateY(0) scale(1)"
-                : "translateY(-4px) scale(0.98)",
-              transition:
-                "opacity 150ms ease-out, transform 150ms ease-out",
-              willChange: "opacity, transform",
-            }}
           >
             {showTokenListControls && (
               <>
