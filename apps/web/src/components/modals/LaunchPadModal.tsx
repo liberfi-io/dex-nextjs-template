@@ -3,10 +3,7 @@
 import { useCallback } from "react";
 import { useTranslation } from "@liberfi.io/i18n";
 import {
-  Button,
-  ModalBody,
   ModalContent,
-  ModalHeader,
   StyledModal,
   useScreen,
   XCloseIcon,
@@ -49,23 +46,29 @@ function LaunchPadModalContent({
       isDismissable={false}
       hideCloseButton
       backdrop="blur"
-      radius="lg"
+      classNames={{
+        base: "!bg-[#18181b] !rounded-[14px] !border !border-[rgba(39,39,42,1)] !shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)]",
+        body: "!p-0",
+      }}
     >
-      <ModalContent className="w-full h-full">
-        <ModalHeader className="flex items-center justify-between px-4 pt-4 pb-2">
-          <span className="text-base font-semibold">{t("extend.launchpad.title")}</span>
-          <Button
-            isIconOnly
-            onPress={handleClose}
-            size="sm"
-            className="bg-transparent min-w-6 w-6 h-6"
-          >
-            <XCloseIcon width={20} height={20} />
-          </Button>
-        </ModalHeader>
-        <ModalBody className="p-4">
-          <LaunchPadHome prompt={params?.prompt} image={params?.image} />
-        </ModalBody>
+      <ModalContent>
+        <div>
+          <div className="flex items-center justify-between px-5 pt-5 pb-3">
+            <h3 className="text-lg font-semibold text-white">
+              {t("extend.launchpad.title")}
+            </h3>
+            <button
+              type="button"
+              onClick={handleClose}
+              className="p-1 rounded-[10px] hover:bg-[rgba(39,39,42,0.5)] text-zinc-400 hover:text-white transition-colors cursor-pointer focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            >
+              <XCloseIcon width={18} height={18} />
+            </button>
+          </div>
+          <div className="px-5 pb-5">
+            <LaunchPadHome prompt={params?.prompt} image={params?.image} />
+          </div>
+        </div>
       </ModalContent>
     </StyledModal>
   );

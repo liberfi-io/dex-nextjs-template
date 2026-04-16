@@ -96,12 +96,12 @@ export function PerpetualsPage() {
           {mobileMainTab === "chart" && (
             <>
               {/* Chart takes ~60% of available height */}
-              <div className="flex-[3] min-h-[200px] flex flex-col" style={{ borderBottom: '1px solid #1c1c1c' }}>
+              <div className="flex-[3] min-h-[200px] flex flex-col" style={{ borderBottom: '1px solid rgba(39,39,42,0.6)' }}>
                 <PerpetualsChart symbol={symbol} />
               </div>
 
               {/* Positions / Orders / History tab bar */}
-              <div className="flex-none flex items-center" style={{ height: 36, padding: '0 8px', borderBottom: '1px solid #1c1c1c' }}>
+              <div className="flex-none flex items-center" style={{ height: 36, padding: '0 8px', borderBottom: '1px solid rgba(39,39,42,0.6)' }}>
                 {(
                   [
                     { key: "positions", label: "Positions" },
@@ -155,7 +155,7 @@ export function PerpetualsPage() {
         </div>
 
         {/* Sticky bottom: Long / Short buttons */}
-        <div className="flex-none flex" style={{ padding: '8px 12px', gap: 8, borderTop: '1px solid #1c1c1c', backgroundColor: '#000000' }}>
+        <div className="flex-none flex" style={{ padding: '8px 12px', gap: 8, borderTop: '1px solid rgba(39,39,42,0.6)', backgroundColor: '#000000' }}>
           <button
             type="button"
             className="flex-1 cursor-pointer transition-colors"
@@ -225,13 +225,13 @@ export function PerpetualsPage() {
           {/* Top half: Chart + OB/Trades side by side */}
           <div className="flex-1 min-h-0 flex">
             {/* Chart */}
-            <div className="flex-1 min-w-0 flex flex-col" style={{ borderRight: '1px solid #1c1c1c' }}>
+            <div className="flex-1 min-w-0 flex flex-col" style={{ borderRight: '1px solid rgba(39,39,42,0.6)' }}>
               <PerpetualsChart symbol={symbol} />
             </div>
 
             {/* OB / Trades */}
             <div className="flex flex-col overflow-hidden" style={{ width: 290, minWidth: 290 }}>
-              <div className="flex-none flex items-center" style={{ height: 36, padding: '0 16px 0 8px', borderBottom: '1px solid #1c1c1c' }}>
+              <div className="flex-none flex items-center" style={{ height: 36, padding: '0 16px 0 8px', borderBottom: '1px solid rgba(39,39,42,0.6)' }}>
                 {(
                   [
                     { key: "orderBook", label: "Order Book" },
@@ -282,7 +282,7 @@ export function PerpetualsPage() {
 
           {/* Bottom half: Positions / Open Orders / Trades */}
           <div className="flex-none flex flex-col" style={{ height: bottomHeight }}>
-            <div className="flex-none flex items-center" style={{ height: 36, padding: '0 16px 0 8px', borderBottom: '1px solid #1c1c1c' }}>
+            <div className="flex-none flex items-center" style={{ height: 36, padding: '0 16px 0 8px', borderBottom: '1px solid rgba(39,39,42,0.6)' }}>
               {(
                 [
                   { key: "positions", label: "Positions" },
@@ -330,7 +330,7 @@ export function PerpetualsPage() {
         </div>
 
         {/* Right: PlaceOrder (full height, fixed 320px) */}
-        <div className="flex flex-col overflow-hidden" style={{ width: 320, minWidth: 320, maxWidth: 320, borderLeft: '1px solid #1c1c1c' }}>
+        <div className="flex flex-col overflow-hidden" style={{ width: 320, minWidth: 320, maxWidth: 320, borderLeft: '1px solid rgba(39,39,42,0.6)' }}>
           <PlaceOrderFormWidget symbol={symbol} className="h-full" />
         </div>
       </div>
@@ -356,7 +356,7 @@ function CoinSelectorBar({
   isMobile?: boolean;
 }) {
   return (
-    <div className="flex-none relative" style={{ height: isMobile ? 48 : 64, borderBottom: '1px solid #1c1c1c' }}>
+    <div className="flex-none relative" style={{ height: isMobile ? 48 : 64, borderBottom: '1px solid rgba(39,39,42,0.6)' }}>
       <div className="flex items-center h-full">
         <button
           type="button"
@@ -405,9 +405,10 @@ function CoinSelectorBar({
             style={{
               width: isMobile ? '100vw' : 800,
               height: isMobile ? '60vh' : 400,
-              backgroundColor: '#1A1A1A',
-              border: '1px solid #2a2a2a',
-              borderRadius: isMobile ? 0 : 4,
+              backgroundColor: 'rgba(24,24,27,1)',
+              border: '1px solid rgba(39,39,42,0.6)',
+              borderRadius: isMobile ? 0 : 14,
+              boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
             }}
           >
             <SearchCoinsWidget onSelectCoin={handleSelectCoin} />
@@ -433,7 +434,7 @@ function MobileTabBar({
   ];
 
   return (
-    <div className="flex-none flex items-center" style={{ padding: '4px 8px', borderBottom: '1px solid #1c1c1c' }}>
+    <div className="flex-none flex items-center" style={{ padding: '4px 8px', borderBottom: '1px solid rgba(39,39,42,0.6)' }}>
       <div
         className="relative flex w-full items-center rounded-full"
         style={{ height: 32, backgroundColor: 'rgba(26,26,26,0.5)', padding: 2 }}
@@ -486,7 +487,7 @@ function MobilePlaceOrderSheet({
           backgroundColor: '#000000',
           borderTopLeftRadius: 16,
           borderTopRightRadius: 16,
-          borderTop: '1px solid #1c1c1c',
+          borderTop: '1px solid rgba(39,39,42,0.6)',
         }}
       >
         {/* Drag indicator */}
@@ -611,7 +612,7 @@ function TickerStrip({
   }, [markets]);
 
   return (
-    <div className="flex-none flex items-center overflow-x-auto" style={{ height: 28, gap: 16, padding: '0 12px', borderBottom: '1px solid #1c1c1c', backgroundColor: '#0e0e0e' }}>
+    <div className="flex-none flex items-center overflow-x-auto" style={{ height: 28, gap: 16, padding: '0 12px', borderBottom: '1px solid rgba(39,39,42,0.6)', backgroundColor: '#0a0a0b' }}>
       {tickerData.map(({ coin, change }) => {
         const isPositive = change >= 0;
         const changeStr = `${isPositive ? "+" : ""}${change.toFixed(2)}%`;

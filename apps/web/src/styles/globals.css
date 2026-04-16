@@ -117,6 +117,78 @@
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(63 63 70 / 0.9) transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgb(63 63 70 / 0.9);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .dot-grid {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.025;
+    background-image: radial-gradient(circle at 1px 1px, rgb(255 255 255) 1px, transparent 0);
+    background-size: 20px 20px;
+  }
+
+  .glass {
+    background: rgba(10, 10, 11, 0.8);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+  }
+
+  @keyframes cardEnter {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes badge-shine-sweep {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(200%);
+    }
+  }
+
+  @keyframes breathe {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.4;
+    }
+  }
+
+  .animate-card-enter {
+    animation: cardEnter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  .animate-breathe {
+    animation: breathe 2s ease-in-out infinite;
+  }
 }
 
 /* override agent-widget styles */
@@ -143,9 +215,14 @@
   padding: 4px !important;
   line-height: 24px !important;
 }
-.axiom-trade-panel [role="tablist"][class*="bg-content2"] [role="tab"][data-selected="true"] {
+.axiom-trade-panel [role="tablist"][class*="bg-content2"] [role="tab"][data-selected="true"][data-key="buy"] {
   font-weight: 700 !important;
   background-color: #C7FF2E !important;
+  color: #000000 !important;
+}
+.axiom-trade-panel [role="tablist"][class*="bg-content2"] [role="tab"][data-selected="true"][data-key="sell"] {
+  font-weight: 700 !important;
+  background-color: #F76816 !important;
   color: #000000 !important;
 }
 .axiom-trade-panel [role="tablist"][class*="bg-content2"] [role="tab"]:not([data-selected="true"]) {
@@ -179,19 +256,10 @@
   color: #b5b5b5 !important;
 }
 
-/* Hide SDK's built-in preset tabs — duplicated by our custom PRESET row below position stats */
-.axiom-trade-panel [role="tablist"][class*="shadow-xs"] {
-  display: none !important;
-}
-.axiom-trade-panel :has(> [data-slot="base"]:has([role="tablist"][class*="shadow-xs"])) {
-  display: none !important;
-  margin: 0 !important;
-  height: 0 !important;
-}
 
-/* Axiom-style main Buy/Sell action button — target only the large submit button */
-.axiom-trade-panel button[class*="bg-success"],
-.axiom-trade-panel button[class*="bg-danger"],
+/* Axiom-style main Buy/Sell action button */
+.axiom-trade-panel button[class*="bg-success"][class*="w-full"],
+.axiom-trade-panel button[class*="bg-danger"][class*="w-full"],
 .axiom-trade-panel button[class*="bg-primary"][class*="w-full"] {
   min-height: 36px !important;
   max-height: 36px !important;
@@ -202,6 +270,12 @@
   display: flex !important;
   flex: 1 !important;
   width: 100% !important;
+}
+.axiom-trade-panel button[class*="bg-primary"][class*="w-full"] {
   background-color: #C7FF2E !important;
+  color: #000000 !important;
+}
+.axiom-trade-panel button[class*="bg-secondary"][class*="w-full"] {
+  background-color: #F76816 !important;
   color: #000000 !important;
 }

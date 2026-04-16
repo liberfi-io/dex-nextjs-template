@@ -248,7 +248,8 @@ export function CombinedTokenList() {
       onSwapSubmitted={handleSwapSubmitted}
       onSwapError={handleSwapError}
     >
-      <div className="w-full h-full flex flex-col gap-3 sm:gap-4 p-4">
+      <div className="w-full h-full flex flex-col">
+        <div className="flex-1 flex flex-col gap-3 sm:gap-4 p-4 min-h-0">
         <div
           className={cn(
             "w-full mx-auto flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0 flex-none sm:h-8",
@@ -271,7 +272,9 @@ export function CombinedTokenList() {
                   onClick={() => setActiveTab(tab)}
                   className={cn(
                     "text-sm sm:text-base font-medium transition-colors cursor-pointer",
-                    activeTab === tab ? "text-foreground" : "text-neutral hover:text-foreground/80",
+                    activeTab === tab
+                      ? "text-[#c7ff2e]"
+                      : "text-zinc-500 hover:text-zinc-200",
                   )}
                 >
                   {t(TAB_I18N_KEYS[tab])}
@@ -344,6 +347,7 @@ export function CombinedTokenList() {
 
         <div className="w-full flex-auto flex flex-col min-h-0" ref={ref}>
           {tokenListContent}
+        </div>
         </div>
       </div>
     </InstantTradeSwapProvider>

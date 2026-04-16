@@ -45,7 +45,7 @@ function Content({ token }: { token: Token }) {
   const displayPrice = latestPrice ? `$${formatLongNumber(latestPrice)}` : "-";
 
   return (
-    <div className="flex min-h-[64px] max-h-[64px] flex-1 flex-row items-center justify-start gap-4 border-b border-neutral-800 pl-4 pr-4">
+    <div className="flex min-h-[64px] max-h-[64px] flex-1 flex-row items-center justify-start gap-4 border-b border-border-subtle pl-4 pr-4">
       {/* Token identity — Axiom: shrink-0, gap=8px, h=42px, avatar 36x36 */}
       <div className="flex shrink-0 flex-row items-center justify-center gap-2 h-[42px]">
         <TokenAvatar

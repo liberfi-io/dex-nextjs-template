@@ -36,9 +36,19 @@ export function InstantTrade({ className }: InstantTradeProps) {
       <Tabs
         fullWidth
         size="sm"
+        color={tradeDirection === "buy" ? "primary" : "secondary"}
         selectedKey={tradeDirection}
         onSelectionChange={setTradeDirection as (key: Key) => void}
-        classNames={{ tabList: "bg-content2", tab: "data-[selected=true]:bg-content3 h-6" }}
+        classNames={{
+          tabList: "bg-content2",
+          tab: clsx(
+            "h-6",
+            tradeDirection === "buy"
+              ? "data-[selected=true]:bg-primary"
+              : "data-[selected=true]:bg-secondary",
+          ),
+          cursor: tradeDirection === "buy" ? "bg-primary" : "bg-secondary",
+        }}
         // TODO heroui bug: tab animation conflicts with modal animation
         disableAnimation
       >

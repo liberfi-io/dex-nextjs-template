@@ -59,7 +59,7 @@ export function AxiomTradePage() {
               onPointerMove={onPointerMove}
               onPointerUp={onPointerUp}
             />
-            <div className="h-px w-full bg-neutral-800 group-hover:bg-neutral-600 transition-colors" />
+            <div className="h-px w-full bg-border-subtle group-hover:bg-zinc-600 transition-colors" />
           </div>
 
           {/* Resizable bottom panel */}
@@ -68,8 +68,8 @@ export function AxiomTradePage() {
           </div>
         </div>
 
-        {/* Right sidebar — Axiom: w=320px, h=calc(100vh+360px), no border-l, overflow hidden, scrollbar hidden */}
-        <div className="hidden md:flex w-[320px] min-w-[320px] max-w-[320px] h-full flex-col overflow-y-auto border-l border-neutral-800" style={{ msOverflowStyle: "none", scrollbarWidth: "none" }}>
+        {/* Right sidebar */}
+        <div className="hidden md:flex w-[320px] min-w-[320px] max-w-[320px] h-full flex-col overflow-y-auto custom-scrollbar border-l border-border-subtle">
           <SidebarVolumeStats />
           <TradingPanel />
           <TokenInfoPanel />
@@ -84,7 +84,7 @@ function SimilarTokensPanel() {
   return (
     <div className="flex flex-col gap-0.5">
       <div className="flex flex-col gap-0">
-        <div className="h-px w-full bg-neutral-800" />
+        <div className="h-px w-full bg-border-subtle" />
         <div className="flex w-full shrink-0 flex-row gap-4 px-4 pl-2 pt-1.5">
           <button className="group flex h-7 w-fit flex-row items-center justify-start rounded pl-2 pr-1 text-sm font-medium text-[rgb(200,201,209)] hover:bg-neutral-800/50 transition-colors">
             Similar Tokens
@@ -107,7 +107,7 @@ function ChartToolbar() {
   const [chartMode, setChartMode] = useState<"MarketCap" | "Price">("Price");
 
   return (
-    <div className="flex-none flex items-center h-[32px] px-3 gap-2 border-b border-neutral-800 text-xs">
+    <div className="flex-none flex items-center h-[32px] px-3 gap-2 border-b border-border-subtle text-xs">
       <button className="px-2 h-6 text-neutral hover:text-foreground transition-colors">
         Indicators
       </button>
