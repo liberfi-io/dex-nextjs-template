@@ -271,10 +271,10 @@ export function CombinedTokenList() {
                   type="button"
                   onClick={() => setActiveTab(tab)}
                   className={cn(
-                    "text-sm sm:text-base font-medium transition-colors cursor-pointer",
+                    "text-sm sm:text-base font-medium transition-all cursor-pointer",
                     activeTab === tab
-                      ? "text-[#c7ff2e]"
-                      : "text-zinc-500 hover:text-zinc-200",
+                      ? "text-foreground hover:opacity-70"
+                      : "text-zinc-500 hover:text-zinc-300",
                   )}
                 >
                   {t(TAB_I18N_KEYS[tab])}
@@ -312,12 +312,8 @@ export function CombinedTokenList() {
             </div>
           </div>
 
-          <div
-            className={cn(
-              "justify-start sm:justify-end items-center gap-2 sm:gap-6",
-              isMobileControlsOpen ? "flex" : "hidden sm:flex",
-            )}
-          >
+          {/* desktop: always visible as inline controls */}
+          <div className="hidden sm:flex justify-end items-center gap-6">
             {showTokenListControls && (
               <>
                 <TokenListResolutionSelectorWidget
@@ -339,6 +335,48 @@ export function CombinedTokenList() {
                 token={nativeToken}
                 size="sm"
                 className="max-w-55"
+                onPresetClick={handlePresetClick}
+              />
+            )}
+          </div>
+
+          {/* mobile: expand/collapse — GPU-only opacity+transform, no layout animation */}
+          <div
+            className={cn(
+              "sm:hidden flex justify-end items-center gap-2 pt-2 relative z-20",
+              !isMobileControlsOpen && "invisible h-0 overflow-hidden",
+            )}
+            style={{
+              opacity: isMobileControlsOpen ? 1 : 0,
+              transform: isMobileControlsOpen
+                ? "translateY(0) scale(1)"
+                : "translateY(-4px) scale(0.98)",
+              transition:
+                "opacity 150ms ease-out, transform 150ms ease-out",
+              willChange: "opacity, transform",
+            }}
+          >
+            {showTokenListControls && (
+              <>
+                <TokenListResolutionSelectorWidget
+                  resolution={resolution}
+                  onResolutionChange={setResolution}
+                />
+                <TokenListFilterWidget
+                  protocols={chain === Chain.SOLANA ? SOLANA_TOKEN_PROTOCOLS : undefined}
+                  resolution={resolution}
+                  filters={filters}
+                  onFiltersChange={setFilters}
+                />
+              </>
+            )}
+            {nativeToken && (
+              <AmountPresetInputWidget
+                id="token-list"
+                chain={chain}
+                token={nativeToken}
+                size="sm"
+                className="max-w-50"
                 onPresetClick={handlePresetClick}
               />
             )}
