@@ -42,7 +42,7 @@ importers:
         specifier: ^0.0.3
         version: 0.0.3(@types/react@18.3.23)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@chainstream-io/sdk':
-        specifier: ^2.0.5
+        specifier: 2.0.5
         version: 2.0.5
       '@heroui/react':
         specifier: ^2.8.10
@@ -540,7 +540,7 @@ importers:
   packages/react-dex:
     dependencies:
       '@chainstream-io/sdk':
-        specifier: ^2.0.5
+        specifier: 2.0.5
         version: 2.0.5
       '@liberfi/core':
         specifier: workspace:*
@@ -622,7 +622,7 @@ importers:
   packages/react-launchpad:
     dependencies:
       '@chainstream-io/sdk':
-        specifier: ^2.0.5
+        specifier: 2.0.5
         version: 2.0.5
       '@liberfi/core':
         specifier: workspace:*
@@ -704,7 +704,7 @@ importers:
   packages/react-redpacket:
     dependencies:
       '@chainstream-io/sdk':
-        specifier: ^2.0.5
+        specifier: 2.0.5
         version: 2.0.5
       '@liberfi/core':
         specifier: workspace:*
@@ -783,7 +783,7 @@ importers:
   packages/ui-base:
     dependencies:
       '@chainstream-io/sdk':
-        specifier: ^2.0.5
+        specifier: 2.0.5
         version: 2.0.5
       '@heroui/framer-utils':
         specifier: ^2.1.28
@@ -1090,7 +1090,7 @@ importers:
   packages/ui-dex:
     dependencies:
       '@chainstream-io/sdk':
-        specifier: ^2.0.5
+        specifier: 2.0.5
         version: 2.0.5
       '@heroui/framer-utils':
         specifier: ^2.1.28
@@ -1415,7 +1415,7 @@ importers:
   packages/ui-launchpad:
     dependencies:
       '@chainstream-io/sdk':
-        specifier: ^2.0.5
+        specifier: 2.0.5
         version: 2.0.5
       '@heroui/framer-utils':
         specifier: ^2.1.28
@@ -1737,7 +1737,7 @@ importers:
   packages/ui-redpacket:
     dependencies:
       '@chainstream-io/sdk':
-        specifier: ^2.0.5
+        specifier: 2.0.5
         version: 2.0.5
       '@heroui/framer-utils':
         specifier: ^2.1.28

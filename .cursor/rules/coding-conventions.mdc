@@ -53,10 +53,7 @@ When updating `@liberfi.io/*` versions:
 1. Update `apps/web/package.json`
 2. Update ALL `packages/*/package.json` (both `peerDependencies` and `devDependencies`)
 3. Sync `@chainstream-io/sdk` version to match `@liberfi.io/client`'s dependency
-4. **Stop here** — tell the user to run the following themselves:
-   ```bash
-   nrm use npm && pnpm install --no-frozen-lockfile && pnpm build && nrm use taobao
-   ```
+4. Run `nrm use npm && pnpm install --no-frozen-lockfile && pnpm build && nrm use taobao`
 
 See `.cursor/rules/liberfi-sdk-context.mdc` for full rules.
 

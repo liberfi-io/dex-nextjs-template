@@ -24,11 +24,10 @@ When updating `@liberfi.io/*` SDK versions in `apps/web/package.json`, you MUST 
 2. Update `peerDependencies` versions (using `>=` range) to match the new SDK version.
 3. Update `devDependencies` versions (using `^` range) to match the new SDK version.
 4. **Sync `@chainstream-io/sdk` version**: Check the `@chainstream-io/sdk` version used by `@liberfi.io/client` (inspect its `package.json` in `node_modules/@liberfi.io/client/package.json`), then update `@chainstream-io/sdk` in all `apps/*/package.json` and `packages/*/package.json` that reference it to match that version.
-5. After all `package.json` files are updated, **stop and tell the user** to run the following commands themselves:
+5. After all `package.json` files are updated, run the following commands automatically:
    ```bash
    nrm use npm   # switch to official registry
    pnpm install --no-frozen-lockfile
    pnpm build
    nrm use taobao  # switch back to mirror
    ```
-   Do NOT run `pnpm install` or `pnpm build` automatically.
