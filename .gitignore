@@ -51,6 +51,9 @@ Thumbs.db
 
 # Screenshots and temp files
 *.png
+# Allow committed static assets under apps/web/public to override the
+# blanket *.png ignore (avoids accidentally publishing 404s on Vercel).
+!apps/web/public/**/*.png
 sdk-status-tee.txt
 
 # Cursor IDE

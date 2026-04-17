@@ -53,8 +53,18 @@ export function PredictSubNav() {
 
   return (
     <nav
-      className="sticky top-0 z-30 w-full bg-[#0a0a0b]/95 backdrop-blur"
-      style={{ borderBottom: "1px solid rgba(39,39,42,0.6)" }}
+      className="w-full"
+      // Match the styling used by every sticky strip inside the prediction
+      // SDK (events categories widget, matches toolbar): same backdrop blur
+      // intensity, background tint, and border alpha. Keeping these values in
+      // sync prevents the SubNav border from looking visually heavier than
+      // the bordered sticky element rendered directly below it on /predict.
+      style={{
+        background: "rgba(10,10,11,0.8)",
+        backdropFilter: "blur(24px)",
+        WebkitBackdropFilter: "blur(24px)",
+        borderBottom: "1px solid rgba(39,39,42,0.5)",
+      }}
       aria-label="Prediction sub navigation"
     >
       <div className="w-full max-w-[1550px] mx-auto px-6 max-lg:px-4 max-sm:px-3 flex items-center gap-1 h-11">
