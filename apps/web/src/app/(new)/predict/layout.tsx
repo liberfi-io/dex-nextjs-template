@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { usePredictWsClient } from "@liberfi.io/react-predict";
+import { PredictSubNav } from "src/components/PredictSubNav";
 
 /**
  * Connects the prediction WebSocket when the user enters any /predict route
@@ -27,9 +28,10 @@ function PredictWsConnector() {
 
 export default function PredictLayout({ children }: { children: React.ReactNode }) {
   return (
-    <>
+    <div className="flex flex-col min-h-full">
       <PredictWsConnector />
-      {children}
-    </>
+      <PredictSubNav />
+      <div className="flex-1 min-h-0">{children}</div>
+    </div>
   );
 }

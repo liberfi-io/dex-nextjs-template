@@ -47,7 +47,7 @@ import { MediaTrackProvider } from "@liberfi.io/ui-media-track";
 import { ChannelsClient } from "@liberfi.io/ui-channels/client";
 import { ChannelsProvider } from "@liberfi.io/ui-channels";
 import { PerpetualsProvider, HyperliquidPerpetualsClient } from "@liberfi.io/ui-perpetuals";
-import { PredictClient, PredictProvider } from "@liberfi.io/react-predict";
+import { PredictClient, PredictProvider, PolymarketProvider } from "@liberfi.io/react-predict";
 import type { PredictEvent } from "@liberfi.io/react-predict";
 import {
   SearchEventsButton,
@@ -125,6 +125,8 @@ import { BottomTweets } from "./BottomTweets";
 import { BottomAICopilot } from "./BottomAICopilot";
 import { PredictDepositButton } from "./PredictDepositButton";
 import { PredictAccountButton } from "./PredictAccountButton";
+import { PredictBalanceIndicator } from "./PredictBalanceIndicator";
+import { FundWalletModal } from "./FundWalletModal";
 
 const LegacyModals = [
   lazy(() => import("@liberfi/ui-dex/components/modals/WebviewModal")),
@@ -169,6 +171,7 @@ export function NewAppLayout({ children, locale }: PropsWithChildren<{ locale: L
               <SearchModal />
               <PredictSearchModal />
               <PresetFormModal />
+              <FundWalletModal />
               <Suspense>
                 {LegacyModals.map((Modal, i) => (
                   <Modal key={i} />
@@ -281,6 +284,7 @@ function ServiceProviders({ children }: PropsWithChildren) {
         <MediaTrackProvider client={mediaTrackClient}>
           <ChannelsProvider client={channelsClient}>
             <PredictProvider client={predictClient} wsClient={predictWsClient}>
+              <PolymarketProvider>
               <PortfolioClientProvider client={portfolioClient}>
                 <PortfolioProvider chain={chain} address={wallet?.address ?? ""}>
                   <PerpetualsProvider client={perpetualsClient}>
@@ -288,6 +292,7 @@ function ServiceProviders({ children }: PropsWithChildren) {
                   </PerpetualsProvider>
                 </PortfolioProvider>
               </PortfolioClientProvider>
+              </PolymarketProvider>
             </PredictProvider>
           </ChannelsProvider>
         </MediaTrackProvider>
@@ -505,6 +510,7 @@ function PageShell({ children }: PropsWithChildren) {
 
                 {!isPredictPage && <LaunchPadButton />}
 
+                {isPredictPage && isAuthenticated && <PredictBalanceIndicator />}
                 {isPredictPage && isAuthenticated && <PredictDepositButton />}
 
                 <div className="hidden sm:block">
