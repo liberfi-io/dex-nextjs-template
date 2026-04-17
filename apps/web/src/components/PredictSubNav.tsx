@@ -67,7 +67,7 @@ export function PredictSubNav() {
       }}
       aria-label="Prediction sub navigation"
     >
-      <div className="w-full max-w-[1550px] mx-auto px-6 max-lg:px-4 max-sm:px-3 flex items-center gap-1 h-11">
+      <div className="w-full px-6 max-lg:px-4 max-sm:px-3 flex items-center justify-center gap-1 h-11">
         {items.map((item) => (
           <Link
             key={item.key}
