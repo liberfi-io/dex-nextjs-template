@@ -27,11 +27,17 @@ function PredictWsConnector() {
 }
 
 export default function PredictLayout({ children }: { children: React.ReactNode }) {
+  // Predict pages (EventsPage / MatchesPage / portfolio) use natural document
+  // flow with `min-height: 100vh` + `position: sticky` + IntersectionObserver
+  // infinite scroll. The dex template's PageShell wraps content in a fixed
+  // viewport-height container with `overflow-hidden`, so we provide our own
+  // internal scroll container here. The sub-nav stays pinned at the top while
+  // the page content scrolls below it.
   return (
-    <div className="flex flex-col min-h-full">
+    <div className="flex flex-col h-full">
       <PredictWsConnector />
       <PredictSubNav />
-      <div className="flex-1 min-h-0">{children}</div>
+      <div className="flex-1 min-h-0 overflow-y-auto">{children}</div>
     </div>
   );
 }

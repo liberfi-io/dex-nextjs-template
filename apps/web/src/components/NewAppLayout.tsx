@@ -171,7 +171,6 @@ export function NewAppLayout({ children, locale }: PropsWithChildren<{ locale: L
               <SearchModal />
               <PredictSearchModal />
               <PresetFormModal />
-              <FundWalletModal />
               <Suspense>
                 {LegacyModals.map((Modal, i) => (
                   <Modal key={i} />
@@ -414,6 +413,12 @@ function PageShell({ children }: PropsWithChildren) {
 
   return (
     <PredictWalletProvider enabled={isPredictPage}>
+      {/* FundWalletModal must live INSIDE PredictWalletProvider because it
+          calls usePredictWallet() during render. Rendering it as a sibling of
+          PageShell (outside the provider) would crash with "usePredictWallet
+          must be used within a PredictWalletProvider" the moment the user
+          opens the deposit dialog. */}
+      <FundWalletModal />
       <Scaffold
         pathname={pathname}
         onNavigate={onNavigate}
