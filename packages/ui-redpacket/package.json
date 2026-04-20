@@ -13,7 +13,7 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
-    "@chainstream-io/sdk": "2.0.5",
+    "@chainstream-io/sdk": "^2.0.5",
     "@heroui/framer-utils": "^2.1.28",
     "@heroui/react": "^2.8.10",
     "@heroui/theme": "^2.4.26",
@@ -59,16 +59,16 @@
     "tailwindcss": "^4.1.11"
   },
   "peerDependencies": {
-    "@liberfi.io/client": ">=0.1.172",
-    "@liberfi.io/types": ">=0.1.162",
-    "@liberfi.io/ui-portfolio": ">=0.1.144"
+    "@liberfi.io/client": ">=0.1.173",
+    "@liberfi.io/types": ">=0.1.163",
+    "@liberfi.io/ui-portfolio": ">=0.1.145"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^3.2.3",
     "@eslint/js": "^9.20.0",
-    "@liberfi.io/client": "^0.1.172",
-    "@liberfi.io/types": "^0.1.162",
-    "@liberfi.io/ui-portfolio": "^0.1.144",
+    "@liberfi.io/client": "^0.1.173",
+    "@liberfi.io/types": "^0.1.163",
+    "@liberfi.io/ui-portfolio": "^0.1.145",
     "@storybook/addon-essentials": "^8.4.7",
     "@storybook/addon-interactions": "^8.4.7",
     "@storybook/addon-styling-webpack": "^1.0.1",
