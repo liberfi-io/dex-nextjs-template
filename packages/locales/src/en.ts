@@ -729,6 +729,29 @@ export default {
         "done": "Done"
       }
     },
+    "hlDeposit": {
+      "entry": "SOL ↔ Hyperliquid USDC",
+      "title": "Convert to Hyperliquid USDC",
+      "subtitle": "Exchange native Solana for USDC on Hyperliquid Perp",
+      "converting": "Converting",
+      "gaining": "Gaining",
+      "balance": "Balance: {{value}}",
+      "rate": "1 SOL ≈ {{rate}} USDC",
+      "minAmount": "Min {{min}} SOL",
+      "usdcLabel": "Hyperliquid USDC",
+      "confirm": "Confirm",
+      "sending": "Sending SOL...",
+      "detecting": "Detecting deposit...",
+      "detectingDescription": "Waiting for Hyperunit to credit USOL on Hyperliquid (usually 30–60s).",
+      "swap": "Swap USOL → USDC",
+      "swapping": "Swapping...",
+      "transfer": "Transfer to Perp",
+      "transferring": "Transferring...",
+      "done": "Done",
+      "noEvmWallet": "No Hyperliquid (EVM) wallet",
+      "noSolanaWallet": "No Solana wallet",
+      "insufficient": "Insufficient SOL balance"
+    },
     "portfolio": {
       "title": "Portfolio",
       "totalBalance": "Total Balance",

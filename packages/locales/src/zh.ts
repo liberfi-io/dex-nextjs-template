@@ -729,6 +729,29 @@ export default {
         "done": "完成"
       }
     },
+    "hlDeposit": {
+      "entry": "SOL ↔ Hyperliquid USDC",
+      "title": "兌換 Hyperliquid USDC",
+      "subtitle": "將 Solana 原生 SOL 兌換為 Hyperliquid Perp USDC",
+      "converting": "支付",
+      "gaining": "獲得",
+      "balance": "餘額：{{value}}",
+      "rate": "1 SOL ≈ {{rate}} USDC",
+      "minAmount": "最少 {{min}} SOL",
+      "usdcLabel": "Hyperliquid USDC",
+      "confirm": "確認",
+      "sending": "發送 SOL 中...",
+      "detecting": "檢測入帳中...",
+      "detectingDescription": "等待 Hyperunit 將 USOL 入帳到 Hyperliquid（通常需 30–60 秒）。",
+      "swap": "賣出 USOL → USDC",
+      "swapping": "下單中...",
+      "transfer": "轉入 Perp",
+      "transferring": "轉入中...",
+      "done": "完成",
+      "noEvmWallet": "未檢測到 Hyperliquid（EVM）錢包",
+      "noSolanaWallet": "未檢測到 Solana 錢包",
+      "insufficient": "SOL 餘額不足"
+    },
     "portfolio": {
       "title": "持倉",
       "totalBalance": "總餘額",

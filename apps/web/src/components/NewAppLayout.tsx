@@ -40,7 +40,13 @@ import {
   useChangeLocale,
   useLocaleContext,
 } from "@liberfi.io/i18n";
-import { useAuth, useConnectedWallet, useSwitchChain } from "@liberfi.io/wallet-connector";
+import {
+  useAuth,
+  useConnectedWallet,
+  useSwitchChain,
+  useWallets,
+  type EvmWalletAdapter,
+} from "@liberfi.io/wallet-connector";
 import { useCurrentChain, useSelectChain } from "@liberfi.io/ui-chain-select";
 import { MediaTrackClient } from "@liberfi.io/ui-media-track/client";
 import { MediaTrackProvider } from "@liberfi.io/ui-media-track";
@@ -120,6 +126,12 @@ import { PresetFormModal } from "@liberfi.io/ui-trade";
 import { useAsyncModal } from "@liberfi.io/ui-scaffold";
 import { useAccountInfo } from "@liberfi.io/ui-portfolio";
 import { LaunchPadModal, LAUNCHPAD_MODAL_ID } from "./modals/LaunchPadModal";
+import {
+  SolToPerpDepositModal,
+  SOL_TO_PERP_DEPOSIT_MODAL_ID,
+} from "./modals/SolToPerpDepositModal";
+import { useHyperliquidBalances } from "../hooks/useHyperliquidBalances";
+import { HyperliquidUsdcIcon } from "./icons/HyperliquidUsdcIcon";
 import { AppBottomToolbar } from "./AppBottomToolbar";
 import { BottomTweets } from "./BottomTweets";
 import { BottomAICopilot } from "./BottomAICopilot";
@@ -167,6 +179,7 @@ export function NewAppLayout({ children, locale }: PropsWithChildren<{ locale: L
             <LegacyBridge>
               <PageShell>{children}</PageShell>
               <LaunchPadModal />
+              <SolToPerpDepositModal />
               <StyledToaster />
               <SearchModal />
               <PredictSearchModal />
@@ -1073,6 +1086,19 @@ function DexAccountMenuContent({
   onSignOut: () => void;
   t: ReturnType<typeof useTranslation>["t"];
 }) {
+  const wallets = useWallets();
+  const evmWallet = useMemo(
+    () =>
+      wallets.find((w) => w.chainNamespace === "EVM") as
+        | EvmWalletAdapter
+        | undefined,
+    [wallets],
+  );
+  const hlBalances = useHyperliquidBalances(evmWallet?.address);
+  const { onOpen: openSolToPerpDeposit } = useAsyncModal(
+    SOL_TO_PERP_DEPOSIT_MODAL_ID,
+  );
+
   return (
     <>
       {/* Wallet address + copy */}
@@ -1126,6 +1152,20 @@ function DexAccountMenuContent({
             {balanceNativeFormatted}
           </span>
         </div>
+        <div className="border-t border-zinc-800/60 my-1" />
+        <div className="flex items-center justify-between gap-3 px-3 py-2 rounded-[10px]">
+          <div className="flex items-center gap-2.5">
+            <HyperliquidUsdcIcon size={20} />
+            <span className="text-sm text-zinc-400">
+              {t("extend.hlDeposit.usdcLabel")}
+            </span>
+          </div>
+          <span className="text-sm font-medium text-zinc-100 tabular-nums">
+            {evmWallet
+              ? formatHlUsdc(hlBalances.perpUsdc)
+              : "—"}
+          </span>
+        </div>
         <div className="flex items-center justify-between gap-3 px-3 py-2">
           <span className="text-sm text-zinc-300 font-medium">
             {t("common.totalValue")}
@@ -1134,6 +1174,25 @@ function DexAccountMenuContent({
             {balanceUsdFormatted}
           </span>
         </div>
+      </div>
+
+      {/* SOL ↔ Hyperliquid USDC entry */}
+      <div style={{ borderTop: "1px solid rgba(39,39,42,1)" }} className="p-2">
+        <button
+          type="button"
+          onClick={() => openSolToPerpDeposit()}
+          className="flex items-center gap-2.5 w-full px-3 py-2 text-sm rounded-[10px] transition-colors cursor-pointer text-zinc-200 hover:bg-[rgba(39,39,42,0.5)]"
+        >
+          <div className="flex items-center justify-center w-7 h-7 rounded-[10px] bg-[#97FCE4]/10 text-[#97FCE4]">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m17 3 4 4-4 4" />
+              <path d="M21 7H9" />
+              <path d="m7 21-4-4 4-4" />
+              <path d="M15 17H3" />
+            </svg>
+          </div>
+          {t("extend.hlDeposit.entry")}
+        </button>
       </div>
 
       {/* Sign out */}
@@ -1155,4 +1214,12 @@ function DexAccountMenuContent({
       </div>
     </>
   );
+}
+
+function formatHlUsdc(s: string): string {
+  const n = Number(s);
+  if (!Number.isFinite(n)) return "0";
+  if (n === 0) return "0";
+  if (n < 0.01) return n.toFixed(6);
+  return n.toFixed(2);
 }
