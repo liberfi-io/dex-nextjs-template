@@ -127,9 +127,9 @@ import { useAsyncModal } from "@liberfi.io/ui-scaffold";
 import { useAccountInfo } from "@liberfi.io/ui-portfolio";
 import { LaunchPadModal, LAUNCHPAD_MODAL_ID } from "./modals/LaunchPadModal";
 import {
-  SolToPerpDepositModal,
-  SOL_TO_PERP_DEPOSIT_MODAL_ID,
-} from "./modals/SolToPerpDepositModal";
+  DepositHyperliquidUsdcModal,
+  DEPOSIT_HL_USDC_MODAL_ID,
+} from "./modals/DepositHyperliquidUsdcModal";
 import { useHyperliquidBalances } from "../hooks/useHyperliquidBalances";
 import { HyperliquidUsdcIcon } from "./icons/HyperliquidUsdcIcon";
 import { AppBottomToolbar } from "./AppBottomToolbar";
@@ -179,7 +179,7 @@ export function NewAppLayout({ children, locale }: PropsWithChildren<{ locale: L
             <LegacyBridge>
               <PageShell>{children}</PageShell>
               <LaunchPadModal />
-              <SolToPerpDepositModal />
+              <DepositHyperliquidUsdcModal />
               <StyledToaster />
               <SearchModal />
               <PredictSearchModal />
@@ -1000,7 +1000,10 @@ function DexAccountButton() {
         </span>
         {evmWalletForTrigger && (
           <>
-            <SwapArrowsIcon className="text-zinc-500" size={12} />
+            <span
+              className="h-3 w-px bg-zinc-700/80 mx-0.5"
+              aria-hidden="true"
+            />
             <HyperliquidUsdcIcon size={16} />
             <span className="text-xs font-medium text-zinc-100 tabular-nums">
               {formatHlUsdc(hlBalancesTrigger.perpUsdc)}
@@ -1119,8 +1122,8 @@ function DexAccountMenuContent({
     [wallets],
   );
   const hlBalances = useHyperliquidBalances(evmWallet?.address);
-  const { onOpen: openSolToPerpDeposit } = useAsyncModal(
-    SOL_TO_PERP_DEPOSIT_MODAL_ID,
+  const { onOpen: openHlUsdcDeposit } = useAsyncModal(
+    DEPOSIT_HL_USDC_MODAL_ID,
   );
 
   return (
@@ -1200,16 +1203,14 @@ function DexAccountMenuContent({
         </div>
       </div>
 
-      {/* SOL ↔ Hyperliquid USDC entry */}
+      {/* Deposit Hyperliquid USDC entry */}
       <div style={{ borderTop: "1px solid rgba(39,39,42,1)" }} className="p-2">
         <button
           type="button"
-          onClick={() => openSolToPerpDeposit()}
+          onClick={() => openHlUsdcDeposit()}
           className="flex items-center gap-2.5 w-full px-3 py-2 text-sm rounded-[10px] transition-colors cursor-pointer text-zinc-200 hover:bg-[rgba(39,39,42,0.5)]"
         >
-          <div className="flex items-center gap-1.5">
-            <TokenIcon symbol="SOL" size={18} />
-            <SwapArrowsIcon className="text-zinc-500" size={12} />
+          <div className="flex items-center justify-center w-7 h-7 rounded-[10px] bg-[#97FCE4]/10">
             <HyperliquidUsdcIcon size={18} />
           </div>
           <span>{t("extend.hlDeposit.entry")}</span>
@@ -1245,31 +1246,3 @@ function formatHlUsdc(s: string): string {
   return n.toFixed(2);
 }
 
-function SwapArrowsIcon({
-  size = 12,
-  className,
-}: {
-  size?: number;
-  className?: string;
-}) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
-      <path d="m17 3 4 4-4 4" />
-      <path d="M21 7H9" />
-      <path d="m7 21-4-4 4-4" />
-      <path d="M15 17H3" />
-    </svg>
-  );
-}
