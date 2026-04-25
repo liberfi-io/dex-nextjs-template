@@ -1000,7 +1000,7 @@ function DexAccountButton() {
         </span>
         {evmWalletForTrigger && (
           <>
-            <span className="h-3 w-px bg-zinc-700/80" aria-hidden="true" />
+            <SwapArrowsIcon className="text-zinc-500" size={12} />
             <HyperliquidUsdcIcon size={16} />
             <span className="text-xs font-medium text-zinc-100 tabular-nums">
               {formatHlUsdc(hlBalancesTrigger.perpUsdc)}
@@ -1207,15 +1207,12 @@ function DexAccountMenuContent({
           onClick={() => openSolToPerpDeposit()}
           className="flex items-center gap-2.5 w-full px-3 py-2 text-sm rounded-[10px] transition-colors cursor-pointer text-zinc-200 hover:bg-[rgba(39,39,42,0.5)]"
         >
-          <div className="relative flex items-center justify-center w-9 h-7">
-            <span className="absolute left-0 top-1/2 -translate-y-1/2 ring-1 ring-zinc-900 rounded-full">
-              <TokenIcon symbol="SOL" size={18} />
-            </span>
-            <span className="absolute right-0 top-1/2 -translate-y-1/2 ring-1 ring-zinc-900 rounded-full">
-              <HyperliquidUsdcIcon size={18} />
-            </span>
+          <div className="flex items-center gap-1.5">
+            <TokenIcon symbol="SOL" size={18} />
+            <SwapArrowsIcon className="text-zinc-500" size={12} />
+            <HyperliquidUsdcIcon size={18} />
           </div>
-          {t("extend.hlDeposit.entry")}
+          <span>{t("extend.hlDeposit.entry")}</span>
         </button>
       </div>
 
@@ -1246,4 +1243,33 @@ function formatHlUsdc(s: string): string {
   if (n === 0) return "0";
   if (n < 0.01) return n.toFixed(6);
   return n.toFixed(2);
+}
+
+function SwapArrowsIcon({
+  size = 12,
+  className,
+}: {
+  size?: number;
+  className?: string;
+}) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="m17 3 4 4-4 4" />
+      <path d="M21 7H9" />
+      <path d="m7 21-4-4 4-4" />
+      <path d="M15 17H3" />
+    </svg>
+  );
 }

@@ -17,7 +17,19 @@ import { NextRequest, NextResponse } from "next/server";
 const UPSTREAM = "https://api.hyperunit.xyz";
 
 export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
+// Edge runtime lives in Vercel's CDN POPs and uses different egress IPs
+// than the AWS Lambda Node runtime — avoids Cloudflare's bot blocklist
+// that flags the default Vercel Lambda IPs.
+export const runtime = "edge";
+
+const BROWSER_HEADERS: Record<string, string> = {
+  accept: "application/json, text/plain, */*",
+  "accept-language": "en-US,en;q=0.9",
+  origin: "https://app.hyperliquid.xyz",
+  referer: "https://app.hyperliquid.xyz/",
+  "user-agent":
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
+};
 
 export async function GET(
   request: NextRequest,
@@ -34,11 +46,9 @@ export async function GET(
   try {
     const res = await fetch(upstreamUrl, {
       method: "GET",
-      headers: {
-        accept: "application/json",
-        // Server-side fetch does not trigger Cloudflare bot challenges.
-      },
+      headers: BROWSER_HEADERS,
       cache: "no-store",
+      redirect: "follow",
     });
 
     const contentType = res.headers.get("content-type") ?? "application/json";
