@@ -909,6 +909,18 @@ function DexAccountButton() {
     walletAddress,
   } = useAccountInfo();
 
+  const wallets = useWallets();
+  const evmWalletForTrigger = useMemo(
+    () =>
+      wallets.find((w) => w.chainNamespace === "EVM") as
+        | EvmWalletAdapter
+        | undefined,
+    [wallets],
+  );
+  const hlBalancesTrigger = useHyperliquidBalances(
+    evmWalletForTrigger?.address,
+  );
+
   const [isOpen, setIsOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const ref = useRef<HTMLDivElement>(null);
@@ -986,6 +998,18 @@ function DexAccountButton() {
             <span className="text-zinc-500 ml-1">{nativeToken.symbol}</span>
           )}
         </span>
+        {evmWalletForTrigger && (
+          <>
+            <span className="h-3 w-px bg-zinc-700/80" aria-hidden="true" />
+            <HyperliquidUsdcIcon size={16} />
+            <span className="text-xs font-medium text-zinc-100 tabular-nums">
+              {formatHlUsdc(hlBalancesTrigger.perpUsdc)}
+              {!isMobile && (
+                <span className="text-zinc-500 ml-1">USDC</span>
+              )}
+            </span>
+          </>
+        )}
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="12"
@@ -1183,13 +1207,13 @@ function DexAccountMenuContent({
           onClick={() => openSolToPerpDeposit()}
           className="flex items-center gap-2.5 w-full px-3 py-2 text-sm rounded-[10px] transition-colors cursor-pointer text-zinc-200 hover:bg-[rgba(39,39,42,0.5)]"
         >
-          <div className="flex items-center justify-center w-7 h-7 rounded-[10px] bg-[#97FCE4]/10 text-[#97FCE4]">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m17 3 4 4-4 4" />
-              <path d="M21 7H9" />
-              <path d="m7 21-4-4 4-4" />
-              <path d="M15 17H3" />
-            </svg>
+          <div className="relative flex items-center justify-center w-9 h-7">
+            <span className="absolute left-0 top-1/2 -translate-y-1/2 ring-1 ring-zinc-900 rounded-full">
+              <TokenIcon symbol="SOL" size={18} />
+            </span>
+            <span className="absolute right-0 top-1/2 -translate-y-1/2 ring-1 ring-zinc-900 rounded-full">
+              <HyperliquidUsdcIcon size={18} />
+            </span>
           </div>
           {t("extend.hlDeposit.entry")}
         </button>

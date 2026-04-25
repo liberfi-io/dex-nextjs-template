@@ -16,7 +16,14 @@
  *       has been credited as USOL on the spot account.
  */
 
-const UNIT_API_BASE = "https://api.hyperunit.xyz";
+/**
+ * Same-origin proxy mounted at `apps/web/src/app/api/hyperunit/[...path]`.
+ *
+ * Direct browser calls to `https://api.hyperunit.xyz` are blocked by
+ * Cloudflare's bot protection (HTTP 403) and the upstream sends no
+ * `Access-Control-Allow-Origin`, so we go through the Next.js server.
+ */
+const UNIT_API_BASE = "/api/hyperunit";
 
 export type GenAddressResponse = {
   address: string;
