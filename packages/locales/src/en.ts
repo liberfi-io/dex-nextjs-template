@@ -746,6 +746,15 @@ export default {
       "bridgeHint": "After USDC arrives, push it to Perp via the official Hyperliquid bridge ({{bridge}}).",
       "notConnected": "Connect an EVM wallet to view your deposit address."
     },
+    "relayDeposit": {
+      "entry": "Quick Deposit · SOL → HL Perp",
+      "title": "Deposit SOL into Hyperliquid Perp",
+      "subtitle": "Bridge Solana SOL to Hyperliquid USDC in one click via Relay.",
+      "needsConfig": "Quick deposit is not configured for this environment.",
+      "needsSolWallet": "Connect a Solana wallet to start.",
+      "needsEvmWallet": "Connect an EVM wallet to receive USDC on Hyperliquid.",
+      "recipientHint": "Recipient defaults to your connected EVM address."
+    },
     "portfolio": {
       "title": "Portfolio",
       "totalBalance": "Total Balance",

@@ -746,6 +746,15 @@ export default {
       "bridgeHint": "USDC 到帳後，再通過 Hyperliquid 官方橋接合約 ({{bridge}}) 轉入 Perp 帳戶。",
       "notConnected": "請連接 EVM 錢包以查看你的充值地址。"
     },
+    "relayDeposit": {
+      "entry": "快捷入金 · SOL → HL Perp",
+      "title": "把 SOL 直接打進 Hyperliquid Perp",
+      "subtitle": "通過 Relay 一鍵把 Solana SOL 兌換為 Hyperliquid USDC。",
+      "needsConfig": "當前環境尚未配置快捷入金。",
+      "needsSolWallet": "請先連接一個 Solana 錢包。",
+      "needsEvmWallet": "請連接 EVM 錢包以接收 Hyperliquid USDC。",
+      "recipientHint": "接收地址預設為已連接的 EVM 地址。"
+    },
     "portfolio": {
       "title": "持倉",
       "totalBalance": "總餘額",

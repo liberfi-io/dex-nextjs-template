@@ -354,7 +354,6 @@ export function PredictAccountButton() {
                   onSetupOpen={() => setIsSetupModalOpen(true)}
                   onKycRefresh={handleKycRefresh}
                   onSignOut={handleSignOut}
-                  t={t}
                 />
               </div>
             </div>
@@ -383,7 +382,6 @@ export function PredictAccountButton() {
                 onSetupOpen={() => setIsSetupModalOpen(true)}
                 onKycRefresh={handleKycRefresh}
                 onSignOut={handleSignOut}
-                t={t}
               />
             </div>
           )}
@@ -407,7 +405,6 @@ function AccountMenuContent({
   onSetupOpen,
   onKycRefresh,
   onSignOut,
-  t,
 }: {
   solanaAddress?: string;
   evmAddress?: string;
@@ -422,8 +419,8 @@ function AccountMenuContent({
   onSetupOpen: () => void;
   onKycRefresh: () => void;
   onSignOut: () => void;
-  t: ReturnType<typeof import("@liberfi.io/i18n").useTranslation>["t"];
 }) {
+  const { t } = useTranslation();
   return (
     <>
       <div className="p-2">

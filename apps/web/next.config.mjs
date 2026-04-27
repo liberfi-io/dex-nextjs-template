@@ -113,6 +113,10 @@ const nextConfig = {
         source: "/predict-api/:path*",
         destination: process.env.PREDICT_URL + "/:path*",
       },
+      {
+        source: "/perpetuals-api/:path*",
+        destination: (process.env.PERPETUALS_API_URL || "") + "/:path*",
+      },
     ];
   },
   webpack(config) {
