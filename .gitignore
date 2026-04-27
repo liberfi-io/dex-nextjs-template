@@ -44,6 +44,9 @@ Thumbs.db
 # Environment Files
 .env
 .env.*
+# But always track *.env.example — these are documentation, not secrets.
+!.env.example
+!apps/**/.env.example
 *storybook.log
 
 # SDK link state

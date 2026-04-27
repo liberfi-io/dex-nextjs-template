@@ -19,12 +19,14 @@ declare global {
       NEXT_PUBLIC_AI_COPILOT_URL: string;
       NEXT_PUBLIC_PREDICT_URL: string;
       NEXT_PUBLIC_PREDICT_WS_URL: string | undefined;
+      NEXT_PUBLIC_PERPETUALS_API_PATH: string | undefined;
       SENTRY_AUTH_TOKEN: string | undefined;
       GRAPHQL_SERVER_ENDPOINT: string;
       DEX_AGGREGATOR_URL: string;
       MEDIA_TRACK_URL: string;
       CHANNELS_URL: string;
       PREDICT_URL: string;
+      PERPETUALS_API_URL: string | undefined;
       DEX_AUTH0_CLIENT_ID: string;
       DEX_AUTH0_CLIENT_SECRET: string;
       DEX_AUTH0_AUDIENCE: string;
