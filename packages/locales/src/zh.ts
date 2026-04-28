@@ -732,19 +732,12 @@ export default {
     "hlDeposit": {
       "entry": "充值 Hyperliquid USDC",
       "title": "充值 Hyperliquid USDC",
-      "subtitle": "將 USDC 通過 Arbitrum One 網絡轉入你的錢包",
-      "depositAddress": "你的充值地址",
-      "network": "網絡",
-      "networkValue": "Arbitrum One",
-      "asset": "資產",
-      "assetValue": "USDC（原生）",
-      "minDeposit": "最低充值",
-      "warning": "僅支援 Arbitrum One 網絡上的 USDC。轉入其他代幣或選錯網絡將永久丟失。",
-      "perpBalance": "Hyperliquid Perp 餘額",
+      "subtitle": "通過 Relay 把 Solana SOL 一鍵充值為 Hyperliquid Perp USDC。",
       "usdcLabel": "Hyperliquid USDC",
-      "viewOnArbiscan": "在 Arbiscan 查看",
-      "bridgeHint": "USDC 到帳後，再通過 Hyperliquid 官方橋接合約 ({{bridge}}) 轉入 Perp 帳戶。",
-      "notConnected": "請連接 EVM 錢包以查看你的充值地址。"
+      "needsConfig": "當前環境尚未配置 Hyperliquid USDC 充值。",
+      "needsSolWallet": "請先連接一個 Solana 錢包。",
+      "needsEvmWallet": "請連接 EVM 錢包以接收 Hyperliquid USDC。",
+      "recipientHint": "接收地址預設為已連接的 EVM 地址。"
     },
     "relayDeposit": {
       "entry": "快捷入金 · SOL → HL Perp",

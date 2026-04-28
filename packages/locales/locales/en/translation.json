@@ -732,19 +732,12 @@
     "hlDeposit": {
       "entry": "Deposit Hyperliquid USDC",
       "title": "Deposit Hyperliquid USDC",
-      "subtitle": "Send USDC on Arbitrum One to your wallet",
-      "depositAddress": "Your deposit address",
-      "network": "Network",
-      "networkValue": "Arbitrum One",
-      "asset": "Asset",
-      "assetValue": "USDC (Native)",
-      "minDeposit": "Min deposit",
-      "warning": "Only send USDC on Arbitrum One. Sending other tokens or using a different network will result in permanent loss.",
-      "perpBalance": "Hyperliquid Perp Balance",
+      "subtitle": "Bridge Solana SOL to Hyperliquid Perp USDC.",
       "usdcLabel": "Hyperliquid USDC",
-      "viewOnArbiscan": "View on Arbiscan",
-      "bridgeHint": "After USDC arrives, push it to Perp via the official Hyperliquid bridge ({{bridge}}).",
-      "notConnected": "Connect an EVM wallet to view your deposit address."
+      "needsConfig": "Hyperliquid USDC deposit is not configured for this environment.",
+      "needsSolWallet": "Connect a Solana wallet to start.",
+      "needsEvmWallet": "Connect an EVM wallet to receive USDC on Hyperliquid.",
+      "recipientHint": "Recipient defaults to your connected EVM address."
     },
     "relayDeposit": {
       "entry": "Quick Deposit · SOL → HL Perp",
