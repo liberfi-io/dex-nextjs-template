@@ -732,21 +732,24 @@
     "hlDeposit": {
       "entry": "充值 Hyperliquid USDC",
       "title": "充值 Hyperliquid USDC",
-      "subtitle": "通過 Relay 把 Solana SOL 一鍵充值為 Hyperliquid Perp USDC。",
+      "exchangeSubtitle": "把原生 Solana 兌換為 Hyperliquid 上的 USDC。",
       "usdcLabel": "Hyperliquid USDC",
+      "converting": "支付",
+      "gaining": "獲得",
+      "balance": "餘額：",
+      "max": "全部",
+      "rate": "1 SOL ≈ {{rate}} USDC",
+      "confirm": "確認",
+      "signing": "簽名中…",
+      "fetchingQuote": "獲取報價中…",
+      "waitingQuote": "等待報價…",
+      "enterAmount": "請輸入金額",
+      "errorInvalid": "金額無效",
+      "errorInsufficient": "SOL 餘額不足",
+      "errorQuote": "報價獲取失敗，請重試。",
       "needsConfig": "當前環境尚未配置 Hyperliquid USDC 充值。",
       "needsSolWallet": "請先連接一個 Solana 錢包。",
-      "needsEvmWallet": "請連接 EVM 錢包以接收 Hyperliquid USDC。",
-      "recipientHint": "接收地址預設為已連接的 EVM 地址。"
-    },
-    "relayDeposit": {
-      "entry": "快捷入金 · SOL → HL Perp",
-      "title": "把 SOL 直接打進 Hyperliquid Perp",
-      "subtitle": "通過 Relay 一鍵把 Solana SOL 兌換為 Hyperliquid USDC。",
-      "needsConfig": "當前環境尚未配置快捷入金。",
-      "needsSolWallet": "請先連接一個 Solana 錢包。",
-      "needsEvmWallet": "請連接 EVM 錢包以接收 Hyperliquid USDC。",
-      "recipientHint": "接收地址預設為已連接的 EVM 地址。"
+      "needsEvmWallet": "請連接 EVM 錢包以接收 Hyperliquid USDC。"
     },
     "portfolio": {
       "title": "持倉",

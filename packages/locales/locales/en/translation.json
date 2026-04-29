@@ -732,21 +732,24 @@
     "hlDeposit": {
       "entry": "Deposit Hyperliquid USDC",
       "title": "Deposit Hyperliquid USDC",
-      "subtitle": "Bridge Solana SOL to Hyperliquid Perp USDC.",
+      "exchangeSubtitle": "Exchange Native Solana for USDC on Hyperliquid.",
       "usdcLabel": "Hyperliquid USDC",
+      "converting": "Converting",
+      "gaining": "Gaining",
+      "balance": "Balance:",
+      "max": "MAX",
+      "rate": "1 SOL ≈ {{rate}} USDC",
+      "confirm": "Confirm",
+      "signing": "Signing…",
+      "fetchingQuote": "Fetching quote…",
+      "waitingQuote": "Waiting for quote…",
+      "enterAmount": "Enter an amount",
+      "errorInvalid": "Invalid amount",
+      "errorInsufficient": "Insufficient SOL balance",
+      "errorQuote": "Failed to fetch a quote, please try again.",
       "needsConfig": "Hyperliquid USDC deposit is not configured for this environment.",
       "needsSolWallet": "Connect a Solana wallet to start.",
-      "needsEvmWallet": "Connect an EVM wallet to receive USDC on Hyperliquid.",
-      "recipientHint": "Recipient defaults to your connected EVM address."
-    },
-    "relayDeposit": {
-      "entry": "Quick Deposit · SOL → HL Perp",
-      "title": "Deposit SOL into Hyperliquid Perp",
-      "subtitle": "Bridge Solana SOL to Hyperliquid USDC in one click via Relay.",
-      "needsConfig": "Quick deposit is not configured for this environment.",
-      "needsSolWallet": "Connect a Solana wallet to start.",
-      "needsEvmWallet": "Connect an EVM wallet to receive USDC on Hyperliquid.",
-      "recipientHint": "Recipient defaults to your connected EVM address."
+      "needsEvmWallet": "Connect an EVM wallet to receive USDC on Hyperliquid."
     },
     "portfolio": {
       "title": "Portfolio",

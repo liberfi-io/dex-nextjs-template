@@ -134,10 +134,6 @@ import {
   DepositHyperliquidUsdcModal,
   DEPOSIT_HL_USDC_MODAL_ID,
 } from "./modals/DepositHyperliquidUsdcModal";
-import {
-  RelayDepositModal,
-  RELAY_DEPOSIT_MODAL_ID,
-} from "./modals/RelayDepositModal";
 import { useHyperliquidBalances } from "../hooks/useHyperliquidBalances";
 import { HyperliquidUsdcIcon } from "./icons/HyperliquidUsdcIcon";
 import { AppBottomToolbar } from "./AppBottomToolbar";
@@ -188,7 +184,6 @@ export function NewAppLayout({ children, locale }: PropsWithChildren<{ locale: L
               <PageShell>{children}</PageShell>
               <LaunchPadModal />
               <DepositHyperliquidUsdcModal />
-              <RelayDepositModal />
               <StyledToaster />
               <SearchModal />
               <PredictSearchModal />
@@ -1143,9 +1138,6 @@ function DexAccountMenuContent({
   const { onOpen: openHlUsdcDeposit } = useAsyncModal(
     DEPOSIT_HL_USDC_MODAL_ID,
   );
-  const { onOpen: openRelayDeposit } = useAsyncModal(
-    RELAY_DEPOSIT_MODAL_ID,
-  );
 
   return (
     <>
@@ -1224,18 +1216,8 @@ function DexAccountMenuContent({
         </div>
       </div>
 
-      {/* Deposit Hyperliquid USDC entries */}
+      {/* Deposit Hyperliquid USDC entry */}
       <div style={{ borderTop: "1px solid rgba(39,39,42,1)" }} className="p-2">
-        <button
-          type="button"
-          onClick={() => openRelayDeposit()}
-          className="flex items-center gap-2.5 w-full px-3 py-2 text-sm rounded-[10px] transition-colors cursor-pointer text-zinc-200 hover:bg-[rgba(39,39,42,0.5)]"
-        >
-          <div className="flex items-center justify-center w-7 h-7 rounded-[10px] bg-[#c7ff2e]/10">
-            <SolanaIcon width={18} height={18} />
-          </div>
-          <span>{t("extend.relayDeposit.entry")}</span>
-        </button>
         <button
           type="button"
           onClick={() => openHlUsdcDeposit()}
