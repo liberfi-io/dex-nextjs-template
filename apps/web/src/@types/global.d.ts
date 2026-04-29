@@ -33,6 +33,9 @@ declare global {
       DEX_AUTH0_DOMAIN: string;
       PRIVY_APP_ID: string;
       PRIVY_APP_SECRET: string;
+      SOLANA_RPC_URL: string | undefined;
+      ETH_RPC_URL: string | undefined;
+      BSC_RPC_URL: string | undefined;
       JWT_ISSUER: string;
       JWT_AUDIENCE: string;
       JWT_SECRET: string;
