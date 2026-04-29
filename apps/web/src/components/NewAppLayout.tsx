@@ -236,6 +236,7 @@ function ServiceProviders({ children }: PropsWithChildren) {
     () =>
       new Client(dexTokenProvider, {
         serverUrl: baseUrl + process.env.NEXT_PUBLIC_DEX_AGGREGATOR_URL,
+        nativeBalanceApiUrl: "/api/balance",
       }),
     [dexTokenProvider],
   );
