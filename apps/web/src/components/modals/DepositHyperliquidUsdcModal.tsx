@@ -39,8 +39,8 @@ import {
 import { Chain } from "@liberfi.io/types";
 import {
   DepositStatusUI,
+  hlUsdcRawToUsdc,
   lamportsToSol,
-  microUsdcToUsdc,
   solToLamports,
   usePerpDepositClient,
   usePerpDepositExecute,
@@ -197,11 +197,12 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
   const quote = quoteQ.data;
 
   // Gain — use locale-aware USD formatting so we keep meaningful
-  // fractional precision (Hyperliquid credits at microUSDC granularity)
-  // without dumping every trailing zero to the user.
+  // fractional precision (Hyperliquid credits perp USDC at 8-decimal
+  // granularity) without dumping every trailing zero to the user. Ask the
+  // helper for 8 decimals so we don't lose precision for sub-cent amounts.
   const gainingAmount = useMemo(() => {
     if (!quote?.breakdown.expectedOutputUSDC) return "0";
-    const exact = microUsdcToUsdc(quote.breakdown.expectedOutputUSDC, 6);
+    const exact = hlUsdcRawToUsdc(quote.breakdown.expectedOutputUSDC, 8);
     return formatUsdcDisplay(Number(exact));
   }, [quote]);
 
@@ -209,7 +210,7 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
   // output as a free approximation. Hidden when there's no quote yet.
   const usdValue = useMemo(() => {
     if (!quote?.breakdown.expectedOutputUSDC) return null;
-    const exact = microUsdcToUsdc(quote.breakdown.expectedOutputUSDC, 6);
+    const exact = hlUsdcRawToUsdc(quote.breakdown.expectedOutputUSDC, 8);
     return formatUsdcDisplay(Number(exact));
   }, [quote]);
 
@@ -219,7 +220,10 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
   const rateText = useMemo(() => {
     if (!quote?.breakdown.expectedOutputUSDC) return null;
     const grossSol = lamportsToSol(quote.breakdown.grossLamports, 9);
-    const expectedUsdc = microUsdcToUsdc(quote.breakdown.expectedOutputUSDC, 6);
+    const expectedUsdc = hlUsdcRawToUsdc(
+      quote.breakdown.expectedOutputUSDC,
+      8,
+    );
     const grossSolNum = Number(grossSol);
     const expectedUsdcNum = Number(expectedUsdc);
     if (!grossSolNum || !expectedUsdcNum) return null;
