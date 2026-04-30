@@ -195,19 +195,27 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
   // Quote-driven preview values
   // ---------------------------------------------------------------------
   const quote = quoteQ.data;
+
+  // Gain — use locale-aware USD formatting so we keep meaningful
+  // fractional precision (Hyperliquid credits at microUSDC granularity)
+  // without dumping every trailing zero to the user.
   const gainingAmount = useMemo(() => {
     if (!quote?.breakdown.expectedOutputUSDC) return "0";
-    return microUsdcToUsdc(quote.breakdown.expectedOutputUSDC, 4);
+    const exact = microUsdcToUsdc(quote.breakdown.expectedOutputUSDC, 6);
+    return formatUsdcDisplay(Number(exact));
   }, [quote]);
 
   // USD value of the input — since 1 USDC ≈ $1 we re-use the expected
   // output as a free approximation. Hidden when there's no quote yet.
   const usdValue = useMemo(() => {
     if (!quote?.breakdown.expectedOutputUSDC) return null;
-    return microUsdcToUsdc(quote.breakdown.expectedOutputUSDC, 2);
+    const exact = microUsdcToUsdc(quote.breakdown.expectedOutputUSDC, 6);
+    return formatUsdcDisplay(Number(exact));
   }, [quote]);
 
   // Rate displayed under the gaining card — "1 SOL ≈ X USDC".
+  // Render with the same precision rules as the gain amount so the math
+  // stays consistent (gross_sol × rate ≈ gain).
   const rateText = useMemo(() => {
     if (!quote?.breakdown.expectedOutputUSDC) return null;
     const grossSol = lamportsToSol(quote.breakdown.grossLamports, 9);
@@ -215,8 +223,18 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
     const grossSolNum = Number(grossSol);
     const expectedUsdcNum = Number(expectedUsdc);
     if (!grossSolNum || !expectedUsdcNum) return null;
-    const rate = expectedUsdcNum / grossSolNum;
-    return rate.toFixed(2);
+    return formatUsdcDisplay(expectedUsdcNum / grossSolNum);
+  }, [quote]);
+
+  // Platform fee — only render the row when a non-zero fee is charged so
+  // we don't add visual noise to free-tier deposits.
+  const platformFeeText = useMemo(() => {
+    const feeLamports = quote?.breakdown.platformFeeLamports;
+    if (!feeLamports || feeLamports === "0") return null;
+    const feeSol = lamportsToSol(feeLamports, 9);
+    const feeNum = Number(feeSol);
+    if (!feeNum) return null;
+    return `${feeSol} SOL`;
   }, [quote]);
 
   // ---------------------------------------------------------------------
@@ -367,12 +385,12 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
                   tokenChip={<TokenChip icon={<SolCoinBadge />} symbol="SOL" />}
                   belowSlot={
                     <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-1.5 text-[11px] text-zinc-500">
+                      <div className="flex items-center gap-1 text-[11px] text-zinc-500">
                         <button
                           type="button"
                           onClick={handleHalf}
                           disabled={!solBalance.lamports || solBalance.lamports === "0" || isExecuting}
-                          className="px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wider text-zinc-400 hover:text-[#c7ff2e] hover:bg-zinc-800/60 transition-colors disabled:opacity-50 disabled:hover:text-zinc-400 disabled:hover:bg-transparent"
+                          className="cursor-pointer px-2 py-0.5 rounded-md text-[10px] uppercase tracking-wider text-zinc-300 bg-zinc-800/60 hover:bg-zinc-700/80 hover:text-[#C7FF2E] transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-zinc-800/60 disabled:hover:text-zinc-300"
                         >
                           50%
                         </button>
@@ -380,7 +398,7 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
                           type="button"
                           onClick={handleMax}
                           disabled={!solBalance.lamports || solBalance.lamports === "0" || isExecuting}
-                          className="px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wider text-zinc-400 hover:text-[#c7ff2e] hover:bg-zinc-800/60 transition-colors disabled:opacity-50 disabled:hover:text-zinc-400 disabled:hover:bg-transparent"
+                          className="cursor-pointer px-2 py-0.5 rounded-md text-[10px] uppercase tracking-wider text-zinc-300 bg-zinc-800/60 hover:bg-zinc-700/80 hover:text-[#C7FF2E] transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-zinc-800/60 disabled:hover:text-zinc-300"
                         >
                           {t("extend.hlDeposit.max")}
                         </button>
@@ -427,6 +445,18 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
                   }
                 />
 
+                {/* Quote breakdown — currently only platform fee, when > 0 */}
+                {platformFeeText && (
+                  <div className="mt-3 rounded-[10px] bg-[#0a0a0b] border border-[#27272a] px-3.5 py-2.5 flex items-center justify-between text-[11px]">
+                    <span className="text-zinc-500">
+                      {t("extend.hlDeposit.platformFee")}
+                    </span>
+                    <span className="text-zinc-200 tabular-nums">
+                      {platformFeeText}
+                    </span>
+                  </div>
+                )}
+
                 {/* Inline errors */}
                 {(amountError || quoteQ.error) && (
                   <p className="mt-3 text-xs text-rose-400">
@@ -440,8 +470,8 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
                   onClick={handleSubmit}
                   disabled={confirmDisabled}
                   className={cn(
-                    "mt-4 w-full h-12 rounded-[12px] font-medium text-white",
-                    "bg-[#4338CA] hover:bg-[#3730A3] active:bg-[#312E81]",
+                    "cursor-pointer mt-4 w-full h-12 rounded-[12px] font-semibold text-black",
+                    "bg-[#C7FF2E] hover:bg-[#b6ed1c] active:bg-[#a6d913]",
                     "transition-colors flex items-center justify-center gap-2",
                     "disabled:bg-[#3f3f46] disabled:text-zinc-500 disabled:cursor-not-allowed",
                   )}
@@ -522,7 +552,7 @@ function ExchangeCard({
         <span className="text-zinc-500">{label}</span>
         <span className="text-zinc-500">
           {balanceLabel}{" "}
-          <span className="text-[#4A8FFF] tabular-nums">{balanceValue}</span>
+          <span className="text-[#C7FF2E] tabular-nums">{balanceValue}</span>
         </span>
       </div>
       <div className="mt-1.5 flex items-center gap-2">
@@ -611,6 +641,29 @@ function formatHlUsdc(s: string): string {
   if (!Number.isFinite(n) || n === 0) return "0.00";
   if (n < 0.01) return n.toFixed(6);
   return n.toFixed(3);
+}
+
+/**
+ * Render a USDC amount with locale grouping and adaptive precision.
+ *
+ * - >= 1 USDC → 2 decimal places minimum, up to 4 to keep the
+ *   conversion round-trip consistent with the rate display
+ *   (`gross_sol × rate ≈ gain` in the form).
+ * - < 1 USDC → up to 6 fractional digits so micro-deposits (e.g. dust
+ *   left after a rounding fee) don't collapse to "0.00".
+ */
+function formatUsdcDisplay(value: number): string {
+  if (!Number.isFinite(value) || value === 0) return "0";
+  if (Math.abs(value) < 1) {
+    return value.toLocaleString("en-US", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 6,
+    });
+  }
+  return value.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 4,
+  });
 }
 
 export default DepositHyperliquidUsdcModal;

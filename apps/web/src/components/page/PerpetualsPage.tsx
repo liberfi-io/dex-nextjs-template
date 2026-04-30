@@ -14,7 +14,9 @@ import {
   useMarketsQuery,
 } from "@liberfi.io/ui-perpetuals";
 import { cn, useScreen } from "@liberfi.io/ui";
+import { useAsyncModal } from "@liberfi.io/ui-scaffold";
 import { useHideBottomNavigationBar, useHideHeader } from "@liberfi/ui-base";
+import { DEPOSIT_HL_USDC_MODAL_ID } from "../modals/DepositHyperliquidUsdcModal";
 import {
   TvChart,
   type TvChartInstance,
@@ -61,6 +63,16 @@ export function PerpetualsPage() {
   useEffect(() => {
     PerpetualsTvChartDataFeedModule.setClient(client);
   }, [client]);
+
+  // Wires the "Add More Funds" button inside the order form to the
+  // SOL → Hyperliquid USDC deposit dialog. The button is hidden when no
+  // handler is provided (see PlaceOrderFormUI).
+  const { onOpen: openHlUsdcDeposit } = useAsyncModal(
+    DEPOSIT_HL_USDC_MODAL_ID,
+  );
+  const handleAddFunds = useCallback(() => {
+    void openHlUsdcDeposit();
+  }, [openHlUsdcDeposit]);
 
   const handleSelectCoin = useCallback((selected: string) => {
     setSymbol(selected);
@@ -195,6 +207,7 @@ export function PerpetualsPage() {
           <MobilePlaceOrderSheet
             symbol={symbol}
             onClose={() => setShowMobileOrder(false)}
+            onAddFunds={handleAddFunds}
           />
         )}
       </div>
@@ -331,7 +344,11 @@ export function PerpetualsPage() {
 
         {/* Right: PlaceOrder (full height, fixed 320px) */}
         <div className="flex flex-col overflow-hidden" style={{ width: 320, minWidth: 320, maxWidth: 320, borderLeft: '1px solid rgba(39,39,42,0.6)' }}>
-          <PlaceOrderFormWidget symbol={symbol} className="h-full" />
+          <PlaceOrderFormWidget
+            symbol={symbol}
+            className="h-full"
+            onAddFunds={handleAddFunds}
+          />
         </div>
       </div>
 
@@ -466,9 +483,11 @@ function MobileTabBar({
 function MobilePlaceOrderSheet({
   symbol,
   onClose,
+  onAddFunds,
 }: {
   symbol: string;
   onClose: () => void;
+  onAddFunds?: () => void;
 }) {
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end">
@@ -510,7 +529,7 @@ function MobilePlaceOrderSheet({
         </div>
 
         <div className="flex-1 overflow-auto">
-          <PlaceOrderFormWidget symbol={symbol} />
+          <PlaceOrderFormWidget symbol={symbol} onAddFunds={onAddFunds} />
         </div>
       </div>
     </div>
