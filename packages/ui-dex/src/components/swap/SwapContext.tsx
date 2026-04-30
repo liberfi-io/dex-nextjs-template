@@ -13,6 +13,8 @@ import { Portfolio } from "@liberfi.io/types";
 import {
   fetchSwapRoute,
   useDexClient,
+  useLatestBlockCacheReader,
+  useLatestBlockQuery,
   useSendTransactionMutation,
   useTokenQuery,
 } from "@liberfi/react-dex";
@@ -36,6 +38,11 @@ import {
   useWalletPortfolios,
 } from "@liberfi/ui-base";
 import { Button, Image, Link } from "@heroui/react";
+import {
+  assertSwapRouteBlockhashFresh,
+  POST_SIGN_MIN_REMAINING_BLOCKS,
+  PRE_SIGN_MIN_REMAINING_BLOCKS,
+} from "../../hooks/blockhashExpiry";
 
 export type SwapContextValue = {
   chainId: Chain;
@@ -199,6 +206,18 @@ export function SwapProvider({
 
   const [routeError, setRouteError] = useState<string | null>(null);
 
+  useLatestBlockQuery(
+    { chain: Chain.SOLANA },
+    {
+      enabled: chainId === Chain.SOLANA,
+      refetchInterval: 10000,
+      staleTime: 8000,
+    },
+  );
+  const readLatestSolanaBlock = useLatestBlockCacheReader({
+    chain: Chain.SOLANA,
+  });
+
   const route = useCallback(async () => {
     if (!user?.solanaAddress || !fromTokenAddress || !toTokenAddress || !amountInDecimals) {
       return;
@@ -283,11 +302,33 @@ export function SwapProvider({
     try {
       const serializedTx = routeInfo.serializedTx;
 
+      assertSwapRouteBlockhashFresh(
+        chainId,
+        routeInfo,
+        readLatestSolanaBlock(),
+        PRE_SIGN_MIN_REMAINING_BLOCKS,
+        {
+          stale: t("extend.account.convert_errors.route_expired"),
+          expired: t("extend.account.convert_errors.route_expired"),
+        },
+      );
+
       // sign tx
       const signedTxBuffer = await walletInstance.signTransaction(
         Buffer.from(serializedTx, "base64"),
       );
       const signedTx = Buffer.from(signedTxBuffer).toString("base64");
+
+      assertSwapRouteBlockhashFresh(
+        chainId,
+        routeInfo,
+        readLatestSolanaBlock(),
+        POST_SIGN_MIN_REMAINING_BLOCKS,
+        {
+          stale: t("extend.account.convert_errors.route_expired"),
+          expired: t("extend.account.convert_errors.route_expired"),
+        },
+      );
 
       // send tx
       const result = await sendTransactionAsync({
@@ -419,6 +460,7 @@ export function SwapProvider({
     waitSwapConfirmation,
     walletInstance,
     appSdk,
+    readLatestSolanaBlock,
   ]);
 
   const value = useMemo(

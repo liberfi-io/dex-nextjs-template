@@ -12,6 +12,7 @@ import {
   UseTokenTradesQueryParams,
   UseWalletTradesQueryParams,
   UseMigratedTokensQueryParams,
+  UseLatestBlockQueryParams,
 } from "./types";
 
 export const QueryKeys = {
@@ -108,6 +109,7 @@ export const QueryKeys = {
     param.inputMint ?? "",
     param.outputMint ?? "",
   ],
+  latestBlock: (param: UseLatestBlockQueryParams) => ["latestBlock", param.chain],
   tokenCandles: (param: UseTokenCandlesQueryParams) => [
     "tokenCandles",
     param.chain,

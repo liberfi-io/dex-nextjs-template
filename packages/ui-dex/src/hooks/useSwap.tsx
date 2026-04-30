@@ -1,5 +1,10 @@
 import { useCallback, useMemo, useState } from "react";
-import { fetchSwapRoute, sendTransaction, useDexClient } from "@liberfi/react-dex";
+import {
+  fetchSwapRoute,
+  sendTransaction,
+  useDexClient,
+  useLatestBlockCacheReader,
+} from "@liberfi/react-dex";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
   useAuth,
@@ -14,10 +19,15 @@ import {
   SwapRouteInputSwapMode,
 } from "@chainstream-io/sdk";
 import { BigNumber } from "bignumber.js";
-import { getWrappedTokenAddress } from "@liberfi/core";
+import { Chain, getWrappedTokenAddress } from "@liberfi/core";
 import { chainIcon } from "@liberfi.io/utils";
 import { Button, Image, Link } from "@heroui/react";
 import { getTxExplorerUrl } from "../libs";
+import {
+  assertSwapRouteBlockhashFresh,
+  POST_SIGN_MIN_REMAINING_BLOCKS,
+  PRE_SIGN_MIN_REMAINING_BLOCKS,
+} from "./blockhashExpiry";
 
 export type SwapOptions = {
   // input token address
@@ -44,6 +54,9 @@ export function useSwap() {
   const dexClient = useDexClient();
 
   const { chain } = useCurrentChain();
+  const readLatestSolanaBlock = useLatestBlockCacheReader({
+    chain: Chain.SOLANA,
+  });
 
   const { user } = useAuth();
 
@@ -71,7 +84,7 @@ export function useSwap() {
 
       try {
         // route
-        const { serializedTx } = await fetchSwapRoute(dexClient, {
+        const route = await fetchSwapRoute(dexClient, {
           chain,
           dex: SwapRouteInputDex.jupiter,
           // TODO using wallet interface instead
@@ -86,10 +99,33 @@ export function useSwap() {
           inputMint: getWrappedTokenAddress(chain, from) ?? from,
           outputMint: getWrappedTokenAddress(chain, to) ?? to,
         });
+        const { serializedTx } = route;
+
+        assertSwapRouteBlockhashFresh(
+          chain,
+          route,
+          readLatestSolanaBlock(),
+          PRE_SIGN_MIN_REMAINING_BLOCKS,
+          {
+            stale: t("extend.account.convert_errors.route_expired"),
+            expired: t("extend.account.convert_errors.route_expired"),
+          },
+        );
 
         // sign tx
         const signedTxBuffer = await walletInstance.signTransaction(Buffer.from(serializedTx, "base64"));
         const signedTx = Buffer.from(signedTxBuffer).toString("base64");
+
+        assertSwapRouteBlockhashFresh(
+          chain,
+          route,
+          readLatestSolanaBlock(),
+          POST_SIGN_MIN_REMAINING_BLOCKS,
+          {
+            stale: t("extend.account.convert_errors.route_expired"),
+            expired: t("extend.account.convert_errors.route_expired"),
+          },
+        );
 
         // send tx
         const { signature, jobId } = await sendTransaction(dexClient, {
@@ -179,7 +215,16 @@ export function useSwap() {
         setIsSwapping(false);
       }
     },
-    [dexClient, chain, user, walletInstance, waitSwapConfirmation, toast, t],
+    [
+      dexClient,
+      chain,
+      user,
+      walletInstance,
+      waitSwapConfirmation,
+      toast,
+      t,
+      readLatestSolanaBlock,
+    ],
   );
 
   return useMemo(

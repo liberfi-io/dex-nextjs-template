@@ -2,8 +2,9 @@ import { useMemo, useState } from "react";
 import { BigNumber } from "bignumber.js";
 import { useAtomValue } from "jotai";
 import { Button } from "@heroui/react";
-import { formatAmountUSD, getPrimaryTokenAddress, getPrimaryTokenDecimals } from "@liberfi/core";
+import { Chain, formatAmountUSD, getPrimaryTokenAddress, getPrimaryTokenDecimals } from "@liberfi/core";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { useLatestBlockQuery } from "@liberfi/react-dex";
 import {
   useAppSdk,
   useAuthenticatedCallback,
@@ -24,6 +25,14 @@ export function MarketBuyForm() {
   const appSdk = useAppSdk();
 
   const { chain } = useCurrentChain();
+  useLatestBlockQuery(
+    { chain: Chain.SOLANA },
+    {
+      enabled: chain === Chain.SOLANA,
+      refetchInterval: 10000,
+      staleTime: 8000,
+    },
+  );
 
   // buy amount
   const [amount, setAmount] = useState<number | undefined>();

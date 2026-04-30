@@ -3,6 +3,7 @@ import { useAtomValue } from "jotai";
 import { BigNumber } from "bignumber.js";
 import { Button } from "@heroui/react";
 import {
+  Chain,
   formatPriceUSD,
   getPrimaryTokenAddress,
   getPrimaryTokenDecimals,
@@ -11,6 +12,7 @@ import {
   SOL_TOKEN_SYMBOL,
 } from "@liberfi/core";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { useLatestBlockQuery } from "@liberfi/react-dex";
 import {
   useAuthenticatedCallback,
   useTranslation,
@@ -31,6 +33,14 @@ export function MarketSellForm() {
   const [amount, setAmount] = useState<number | undefined>();
 
   const { chain } = useCurrentChain();
+  useLatestBlockQuery(
+    { chain: Chain.SOLANA },
+    {
+      enabled: chain === Chain.SOLANA,
+      refetchInterval: 10000,
+      staleTime: 8000,
+    },
+  );
 
   // primary token symbol
   const primaryTokenSymbol =

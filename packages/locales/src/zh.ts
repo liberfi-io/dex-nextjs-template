@@ -369,6 +369,7 @@ export default {
         "amount_error": "請輸入正確的數量",
         "amount_gt_balance": "餘額不足",
         "route_error": "沒有可用的兌換路徑，請稍後再試",
+        "route_expired": "報價已過期，請刷新路由後重試。",
         "token_not_found": "代幣地址 {{address}} 不存在"
       },
       "convert_transaction_submitted": "交易已提交，請耐心等待完成。",

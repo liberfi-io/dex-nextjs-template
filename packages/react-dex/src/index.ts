@@ -4,6 +4,7 @@ export * from "./types";
 export * from "./useFinalStretchTokensQuery";
 export * from "./useHotTokensQuery";
 export * from "./useJobSubscription";
+export * from "./useLatestBlockQuery";
 export * from "./useMigratedTokensQuery";
 export * from "./useNewTokensQuery";
 export * from "./useSearchTokensQuery";

@@ -12,6 +12,7 @@ import {
   SendTxInput as SendRequest,
   SwapRouteInput as RouteRequest,
   ChainSymbol,
+  BlockchainLatestBlock,
 } from "@chainstream-io/sdk";
 import { Chain } from "@liberfi/core";
 
@@ -54,6 +55,12 @@ export type UseStockTokensQueryParams = GetStocksTokensRequest & {
 export type UseSwapRouteQueryParams = Omit<RouteRequest, "chain"> & {
   chain: Chain;
 };
+
+export type UseLatestBlockQueryParams = {
+  chain: Chain;
+};
+
+export type LatestBlock = BlockchainLatestBlock;
 
 export type UseTokenCandlesQueryParams = Omit<GetCandlesRequest, "chain" | "_from"> & {
   chain: Chain;
