@@ -1,9 +1,5 @@
 import type { Chain } from "@liberfi.io/types";
-import {
-  TokenTradersOverviewWidget,
-  TokenTransactionsOverviewWidget,
-  TokenVolumesOverviewWidget,
-} from "@liberfi.io/ui-tokens";
+import { TokenStatsFlipWidget } from "@liberfi.io/ui-tokens";
 
 export interface SidebarVolumeStatsProps {
   chain: Chain;
@@ -11,18 +7,17 @@ export interface SidebarVolumeStatsProps {
 }
 
 /**
- * Right-sidebar overview stack. Each card is a self-contained react-sdk widget
- * that subscribes to the live token via `useLiveToken` internally, so all
- * three cards stay in sync without the dex layer orchestrating data.
+ * Right-sidebar stats block that cross-fades between volume and price-change
+ * windows on hover, mirroring Axiom's signature interaction. The legacy
+ * three-card overview has been replaced by a single `TokenStatsFlipWidget`
+ * that subscribes to `useTokenStatsQuery` for each resolution internally.
  */
 export function SidebarVolumeStats({ chain, address }: SidebarVolumeStatsProps) {
   return (
-    <div className="flex flex-col border-b border-neutral-800">
-      <div className="flex flex-col gap-3 p-4">
-        <TokenTransactionsOverviewWidget chain={chain} address={address} />
-        <TokenVolumesOverviewWidget chain={chain} address={address} />
-        <TokenTradersOverviewWidget chain={chain} address={address} />
-      </div>
-    </div>
+    <TokenStatsFlipWidget
+      chain={chain}
+      address={address}
+      className="border-b border-default-100"
+    />
   );
 }

@@ -1,11 +1,27 @@
 @theme {
-  --color-bullish: #c7ff2e;
-  --color-bearish: #f76816;
-  --color-surface-glass: rgba(10, 10, 11, 0.8);
-  --color-border-subtle: rgba(39, 39, 42, 0.6);
-  --color-card-bg: rgba(24, 24, 27, 0.4);
-  --color-card-bg-solid: rgba(24, 24, 27, 1);
-  --color-header-bg: #0a0a0b;
-  --shadow-glow-primary: 0 2px 18px rgba(199, 255, 46, 0.15);
-  --shadow-popover: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  /*
+   * Axiom-style semantic tokens, mapped onto HeroUI CSS variables.
+   * HeroUI exposes its palette as `hsl` tuples via `--heroui-*`, so each
+   * alias below stays in lock-step with the active HeroUI theme instead
+   * of freezing a specific hex.
+   */
+  --color-bullish: hsl(var(--heroui-success));
+  --color-bearish: hsl(var(--heroui-danger));
+  --color-surface-glass: hsl(var(--heroui-background) / 0.8);
+  --color-border-subtle: hsl(var(--heroui-default-200));
+  --color-card-bg: hsl(var(--heroui-content1) / 0.4);
+  --color-card-bg-solid: hsl(var(--heroui-content1));
+  --color-header-bg: hsl(var(--heroui-background));
+
+  /* Additional Axiom aliases used by the token detail page. */
+  --color-surface-overlay: hsl(var(--heroui-content1) / 0.7);
+  --color-surface-elevated: hsl(var(--heroui-content2));
+  --color-splitter-hover: hsl(var(--heroui-default-500));
+
+  /*
+   * Shadows derived from HeroUI's primary + foreground channels so they
+   * follow the theme (light / dark) without manual re-tuning.
+   */
+  --shadow-glow-primary: 0 2px 18px hsl(var(--heroui-primary) / 0.15);
+  --shadow-popover: 0 25px 50px -12px hsl(var(--heroui-foreground) / 0.5);
 }

@@ -197,12 +197,20 @@
   right: 0 !important;
 }
 
-/* Axiom-style: Buy/Sell tablist (bg-content2 identifies the primary tab pair) */
+/*
+ * Axiom-style InstantTrade panel overrides.
+ *
+ * Visual constants come from HeroUI semantic tokens (`--heroui-*`) instead
+ * of hard-coded hex so the trade panel adapts to theme changes and to the
+ * consumer project's primary / success / danger palette.
+ */
+
+/* Buy/Sell tablist (bg-content2 identifies the primary tab pair) */
 .axiom-trade-panel [role="tablist"][class*="bg-content2"] {
   gap: 4px !important;
   padding: 4px !important;
   border-radius: 8px !important;
-  border: 1px solid #2a2a2a !important;
+  border: 1px solid hsl(var(--heroui-default-200)) !important;
   height: 40px !important;
   min-height: 40px !important;
   background-color: transparent !important;
@@ -217,21 +225,21 @@
 }
 .axiom-trade-panel [role="tablist"][class*="bg-content2"] [role="tab"][data-selected="true"][data-key="buy"] {
   font-weight: 700 !important;
-  background-color: #C7FF2E !important;
-  color: #000000 !important;
+  background-color: hsl(var(--heroui-success)) !important;
+  color: hsl(var(--heroui-success-foreground)) !important;
 }
 .axiom-trade-panel [role="tablist"][class*="bg-content2"] [role="tab"][data-selected="true"][data-key="sell"] {
   font-weight: 700 !important;
-  background-color: #F76816 !important;
-  color: #000000 !important;
+  background-color: hsl(var(--heroui-danger)) !important;
+  color: hsl(var(--heroui-danger-foreground)) !important;
 }
 .axiom-trade-panel [role="tablist"][class*="bg-content2"] [role="tab"]:not([data-selected="true"]) {
   font-weight: 500 !important;
   background-color: transparent !important;
-  color: #b5b5b5 !important;
+  color: hsl(var(--heroui-default-500)) !important;
 }
 
-/* Axiom-style: Market/Limit/Adv tab (rounded-none tablist) — no green bg */
+/* Market/Limit/Adv tab (rounded-none tablist) */
 .axiom-trade-panel [role="tablist"][class*="rounded-none"] {
   height: 24px !important;
   min-height: 24px !important;
@@ -248,16 +256,16 @@
 .axiom-trade-panel [role="tablist"][class*="rounded-none"] [role="tab"][data-selected="true"] {
   background-color: transparent !important;
   font-weight: 400 !important;
-  color: #ffffff !important;
+  color: hsl(var(--heroui-foreground)) !important;
 }
 .axiom-trade-panel [role="tablist"][class*="rounded-none"] [role="tab"]:not([data-selected="true"]) {
   background-color: transparent !important;
   font-weight: 400 !important;
-  color: #b5b5b5 !important;
+  color: hsl(var(--heroui-default-500)) !important;
 }
 
 
-/* Axiom-style main Buy/Sell action button */
+/* Main Buy/Sell action button */
 .axiom-trade-panel button[class*="bg-success"][class*="w-full"],
 .axiom-trade-panel button[class*="bg-danger"][class*="w-full"],
 .axiom-trade-panel button[class*="bg-primary"][class*="w-full"] {
@@ -272,10 +280,10 @@
   width: 100% !important;
 }
 .axiom-trade-panel button[class*="bg-primary"][class*="w-full"] {
-  background-color: #C7FF2E !important;
-  color: #000000 !important;
+  background-color: hsl(var(--heroui-success)) !important;
+  color: hsl(var(--heroui-success-foreground)) !important;
 }
 .axiom-trade-panel button[class*="bg-secondary"][class*="w-full"] {
-  background-color: #F76816 !important;
-  color: #000000 !important;
+  background-color: hsl(var(--heroui-danger)) !important;
+  color: hsl(var(--heroui-danger-foreground)) !important;
 }

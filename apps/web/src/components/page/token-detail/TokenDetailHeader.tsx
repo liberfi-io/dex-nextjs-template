@@ -78,7 +78,7 @@ function Content({ token }: { token: Token }) {
       </div>
 
       {/* Market cap — Axiom: 12px/500, muted gray, next to token name */}
-      <span className="shrink-0 text-xs font-medium tabular-nums leading-4 text-[rgb(119,122,140)]">
+      <span className="shrink-0 text-xs font-medium tabular-nums leading-4 text-default-500">
         {token.marketData?.marketCapInUsd ? (
           <NumberDisplay value={token.marketData.marketCapInUsd} />
         ) : (
@@ -161,12 +161,12 @@ function Metric({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex shrink-0 flex-row items-end justify-start gap-1 text-nowrap px-1 py-0.5 sm:flex-col sm:items-start sm:gap-[3px]">
       {label && (
-        <span className="text-xs font-normal leading-4 text-[rgb(200,201,209)]">
+        <span className="text-xs font-normal leading-4 text-foreground-600">
           {label}
         </span>
       )}
       <div className="flex flex-row items-center gap-1">
-        <span className="text-base tabular-nums leading-6 text-[rgb(252,252,252)]">
+        <span className="text-base tabular-nums leading-6 text-foreground">
           {value}
         </span>
       </div>
@@ -176,7 +176,7 @@ function Metric({ label, value }: { label: string; value: React.ReactNode }) {
 
 function HeaderSkeleton() {
   return (
-    <div className="flex-none w-full min-h-[64px] max-h-[64px] flex items-center gap-4 px-4 border-b border-neutral-800">
+    <div className="flex-none w-full min-h-[64px] max-h-[64px] flex items-center gap-4 px-4 border-b border-default-100">
       <Skeleton className="w-6 h-6 rounded-full" />
       <Skeleton className="w-14 h-4 rounded" />
       <Skeleton className="w-16 h-4 rounded" />
