@@ -1,6 +1,9 @@
 import { Chain } from "@liberfi/core";
 import { AssetList } from "../account";
 
+/**
+ * @deprecated Use `PortfolioNetWorthTokensWidget` from `@liberfi.io/ui-portfolio`.
+ */
 export function AccountAssetList() {
   return (
     <div className="flex-1 w-full pb-2.5 flex flex-col">

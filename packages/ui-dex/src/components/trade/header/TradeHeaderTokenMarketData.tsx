@@ -5,6 +5,9 @@ import { Token } from "@chainstream-io/sdk";
 import { useMemo } from "react";
 import { useAtomValue } from "jotai";
 
+/**
+ * @deprecated Use `TokenBasicInfoWidget` / sub-widgets from `@liberfi.io/ui-tokens`.
+ */
 export function TradeHeaderTokenMarketData({ token }: { token: Token }) {
   const { t } = useTranslation();
 

@@ -6,6 +6,9 @@ import { useTradeDataContext } from "../providers";
 import { tokenInfoAtom } from "../../../states";
 import { useAtomValue } from "jotai";
 
+/**
+ * @deprecated Use `TokenBasicInfoWidget` from `@liberfi.io/ui-tokens`.
+ */
 export function TradeTokenBasicInfo() {
   const { isFavorite, toggleFavorite } = useTradeDataContext();
 

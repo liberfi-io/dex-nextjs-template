@@ -5,6 +5,9 @@ import { formatPercentage, tokenPriceChangeRatioInUsd } from "../../../libs";
 import { Token } from "@chainstream-io/sdk";
 import { useMemo } from "react";
 
+/**
+ * @deprecated Use `TokenPriceWidget` from `@liberfi.io/ui-tokens`.
+ */
 export function TradeHeaderTokenPrice({ token }: { token: Token }) {
   const { t } = useTranslation();
 

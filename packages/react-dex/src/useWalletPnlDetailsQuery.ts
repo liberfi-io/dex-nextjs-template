@@ -13,6 +13,12 @@ export async function fetchWalletPnlDetails(
   return await client.wallet.getPnlDetails(chainParam(chain), walletAddress, { limit: 100 });
 }
 
+/**
+ * @deprecated Use `useWalletPortfolioPnlsQuery` /
+ * `useWalletPortfolioPnlsInfiniteQuery` from `@liberfi.io/react` instead. The
+ * Phase 3 endpoint supports `resolution` / `positionState` / `sortBy` and
+ * returns `isClosed`, `firstBuyAt`, `lastSellAt`.
+ */
 export function useWalletPnlDetailsQuery(
   chain: Chain,
   walletAddress: string,

@@ -12,6 +12,9 @@ export async function fetchTokenCandles(
   return await client.token.getCandles(chainParam(chain), tokenAddress, { ...others, from });
 }
 
+/**
+ * @deprecated Use `useTokenCandlesQuery` from `@liberfi.io/react` instead.
+ */
 export function useTokenCandlesQuery(
   param: UseTokenCandlesQueryParams,
   options: Omit<UseQueryOptions<TokenCandle[], Error, TokenCandle[], string[]>, "queryKey" | "queryFn"> = {},

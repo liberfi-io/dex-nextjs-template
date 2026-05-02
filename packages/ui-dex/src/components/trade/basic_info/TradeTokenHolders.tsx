@@ -3,6 +3,9 @@ import { Number } from "../../Number";
 import { useTranslation } from "@liberfi/ui-base";
 import { Token } from "@chainstream-io/sdk";
 
+/**
+ * @deprecated Use `TokenHoldersCountWidget` from `@liberfi.io/ui-tokens`.
+ */
 export function TradeTokenHolders({ token }: { token: Token }) {
   const { t } = useTranslation();
   return (

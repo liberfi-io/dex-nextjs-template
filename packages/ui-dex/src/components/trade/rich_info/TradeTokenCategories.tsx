@@ -7,6 +7,9 @@ import { Token } from "@chainstream-io/sdk";
 import clsx from "clsx";
 import { useCallback, useState } from "react";
 
+/**
+ * @deprecated Use `TokenCategoriesWidget` from `@liberfi.io/ui-tokens`.
+ */
 export function TradeTokenCategories({ token }: { token: Token }) {
   const { t } = useTranslation();
 

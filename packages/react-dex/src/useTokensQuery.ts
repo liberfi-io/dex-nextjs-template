@@ -13,6 +13,9 @@ export async function fetchTokens(client: ChainStreamClient, param: UseTokensQue
   });
 }
 
+/**
+ * @deprecated Use `useTokensQuery` from `@liberfi.io/react` instead.
+ */
 export function useTokensQuery(
   param: UseTokensQueryParams,
   options: Omit<

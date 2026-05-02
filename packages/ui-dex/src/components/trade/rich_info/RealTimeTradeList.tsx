@@ -11,6 +11,11 @@ import { Virtuoso } from "react-virtuoso";
 import { useAtomValue } from "jotai";
 import { TradeDetail } from "@chainstream-io/sdk";
 
+/**
+ * @deprecated Use `TokenActivitiesListWidget` from `@liberfi.io/ui-tokens`.
+ * The new widget reads from the Phase 3 `/v2/trade/{chain}/activities` endpoint
+ * and surfaces `traderTags` + `gasFee`.
+ */
 export function RealtimeTradeList() {
   const { isTradesLoading, trades } = useTradeDataContext();
   return isTradesLoading ? <Skeletons /> : <Content trades={trades} />;

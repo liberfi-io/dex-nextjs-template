@@ -7,6 +7,10 @@ import { Button, Chip, Divider, Image } from "@heroui/react";
 import clsx from "clsx";
 import { useCallback, useState } from "react";
 
+/**
+ * @deprecated Use `TokenCexListingWidget` from `@liberfi.io/ui-tokens`
+ * (caller-supplied `cexes` prop).
+ */
 export function TradeTokenCEXListing({ token }: { token: Token }) {
   const { t } = useTranslation();
 

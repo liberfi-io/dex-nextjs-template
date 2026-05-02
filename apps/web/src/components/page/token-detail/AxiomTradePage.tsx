@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 import { useHideBottomNavigationBar, useHideHeader } from "@liberfi/ui-base";
 import { TradingChart } from "@liberfi/ui-dex/components/trade";
+import type { Chain } from "@liberfi.io/types";
 import { TokenDetailHeader } from "./TokenDetailHeader";
 import { SidebarVolumeStats } from "./SidebarVolumeStats";
 import { TradingPanel } from "./TradingPanel";
@@ -12,7 +13,12 @@ import { BottomDataPanel } from "./BottomDataPanel";
 const MIN_BOTTOM_H = 80;
 const DEFAULT_BOTTOM_H = 200;
 
-export function AxiomTradePage() {
+export interface AxiomTradePageProps {
+  chain: Chain;
+  address: string;
+}
+
+export function AxiomTradePage({ chain, address }: AxiomTradePageProps) {
   useHideHeader("tablet");
   useHideBottomNavigationBar();
 
@@ -43,7 +49,7 @@ export function AxiomTradePage() {
       <div className="flex flex-1 min-h-0">
         {/* Left: header + chart + split + bottom */}
         <div ref={containerRef} className="flex-1 flex flex-col min-w-0">
-          <TokenDetailHeader />
+          <TokenDetailHeader chain={chain} address={address} />
 
           {/* Chart toolbar + chart */}
           <ChartToolbar />
@@ -64,15 +70,15 @@ export function AxiomTradePage() {
 
           {/* Resizable bottom panel */}
           <div style={{ height: bottomH }} className="flex-none overflow-hidden">
-            <BottomDataPanel />
+            <BottomDataPanel chain={chain} address={address} />
           </div>
         </div>
 
         {/* Right sidebar */}
         <div className="hidden md:flex w-[320px] min-w-[320px] max-w-[320px] h-full flex-col overflow-y-auto custom-scrollbar border-l border-border-subtle">
-          <SidebarVolumeStats />
+          <SidebarVolumeStats chain={chain} address={address} />
           <TradingPanel />
-          <TokenInfoPanel />
+          <TokenInfoPanel chain={chain} address={address} />
           <SimilarTokensPanel />
         </div>
       </div>

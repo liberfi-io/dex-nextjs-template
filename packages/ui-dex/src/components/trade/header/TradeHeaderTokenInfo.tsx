@@ -5,6 +5,9 @@ import { Skeleton } from "@heroui/react";
 import { tokenInfoAtom } from "../../../states";
 import { useAtomValue } from "jotai";
 
+/**
+ * @deprecated Use `TokenDetailHeaderWidget` from `@liberfi.io/ui-tokens`.
+ */
 export function TradeHeaderTokenInfo() {
   const token = useAtomValue(tokenInfoAtom);
   return token ? <Content token={token} /> : <Skeletons />;

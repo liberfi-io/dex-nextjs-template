@@ -4,6 +4,9 @@ import { useTranslation } from "@liberfi/ui-base";
 import { tokenTraders, tokenTrades, tokenVolumesInUsd } from "../../../libs";
 import { useMemo } from "react";
 
+/**
+ * @deprecated Use `TokenVolumeWidget` from `@liberfi.io/ui-tokens`.
+ */
 export function TradeTokenVolume({ token }: { token: Token }) {
   const { t } = useTranslation();
 

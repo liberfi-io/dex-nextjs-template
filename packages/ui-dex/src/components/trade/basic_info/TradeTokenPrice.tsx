@@ -19,6 +19,9 @@ import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { useTranslation } from "@liberfi/ui-base";
 import { BearishIcon, BullishIcon } from "../../../assets";
 
+/**
+ * @deprecated Use `TokenPriceWidget` from `@liberfi.io/ui-tokens`.
+ */
 export function TradeTokenPrice() {
   const { t } = useTranslation();
 

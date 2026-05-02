@@ -8,6 +8,9 @@ import { TradeTokenSecurity, TradeTokenSecuritySkeleton } from "./TradeTokenSecu
 import { tokenInfoAtom } from "../../../states";
 import { useAtomValue } from "jotai";
 
+/**
+ * @deprecated Use `TokenAboutWidget` from `@liberfi.io/ui-tokens`.
+ */
 export function TradeTokenAbout() {
   const token = useAtomValue(tokenInfoAtom);
   return token ? <Content token={token} /> : <Skeletons />;

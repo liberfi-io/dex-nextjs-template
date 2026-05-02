@@ -12,6 +12,9 @@ import { useAtomValue } from "jotai";
 import { layoutAtom } from "@liberfi/ui-base";
 import { tokenInfoAtom } from "../../../states";
 
+/**
+ * @deprecated Use `TokenHoldersListWidget` from `@liberfi.io/ui-tokens`.
+ */
 export function HoldersList() {
   const token = useAtomValue(tokenInfoAtom);
   return token ? <Content token={token} /> : <Skeletons />;

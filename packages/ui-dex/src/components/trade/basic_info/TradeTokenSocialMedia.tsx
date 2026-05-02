@@ -10,6 +10,9 @@ import {
 import { Token, TokenSocialMedias } from "@chainstream-io/sdk";
 import { useMemo } from "react";
 
+/**
+ * @deprecated Use `TokenSocialMediaWidget` from `@liberfi.io/ui-tokens`.
+ */
 export function TradeTokenSocialMedia({ token }: { token: Token }) {
   const socials = useMemo<TokenSocialMedias>(() => {
     try {

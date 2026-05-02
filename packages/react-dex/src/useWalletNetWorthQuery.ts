@@ -13,6 +13,12 @@ export async function fetchWalletNetWorth(
   return await client.wallet.getNetWorth(chainParam(chain), walletAddress, { limit: 100 });
 }
 
+/**
+ * @deprecated Use `useWalletPortfoliosQuery` /
+ * `useWalletPortfoliosByTokensQuery` from `@liberfi.io/react` instead. The
+ * Phase 3 endpoint returns `isActive`, `avgCostUsd`, `lastActiveAt`,
+ * `walletTokenTags`.
+ */
 export function useWalletNetWorthQuery(
   chain: Chain,
   walletAddress: string,

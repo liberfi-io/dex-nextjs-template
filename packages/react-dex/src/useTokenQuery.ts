@@ -9,6 +9,11 @@ export async function fetchToken(client: ChainStreamClient, chain: Chain, tokenA
   return await client.token.getToken(chainParam(chain), tokenAddress);
 }
 
+/**
+ * @deprecated Use `useTokenQuery` from `@liberfi.io/react` instead. This hook
+ * wraps `@chainstream-io/sdk` directly and is scheduled for removal in a
+ * follow-up PR.
+ */
 export function useTokenQuery(
   chain: Chain,
   tokenAddress: string,

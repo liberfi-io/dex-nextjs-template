@@ -13,6 +13,12 @@ export async function fetchTokenTrades(client: ChainStreamClient, param: UseToke
   });
 }
 
+/**
+ * @deprecated Prefer `useTokenActivitiesQuery` from `@liberfi.io/react`
+ * (Phase 3 activities endpoint with `gasFee` + `traderTags`). The legacy
+ * trades endpoint is kept available via `useTokenTradesQuery` in
+ * `@liberfi.io/react` for back-compat.
+ */
 export function useTokenTradesQuery(
   param: UseTokenTradesQueryParams,
   options: Omit<

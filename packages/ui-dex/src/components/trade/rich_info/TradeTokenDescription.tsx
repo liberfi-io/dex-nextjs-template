@@ -4,6 +4,9 @@ import { Token } from "@chainstream-io/sdk";
 import { Button, Divider } from "@heroui/react";
 import { useCallback, useState } from "react";
 
+/**
+ * @deprecated Use `TokenAboutWidget` from `@liberfi.io/ui-tokens`.
+ */
 export function TradeTokenDescription({ token }: { token: Token }) {
   const { t } = useTranslation();
 

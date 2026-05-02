@@ -13,6 +13,12 @@ export async function fetchWalletTrades(client: ChainStreamClient, param: UseWal
   });
 }
 
+/**
+ * @deprecated Prefer `useWalletActivitiesQuery` from `@liberfi.io/react`
+ * (Phase 3 activities endpoint with `gasFee` + `traderTags`). The legacy
+ * trades endpoint is still available via `useWalletTradesQuery` in
+ * `@liberfi.io/react` for back-compat.
+ */
 export function useWalletTradesQuery(
   param: UseWalletTradesQueryParams,
   options: Omit<

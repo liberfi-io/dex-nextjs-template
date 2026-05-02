@@ -10,6 +10,9 @@ import { useMemo } from "react";
 
 const SECURITY_PROVIDER = "GoPlus";
 
+/**
+ * @deprecated Use `TokenSecurityWidget` from `@liberfi.io/ui-tokens`.
+ */
 export function TradeTokenSecurity({ token }: { token: Token }) {
   const chain = useMemo(() => chainIdBySlug(token.chain) ?? Chain.SOLANA, [token.chain]);
 

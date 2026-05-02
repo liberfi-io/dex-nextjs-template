@@ -1,7 +1,6 @@
-import { useMemo } from "react";
-import { useAtomValue } from "jotai";
 import { Button, Link, Skeleton } from "@heroui/react";
-import { Token, TokenSocialMedias } from "@chainstream-io/sdk";
+import { useTokenQuery } from "@liberfi.io/react";
+import type { Chain, Token } from "@liberfi.io/types";
 import { useTranslation } from "@liberfi/ui-base";
 import { TokenAvatar } from "@liberfi/ui-dex/components/TokenAvatar";
 import { Number } from "@liberfi/ui-dex/components/Number";
@@ -13,36 +12,36 @@ import {
   TelegramIcon,
   WebsiteIcon,
 } from "@liberfi/ui-dex/assets";
-import {
-  tokenInfoAtom,
-  tokenLatestPriceAtom,
-} from "@liberfi/ui-dex/states";
 import { useTradeDataContext } from "@liberfi/ui-dex/components/trade/providers";
 import { formatLongNumber, formatShortNumber } from "@liberfi/ui-dex/libs";
 
-export function TokenDetailHeader() {
-  const token = useAtomValue(tokenInfoAtom);
-  return token ? <Content token={token} /> : <HeaderSkeleton />;
+export interface TokenDetailHeaderProps {
+  chain: Chain;
+  address: string;
+}
+
+/**
+ * Axiom-style token header. Data source is the react-sdk `useTokenQuery` hook
+ * (no direct `@chainstream-io/sdk` or `ui-dex`-owned atoms). Visual layout is
+ * unchanged so the Axiom aesthetic stays pixel-aligned.
+ */
+export function TokenDetailHeader({ chain, address }: TokenDetailHeaderProps) {
+  const { data: token, isLoading } = useTokenQuery({ chain, address });
+
+  if (!token || isLoading) return <HeaderSkeleton />;
+  return <Content token={token} />;
 }
 
 function Content({ token }: { token: Token }) {
   const { t } = useTranslation();
   const { isFavorite, toggleFavorite } = useTradeDataContext();
-  const latestPrice = useAtomValue(tokenLatestPriceAtom);
 
-  const socials = useMemo<TokenSocialMedias>(() => {
-    try {
-      return typeof token.socialMedias === "string"
-        ? JSON.parse(token.socialMedias ?? "{}")
-        : typeof token.socialMedias === "object"
-          ? (token.socialMedias as TokenSocialMedias)
-          : {};
-    } catch {
-      return {};
-    }
-  }, [token]);
+  const socials = token.socialMedias ?? {};
 
-  const displayPrice = latestPrice ? `$${formatLongNumber(latestPrice)}` : "-";
+  const priceInUsd = token.marketData?.priceInUsd;
+  const displayPrice = priceInUsd
+    ? `$${formatLongNumber(window.Number(priceInUsd))}`
+    : "-";
 
   return (
     <div className="flex min-h-[64px] max-h-[64px] flex-1 flex-row items-center justify-start gap-4 border-b border-border-subtle pl-4 pr-4">
@@ -50,7 +49,7 @@ function Content({ token }: { token: Token }) {
       <div className="flex shrink-0 flex-row items-center justify-center gap-2 h-[42px]">
         <TokenAvatar
           className="flex-none"
-          src={token.imageUrl ?? ""}
+          src={token.image ?? ""}
           name={token.symbol}
           size={36}
         />
@@ -81,7 +80,7 @@ function Content({ token }: { token: Token }) {
       {/* Market cap — Axiom: 12px/500, muted gray, next to token name */}
       <span className="shrink-0 text-xs font-medium tabular-nums leading-4 text-[rgb(119,122,140)]">
         {token.marketData?.marketCapInUsd ? (
-          <Number value={token.marketData.marketCapInUsd} abbreviate defaultCurrencySign="$" />
+          <NumberDisplay value={token.marketData.marketCapInUsd} />
         ) : (
           displayPrice
         )}
@@ -92,8 +91,8 @@ function Content({ token }: { token: Token }) {
       <Metric
         label={t("extend.token_list.attributes.liquidity")}
         value={
-          token.marketData?.totalTvlInUsd ? (
-            <Number value={token.marketData.totalTvlInUsd} abbreviate defaultCurrencySign="$" />
+          token.marketData?.tvlInUsd ? (
+            <NumberDisplay value={token.marketData.tvlInUsd} />
           ) : (
             "-"
           )
@@ -138,6 +137,10 @@ function Content({ token }: { token: Token }) {
       </div>
     </div>
   );
+}
+
+function NumberDisplay({ value }: { value: string | number }) {
+  return <Number value={value} abbreviate defaultCurrencySign="$" />;
 }
 
 function SocialButton({ href, children }: { href: string; children: React.ReactNode }) {

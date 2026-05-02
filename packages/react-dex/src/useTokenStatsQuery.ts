@@ -9,6 +9,9 @@ export async function fetchTokenStats(client: ChainStreamClient, chain: Chain, t
   return await client.token.getStats(chainParam(chain), tokenAddress);
 }
 
+/**
+ * @deprecated Use `useTokenStatsQuery` from `@liberfi.io/react` instead.
+ */
 export function useTokenStatsQuery(
   chain: Chain,
   tokenAddress: string,

@@ -24,7 +24,7 @@ export function TokensPage() {
   return (
     <TradeDataLoader chainId={chainId} address={address}>
       <TradeDataProvider address={address} chain={chainId}>
-        <AxiomTradePage />
+        <AxiomTradePage chain={chainId} address={address} />
       </TradeDataProvider>
     </TradeDataLoader>
   );

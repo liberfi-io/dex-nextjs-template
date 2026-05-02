@@ -1,17 +1,24 @@
 import { Key, useState } from "react";
 import { Tab, Tabs } from "@heroui/react";
 import { useTranslation } from "@liberfi/ui-base";
-import { RealtimeTradeList } from "@liberfi/ui-dex/components/trade/rich_info/RealTimeTradeList";
-import { TradeTokenHolders } from "@liberfi/ui-dex/components/trade/rich_info/TradeTokenHolders";
-import { useAtomValue } from "jotai";
-import { tokenInfoAtom } from "@liberfi/ui-dex/states";
+import { useTokenQuery } from "@liberfi.io/react";
+import type { Chain } from "@liberfi.io/types";
+import {
+  TokenActivitiesListWidget,
+  TokenHoldersListWidget,
+} from "@liberfi.io/ui-tokens";
 
 type BottomTab = "trades" | "positions" | "orders" | "holders" | "top-traders" | "dev-tokens";
 
-export function BottomDataPanel() {
+export interface BottomDataPanelProps {
+  chain: Chain;
+  address: string;
+}
+
+export function BottomDataPanel({ chain, address }: BottomDataPanelProps) {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<BottomTab>("trades");
-  const token = useAtomValue(tokenInfoAtom);
+  const { data: token } = useTokenQuery({ chain, address });
 
   const holdersCount = token?.marketData?.holders;
 
@@ -68,10 +75,14 @@ export function BottomDataPanel() {
 
       {/* Tab content */}
       <div className="flex-1 min-h-0 overflow-auto">
-        {activeTab === "trades" && <RealtimeTradeList />}
+        {activeTab === "trades" && (
+          <TokenActivitiesListWidget chain={chain} address={address} />
+        )}
         {activeTab === "positions" && <PositionsPlaceholder />}
         {activeTab === "orders" && <EmptyPlaceholder text="No orders" />}
-        {activeTab === "holders" && <TradeTokenHolders />}
+        {activeTab === "holders" && (
+          <TokenHoldersListWidget chain={chain} address={address} />
+        )}
         {activeTab === "top-traders" && <EmptyPlaceholder text="Coming soon" />}
         {activeTab === "dev-tokens" && <EmptyPlaceholder text="Coming soon" />}
       </div>

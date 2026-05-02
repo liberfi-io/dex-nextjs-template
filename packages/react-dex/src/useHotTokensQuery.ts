@@ -16,6 +16,9 @@ export async function fetchHotTokens(client: ChainStreamClient, param: UseHotTok
   return await client.ranking.getHotTokens(chainParam(chain), duration, rest);
 }
 
+/**
+ * @deprecated Use `useTrendingTokensQuery` from `@liberfi.io/react` instead.
+ */
 export function useHotTokensQuery(
   param: UseHotTokensQueryParams = defaultParam,
   options: Omit<

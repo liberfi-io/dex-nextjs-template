@@ -10,6 +10,9 @@ export async function fetchTokenSecurity(client: ChainStreamClient, chain: Chain
   return await client.token.getSecurity(chainParam(chain), tokenAddress);
 }
 
+/**
+ * @deprecated Use `useTokenSecurityQuery` from `@liberfi.io/react` instead.
+ */
 export function useTokenSecurityQuery(
   chain: Chain,
   tokenAddress: string,

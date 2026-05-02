@@ -13,6 +13,11 @@ export async function fetchTokenHolders(client: ChainStreamClient, param: UseTok
   });
 }
 
+/**
+ * @deprecated Use `useTokenHoldersQuery` from `@liberfi.io/react` instead.
+ * The react-sdk version supports Phase 3 `sortBy` and returns `tags`,
+ * `lastActiveAt`, `startHoldingAt` on each holder.
+ */
 export function useTokenHoldersQuery(
   param: UseTokenHoldersQueryParams,
   options: Omit<

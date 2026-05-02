@@ -8,6 +8,9 @@ import { Button, Divider, Skeleton } from "@heroui/react";
 import clsx from "clsx";
 import { useCallback, useState } from "react";
 
+/**
+ * @deprecated Use `TokenLiquiditiesWidget` from `@liberfi.io/ui-tokens`.
+ */
 export function TradeTokenLiquidities({ token }: { token: Token }) {
   const { t } = useTranslation();
 

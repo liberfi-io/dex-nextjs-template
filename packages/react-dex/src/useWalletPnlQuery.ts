@@ -13,6 +13,9 @@ export async function fetchWalletPnl(
   return await client.wallet.getPnl(chainParam(chain), walletAddress);
 }
 
+/**
+ * @deprecated Use `useWalletPnlQuery` from `@liberfi.io/react` instead.
+ */
 export function useWalletPnlQuery(
   chain: Chain,
   walletAddress: string,

@@ -1,6 +1,9 @@
 import { Chain } from "@liberfi/core";
 import { ActivityList } from "../account";
 
+/**
+ * @deprecated Use `PortfolioActivitiesWidget` from `@liberfi.io/ui-portfolio`.
+ */
 export function AccountActivityList() {
   return (
     <div className="flex-1 w-full pb-2.5 flex flex-col">

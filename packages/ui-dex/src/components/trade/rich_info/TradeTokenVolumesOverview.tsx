@@ -11,6 +11,9 @@ type TradeTokenVolumesOverviewProps = {
   timeframe: string;
 };
 
+/**
+ * @deprecated Use `TokenVolumesOverviewWidget` from `@liberfi.io/ui-tokens`.
+ */
 export function TradeTokenVolumesOverview({ token, timeframe }: TradeTokenVolumesOverviewProps) {
   const { t } = useTranslation();
 

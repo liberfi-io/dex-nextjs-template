@@ -9,6 +9,9 @@ import { AppRoute } from "../../../libs";
 import { tokenInfoAtom } from "../../../states";
 import { useAtomValue } from "jotai";
 
+/**
+ * @deprecated Use `TokenDetailHeaderWidget` from `@liberfi.io/ui-tokens`.
+ */
 export function TradeHeader() {
   const { navigate } = useRouter();
 

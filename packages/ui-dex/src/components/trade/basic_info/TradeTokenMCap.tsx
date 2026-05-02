@@ -5,6 +5,9 @@ import { tickAtom, useTranslation } from "@liberfi/ui-base";
 import { useAtomValue } from "jotai";
 import { useMemo } from "react";
 
+/**
+ * @deprecated Use `TokenMarketCapWidget` from `@liberfi.io/ui-tokens`.
+ */
 export function TradeTokenMCap({ token }: { token: Token }) {
   const { t } = useTranslation();
 

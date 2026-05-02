@@ -8,6 +8,10 @@ import { Token } from "@chainstream-io/sdk";
 import { useAtomValue } from "jotai";
 import { tokenInfoAtom } from "../../../states";
 
+/**
+ * @deprecated Use `TokenHoldersListWidget` (list) or `TokenHoldersCountWidget`
+ * (count only) from `@liberfi.io/ui-tokens`.
+ */
 export function TradeTokenHolders() {
   const token = useAtomValue(tokenInfoAtom);
   return token ? <Content token={token} /> : <Skeletons />;

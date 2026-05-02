@@ -13,6 +13,9 @@ export async function fetchTokenMarketData(
   return client.token.getMarketData(chainParam(chain), tokenAddress);
 }
 
+/**
+ * @deprecated Use `useTokenMarketDataQuery` from `@liberfi.io/react` instead.
+ */
 export function useTokenMarketDataQuery(
   chain: Chain,
   tokenAddress: string,

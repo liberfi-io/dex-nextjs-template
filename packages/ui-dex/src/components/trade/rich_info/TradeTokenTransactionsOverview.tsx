@@ -11,6 +11,9 @@ type TradeTokenTransactionsOverviewProps = {
   timeframe: string;
 };
 
+/**
+ * @deprecated Use `TokenTransactionsOverviewWidget` from `@liberfi.io/ui-tokens`.
+ */
 export function TradeTokenTransactionsOverview({
   token,
   timeframe,
