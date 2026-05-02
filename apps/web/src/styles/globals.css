@@ -200,9 +200,10 @@
 /*
  * Axiom-style InstantTrade panel overrides.
  *
- * Visual constants come from HeroUI semantic tokens (`--heroui-*`) instead
- * of hard-coded hex so the trade panel adapts to theme changes and to the
- * consumer project's primary / success / danger palette.
+ * All colours come from HeroUI semantic tokens (`--heroui-*`). The trade
+ * panel uses the BRAND `primary / secondary` pair (our green + orange)
+ * for buy / sell — not `success / danger`, which are reserved for status
+ * signals.
  */
 
 /* Buy/Sell tablist (bg-content2 identifies the primary tab pair) */
@@ -225,13 +226,13 @@
 }
 .axiom-trade-panel [role="tablist"][class*="bg-content2"] [role="tab"][data-selected="true"][data-key="buy"] {
   font-weight: 700 !important;
-  background-color: hsl(var(--heroui-success)) !important;
-  color: hsl(var(--heroui-success-foreground)) !important;
+  background-color: hsl(var(--heroui-primary)) !important;
+  color: hsl(var(--heroui-primary-foreground)) !important;
 }
 .axiom-trade-panel [role="tablist"][class*="bg-content2"] [role="tab"][data-selected="true"][data-key="sell"] {
   font-weight: 700 !important;
-  background-color: hsl(var(--heroui-danger)) !important;
-  color: hsl(var(--heroui-danger-foreground)) !important;
+  background-color: hsl(var(--heroui-secondary)) !important;
+  color: hsl(var(--heroui-secondary-foreground)) !important;
 }
 .axiom-trade-panel [role="tablist"][class*="bg-content2"] [role="tab"]:not([data-selected="true"]) {
   font-weight: 500 !important;
@@ -268,22 +269,50 @@
 /* Main Buy/Sell action button */
 .axiom-trade-panel button[class*="bg-success"][class*="w-full"],
 .axiom-trade-panel button[class*="bg-danger"][class*="w-full"],
-.axiom-trade-panel button[class*="bg-primary"][class*="w-full"] {
+.axiom-trade-panel button[class*="bg-primary"][class*="w-full"],
+.axiom-trade-panel button[class*="bg-secondary"][class*="w-full"] {
   min-height: 36px !important;
   max-height: 36px !important;
   border-radius: 9999px !important;
   font-size: 16px !important;
-  font-weight: 400 !important;
+  font-weight: 600 !important;
   line-height: 24px !important;
   display: flex !important;
   flex: 1 !important;
   width: 100% !important;
 }
 .axiom-trade-panel button[class*="bg-primary"][class*="w-full"] {
-  background-color: hsl(var(--heroui-success)) !important;
-  color: hsl(var(--heroui-success-foreground)) !important;
+  background-color: hsl(var(--heroui-primary)) !important;
+  color: hsl(var(--heroui-primary-foreground)) !important;
 }
 .axiom-trade-panel button[class*="bg-secondary"][class*="w-full"] {
-  background-color: hsl(var(--heroui-danger)) !important;
-  color: hsl(var(--heroui-danger-foreground)) !important;
+  background-color: hsl(var(--heroui-secondary)) !important;
+  color: hsl(var(--heroui-secondary-foreground)) !important;
+}
+
+/*
+ * Preset config row — the four icon buttons right above the main Buy / Sell
+ * button (slippage %, priority fee, tip, MEV toggle). Upstream ships them
+ * as transparent text-only buttons which look "flat" and unclickable next
+ * to the other controls. Give each button a soft chip background with a
+ * hover lift so the row reads as interactive configuration.
+ */
+.axiom-trade-panel .flex.items-center.gap-2 > button[data-react-aria-pressable="true"][class*="h-5"] {
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 0 8px !important;
+  border-radius: 6px !important;
+  background-color: hsl(var(--heroui-default-100)) !important;
+  color: hsl(var(--heroui-foreground-600)) !important;
+  font-size: 12px !important;
+  transition: background-color 150ms ease, color 150ms ease !important;
+}
+.axiom-trade-panel .flex.items-center.gap-2 > button[data-react-aria-pressable="true"][class*="h-5"]:hover,
+.axiom-trade-panel .flex.items-center.gap-2 > button[data-react-aria-pressable="true"][class*="h-5"][data-hover="true"] {
+  background-color: hsl(var(--heroui-default-200)) !important;
+  color: hsl(var(--heroui-foreground)) !important;
+}
+.axiom-trade-panel .flex.items-center.gap-2 > button[data-react-aria-pressable="true"][class*="h-5"] svg {
+  width: 12px !important;
+  height: 12px !important;
 }

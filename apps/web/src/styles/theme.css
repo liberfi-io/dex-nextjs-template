@@ -4,9 +4,13 @@
    * HeroUI exposes its palette as `hsl` tuples via `--heroui-*`, so each
    * alias below stays in lock-step with the active HeroUI theme instead
    * of freezing a specific hex.
+   *
+   * `bullish / bearish` map to `primary / secondary` (our brand green and
+   * orange), NOT to `success / danger` — Axiom's green buy / orange sell
+   * pair is the brand accent colour system.
    */
-  --color-bullish: hsl(var(--heroui-success));
-  --color-bearish: hsl(var(--heroui-danger));
+  --color-bullish: hsl(var(--heroui-primary));
+  --color-bearish: hsl(var(--heroui-secondary));
   --color-surface-glass: hsl(var(--heroui-background) / 0.8);
   --color-border-subtle: hsl(var(--heroui-default-200));
   --color-card-bg: hsl(var(--heroui-content1) / 0.4);

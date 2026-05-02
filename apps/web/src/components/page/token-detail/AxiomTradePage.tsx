@@ -12,7 +12,6 @@ import {
 import {
   TokenAboutWidget,
   TokenCategoriesWidget,
-  TokenChartBannerWidget,
   TokenLiquiditiesWidget,
   TokenReusedImageListWidget,
   TokenSecurityWidget,
@@ -82,15 +81,6 @@ function AxiomTradeDesktopPage({ chain, address }: AxiomTradePageProps) {
         {/* Left column */}
         <div ref={containerRef} className="flex min-w-0 flex-1 flex-col">
           <TokenDetailHeader chain={chain} address={address} />
-
-          {/* Collapsible chart-top banner */}
-          <CollapsibleSection
-            title="Token Banner"
-            defaultOpen
-            className="border-b border-default-100"
-          >
-            <TokenChartBannerWidget chain={chain} address={address} />
-          </CollapsibleSection>
 
           {/* TradingView occupies the remaining vertical space */}
           <div className="min-h-0 flex-1">

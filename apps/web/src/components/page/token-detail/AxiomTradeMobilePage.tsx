@@ -13,7 +13,6 @@ import {
   TokenAboutWidget,
   TokenActivitiesListWidget,
   TokenCategoriesWidget,
-  TokenChartBannerWidget,
   TokenDevTokensListWidget,
   TokenHoldersListWidget,
   TokenLiquiditiesWidget,
@@ -109,14 +108,6 @@ function TradeMode({
   return (
     <div className="flex flex-col pb-[220px]">
       <TokenDetailHeader chain={chain} address={address} />
-
-      <CollapsibleSection
-        title="Token Banner"
-        defaultOpen={false}
-        className="border-b border-default-100"
-      >
-        <TokenChartBannerWidget chain={chain} address={address} />
-      </CollapsibleSection>
 
       <TokenStatsFlipWidget
         chain={chain}
