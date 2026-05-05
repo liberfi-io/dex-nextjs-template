@@ -740,12 +740,44 @@ export class TvChartLibraryWidgetBridge {
     }
     styleEl.textContent = `
       body {
+        background-color: ${bg};
         --color-layer-1: ${bg};
         --color-layer-2: ${bg};
         --tv-color-platform-background: ${bg};
         --tv-color-pane-background: ${bg};
         --tv-color-pane-background-secondary: ${bg};
         --tv-color-popup-background: ${bg};
+      }
+
+      /*
+       * Force-paint the layout chrome with the host page background.
+       *
+       * TradingView's bundled CSS sets explicit background-color on the
+       * layout shells (top header, left drawing toolbar, bottom timeframes
+       * bar, and outer container), so overriding the CSS variables alone
+       * leaves a visible gray flash on the toolbars during loading. We
+       * stamp the host bg with !important on these stable class names so
+       * any bundled rule loses. Keep the selector list narrow to avoid
+       * recoloring internal toolbar buttons / popups (which need their
+       * own hover / expanded backgrounds to stay distinguishable).
+       */
+      .layout__area--top,
+      .layout__area--left,
+      .layout__area--right,
+      .layout__area--bottom,
+      .layout__area--center,
+      .chart-page,
+      .chart-container,
+      .chart-container-border,
+      .layout-with-border-radius {
+        background-color: ${bg} !important;
+      }
+
+      /* TradingView loading-screen overlay (covers the central pane) */
+      .tv-loading-indicator,
+      .loading-indicator,
+      .loading-indicator-content {
+        background-color: ${bg} !important;
       }
     `;
   }
