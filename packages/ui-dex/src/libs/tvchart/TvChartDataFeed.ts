@@ -103,9 +103,13 @@ export class TvChartDataFeed {
       // if (periodParams.firstDataRequest) {
       // gtag report { name: "getBarsFistCallEnd", key: g.e1.KLineFirstRender }
       // }
-      if (bars) {
-        onResult(bars, { noData: true });
-      }
+      // TradingView treats `noData: true` as "no more historical data exists
+      // earlier than this point" and stops issuing backward-pan requests for
+      // older bars. We must only set it when the datafeed truly returned an
+      // empty range — otherwise dragging the chart backward never loads
+      // history.
+      const result = bars ?? [];
+      onResult(result, { noData: result.length === 0 });
     } catch (e) {
       console.error("TvChartDataFeed.getBars", e);
       onError(e as any);

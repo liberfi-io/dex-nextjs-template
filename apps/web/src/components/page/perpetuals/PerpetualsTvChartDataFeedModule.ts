@@ -143,22 +143,35 @@ export class PerpetualsTvChartDataFeedModule implements ITvChartDataFeedModule {
       const interval = RESOLUTION_TO_KLINE_INTERVAL[resolution] || "1m";
       const intervalMs = KLINE_INTERVAL_MS[interval];
 
+      // TradingView passes a window in seconds; convert once to ms epochs.
       const fromMs = periodParams.from * 1000;
       const toMs = periodParams.to * 1000;
-      const barCount = Math.min(500, Math.ceil((toMs - fromMs) / intervalMs) + 1);
 
-      const klines = await this.client.getKlines(symbol, interval, barCount);
+      // Hyperliquid's candleSnapshot caps each response at ~5000 candles.
+      // Prefer `countBack` (TV's authoritative bar-count hint) and fall
+      // back to a window-derived estimate.
+      const windowEstimate = Math.ceil((toMs - fromMs) / intervalMs) + 1;
+      const limit = Math.min(
+        5000,
+        Math.max(periodParams.countBack || windowEstimate, 1),
+      );
 
-      const bars: Bar[] = klines
-        .filter((k) => k.timestamp >= fromMs && k.timestamp <= toMs)
-        .map((k) => ({
-          time: k.timestamp,
-          open: k.open,
-          high: k.high,
-          low: k.low,
-          close: k.close,
-          volume: k.volume,
-        }));
+      // Forward the explicit time window to the SDK so the provider can
+      // return historical candles for any pan, not just the latest N.
+      const klines = await this.client.getKlines(symbol, interval, {
+        from: fromMs,
+        to: toMs,
+        limit,
+      });
+
+      const bars: Bar[] = klines.map((k) => ({
+        time: k.timestamp,
+        open: k.open,
+        high: k.high,
+        low: k.low,
+        close: k.close,
+        volume: k.volume,
+      }));
 
       bars.sort((a, b) => a.time - b.time);
       return bars;
