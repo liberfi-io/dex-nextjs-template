@@ -298,6 +298,13 @@ export class TvChartLibraryWidgetBridge {
       timezone: this.localTimezone as Timezone,
       library_path: this.libraryPath,
       custom_css_url: this.customCssUrl,
+      // Mask the loading spinner area with the host page's background.
+      // Without this the spinner overlay shows TradingView's default
+      // loading background, which on the perpetuals page (host bg
+      // `#000000`) reads as a navy patch until `onChartReady` fires.
+      loading_screen: this.settings.backgroundColor
+        ? { backgroundColor: this.settings.backgroundColor }
+        : undefined,
       theme: getTvChartLibraryTheme(this.settings.theme),
       custom_font_family: window.getComputedStyle(document.body).fontFamily,
       symbol: this.chartManager.activeArea?.tickerSymbol,
@@ -610,47 +617,97 @@ export class TvChartLibraryWidgetBridge {
     if (!this.settings.backgroundColor) return;
     if (!this.container) return;
 
+    let injected = false;
+
     const tryInject = () => {
-      if (this.getContentDocument()?.head) {
+      if (injected) return true;
+      const doc = this.getContentDocument();
+      if (doc?.head) {
         this.updateCSSVariables();
+        injected = true;
+        // Re-inject if TradingView removes our style tag during init.
+        this.installStyleTagGuard(doc);
         return true;
       }
       return false;
     };
 
     // 1) Synchronous attempt — succeeds if the iframe document is already
-    //    parseable (rare but possible in some browsers).
+    //    parseable.
     if (tryInject()) return;
 
+    // 2) Aggressive rAF polling — runs every animation frame (~16 ms) so
+    //    we catch the iframe document head the moment it's appended,
+    //    BEFORE TradingView's bootstrap scripts paint toolbars with the
+    //    default `--color-layer-2` (navy `#181825`). Without this the
+    //    `iframe.load` event fires only AFTER all resources finish
+    //    loading, leaving a visible navy flash on slow connections.
+    let cancelled = false;
+    const stopAfterMs = 30_000;
+    const startedAt = Date.now();
+    const tick = () => {
+      if (cancelled || injected) return;
+      if (tryInject()) return;
+      if (Date.now() - startedAt > stopAfterMs) return;
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+
+    // 3) Belt-and-suspenders: also fire on iframe load (covers cases
+    //    where the document head is delayed past 30 s for some reason).
     const attachLoadListener = (iframe: HTMLIFrameElement) => {
       const onLoad = () => {
         iframe.removeEventListener("load", onLoad);
         tryInject();
       };
       iframe.addEventListener("load", onLoad);
-      // The iframe may have already loaded before the listener attached
-      // (e.g. cached HTML); attempt one more sync injection.
-      tryInject();
     };
 
-    // 2) The iframe is usually present synchronously after `new Widget(...)`.
     const existing = this.getIframeElement();
     if (existing) {
       attachLoadListener(existing);
-      return;
+    } else {
+      // Wait for the iframe to be inserted into the container.
+      const observer = new MutationObserver(() => {
+        const iframe = this.getIframeElement();
+        if (iframe) {
+          observer.disconnect();
+          attachLoadListener(iframe);
+        }
+      });
+      observer.observe(this.container, { childList: true });
+      this.abortController.signal.addEventListener(
+        "abort",
+        () => observer.disconnect(),
+        { once: true },
+      );
     }
 
-    // 3) Otherwise wait for the iframe to be inserted into the container.
-    //    Disconnect once found or after the abort signal fires (component
-    //    unmount / chart destroy).
+    // Stop polling on chart destroy.
+    this.abortController.signal.addEventListener(
+      "abort",
+      () => {
+        cancelled = true;
+      },
+      { once: true },
+    );
+  }
+  /**
+   * Watch the iframe document head and re-inject our background override
+   * style tag if TradingView removes it during its bootstrap (some
+   * library versions clear `head` children when applying their own
+   * theme stylesheet).
+   */
+  private installStyleTagGuard(doc: Document) {
+    const styleId = "tv-host-bg-override";
     const observer = new MutationObserver(() => {
-      const iframe = this.getIframeElement();
-      if (iframe) {
-        observer.disconnect();
-        attachLoadListener(iframe);
+      if (!doc.getElementById(styleId)) {
+        this.updateCSSVariables();
       }
     });
-    observer.observe(this.container, { childList: true });
+    if (doc.head) {
+      observer.observe(doc.head, { childList: true });
+    }
     this.abortController.signal.addEventListener(
       "abort",
       () => observer.disconnect(),
