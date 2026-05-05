@@ -738,6 +738,25 @@ export class TvChartLibraryWidgetBridge {
       styleEl.id = styleId;
       doc.head.appendChild(styleEl);
     }
+    // custom-styles.css ships rules like
+    //   .separator-QjUlCDId, .layout__area--top {
+    //     background-color: var(--color-border) !important;
+    //   }
+    // which paints the top header #333333 (dark theme --color-border).
+    // Both that rule and ours are !important with the same specificity
+    // (one class), so for !important declarations the LATER source order
+    // wins. Empirically custom-styles.css is inserted by TradingView's
+    // custom_css_url handling AFTER our early injection, so it wins by
+    // source order, leaving a visible gray flash on the top toolbar
+    // during loading.
+    //
+    // Workaround: prefix every layout selector with "body " so our
+    // specificity becomes (0,1,1), beating custom-styles.css's (0,1,0)
+    // regardless of source order.
+    //
+    // Selector list intentionally narrow: only the stable layout shells.
+    // Internal toolbar buttons / popups keep their own hover/expanded
+    // backgrounds via the un-prefixed CSS.
     styleEl.textContent = `
       body {
         background-color: ${bg};
@@ -748,35 +767,20 @@ export class TvChartLibraryWidgetBridge {
         --tv-color-pane-background-secondary: ${bg};
         --tv-color-popup-background: ${bg};
       }
-
-      /*
-       * Force-paint the layout chrome with the host page background.
-       *
-       * TradingView's bundled CSS sets explicit background-color on the
-       * layout shells (top header, left drawing toolbar, bottom timeframes
-       * bar, and outer container), so overriding the CSS variables alone
-       * leaves a visible gray flash on the toolbars during loading. We
-       * stamp the host bg with !important on these stable class names so
-       * any bundled rule loses. Keep the selector list narrow to avoid
-       * recoloring internal toolbar buttons / popups (which need their
-       * own hover / expanded backgrounds to stay distinguishable).
-       */
-      .layout__area--top,
-      .layout__area--left,
-      .layout__area--right,
-      .layout__area--bottom,
-      .layout__area--center,
-      .chart-page,
-      .chart-container,
-      .chart-container-border,
-      .layout-with-border-radius {
+      body .layout__area--top,
+      body .layout__area--left,
+      body .layout__area--right,
+      body .layout__area--bottom,
+      body .layout__area--center,
+      body .chart-page,
+      body .chart-container,
+      body .chart-container-border,
+      body .layout-with-border-radius {
         background-color: ${bg} !important;
       }
-
-      /* TradingView loading-screen overlay (covers the central pane) */
-      .tv-loading-indicator,
-      .loading-indicator,
-      .loading-indicator-content {
+      body .tv-loading-indicator,
+      body .loading-indicator,
+      body .loading-indicator-content {
         background-color: ${bg} !important;
       }
     `;
