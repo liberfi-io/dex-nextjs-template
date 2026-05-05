@@ -320,13 +320,28 @@ export class TvChartLibraryWidgetBridge {
       timezone: this.localTimezone as Timezone,
       library_path: this.libraryPath,
       custom_css_url: this.customCssUrl,
-      // Mask the loading spinner area with the host page's background.
-      // Without this the spinner overlay shows TradingView's default
-      // loading background, which on the perpetuals page (host bg
-      // `#000000`) reads as a navy patch until `onChartReady` fires.
-      loading_screen: this.settings.backgroundColor
-        ? { backgroundColor: this.settings.backgroundColor }
-        : undefined,
+      // Mask the loading spinner area with the host page's background and
+      // optionally tint the spinner itself with the host's accent color.
+      //
+      // - `backgroundColor`: without this the spinner overlay shows
+      //   TradingView's default loading background, which on the perpetuals
+      //   page (host bg `#000000`) reads as a navy patch until
+      //   `onChartReady` fires.
+      // - `foregroundColor`: TradingView's default spinner is bright blue,
+      //   visually competing with brand colors. Consumers can pass their
+      //   primary / accent color via `loadingForegroundColor` to keep the
+      //   loading state on-brand.
+      loading_screen:
+        this.settings.backgroundColor || this.settings.loadingForegroundColor
+          ? {
+              ...(this.settings.backgroundColor && {
+                backgroundColor: this.settings.backgroundColor,
+              }),
+              ...(this.settings.loadingForegroundColor && {
+                foregroundColor: this.settings.loadingForegroundColor,
+              }),
+            }
+          : undefined,
       theme: getTvChartLibraryTheme(this.settings.theme),
       custom_font_family: window.getComputedStyle(document.body).fontFamily,
       symbol: this.chartManager.activeArea?.tickerSymbol,

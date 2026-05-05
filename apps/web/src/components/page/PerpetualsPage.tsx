@@ -741,6 +741,11 @@ const PerpetualsChart = memo(function PerpetualsChart({ symbol }: { symbol: stri
       },
       // Match the perpetuals page background instead of the default chart bg.
       backgroundColor: "#000000",
+      // Tint TradingView's loading spinner with the brand primary green
+      // so the loading state stays on-brand instead of TV's default blue.
+      // Hardcoded to the `defaultTheme.colors.primary.default` value in
+      // `@liberfi/ui-base` — keep in sync if the brand color changes.
+      loadingForegroundColor: "#C7FF2E",
       // Show TradingView's native header (resolution / indicators / settings).
       enabledFeatures: [TvChartFeature.HeaderWidget],
       // Hide native header items the perpetuals page does not need.

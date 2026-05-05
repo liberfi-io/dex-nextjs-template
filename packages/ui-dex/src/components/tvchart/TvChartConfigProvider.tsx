@@ -33,6 +33,12 @@ export interface TvChartConfig {
   theme: TvChartTheme;
   reverseColor?: boolean;
   backgroundColor?: string;
+  /**
+   * Color of the loading spinner shown by TradingView before chart-ready.
+   * Maps to `loading_screen.foregroundColor` of the underlying widget.
+   * Defaults to TradingView's blue when omitted.
+   */
+  loadingForegroundColor?: string;
   timezone: Timezone;
   locale: LanguageCode;
   longShortMode?: boolean;
@@ -70,6 +76,7 @@ export const TvChartConfigProvider = ({ initConfig, children }: TvChartConfigPro
       chartSettings.updateValue("supportedLayouts", initConfig.supportedLayouts);
       chartSettings.updateValue("supportedChartTypes", initConfig.supportedChartTypes);
       chartSettings.updateValue("backgroundColor", initConfig.backgroundColor);
+      chartSettings.updateValue("loadingForegroundColor", initConfig.loadingForegroundColor);
       chartSettings.updateValue("storageId", initConfig.storageId);
       chartSettings.updateValue("enabledFeatures", initConfig.enabledFeatures);
       chartSettings.updateValue("disabledFeatures", initConfig.disabledFeatures);

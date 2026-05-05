@@ -34,6 +34,7 @@ const defaultSettings = {
   openPlaceOrderPane: null,
   getTradeHeader: null,
   backgroundColor: null,
+  loadingForegroundColor: null,
   renderAlertHeaderPortal: false,
   chartTradeSettingActions: undefined,
 };
@@ -81,6 +82,9 @@ export class TvChartSettings {
   }
   get backgroundColor() {
     return this.getState("backgroundColor");
+  }
+  get loadingForegroundColor() {
+    return this.getState("loadingForegroundColor");
   }
   get renderAlertHeaderPortal() {
     return this.getState("renderAlertHeaderPortal");
