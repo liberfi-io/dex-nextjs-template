@@ -75,6 +75,11 @@ export enum TvChartTheme {
 
 export enum TvChartFeature {
   HeaderWidget = "header_widget",
+  HeaderSymbolSearch = "header_symbol_search",
+  HeaderCompare = "header_compare",
+  HeaderSaveload = "header_saveload",
+  HeaderLayoutToggle = "header_layouttoggle",
+  HeaderQuickSearch = "header_quick_search",
   HeaderSimpleMode = "header_simple_mode",
   HeaderKLineTradeMode = "header_kline_trade_mode",
   HeaderPriceTypeMenu = "header_price_type_menu",

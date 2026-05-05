@@ -41,10 +41,16 @@ export interface TvChartProps {
   };
   onFullscreenSwitch?: (fullscreen: boolean) => void;
   onChartReady?: (chartType: TvChartType) => void;
+  /**
+   * Whether to render the top toolbar (resolutions, multicharts, kline style,
+   * price/quote switches, snapshot, fullscreen, settings). Defaults to `true`.
+   * Set to `false` for embeds that supply their own controls (e.g. perpetuals).
+   */
+  showToolbar?: boolean;
 }
 
 export const TvChart = forwardRef<TvChartInstance, TvChartProps>(
-  ({ config, onFullscreenSwitch, onChartReady }, ref) => {
+  ({ config, onFullscreenSwitch, onChartReady, showToolbar = true }, ref) => {
     const [initConfig] = useState<TvChartConfig>({
       ...config,
       datafeed: new config.datafeedModule(),
@@ -162,7 +168,7 @@ export const TvChart = forwardRef<TvChartInstance, TvChartProps>(
 
     return (
       <TvChartProvider ref={handleChartRef} initConfig={initConfig}>
-        <TvChartToolbar />
+        {showToolbar && <TvChartToolbar />}
         <TvChartWidgetProvider onReady={handleChartReady} />
       </TvChartProvider>
     );

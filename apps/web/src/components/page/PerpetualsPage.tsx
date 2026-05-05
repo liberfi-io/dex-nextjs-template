@@ -23,6 +23,7 @@ import {
   type TvChartProps,
 } from "@liberfi/ui-dex/components/tvchart/TvChart";
 import {
+  TvChartFeature,
   TvChartKlineStyle,
   TvChartLayout,
   TvChartTheme,
@@ -154,14 +155,21 @@ export function PerpetualsPage() {
           )}
 
           {mobileMainTab === "orderBook" && (
-            <div className="flex-1 min-h-0 overflow-auto">
-              <OrderBookWidget symbol={symbol} className="h-full" />
+            // Mobile: let the widget own its layout (independent ask/bid
+            // scrolls). The wrapper just clips overflow so the widget's
+            // internal min-h-0 flex math works.
+            <div className="flex-1 min-h-0 overflow-hidden">
+              <OrderBookWidget
+                symbol={symbol}
+                maxLevel={50}
+                className="h-full"
+              />
             </div>
           )}
 
           {mobileMainTab === "trades" && (
-            <div className="flex-1 min-h-0 overflow-auto">
-              <TradesWidget symbol={symbol} limit={50} className="h-full" />
+            <div className="flex-1 min-h-0 overflow-hidden">
+              <TradesWidget symbol={symbol} limit={100} className="h-full" />
             </div>
           )}
         </div>
@@ -222,27 +230,35 @@ export function PerpetualsPage() {
         onSelectCoin={(coin) => setSymbol(`${coin}-USDC`)}
       />
 
-      {/* Coin selector + CoinInfo stats */}
-      <CoinSelectorBar
-        tokenSymbol={tokenSymbol}
-        symbol={symbol}
-        showSearch={showSearch}
-        setShowSearch={setShowSearch}
-        handleSelectCoin={handleSelectCoin}
-      />
-
-      {/* Main content: Left (chart+OB / split / positions) | Right (PlaceOrder) */}
+      {/* Main content layout:
+            ┌─────────────────────── left section ─────────────────────┐  ┌── PlaceOrder ──┐
+            │  ┌─ Chart sub-col (CoinInfo + Chart) ─┐ ┌─ OB sub-col ─┐ │  │                │
+            │  │                                    │ │              │ │  │                │
+            │  └────────────────────────────────────┘ └──────────────┘ │  │                │
+            │  ─── SplitHandle ────────────────────────────────────────│  │                │
+            │  Positions / Open Orders / Trades  (spans chart + OB)    │  │                │
+            └──────────────────────────────────────────────────────────┘  └────────────────┘ */}
       <div className="flex-1 min-h-0 flex">
-        {/* Left: split view — top (Chart + OB side by side) | handle | bottom (Positions) */}
+        {/* Left section: Chart+OB on top, Positions on bottom */}
         <div className="flex-1 min-w-0 flex flex-col">
-          {/* Top half: Chart + OB/Trades side by side */}
+          {/* Top half: Chart sub-col + OB sub-col side by side */}
           <div className="flex-1 min-h-0 flex">
-            {/* Chart */}
+            {/* Chart sub-col: CoinSelectorBar header + Chart */}
             <div className="flex-1 min-w-0 flex flex-col" style={{ borderRight: '1px solid rgba(39,39,42,0.6)' }}>
-              <PerpetualsChart symbol={symbol} />
+              <CoinSelectorBar
+                tokenSymbol={tokenSymbol}
+                symbol={symbol}
+                showSearch={showSearch}
+                setShowSearch={setShowSearch}
+                handleSelectCoin={handleSelectCoin}
+              />
+              <div className="flex-1 min-h-0 flex flex-col">
+                <PerpetualsChart symbol={symbol} />
+              </div>
             </div>
 
-            {/* OB / Trades */}
+            {/* OB sub-col: OrderBook / Trades, top-aligned to TickerStrip,
+                bottom-aligned to chart (i.e. ends at SplitHandle) */}
             <div className="flex flex-col overflow-hidden" style={{ width: 290, minWidth: 290 }}>
               <div className="flex-none flex items-center" style={{ height: 36, padding: '0 16px 0 8px', borderBottom: '1px solid rgba(39,39,42,0.6)' }}>
                 {(
@@ -282,18 +298,27 @@ export function PerpetualsPage() {
               </div>
               <div className="flex-1 min-h-0 overflow-hidden">
                 {middleTab === "orderBook" ? (
-                  <OrderBookWidget symbol={symbol} className="h-full" />
+                  // Fetch ~50 levels per side so that even with the largest
+                  // aggregation step (1000 USD) there are several visible
+                  // buckets, and so that asks/bids each have enough rows to
+                  // overflow their independent scroll containers.
+                  <OrderBookWidget
+                    symbol={symbol}
+                    maxLevel={50}
+                    className="h-full"
+                  />
                 ) : (
-                  <TradesWidget symbol={symbol} limit={50} className="h-full" />
+                  <TradesWidget symbol={symbol} limit={100} className="h-full" />
                 )}
               </div>
             </div>
           </div>
 
-          {/* Draggable split handle */}
+          {/* Draggable split handle — splits the left section vertically */}
           <SplitHandle onResize={setBottomHeight} currentHeight={bottomHeight} />
 
-          {/* Bottom half: Positions / Open Orders / Trades */}
+          {/* Bottom panel: Positions / Open Orders / Trades — spans the
+              entire left section (chart + OB widths) */}
           <div className="flex-none flex flex-col" style={{ height: bottomHeight }}>
             <div className="flex-none flex items-center" style={{ height: 36, padding: '0 16px 0 8px', borderBottom: '1px solid rgba(39,39,42,0.6)' }}>
               {(
@@ -342,7 +367,8 @@ export function PerpetualsPage() {
           </div>
         </div>
 
-        {/* Right: PlaceOrder (full height, fixed 320px) */}
+        {/* PlaceOrder (full main height, fixed 320px). Bottom aligns with
+            the Positions row — both stop at the main content's bottom edge. */}
         <div className="flex flex-col overflow-hidden" style={{ width: 320, minWidth: 320, maxWidth: 320, borderLeft: '1px solid rgba(39,39,42,0.6)' }}>
           <PlaceOrderFormWidget
             symbol={symbol}
@@ -713,6 +739,22 @@ const PerpetualsChart = memo(function PerpetualsChart({ symbol }: { symbol: stri
         [TvChartType.TradingView]: "TradingView",
         [TvChartType.Original]: "Original",
       },
+      // Match the perpetuals page background instead of the default chart bg.
+      backgroundColor: "#000000",
+      // Show TradingView's native header (resolution / indicators / settings).
+      enabledFeatures: [TvChartFeature.HeaderWidget],
+      // Hide native header items the perpetuals page does not need.
+      // Left side keeps: resolution / chart type / indicators / undo-redo.
+      // Right side keeps: settings / fullscreen / screenshot.
+      // Everything else (symbol search, compare/+, saved-layout dropdown,
+      // multi-chart layout toggle, quick search magnifier) is removed.
+      disabledFeatures: [
+        TvChartFeature.HeaderSymbolSearch,
+        TvChartFeature.HeaderCompare,
+        TvChartFeature.HeaderSaveload,
+        TvChartFeature.HeaderLayoutToggle,
+        TvChartFeature.HeaderQuickSearch,
+      ],
     }),
     [symbol, i18n.language],
   );
@@ -729,7 +771,12 @@ const PerpetualsChart = memo(function PerpetualsChart({ symbol }: { symbol: stri
 
   return (
     <div className="flex-1 w-full min-h-0 flex flex-col">
-      <TvChart ref={chartRef} config={config} onChartReady={handleChartReady} />
+      <TvChart
+        ref={chartRef}
+        config={config}
+        onChartReady={handleChartReady}
+        showToolbar={false}
+      />
     </div>
   );
 });

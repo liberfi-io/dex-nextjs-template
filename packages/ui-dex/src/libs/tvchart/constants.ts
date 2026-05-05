@@ -2,7 +2,6 @@ import { CONFIG } from "@liberfi/core";
 import { TvChartFeature, TvChartLayout, TvChartResolution } from "./types";
 
 export const ENABLED_TV_CHART_FEATURES: TvChartFeature[] = [
-  TvChartFeature.HeaderWidget,
   TvChartFeature.HeaderPriceTypeMenu,
   TvChartFeature.HeaderLayoutSelectMenu,
   TvChartFeature.HeaderCandleStyleMenu,

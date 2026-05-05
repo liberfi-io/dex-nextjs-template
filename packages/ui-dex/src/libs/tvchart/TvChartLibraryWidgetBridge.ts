@@ -32,7 +32,7 @@ import {
   TV_CHART_LIGHT_THEME_COLORS,
   TV_CHART_THEME_COLORS,
 } from "./constants";
-import { checkKeyboardShortcut, createEventObservable, getCssPropertyValue } from "..";
+import { checkKeyboardShortcut, createEventObservable } from "..";
 import { TvChartDataFeed } from "./TvChartDataFeed";
 import { TvChartSaveLoadAdapter } from "./TvChartSaveLoadAdapter";
 import { TvChartSettingsAdapter } from "./TvChartSettingsAdapter";
@@ -224,7 +224,6 @@ export class TvChartLibraryWidgetBridge {
   }
   getWidgetOptions(): ChartingLibraryWidgetOptions | TradingTerminalWidgetOptions {
     const disabledFeatures = [
-      "header_widget",
       "legend_inplace_edit",
       "display_market_status",
       "save_shortcut",
@@ -258,6 +257,9 @@ export class TvChartLibraryWidgetBridge {
     if (this.settings.enableHideDrawingToolsByDefault) {
       enabledFeatures.push("hide_left_toolbar_by_default");
     }
+    if (!this.settings.enableHeaderWidget) {
+      disabledFeatures.push("header_widget");
+    }
     if (!this.settings.enableTimeframesToolbar) {
       disabledFeatures.push("timeframes_toolbar");
     }
@@ -267,6 +269,12 @@ export class TvChartLibraryWidgetBridge {
     if (!this.settings.enableVolumeForceOverlay) {
       disabledFeatures.push("volume_force_overlay");
     }
+    // Pass through caller-supplied feature flags. Useful for fine-grained
+    // control over native TradingView header items (e.g. hiding
+    // header_symbol_search / header_compare / header_saveload while keeping
+    // the rest of header_widget visible).
+    disabledFeatures.push(...this.settings.disabledFeatures);
+    enabledFeatures.push(...this.settings.enabledFeatures);
     return {
       container: "",
       autosize: true,
@@ -571,17 +579,39 @@ export class TvChartLibraryWidgetBridge {
     }
   }
   updateCSSVariables() {
-    Object.entries({
-      // TODO ...
-    })
-      .map(([key, value]) => {
-        return [key, getCssPropertyValue(value as string)];
-      })
-      .forEach(([key, value]) => {
-        if (value) {
-          this.widget?.setCSSCustomProperty(key, value);
-        }
-      });
+    // Drive TradingView's chrome (top header, bottom timeframes bar, side
+    // drawing panel, popups) background from `settings.backgroundColor`.
+    //
+    // We *cannot* simply call `widget.setCSSCustomProperty(...)` because
+    // `custom-styles.css` already declares `--tv-color-*` and
+    // `--color-layer-*` at the iframe `body { }` level. A body-level
+    // declaration wins over the root-level one set by setCSSCustomProperty
+    // for any element inside body (which is everything we care about).
+    //
+    // Instead inject a body-scoped `<style>` tag into the iframe document
+    // *after* the imported stylesheet. Same specificity, later source
+    // order → wins. Idempotent: re-uses the same <style> id if present.
+    const bg = this.settings.backgroundColor;
+    if (!bg) return;
+    const doc = this.getContentDocument();
+    if (!doc?.head) return;
+    const styleId = "tv-host-bg-override";
+    let styleEl = doc.getElementById(styleId) as HTMLStyleElement | null;
+    if (!styleEl) {
+      styleEl = doc.createElement("style");
+      styleEl.id = styleId;
+      doc.head.appendChild(styleEl);
+    }
+    styleEl.textContent = `
+      body {
+        --color-layer-1: ${bg};
+        --color-layer-2: ${bg};
+        --tv-color-platform-background: ${bg};
+        --tv-color-pane-background: ${bg};
+        --tv-color-pane-background-secondary: ${bg};
+        --tv-color-popup-background: ${bg};
+      }
+    `;
   }
   getInitOverrides() {
     return { ...this.getSettingsOverrides(), ...this.getColorPaletteOverrides() };
@@ -625,7 +655,8 @@ export class TvChartLibraryWidgetBridge {
         ? TV_CHART_THEME_COLORS.card
         : TV_CHART_LIGHT_THEME_COLORS.card;
     return {
-      "paneProperties.background": TV_CHART_THEME_COLORS.chartBg,
+      "paneProperties.background":
+        this.settings.backgroundColor ?? TV_CHART_THEME_COLORS.chartBg,
       "paneProperties.backgroundType": "solid" as ColorTypes,
       volumePaneSize: "medium",
       "mainSeriesProperties.candleStyle.upColor": TV_CHART_THEME_COLORS.increase,
@@ -668,6 +699,22 @@ export class TvChartLibraryWidgetBridge {
     this.widget?.applyOverrides(overrides);
     this.widget?.applyStudiesOverrides(studyOverrides);
   }
+  /**
+   * Force-apply just the chart pane background color. This needs to run on
+   * every chart ready (not only when the theme changes) because TradingView
+   * persists `paneProperties.background` to localStorage as part of the
+   * saved layout, and on next load the persisted value wins over the
+   * widget-options `overrides`. We re-assert it here so the host page's
+   * `backgroundColor` setting is always honored.
+   */
+  applyBackgroundOverride() {
+    const bg = this.settings.backgroundColor;
+    if (!bg) return;
+    this.widget?.applyOverrides({
+      "paneProperties.background": bg,
+      "paneProperties.backgroundType": "solid" as ColorTypes,
+    });
+  }
   async handleChartReady() {
     // wait for layout to be ready
     const layout = getTvChartLibraryLayout(this.settings.layout);
@@ -688,6 +735,11 @@ export class TvChartLibraryWidgetBridge {
       });
       this.applyColorPaletteOverrides();
     }
+
+    // Always re-apply the background + chrome CSS vars on ready, so the
+    // host page's `backgroundColor` overrides any persisted localStorage state.
+    this.applyBackgroundOverride();
+    this.updateCSSVariables();
 
     // subscribe to events
     this.widget?.subscribe("onAutoSaveNeeded", this.onAutoSaveNeeded.bind(this));
