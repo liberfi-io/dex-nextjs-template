@@ -189,6 +189,17 @@ export class TvChartLibraryWidgetBridge {
     // gradient), the canvas paints that color and stays gray until the
     // first candle batch arrives. Patching localStorage in-place here
     // lines up the very first paint with the host bg.
+    //
+    // TODO(cleanup, ~3 months after deploy): this is a self-healing patch
+    // for users whose localStorage was poisoned by a previous version. New
+    // installs already get the correct color from `getColorPaletteOverrides`
+    // in widget options, and once `applyBackgroundOverride` writes back,
+    // auto-save persists the right value. After enough time has passed for
+    // active users' caches to self-heal (and assuming no future code path
+    // writes a wrong color back), `patchPersistedPaneBackground` can be
+    // removed. Verify before deleting by sampling localStorage of a few
+    // long-time users to confirm `paneProperties.background` matches the
+    // host bg.
     this.patchPersistedPaneBackground();
 
     // create TradingView Widget instance
@@ -749,34 +760,60 @@ export class TvChartLibraryWidgetBridge {
       styleEl.id = styleId;
       doc.head.appendChild(styleEl);
     }
-    // custom-styles.css ships rules like
-    //   .separator-QjUlCDId, .layout__area--top {
-    //     background-color: var(--color-border) !important;
-    //   }
-    // which paints the top header #333333 (dark theme --color-border).
-    // Both that rule and ours are !important with the same specificity
-    // (one class), so for !important declarations the LATER source order
-    // wins. Empirically custom-styles.css is inserted by TradingView's
-    // custom_css_url handling AFTER our early injection, so it wins by
-    // source order, leaving a visible gray flash on the top toolbar
-    // during loading.
+    // Defense in depth — three layers, all carrying !important so that
+    // none can be silently outranked by other source-ordered rules in the
+    // iframe (e.g. custom-styles.css, which is loaded by TradingView's
+    // custom_css_url and may end up later than our early injection):
     //
-    // Workaround: prefix every layout selector with "body " so our
-    // specificity becomes (0,1,1), beating custom-styles.css's (0,1,0)
-    // regardless of source order.
+    // 1. `:root.theme-dark` — overrides the same selector in colors.css
+    //    (which sets `--color-layer-2: #1A1A1A` etc. for dark theme).
+    //    Same specificity (0,1,1); ours later in source order, plus
+    //    !important, so we win unconditionally. This kills the gray at
+    //    the variable source so EVERY descendant that reads
+    //    `var(--color-layer-2)` etc. resolves to `bg` — including
+    //    elements we did not enumerate by selector.
     //
-    // Selector list intentionally narrow: only the stable layout shells.
-    // Internal toolbar buttons / popups keep their own hover/expanded
-    // backgrounds via the un-prefixed CSS.
+    // 2. `body { ... !important }` — overrides the body declarations in
+    //    custom-styles.css (which sets `--tv-color-pane-background:
+    //    var(--color-layer-2)` etc.). Layer 1 already neutralizes
+    //    `--color-layer-2` itself, but there are other variable chains
+    //    (e.g. `--tv-color-popup-background`) we belt-and-suspender here.
+    //
+    // 3. Explicit per-selector `background-color: ${bg} !important` for
+    //    the known layout shells. Catches any element whose paint does
+    //    NOT go through the above variables (e.g. a hard-coded
+    //    `background-color: var(--color-border)` rule in
+    //    custom-styles.css line 296 for `.layout__area--top` paints
+    //    `#333333` directly).
+    //
+    // The previous version omitted !important on the CSS variable
+    // declarations. When TradingView injected custom-styles.css AFTER
+    // our early <style>, custom-styles' body block won by source order
+    // for the brief window between its load and our re-injection on
+    // chart-ready, painting layout shells `#1A1A1A` (the value of
+    // `--color-layer-2` in dark theme). The flash was visible to users
+    // even when getComputedStyle later reported `rgb(0,0,0)`.
     styleEl.textContent = `
+      :root.theme-dark,
+      :root.theme-light,
+      :root {
+        --color-layer-0: ${bg} !important;
+        --color-layer-1: ${bg} !important;
+        --color-layer-2: ${bg} !important;
+        --tv-color-platform-background: ${bg} !important;
+        --tv-color-pane-background: ${bg} !important;
+        --tv-color-pane-background-secondary: ${bg} !important;
+        --tv-color-popup-background: ${bg} !important;
+      }
       body {
-        background-color: ${bg};
-        --color-layer-1: ${bg};
-        --color-layer-2: ${bg};
-        --tv-color-platform-background: ${bg};
-        --tv-color-pane-background: ${bg};
-        --tv-color-pane-background-secondary: ${bg};
-        --tv-color-popup-background: ${bg};
+        background-color: ${bg} !important;
+        --color-layer-0: ${bg} !important;
+        --color-layer-1: ${bg} !important;
+        --color-layer-2: ${bg} !important;
+        --tv-color-platform-background: ${bg} !important;
+        --tv-color-pane-background: ${bg} !important;
+        --tv-color-pane-background-secondary: ${bg} !important;
+        --tv-color-popup-background: ${bg} !important;
       }
       body .layout__area--top,
       body .layout__area--left,
