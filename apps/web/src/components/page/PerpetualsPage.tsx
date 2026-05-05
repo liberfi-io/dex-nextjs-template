@@ -11,7 +11,7 @@ import {
   OpenOrdersWidget,
   TradeHistoryWidget,
   usePerpetualsClient,
-  useMarketsQuery,
+  useCoinInfo,
 } from "@liberfi.io/ui-perpetuals";
 import { cn, useScreen } from "@liberfi.io/ui";
 import { useAsyncModal } from "@liberfi.io/ui-scaffold";
@@ -418,14 +418,17 @@ function CoinSelectorBar({
             aria-label="Close search"
           />
           <div
-            className="absolute top-full left-0 z-50 flex flex-col overflow-hidden shadow-2xl"
+            className="absolute top-full left-0 z-50 flex flex-col overflow-hidden"
             style={{
               width: isMobile ? '100vw' : 800,
               height: isMobile ? '60vh' : 400,
-              backgroundColor: 'rgba(24,24,27,1)',
-              border: '1px solid rgba(39,39,42,0.6)',
+              background: 'rgba(24,24,27,1)',
+              border: '1px solid rgba(39,39,42,1)',
               borderRadius: isMobile ? 0 : 14,
               boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
+              paddingBottom: 8,
+              marginTop: isMobile ? 0 : -8,
+              marginLeft: isMobile ? 0 : 12,
             }}
           >
             <SearchCoinsWidget onSelectCoin={handleSelectCoin} />
@@ -609,7 +612,14 @@ function SplitHandle({
   );
 }
 
-/** Horizontal ticker strip showing popular coins with 24h change */
+/**
+ * Horizontal ticker strip showing popular coins with their 24h change.
+ *
+ * Each ticker entry independently subscribes to the coin's market data
+ * via `useCoinInfo`, which combines a one-shot REST snapshot with a
+ * Hyperliquid `activeAssetCtx` WebSocket subscription. The 24h change
+ * therefore updates in real time off WS pushes — no polling required.
+ */
 function TickerStrip({
   activeSymbol,
   onSelectCoin,
@@ -617,57 +627,68 @@ function TickerStrip({
   activeSymbol: string;
   onSelectCoin: (coin: string) => void;
 }) {
-  const { data: markets } = useMarketsQuery({});
-
-  const tickerData = useMemo(() => {
-    if (!markets) return TICKER_COINS.map((c) => ({ coin: c, change: 0 }));
-    return TICKER_COINS.map((coin) => {
-      const market = markets.find(
-        (m) => m.symbol === `${coin}-USDC` || m.symbol === `${coin}-USD`,
-      );
-      const change = market?.change24h ?? 0;
-      return { coin, change };
-    });
-  }, [markets]);
-
   return (
     <div className="flex-none flex items-center overflow-x-auto" style={{ height: 28, gap: 16, padding: '0 12px', borderBottom: '1px solid rgba(39,39,42,0.6)', backgroundColor: '#0a0a0b' }}>
-      {tickerData.map(({ coin, change }) => {
-        const isPositive = change >= 0;
-        const changeStr = `${isPositive ? "+" : ""}${change.toFixed(2)}%`;
-        return (
-          <button
-            key={coin}
-            type="button"
-            onClick={() => onSelectCoin(coin)}
-            className="flex items-center cursor-pointer transition-colors"
-            style={{
-              gap: 4,
-              padding: '2px 4px',
-              borderRadius: 4,
-              fontSize: 12,
-              fontWeight: 500,
-              color: '#b5b5b5',
-              backgroundColor: activeSymbol === coin ? 'rgba(255,255,255,0.05)' : 'transparent',
-              border: 'none',
-            }}
-          >
-            <img
-              src={`https://app.hyperliquid.xyz/coins/${coin}.svg`}
-              alt={coin}
-              className="w-4 h-4 rounded-full"
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = "none";
-              }}
-            />
-            <span>{coin}</span>
-            <span style={{ color: isPositive ? '#C7FF2E' : '#F76816' }}>
-              {changeStr}
-            </span>
-          </button>
-        );
-      })}
+      {TICKER_COINS.map((coin) => (
+        <TickerItem
+          key={coin}
+          coin={coin}
+          isActive={activeSymbol === coin}
+          onSelect={() => onSelectCoin(coin)}
+        />
+      ))}
     </div>
+  );
+}
+
+/**
+ * Single entry in the ticker strip. Owns its own `useCoinInfo`
+ * subscription so each item streams independently and re-renders only
+ * when its own market data changes.
+ */
+function TickerItem({
+  coin,
+  isActive,
+  onSelect,
+}: {
+  coin: string;
+  isActive: boolean;
+  onSelect: () => void;
+}) {
+  const { marketData } = useCoinInfo(`${coin}-USDC`);
+  const change = marketData?.change24h ?? 0;
+  const isPositive = change >= 0;
+  const changeStr = `${isPositive ? "+" : ""}${change.toFixed(2)}%`;
+
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className="flex items-center cursor-pointer transition-colors"
+      style={{
+        gap: 4,
+        padding: '2px 4px',
+        borderRadius: 4,
+        fontSize: 12,
+        fontWeight: 500,
+        color: '#b5b5b5',
+        backgroundColor: isActive ? 'rgba(255,255,255,0.05)' : 'transparent',
+        border: 'none',
+      }}
+    >
+      <img
+        src={`https://app.hyperliquid.xyz/coins/${coin}.svg`}
+        alt={coin}
+        className="w-4 h-4 rounded-full"
+        onError={(e) => {
+          (e.target as HTMLImageElement).style.display = "none";
+        }}
+      />
+      <span>{coin}</span>
+      <span style={{ color: isPositive ? '#C7FF2E' : '#F76816' }}>
+        {changeStr}
+      </span>
+    </button>
   );
 }
 
