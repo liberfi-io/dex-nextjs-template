@@ -185,6 +185,20 @@ export class TvChartLibraryWidgetBridge {
     this.container = container;
     this.widget = new Widget({ ...options, container: container });
 
+    // Inject the host page's `backgroundColor` override into the iframe
+    // document as soon as the iframe loads, BEFORE waiting for chart-ready.
+    //
+    // Without this, the iframe shows the default `--color-layer-2` (navy
+    // `#181825` from `colors.css :root`) for its top/bottom/left toolbars
+    // and chart pane during the entire loading window between iframe load
+    // and `handleChartReady()` (which can be several seconds). On the
+    // perpetuals page (host bg `#000000`) this manifests as a navy-blue
+    // flash on the toolbars and chart background until the chart finishes
+    // loading. Re-applying the override on chart-ready (existing behavior
+    // in `handleChartReady`) then resolves any persisted-localStorage
+    // overrides — both runs are idempotent.
+    this.installEarlyBackgroundOverride();
+
     // wait for widget ready
     const widgetReadyPromise = new Promise<void>((resolve) => {
       this.widget?.onChartReady(() => {
@@ -577,6 +591,71 @@ export class TvChartLibraryWidgetBridge {
         crosshairMovedSubscription.unsubscribe(area, onCrosshairMoved);
       });
     }
+  }
+  /**
+   * Inject the host page's background CSS override into the iframe document
+   * as early as possible — on iframe `load`, not after `onChartReady`.
+   *
+   * `colors.css` declares `--color-layer-2: #181825` (navy) at `:root`,
+   * which the iframe shows for toolbars and chart pane until either
+   * (a) TradingView applies `theme-dark` on the iframe `<html>`, or
+   * (b) we override the variables on `body` via `updateCSSVariables`.
+   * Both happen at chart-ready, leaving a multi-second navy flash on
+   * pages whose host bg is not navy (e.g. perpetuals at `#000000`).
+   *
+   * Idempotent — re-runs over the same `<style>` id used by
+   * `updateCSSVariables`.
+   */
+  installEarlyBackgroundOverride() {
+    if (!this.settings.backgroundColor) return;
+    if (!this.container) return;
+
+    const tryInject = () => {
+      if (this.getContentDocument()?.head) {
+        this.updateCSSVariables();
+        return true;
+      }
+      return false;
+    };
+
+    // 1) Synchronous attempt — succeeds if the iframe document is already
+    //    parseable (rare but possible in some browsers).
+    if (tryInject()) return;
+
+    const attachLoadListener = (iframe: HTMLIFrameElement) => {
+      const onLoad = () => {
+        iframe.removeEventListener("load", onLoad);
+        tryInject();
+      };
+      iframe.addEventListener("load", onLoad);
+      // The iframe may have already loaded before the listener attached
+      // (e.g. cached HTML); attempt one more sync injection.
+      tryInject();
+    };
+
+    // 2) The iframe is usually present synchronously after `new Widget(...)`.
+    const existing = this.getIframeElement();
+    if (existing) {
+      attachLoadListener(existing);
+      return;
+    }
+
+    // 3) Otherwise wait for the iframe to be inserted into the container.
+    //    Disconnect once found or after the abort signal fires (component
+    //    unmount / chart destroy).
+    const observer = new MutationObserver(() => {
+      const iframe = this.getIframeElement();
+      if (iframe) {
+        observer.disconnect();
+        attachLoadListener(iframe);
+      }
+    });
+    observer.observe(this.container, { childList: true });
+    this.abortController.signal.addEventListener(
+      "abort",
+      () => observer.disconnect(),
+      { once: true },
+    );
   }
   updateCSSVariables() {
     // Drive TradingView's chrome (top header, bottom timeframes bar, side
