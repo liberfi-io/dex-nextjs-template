@@ -639,57 +639,74 @@ export class TvChartLibraryWidgetBridge {
     if (!this.settings.backgroundColor) return;
     if (!this.container) return;
 
-    let injected = false;
+    // The iframe's initial about:blank document gets REPLACED by
+    // TradingView when it writes the actual chart HTML. Any <style> we
+    // injected into the about:blank head dies with that document, and a
+    // MutationObserver attached to the dead head never fires on the new
+    // one. Previous versions used `let injected = false` as a
+    // run-once guard; once set true after the first injection into
+    // about:blank, the new (real) document was never patched, leaving
+    // toolbars and the loading overlay painted with TradingView's
+    // default colors (`--color-layer-2 = #1A1A1A` in dark theme).
+    //
+    // Fix: track the doc identity. Re-inject (and re-attach the
+    // mutation guard to the new head) every time `contentDocument`
+    // changes. Keep polling every animation frame for the lifetime of
+    // the chart — `ensureInjected` is a no-op when nothing has
+    // changed, so the cost is negligible.
+    let observedDoc: Document | null = null;
+    let docObserver: MutationObserver | null = null;
+    const styleId = "tv-host-bg-override";
 
-    const tryInject = () => {
-      if (injected) return true;
+    const ensureInjected = () => {
       const doc = this.getContentDocument();
-      if (doc?.head) {
-        this.updateCSSVariables();
-        injected = true;
-        // Re-inject if TradingView removes our style tag during init.
-        this.installStyleTagGuard(doc);
-        return true;
+      if (!doc?.head) return;
+
+      if (doc !== observedDoc) {
+        // Document was replaced (or first-seen). Detach observer from
+        // old doc's head (which is now floating / GC'd) and attach to
+        // the new one.
+        docObserver?.disconnect();
+        observedDoc = doc;
+        docObserver = new MutationObserver(() => {
+          if (!doc.getElementById(styleId)) {
+            this.updateCSSVariables();
+          }
+        });
+        docObserver.observe(doc.head, { childList: true });
       }
-      return false;
+
+      if (!doc.getElementById(styleId)) {
+        this.updateCSSVariables();
+      }
     };
 
-    // 1) Synchronous attempt — succeeds if the iframe document is already
-    //    parseable.
-    if (tryInject()) return;
+    ensureInjected();
 
-    // 2) Aggressive rAF polling — runs every animation frame (~16 ms) so
-    //    we catch the iframe document head the moment it's appended,
-    //    BEFORE TradingView's bootstrap scripts paint toolbars with the
-    //    default `--color-layer-2` (navy `#181825`). Without this the
-    //    `iframe.load` event fires only AFTER all resources finish
-    //    loading, leaving a visible navy flash on slow connections.
     let cancelled = false;
-    const stopAfterMs = 30_000;
-    const startedAt = Date.now();
     const tick = () => {
-      if (cancelled || injected) return;
-      if (tryInject()) return;
-      if (Date.now() - startedAt > stopAfterMs) return;
+      if (cancelled) return;
+      ensureInjected();
       requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
 
-    // 3) Belt-and-suspenders: also fire on iframe load (covers cases
-    //    where the document head is delayed past 30 s for some reason).
     const attachLoadListener = (iframe: HTMLIFrameElement) => {
       const onLoad = () => {
-        iframe.removeEventListener("load", onLoad);
-        tryInject();
+        ensureInjected();
       };
       iframe.addEventListener("load", onLoad);
+      this.abortController.signal.addEventListener(
+        "abort",
+        () => iframe.removeEventListener("load", onLoad),
+        { once: true },
+      );
     };
 
     const existing = this.getIframeElement();
     if (existing) {
       attachLoadListener(existing);
     } else {
-      // Wait for the iframe to be inserted into the container.
       const observer = new MutationObserver(() => {
         const iframe = this.getIframeElement();
         if (iframe) {
@@ -705,34 +722,12 @@ export class TvChartLibraryWidgetBridge {
       );
     }
 
-    // Stop polling on chart destroy.
     this.abortController.signal.addEventListener(
       "abort",
       () => {
         cancelled = true;
+        docObserver?.disconnect();
       },
-      { once: true },
-    );
-  }
-  /**
-   * Watch the iframe document head and re-inject our background override
-   * style tag if TradingView removes it during its bootstrap (some
-   * library versions clear `head` children when applying their own
-   * theme stylesheet).
-   */
-  private installStyleTagGuard(doc: Document) {
-    const styleId = "tv-host-bg-override";
-    const observer = new MutationObserver(() => {
-      if (!doc.getElementById(styleId)) {
-        this.updateCSSVariables();
-      }
-    });
-    if (doc.head) {
-      observer.observe(doc.head, { childList: true });
-    }
-    this.abortController.signal.addEventListener(
-      "abort",
-      () => observer.disconnect(),
       { once: true },
     );
   }
