@@ -180,6 +180,17 @@ export class TvChartLibraryWidgetBridge {
     }
     // TODO gtag report { name: "TVInitStart", key: g.e1.KLineFirstRender }
 
+    // Pre-empt persisted pane background BEFORE constructing the widget.
+    // TradingView reads the saved chart layout from localStorage and uses
+    // its `paneProperties.background` for the very first canvas paint,
+    // long before our `applyBackgroundOverride()` runs at chart-ready.
+    // If localStorage carries a stale color (e.g. `#06070b` left over
+    // from a previous version, or TradingView's default `#131722`
+    // gradient), the canvas paints that color and stays gray until the
+    // first candle batch arrives. Patching localStorage in-place here
+    // lines up the very first paint with the host bg.
+    this.patchPersistedPaneBackground();
+
     // create TradingView Widget instance
     const options = this.getWidgetOptions();
     this.container = container;
@@ -870,6 +881,97 @@ export class TvChartLibraryWidgetBridge {
     const studyOverrides = this.getColorPaletteStudiesOverrides();
     this.widget?.applyOverrides(overrides);
     this.widget?.applyStudiesOverrides(studyOverrides);
+  }
+  /**
+   * Patch persisted TradingView pane backgrounds in `window.localStorage`
+   * BEFORE the widget is constructed, so the very first canvas paint uses
+   * the host page's `backgroundColor`.
+   *
+   * TradingView stores chart bg in two places, both read at widget
+   * bootstrap (before our `applyBackgroundOverride()` runs at chart-ready):
+   *
+   * 1. `tradingview-pi.chartproperties` -- global default chartproperties.
+   *    Stores `paneProperties.{background,backgroundType,backgroundGradient*}`.
+   *
+   * 2. `charts.tradingview.data.<chartStorageKey>` -- saved chart layouts
+   *    (one entry per `chartStorageKey`, e.g. `perps-kline`, `kline`).
+   *    The structure is doubly-nested JSON: `outer.content` is itself a
+   *    JSON string `{name, content, ...}`, and `outer.content.content` is
+   *    another JSON string `{layout, charts: [{chartProperties: {paneProperties: {...}}}]}`.
+   *    Each chart's `chartProperties.paneProperties.background` wins over
+   *    the global chartproperties.
+   *
+   * Without this preempt, a stale value like `#06070b` (almost-black but
+   * visibly gray next to a true black host page) or the TradingView default
+   * `#131722` gradient stays painted on the canvas for the entire window
+   * between iframe ready and the first data redraw -- producing the loading
+   * flash users notice on every reload.
+   *
+   * Safe to run on every init: it only writes when our `backgroundColor`
+   * setting differs from what is already persisted.
+   */
+  patchPersistedPaneBackground() {
+    const bg = this.settings.backgroundColor;
+    if (!bg) return;
+    if (typeof window === "undefined" || !window.localStorage) return;
+    const storage = window.localStorage;
+
+    const paneOverrides = {
+      backgroundType: "solid" as const,
+      background: bg,
+      backgroundGradientStartColor: bg,
+      backgroundGradientEndColor: bg,
+    };
+
+    try {
+      const raw = storage.getItem("tradingview-pi.chartproperties");
+      const parsed = raw ? JSON.parse(raw) : {};
+      parsed.paneProperties = {
+        ...(parsed.paneProperties || {}),
+        ...paneOverrides,
+      };
+      storage.setItem("tradingview-pi.chartproperties", JSON.stringify(parsed));
+    } catch (e) {
+      console.warn("patchPersistedPaneBackground: chartproperties patch failed", e);
+    }
+
+    for (let i = 0; i < storage.length; i++) {
+      const key = storage.key(i);
+      if (!key || !key.startsWith("charts.tradingview.data.")) continue;
+      try {
+        const raw = storage.getItem(key);
+        if (!raw) continue;
+        const outer = JSON.parse(raw);
+        if (typeof outer.content !== "string") continue;
+        const middle = JSON.parse(outer.content);
+        if (typeof middle.content !== "string") continue;
+        const real = JSON.parse(middle.content);
+        let mutated = false;
+        if (Array.isArray(real?.charts)) {
+          for (const chart of real.charts) {
+            const pp = chart?.chartProperties?.paneProperties;
+            if (!pp) continue;
+            if (
+              pp.background === bg &&
+              pp.backgroundType === "solid" &&
+              pp.backgroundGradientStartColor === bg &&
+              pp.backgroundGradientEndColor === bg
+            ) {
+              continue;
+            }
+            Object.assign(pp, paneOverrides);
+            mutated = true;
+          }
+        }
+        if (mutated) {
+          middle.content = JSON.stringify(real);
+          outer.content = JSON.stringify(middle);
+          storage.setItem(key, JSON.stringify(outer));
+        }
+      } catch (e) {
+        console.warn("patchPersistedPaneBackground: layout patch failed", key, e);
+      }
+    }
   }
   /**
    * Force-apply just the chart pane background color. This needs to run on
