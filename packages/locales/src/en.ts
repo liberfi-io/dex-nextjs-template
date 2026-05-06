@@ -753,6 +753,13 @@ export default {
       "needsEvmWallet": "Connect an EVM wallet to receive USDC on Hyperliquid.",
       "platformFee": "Platform fee"
     },
+    "perpetuals": {
+      "leverage": {
+        "needsEvmWallet": "Connect an EVM wallet to update leverage on Hyperliquid.",
+        "updated": "Leverage updated to {{value}}x.",
+        "updateFailed": "Failed to update leverage: {{reason}}"
+      }
+    },
     "portfolio": {
       "title": "Portfolio",
       "totalBalance": "Total Balance",

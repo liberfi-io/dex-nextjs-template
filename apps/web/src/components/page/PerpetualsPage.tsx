@@ -17,6 +17,7 @@ import { cn, useScreen } from "@liberfi.io/ui";
 import { useAsyncModal } from "@liberfi.io/ui-scaffold";
 import { useHideBottomNavigationBar, useHideHeader } from "@liberfi/ui-base";
 import { DEPOSIT_HL_USDC_MODAL_ID } from "../modals/DepositHyperliquidUsdcModal";
+import { useHyperliquidUpdateLeverage } from "../../hooks/useHyperliquidUpdateLeverage";
 import {
   TvChart,
   type TvChartInstance,
@@ -74,6 +75,16 @@ export function PerpetualsPage() {
   const handleAddFunds = useCallback(() => {
     void openHlUsdcDeposit();
   }, [openHlUsdcDeposit]);
+
+  // Sign + relay the Hyperliquid `updateLeverage` action when the user
+  // confirms a new leverage value in the form's modal. The hook returns
+  // a stable promise-returning callback so the SDK widget can drive its
+  // button's loading state and error recovery.
+  const updateLeverage = useHyperliquidUpdateLeverage();
+  const handleUpdateLeverage = useCallback(
+    (leverage: number) => updateLeverage({ symbol, leverage }),
+    [updateLeverage, symbol],
+  );
 
   const handleSelectCoin = useCallback((selected: string) => {
     setSymbol(selected);
@@ -216,6 +227,7 @@ export function PerpetualsPage() {
             symbol={symbol}
             onClose={() => setShowMobileOrder(false)}
             onAddFunds={handleAddFunds}
+            onUpdateLeverage={handleUpdateLeverage}
           />
         )}
       </div>
@@ -374,6 +386,7 @@ export function PerpetualsPage() {
             symbol={symbol}
             className="h-full"
             onAddFunds={handleAddFunds}
+            onUpdateLeverage={handleUpdateLeverage}
           />
         </div>
       </div>
@@ -513,10 +526,12 @@ function MobilePlaceOrderSheet({
   symbol,
   onClose,
   onAddFunds,
+  onUpdateLeverage,
 }: {
   symbol: string;
   onClose: () => void;
   onAddFunds?: () => void;
+  onUpdateLeverage?: (leverage: number) => Promise<void>;
 }) {
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end">
@@ -558,7 +573,11 @@ function MobilePlaceOrderSheet({
         </div>
 
         <div className="flex-1 overflow-auto">
-          <PlaceOrderFormWidget symbol={symbol} onAddFunds={onAddFunds} />
+          <PlaceOrderFormWidget
+            symbol={symbol}
+            onAddFunds={onAddFunds}
+            onUpdateLeverage={onUpdateLeverage}
+          />
         </div>
       </div>
     </div>

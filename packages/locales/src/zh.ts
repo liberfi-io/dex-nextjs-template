@@ -753,6 +753,13 @@ export default {
       "needsEvmWallet": "請連接 EVM 錢包以接收 Hyperliquid USDC。",
       "platformFee": "平台費用"
     },
+    "perpetuals": {
+      "leverage": {
+        "needsEvmWallet": "請連接 EVM 錢包以在 Hyperliquid 更新槓桿。",
+        "updated": "槓桿已更新為 {{value}}x。",
+        "updateFailed": "槓桿更新失敗：{{reason}}"
+      }
+    },
     "portfolio": {
       "title": "持倉",
       "totalBalance": "總餘額",
