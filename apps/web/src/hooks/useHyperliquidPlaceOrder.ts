@@ -13,14 +13,26 @@
  *     payloads. We round the cap UP for buys and DOWN for sells so
  *     the result is always strictly worse than mark — the venue then
  *     fills at any price up to that cap.
+ *   - TP/SL bracket orders piggy-back on the same `order` action.
+ *     When the user fills in `takeProfitPrice` and/or `stopLossPrice`
+ *     we ship a 2- or 3-leg payload with `grouping: "normalTpsl"`,
+ *     each close leg `r: true`, opposite side, same size as entry.
+ *     The close leg's `p` is `triggerPx × (close_isBuy ? 1.08 : 0.92)`
+ *     — same 8% cap, rebased on the user-chosen trigger so the close
+ *     market order can fill regardless of where the venue's mark sits
+ *     when the trigger fires. Without TP/SL we fall back to a single
+ *     leg + `grouping: "na"`. Mirrors axiom's market+TP/SL payloads.
  *   - We bypass the `IPerpetualsClient.placeOrder` path entirely
  *     because the active client (`HyperliquidPerpetualsClient`) is
  *     read-only and throws on submit. The `LiberFi*` adapter still
  *     uses the SDK path; that's untouched.
- *   - The response shape is `{statuses: [filled|resting|error]}`. We
- *     surface filled vs resting differently (different toast text)
- *     and re-throw on error so the widget's `useMutation` flips to
- *     error state and the submit button label restores.
+ *   - The response shape is `{statuses: [filled|resting|error|
+ *     "waitingForFill"|"waitingForTrigger"]}` with one entry per leg.
+ *     The entry leg is interpreted as filled/resting/error (current
+ *     behaviour). Trigger legs are expected to come back as
+ *     `"waitingForTrigger"` or `{resting}`; we still inspect every
+ *     entry for the `error` variant so a rejected TP/SL aborts the
+ *     whole flow rather than silently leaving the entry on its own.
  *   - We deliberately do NOT include the `builder` field. The address
  *     in axiom's curl examples is *axiom's own*; copying it would
  *     route referral fees to them. We can re-enable later via an
@@ -109,6 +121,8 @@ export function useHyperliquidPlaceOrder(): (
           szDecimals,
           price: limitPrice,
           reduceOnly,
+          takeProfitPrice,
+          stopLossPrice,
         } = request;
 
         const isBuy = side === "long";
@@ -121,7 +135,11 @@ export function useHyperliquidPlaceOrder(): (
           orderType === "market"
             ? refPrice * (isBuy ? 1 + MARKET_SLIPPAGE : 1 - MARKET_SLIPPAGE)
             : (limitPrice ?? refPrice);
-        const priceStr = formatHlPx(targetPx, szDecimals, isBuy ? "ceil" : "floor");
+        const priceStr = formatHlPx(
+          targetPx,
+          szDecimals,
+          isBuy ? "ceil" : "floor",
+        );
         const sizeStr = formatHlSz(size, szDecimals);
 
         // TIF maps directly to the user-selected order type. We
@@ -130,40 +148,116 @@ export function useHyperliquidPlaceOrder(): (
         const tif: "FrontendMarket" | "Gtc" =
           orderType === "market" ? "FrontendMarket" : "Gtc";
 
-        const exchange = getExchangeClient(provider, evm.address as Hex);
-        const result = await exchange.order({
-          orders: [
-            {
-              a: asset,
-              b: isBuy,
-              p: priceStr,
-              s: sizeStr,
-              r: reduceOnly ?? false,
-              t: { limit: { tif } },
+        // Bracket legs close the entry, so they trade in the opposite
+        // direction. The 8% slippage cap is applied to the *close*
+        // direction — buy → ceil, sell → floor — same rule as entry,
+        // just rebased on `triggerPx` instead of `refPrice`.
+        const closeIsBuy = !isBuy;
+        const closeRound: "ceil" | "floor" = closeIsBuy ? "ceil" : "floor";
+        const closeSlipMul = closeIsBuy
+          ? 1 + MARKET_SLIPPAGE
+          : 1 - MARKET_SLIPPAGE;
+
+        type TriggerLeg = {
+          a: number;
+          b: boolean;
+          p: string;
+          s: string;
+          r: boolean;
+          t: {
+            trigger: {
+              isMarket: boolean;
+              triggerPx: string;
+              tpsl: "tp" | "sl";
+            };
+          };
+        };
+
+        const buildTriggerLeg = (
+          triggerPx: number,
+          tpsl: "tp" | "sl",
+        ): TriggerLeg => ({
+          a: asset,
+          b: closeIsBuy,
+          p: formatHlPx(triggerPx * closeSlipMul, szDecimals, closeRound),
+          // Same size as entry — `normalTpsl` brackets are fixed-size
+          // (Hyperliquid won't auto-scale them when the position
+          // grows), so we close the exact quantity we just opened.
+          s: sizeStr,
+          r: true,
+          t: {
+            trigger: {
+              isMarket: true,
+              triggerPx: formatHlPx(triggerPx, szDecimals, closeRound),
+              tpsl,
             },
-          ],
-          // `na` = standard order without TP/SL bracket. Bracket
-          // orders ship in a follow-up ticket (different `grouping`
-          // + 1+2 orders shape).
-          grouping: "na",
+          },
         });
 
-        const status = result.response.data.statuses[0];
+        // Treat 0 / NaN / undefined uniformly as "not set" — the form
+        // models an unset TP/SL as `undefined`, but defensive parsing
+        // of cached form values can occasionally surface `0`.
+        const tpPx =
+          takeProfitPrice && takeProfitPrice > 0 ? takeProfitPrice : undefined;
+        const slPx =
+          stopLossPrice && stopLossPrice > 0 ? stopLossPrice : undefined;
+        const hasBracket = tpPx !== undefined || slPx !== undefined;
+
+        const orders = [
+          {
+            a: asset,
+            b: isBuy,
+            p: priceStr,
+            s: sizeStr,
+            r: reduceOnly ?? false,
+            t: { limit: { tif } },
+          },
+          ...(tpPx !== undefined ? [buildTriggerLeg(tpPx, "tp")] : []),
+          ...(slPx !== undefined ? [buildTriggerLeg(slPx, "sl")] : []),
+        ];
+
+        const exchange = getExchangeClient(provider, evm.address as Hex);
+        const result = await exchange.order({
+          orders,
+          // `normalTpsl` ships entry + TP/SL atomically; the venue
+          // links the legs so a cancel of the parent also clears the
+          // brackets. `na` is the lighter path for plain entry-only.
+          grouping: hasBracket ? "normalTpsl" : "na",
+        });
+
+        const statuses = result.response.data.statuses;
+
+        // Surface a rejected TP/SL leg as a hard failure rather than
+        // letting the user's order go through with broken brackets.
+        // We check ALL legs (not just `[0]`) because the venue
+        // sometimes accepts entry while rejecting a leg whose trigger
+        // crosses the spread.
+        for (let i = 1; i < statuses.length; i++) {
+          const legStatus = statuses[i];
+          if (
+            legStatus &&
+            typeof legStatus === "object" &&
+            "error" in legStatus
+          ) {
+            const legName = i === 1 && tpPx !== undefined ? "TP" : "SL";
+            throw new Error(`${legName} leg rejected: ${String(legStatus.error)}`);
+          }
+        }
+
+        const status = statuses[0];
 
         // The schema is a discriminated union with two flavours:
         //   - object variants: `{ filled }`, `{ resting }`, `{ error }`
         //   - string variants: `"waitingForFill"`, `"waitingForTrigger"`
-        // The string variants only appear for bracket / TP-SL orders
-        // (different `grouping` than what we send), but we guard for
-        // them anyway so TypeScript can narrow the object variants
-        // safely below — `'error' in status` doesn't compile when
-        // `status` could be a string.
+        // The entry leg should never come back as a string variant
+        // (those only apply to triggers), but we keep the guard so
+        // TypeScript narrows the object variants safely below —
+        // `'error' in status` doesn't compile when `status` could be
+        // a string.
         if (typeof status === "string") {
           throw new Error(`Order accepted in unexpected state: ${status}`);
         }
         if ("error" in status) {
-          // valibot-derived `error` is typed `unknown`; coerce to
-          // string so the thrown `Error.message` always renders.
           throw new Error(String(status.error));
         }
 
