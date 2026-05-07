@@ -9,8 +9,10 @@
  *      Arbitrum One signature chain id (`0xa4b1`).
  *   3. POSTs the signed `updateLeverage` action to
  *      `https://api.hyperliquid.xyz/exchange`.
- *   4. Invalidates the SDK's positions query so the form's per-asset
- *      leverage badge reflects the new value on next paint.
+ *   4. Invalidates the SDK's positions and active-asset-leverage
+ *      queries so the form's leverage badge — which now reads from the
+ *      `activeAssetData` info endpoint as its source of truth —
+ *      refetches and reflects the new value on next paint.
  *   5. Returns control to the caller; the consumer surfaces toasts so
  *      the SDK widget stays decoupled from the host's UX library.
  *
@@ -30,9 +32,13 @@ import {
   useWallets,
   type EvmWalletAdapter,
 } from "@liberfi.io/wallet-connector";
-import { positionsQueryKey } from "@liberfi.io/ui-perpetuals";
+import {
+  activeAssetLeverageQueryKey,
+  positionsQueryKey,
+} from "@liberfi.io/ui-perpetuals";
 
-import { getExchangeClient, getInfoClient } from "../lib/hyperliquid/client";
+import { getExchangeClient } from "../lib/hyperliquid/client";
+import { getAssetIndex } from "../lib/hyperliquid/asset-index";
 
 /**
  * Cross or isolated margin selector. Hyperliquid stores the choice
@@ -40,26 +46,6 @@ import { getExchangeClient, getInfoClient } from "../lib/hyperliquid/client";
  * leverage, mirroring the curl example provided by the user.
  */
 const DEFAULT_IS_CROSS = false;
-
-/** Cache the universe lookup for the lifetime of the page session. */
-let universePromise: Promise<readonly { name: string }[]> | null = null;
-
-async function getAssetIndex(symbol: string): Promise<number> {
-  if (!universePromise) {
-    universePromise = getInfoClient()
-      .meta()
-      .then((meta) => meta.universe);
-  }
-  const universe = await universePromise;
-  // Symbols are stored in the SDK's `${coin}-USDC` shape; Hyperliquid's
-  // universe array is keyed on `coin` and the asset id is the index.
-  const coin = symbol.split("-")[0];
-  const index = universe.findIndex((entry) => entry.name === coin);
-  if (index < 0) {
-    throw new Error(`Unknown symbol: ${symbol}`);
-  }
-  return index;
-}
 
 export type UpdateLeverageParams = {
   symbol: string;
@@ -108,13 +94,23 @@ export function useHyperliquidUpdateLeverage(): (
           isCross: DEFAULT_IS_CROSS,
           leverage,
         });
-        // Refresh positions so the form's leverage badge reflects the
-        // new on-chain value the next time the script's sync effect
-        // runs. Match the SDK key shape (see `positionsQueryKey`):
-        // `["perps", "positions", userAddress, symbol]`.
-        await queryClient.invalidateQueries({
-          queryKey: positionsQueryKey({ userAddress: evm.address, symbol }),
-        });
+        // Refresh both the positions query (in case the user has an
+        // open position whose displayed leverage now changed) and the
+        // active-asset leverage query (the form's source of truth for
+        // the leverage badge). Running both in parallel keeps the UI
+        // consistent even when the user has no open position for the
+        // symbol — `activeAssetData` updates regardless.
+        await Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: positionsQueryKey({ userAddress: evm.address, symbol }),
+          }),
+          queryClient.invalidateQueries({
+            queryKey: activeAssetLeverageQueryKey({
+              userAddress: evm.address,
+              symbol,
+            }),
+          }),
+        ]);
         toast.success(
           t("extend.perpetuals.leverage.updated", { value: leverage }),
         );

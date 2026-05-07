@@ -758,6 +758,12 @@ export default {
         "needsEvmWallet": "請連接 EVM 錢包以在 Hyperliquid 更新槓桿。",
         "updated": "槓桿已更新為 {{value}}x。",
         "updateFailed": "槓桿更新失敗：{{reason}}"
+      },
+      "order": {
+        "needsEvmWallet": "請連接 EVM 錢包以在 Hyperliquid 下單。",
+        "placed": "{{side}} {{symbol}} 已成交，均價 {{avgPrice}}。",
+        "resting": "{{side}} {{symbol}} 限價單已掛出。",
+        "placeFailed": "下單失敗：{{reason}}"
       }
     },
     "portfolio": {

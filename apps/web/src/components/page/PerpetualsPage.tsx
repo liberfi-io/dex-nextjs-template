@@ -15,9 +15,18 @@ import {
 } from "@liberfi.io/ui-perpetuals";
 import { cn, useScreen } from "@liberfi.io/ui";
 import { useAsyncModal } from "@liberfi.io/ui-scaffold";
-import { useHideBottomNavigationBar, useHideHeader } from "@liberfi/ui-base";
+import {
+  useAuthCallback,
+  useWallets,
+  type EvmWalletAdapter,
+} from "@liberfi.io/wallet-connector";
+import {
+  useHideBottomNavigationBar,
+  useHideHeader,
+} from "@liberfi/ui-base";
 import { DEPOSIT_HL_USDC_MODAL_ID } from "../modals/DepositHyperliquidUsdcModal";
 import { useHyperliquidUpdateLeverage } from "../../hooks/useHyperliquidUpdateLeverage";
+import { useHyperliquidPlaceOrder } from "../../hooks/useHyperliquidPlaceOrder";
 import {
   TvChart,
   type TvChartInstance,
@@ -66,25 +75,74 @@ export function PerpetualsPage() {
     PerpetualsTvChartDataFeedModule.setClient(client);
   }, [client]);
 
+  // EVM wallet address used by every account-scoped widget on this page
+  // (PlaceOrderForm, Positions, OpenOrders, TradeHistory). Without this
+  // the widgets stay in their loading / empty states because their
+  // queries are gated on `!!userAddress`. We resolve it the same way
+  // `useHyperliquidUpdateLeverage` does — find the connected EVM
+  // adapter and surface its address.
+  const wallets = useWallets();
+  const userAddress = useMemo(() => {
+    const evm = wallets.find(
+      (w) => w.chainNamespace === "EVM" && w.isConnected,
+    ) as EvmWalletAdapter | undefined;
+    return evm?.address;
+  }, [wallets]);
+
   // Wires the "Add More Funds" button inside the order form to the
   // SOL → Hyperliquid USDC deposit dialog. The button is hidden when no
   // handler is provided (see PlaceOrderFormUI).
+  //
+  // Guarded by `useAuthCallback` from the SDK: when the user is
+  // signed-out the wrapper triggers Privy `signIn()` (fire-and-forget,
+  // returns `undefined`) and the deposit modal is *not* opened on this
+  // click. Once auth completes the page re-renders with a connected
+  // wallet, the form's submit-state machine still resolves to
+  // "Add More Funds" (balance is 0 immediately after login), and the
+  // user clicks again to actually open the deposit dialog.
+  //
+  // We deliberately avoid `useAuthenticatedCallback` from
+  // `@liberfi/ui-base` here because that variant `await`s `signIn()`
+  // and then synchronously checks a status ref that may not have
+  // propagated yet — that race throws "User is not authenticated
+  // after signing in" even on a successful Privy login. The SDK's
+  // `useAuthCallback` doesn't try to chain post-auth work, so it
+  // sidesteps the race entirely.
   const { onOpen: openHlUsdcDeposit } = useAsyncModal(
     DEPOSIT_HL_USDC_MODAL_ID,
   );
-  const handleAddFunds = useCallback(() => {
-    void openHlUsdcDeposit();
-  }, [openHlUsdcDeposit]);
+  const handleAddFunds = useAuthCallback(
+    useCallback(() => {
+      void openHlUsdcDeposit();
+    }, [openHlUsdcDeposit]),
+  );
 
   // Sign + relay the Hyperliquid `updateLeverage` action when the user
   // confirms a new leverage value in the form's modal. The hook returns
   // a stable promise-returning callback so the SDK widget can drive its
   // button's loading state and error recovery.
+  //
+  // The unauth path is handled inside the SDK's LeverageModal via
+  // `useAuthCallback(handleConfirm)`: signed-out clicks short-circuit
+  // before this callback is ever invoked, so we don't wrap auth here.
   const updateLeverage = useHyperliquidUpdateLeverage();
   const handleUpdateLeverage = useCallback(
     (leverage: number) => updateLeverage({ symbol, leverage }),
     [updateLeverage, symbol],
   );
+
+  // Sign + relay the Hyperliquid `order` action when the user submits
+  // the place-order form. Returns a `PlaceOrderResult` to satisfy the
+  // SDK's callback contract (status, oid, avgPrice for filled
+  // orders). The hook owns toasts and cache invalidation; the widget
+  // owns spinner / button-state via `useMutation`.
+  //
+  // The active perpetuals client (`HyperliquidPerpetualsClient`) is
+  // read-only and throws on `placeOrder`, so this hook is the only
+  // path that actually submits orders today. Passing the callback to
+  // `PlaceOrderFormWidget` switches the SDK's `handleSubmit` onto
+  // the host-signed branch and skips the throwing path entirely.
+  const placeOrder = useHyperliquidPlaceOrder();
 
   const handleSelectCoin = useCallback((selected: string) => {
     setSymbol(selected);
@@ -156,10 +214,10 @@ export function PerpetualsPage() {
 
               {/* Positions content — fills remaining ~40% */}
               <div className="flex-[2] min-h-0 overflow-auto" style={{ backgroundColor: '#000000' }}>
-                {activeTab === "positions" && <PositionsWidget symbol={symbol} />}
-                {activeTab === "openOrders" && <OpenOrdersWidget symbol={symbol} />}
+                {activeTab === "positions" && <PositionsWidget symbol={symbol} userAddress={userAddress} />}
+                {activeTab === "openOrders" && <OpenOrdersWidget symbol={symbol} userAddress={userAddress} />}
                 {activeTab === "tradeHistory" && (
-                  <TradeHistoryWidget symbol={symbol} initialTimeRange="7d" pageSize={50} />
+                  <TradeHistoryWidget symbol={symbol} userAddress={userAddress} initialTimeRange="7d" pageSize={50} />
                 )}
               </div>
             </>
@@ -225,9 +283,11 @@ export function PerpetualsPage() {
         {showMobileOrder && (
           <MobilePlaceOrderSheet
             symbol={symbol}
+            userAddress={userAddress}
             onClose={() => setShowMobileOrder(false)}
             onAddFunds={handleAddFunds}
             onUpdateLeverage={handleUpdateLeverage}
+            onPlaceOrder={placeOrder}
           />
         )}
       </div>
@@ -370,10 +430,10 @@ export function PerpetualsPage() {
               ))}
             </div>
             <div className="flex-1 min-h-0 overflow-auto" style={{ backgroundColor: '#000000' }}>
-              {activeTab === "positions" && <PositionsWidget symbol={symbol} />}
-              {activeTab === "openOrders" && <OpenOrdersWidget symbol={symbol} />}
+              {activeTab === "positions" && <PositionsWidget symbol={symbol} userAddress={userAddress} />}
+              {activeTab === "openOrders" && <OpenOrdersWidget symbol={symbol} userAddress={userAddress} />}
               {activeTab === "tradeHistory" && (
-                <TradeHistoryWidget symbol={symbol} initialTimeRange="7d" pageSize={50} />
+                <TradeHistoryWidget symbol={symbol} userAddress={userAddress} initialTimeRange="7d" pageSize={50} />
               )}
             </div>
           </div>
@@ -384,9 +444,11 @@ export function PerpetualsPage() {
         <div className="flex flex-col overflow-hidden" style={{ width: 320, minWidth: 320, maxWidth: 320, borderLeft: '1px solid rgba(39,39,42,0.6)' }}>
           <PlaceOrderFormWidget
             symbol={symbol}
+            userAddress={userAddress}
             className="h-full"
             onAddFunds={handleAddFunds}
             onUpdateLeverage={handleUpdateLeverage}
+            onPlaceOrder={placeOrder}
           />
         </div>
       </div>
@@ -524,14 +586,20 @@ function MobileTabBar({
 /** Mobile place order bottom sheet */
 function MobilePlaceOrderSheet({
   symbol,
+  userAddress,
   onClose,
   onAddFunds,
   onUpdateLeverage,
+  onPlaceOrder,
 }: {
   symbol: string;
+  userAddress?: string;
   onClose: () => void;
   onAddFunds?: () => void;
   onUpdateLeverage?: (leverage: number) => Promise<void>;
+  onPlaceOrder?: React.ComponentProps<
+    typeof PlaceOrderFormWidget
+  >["onPlaceOrder"];
 }) {
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end">
@@ -575,8 +643,10 @@ function MobilePlaceOrderSheet({
         <div className="flex-1 overflow-auto">
           <PlaceOrderFormWidget
             symbol={symbol}
+            userAddress={userAddress}
             onAddFunds={onAddFunds}
             onUpdateLeverage={onUpdateLeverage}
+            onPlaceOrder={onPlaceOrder}
           />
         </div>
       </div>

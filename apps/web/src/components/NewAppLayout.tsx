@@ -135,6 +135,7 @@ import {
   DEPOSIT_HL_USDC_MODAL_ID,
 } from "./modals/DepositHyperliquidUsdcModal";
 import { useHyperliquidBalances } from "../hooks/useHyperliquidBalances";
+import { HyperliquidAccountStateSync } from "./HyperliquidAccountStateSync";
 import { HyperliquidUsdcIcon } from "./icons/HyperliquidUsdcIcon";
 import { AppBottomToolbar } from "./AppBottomToolbar";
 import { BottomTweets } from "./BottomTweets";
@@ -317,6 +318,12 @@ function ServiceProviders({ children }: PropsWithChildren) {
                     client={perpetualsClient}
                     depositClient={perpDepositClient}
                   >
+                    {/* Drives the Hyperliquid `webData2` subscription for the
+                    whole app — replaces the 10s `clearinghouseState` /
+                    `spotClearinghouseState` poll with a single push channel
+                    that updates `usePositionsQuery`, `useOrdersQuery`, and
+                    `useHyperliquidBalances` in real time. */}
+                    <HyperliquidAccountStateSync />
                     {children}
                   </PerpetualsProvider>
                 </PortfolioProvider>

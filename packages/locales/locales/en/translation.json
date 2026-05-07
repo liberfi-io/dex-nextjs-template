@@ -758,6 +758,12 @@
         "needsEvmWallet": "Connect an EVM wallet to update leverage on Hyperliquid.",
         "updated": "Leverage updated to {{value}}x.",
         "updateFailed": "Failed to update leverage: {{reason}}"
+      },
+      "order": {
+        "needsEvmWallet": "Connect an EVM wallet to place orders on Hyperliquid.",
+        "placed": "{{side}} {{symbol}} filled at {{avgPrice}}.",
+        "resting": "{{side}} {{symbol}} order placed and resting.",
+        "placeFailed": "Failed to place order: {{reason}}"
       }
     },
     "portfolio": {
