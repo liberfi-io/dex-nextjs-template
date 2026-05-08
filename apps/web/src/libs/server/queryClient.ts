@@ -11,6 +11,7 @@ export function createServerQueryClient() {
     defaultOptions: {
       queries: {
         staleTime: 30_000,
+        refetchOnReconnect: false,
       },
     },
   });

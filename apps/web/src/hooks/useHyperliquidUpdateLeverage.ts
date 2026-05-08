@@ -100,9 +100,11 @@ export function useHyperliquidUpdateLeverage(): (
         // the leverage badge). Running both in parallel keeps the UI
         // consistent even when the user has no open position for the
         // symbol — `activeAssetData` updates regardless.
+        // Positions are keyed by userAddress only — per-symbol forms
+        // derive via TanStack Query's `select` option.
         await Promise.all([
           queryClient.invalidateQueries({
-            queryKey: positionsQueryKey({ userAddress: evm.address, symbol }),
+            queryKey: positionsQueryKey({ userAddress: evm.address }),
           }),
           queryClient.invalidateQueries({
             queryKey: activeAssetLeverageQueryKey({

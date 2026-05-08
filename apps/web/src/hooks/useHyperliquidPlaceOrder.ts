@@ -273,14 +273,16 @@ export function useHyperliquidPlaceOrder(): (
         //   - positions: filled orders open / close positions
         //   - orders:    resting orders show up here
         //   - trades:    filled orders create new trade entries
-        // Partial-prefix matching means each invalidate covers all
-        // variants of the key (limit/startTime/etc).
+        // Positions and orders share a single user-level cache slot
+        // (per-symbol consumers derive via `select`), so we invalidate
+        // by userAddress only — symbol-specific subtree slicing is no
+        // longer part of the queryKey. Trades are still per-symbol.
         await Promise.all([
           queryClient.invalidateQueries({
-            queryKey: positionsQueryKey({ userAddress: evm.address, symbol }),
+            queryKey: positionsQueryKey({ userAddress: evm.address }),
           }),
           queryClient.invalidateQueries({
-            queryKey: ordersQueryKey({ userAddress: evm.address, symbol }),
+            queryKey: ordersQueryKey({ userAddress: evm.address }),
           }),
           queryClient.invalidateQueries({
             queryKey: tradesQueryKey({ userAddress: evm.address, symbol }),

@@ -23,7 +23,10 @@
  *  - Easy to gate: the host can mount or unmount this component to
  *    pause / resume the subscription without rerunning the entire layout.
  */
-import { useAccountStateSubscription } from "@liberfi.io/ui-perpetuals";
+import {
+  useAccountStateSubscription,
+  useHyperliquidUserBootstrap,
+} from "@liberfi.io/ui-perpetuals";
 import { type EvmWalletAdapter, useWallets } from "@liberfi.io/wallet-connector";
 import { useMemo } from "react";
 
@@ -38,6 +41,13 @@ export function HyperliquidAccountStateSync() {
   );
 
   useAccountStateSubscription({ userAddress: evmWallet?.address });
+
+  // Single-shot REST fallback for slow webData2 handshakes. Fires at
+  // most one positions + open-orders round-trip after a 3 s grace
+  // window and only when the subscription hasn't primed the cache
+  // yet — keeping HL `/info` traffic at a minimum on cold pages
+  // while preserving snappy first-paint when the WS is healthy.
+  useHyperliquidUserBootstrap({ userAddress: evmWallet?.address });
 
   return null;
 }

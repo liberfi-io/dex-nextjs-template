@@ -11,8 +11,9 @@ import {
   OpenOrdersWidget,
   TradeHistoryWidget,
   usePerpetualsClient,
-  useCoinInfo,
   useOrdersQuery,
+  useUniverseQuery,
+  type UniverseSnapshot,
 } from "@liberfi.io/ui-perpetuals";
 import { cn, useScreen } from "@liberfi.io/ui";
 import { useAsyncModal } from "@liberfi.io/ui-scaffold";
@@ -769,10 +770,21 @@ function SplitHandle({
 /**
  * Horizontal ticker strip showing popular coins with their 24h change.
  *
- * Each ticker entry independently subscribes to the coin's market data
- * via `useCoinInfo`, which combines a one-shot REST snapshot with a
- * Hyperliquid `activeAssetCtx` WebSocket subscription. The 24h change
- * therefore updates in real time off WS pushes — no polling required.
+ * The strip reads from the global `useUniverseQuery` cache (one HTTP
+ * round-trip / 60s shared across the whole page) instead of mounting
+ * a `useCoinInfo` per item. Concretely this swaps:
+ *
+ *   - N × REST `metaAndAssetCtxs` polls (one per ticker item) → 1
+ *   - N × `activeAssetCtx` WS subscriptions               → 0
+ *
+ * The universe cache is also kept hot by `useAccountStateSubscription`
+ * — every `webData2` push writes the latest `assetCtxs` directly into
+ * `universeQueryKey()`, so the ticker re-renders in real time off the
+ * same WS frame the place-order form already consumes.
+ *
+ * If the active client doesn't expose `getUniverseSnapshot()` (e.g.
+ * non-Hyperliquid adapters), the universe query is disabled and the
+ * tickers degrade gracefully to a static "—" change %.
  */
 function TickerStrip({
   activeSymbol,
@@ -781,6 +793,8 @@ function TickerStrip({
   activeSymbol: string;
   onSelectCoin: (coin: string) => void;
 }) {
+  const { data: universe } = useUniverseQuery();
+
   return (
     <div className="flex-none flex items-center overflow-x-auto" style={{ height: 28, gap: 16, padding: '0 12px', borderBottom: '1px solid rgba(39,39,42,0.6)', backgroundColor: '#0a0a0b' }}>
       {TICKER_COINS.map((coin) => (
@@ -789,6 +803,7 @@ function TickerStrip({
           coin={coin}
           isActive={activeSymbol === coin}
           onSelect={() => onSelectCoin(coin)}
+          universe={universe}
         />
       ))}
     </div>
@@ -796,23 +811,31 @@ function TickerStrip({
 }
 
 /**
- * Single entry in the ticker strip. Owns its own `useCoinInfo`
- * subscription so each item streams independently and re-renders only
- * when its own market data changes.
+ * Single entry in the ticker strip.
+ *
+ * Pure presentation: looks up `${coin}-USDC` in the snapshot the parent
+ * already holds, so re-renders are driven by universe-level cache
+ * updates (poll cadence + webData2 pushes) and not by component-local
+ * subscriptions.
  */
 function TickerItem({
   coin,
   isActive,
   onSelect,
+  universe,
 }: {
   coin: string;
   isActive: boolean;
   onSelect: () => void;
+  universe: UniverseSnapshot | undefined;
 }) {
-  const { marketData } = useCoinInfo(`${coin}-USDC`);
-  const change = marketData?.change24h ?? 0;
-  const isPositive = change >= 0;
-  const changeStr = `${isPositive ? "+" : ""}${change.toFixed(2)}%`;
+  const entry = universe?.bySymbol.get(`${coin}-USDC`);
+  const change = entry?.market.change24h;
+  const isPositive = (change ?? 0) >= 0;
+  const changeStr =
+    typeof change === "number"
+      ? `${isPositive ? "+" : ""}${change.toFixed(2)}%`
+      : "—";
 
   return (
     <button
