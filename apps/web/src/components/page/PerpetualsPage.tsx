@@ -29,6 +29,7 @@ import {
 import { DEPOSIT_HL_USDC_MODAL_ID } from "../modals/DepositHyperliquidUsdcModal";
 import { useHyperliquidUpdateLeverage } from "../../hooks/useHyperliquidUpdateLeverage";
 import { useHyperliquidPlaceOrder } from "../../hooks/useHyperliquidPlaceOrder";
+import { useHyperliquidCancelOrder } from "../../hooks/useHyperliquidCancelOrder";
 import {
   TvChart,
   type TvChartInstance,
@@ -146,6 +147,18 @@ export function PerpetualsPage() {
   // the host-signed branch and skips the throwing path entirely.
   const placeOrder = useHyperliquidPlaceOrder();
 
+  // Same story for `cancelOrder` / cancelOrders — the SDK's
+  // `HyperliquidPerpetualsClient.cancelOrder` is a deliberate stub
+  // (it cannot hold private keys), so `OpenOrdersWidget` needs the
+  // host to inject signers. We expose BOTH props:
+  //   - cancelOrder  → signs ONE leg per click (per-row x button)
+  //   - cancelOrders → signs ALL legs in ONE wallet prompt
+  //                   (`Cancel All`)
+  // The hook returns an object with both functions so the page just
+  // forwards them via spread; see `useHyperliquidCancelOrder` for the
+  // venue-specific signing + cache-invalidation logic.
+  const { cancelOrder, cancelOrders } = useHyperliquidCancelOrder();
+
   const handleSelectCoin = useCallback((selected: string) => {
     setSymbol(selected);
     setShowSearch(false);
@@ -251,7 +264,13 @@ export function PerpetualsPage() {
                   switch. */}
               <div className="flex-[2] min-h-0 overflow-auto" style={{ backgroundColor: '#000000' }}>
                 {activeTab === "positions" && <PositionsWidget userAddress={userAddress} />}
-                {activeTab === "openOrders" && <OpenOrdersWidget userAddress={userAddress} />}
+                {activeTab === "openOrders" && (
+                  <OpenOrdersWidget
+                    userAddress={userAddress}
+                    cancelOrder={cancelOrder}
+                    cancelOrders={cancelOrders}
+                  />
+                )}
                 {activeTab === "tradeHistory" && (
                   <TradeHistoryWidget userAddress={userAddress} />
                 )}
@@ -471,7 +490,13 @@ export function PerpetualsPage() {
                 full rationale. */}
             <div className="flex-1 min-h-0 overflow-auto" style={{ backgroundColor: '#000000' }}>
               {activeTab === "positions" && <PositionsWidget userAddress={userAddress} />}
-              {activeTab === "openOrders" && <OpenOrdersWidget userAddress={userAddress} />}
+              {activeTab === "openOrders" && (
+                <OpenOrdersWidget
+                  userAddress={userAddress}
+                  cancelOrder={cancelOrder}
+                  cancelOrders={cancelOrders}
+                />
+              )}
               {activeTab === "tradeHistory" && (
                 <TradeHistoryWidget userAddress={userAddress} />
               )}

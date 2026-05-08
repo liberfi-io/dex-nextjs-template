@@ -764,6 +764,12 @@
         "placed": "{{side}} {{symbol}} 已成交，均價 {{avgPrice}}。",
         "resting": "{{side}} {{symbol}} 限價單已掛出。",
         "placeFailed": "下單失敗：{{reason}}"
+      },
+      "cancel": {
+        "needsEvmWallet": "請連接 EVM 錢包以在 Hyperliquid 取消訂單。",
+        "canceled": "訂單已取消。",
+        "cancelFailed": "取消訂單失敗：{{reason}}",
+        "missingOrderId": "取消訂單需要 orderId；僅憑 clientOrderId 取消尚未支援。"
       }
     },
     "portfolio": {

@@ -764,6 +764,12 @@
         "placed": "{{side}} {{symbol}} filled at {{avgPrice}}.",
         "resting": "{{side}} {{symbol}} order placed and resting.",
         "placeFailed": "Failed to place order: {{reason}}"
+      },
+      "cancel": {
+        "needsEvmWallet": "Connect an EVM wallet to cancel orders on Hyperliquid.",
+        "canceled": "Order canceled.",
+        "cancelFailed": "Failed to cancel order: {{reason}}",
+        "missingOrderId": "Cancel requires an orderId; clientOrderId-only cancellation is not supported."
       }
     },
     "portfolio": {
