@@ -12,6 +12,7 @@ import {
   TradeHistoryWidget,
   usePerpetualsClient,
   useCoinInfo,
+  useOrdersQuery,
 } from "@liberfi.io/ui-perpetuals";
 import { cn, useScreen } from "@liberfi.io/ui";
 import { useAsyncModal } from "@liberfi.io/ui-scaffold";
@@ -149,6 +150,28 @@ export function PerpetualsPage() {
     setShowSearch(false);
   }, []);
 
+  // Open-orders count rendered next to the tab label (Axiom shows
+  // `Open Orders (N)`). The bottom panel — Positions and Open Orders
+  // alike — mirrors Axiom by showing **all coins**, not filtered by
+  // the chart symbol. The query runs without a `symbol` filter so:
+  //   1. It hits the same react-query cache slot the SDK's `webData2`
+  //      WebSocket subscription writes to (via
+  //      `useAccountStateSubscription`). Cache key alignment means the
+  //      counter and the table populate **the instant the WS frame
+  //      arrives** — no second REST round-trip on tab switch.
+  //   2. The counter / table never go stale: every webData2 push
+  //      updates them in lockstep.
+  // The widgets below are similarly mounted without `symbol` for the
+  // same reason.
+  const { data: openOrdersData } = useOrdersQuery(
+    { userAddress },
+    { enabled: !!userAddress },
+  );
+  const openOrdersCount = openOrdersData?.orders.length ?? 0;
+  const openOrdersTabLabel = openOrdersCount > 0
+    ? `Open Orders (${openOrdersCount})`
+    : "Open Orders";
+
   const tokenSymbol = symbol.split("-")[0];
 
   if (isMobile) {
@@ -187,7 +210,7 @@ export function PerpetualsPage() {
                 {(
                   [
                     { key: "positions", label: "Positions" },
-                    { key: "openOrders", label: "Open Orders" },
+                    { key: "openOrders", label: openOrdersTabLabel },
                     { key: "tradeHistory", label: "Trades" },
                   ] as const
                 ).map((tab) => (
@@ -212,10 +235,22 @@ export function PerpetualsPage() {
                 ))}
               </div>
 
-              {/* Positions content — fills remaining ~40% */}
+              {/* Positions / Open Orders / Trades content — fills
+                  remaining ~40%.
+
+                  `PositionsWidget` and `OpenOrdersWidget` are mounted
+                  WITHOUT `symbol` so they show **all coins**, matching
+                  Axiom's bottom-panel behaviour (verified via MCP — Axiom
+                  shows BTC + ETH rows together regardless of the
+                  selected chart). This also aligns the widget's
+                  react-query cache key with the slot
+                  `useAccountStateSubscription` writes to from the
+                  `webData2` push, so the table populates the instant the
+                  WS frame arrives — no extra REST round-trip on tab
+                  switch. */}
               <div className="flex-[2] min-h-0 overflow-auto" style={{ backgroundColor: '#000000' }}>
-                {activeTab === "positions" && <PositionsWidget symbol={symbol} userAddress={userAddress} />}
-                {activeTab === "openOrders" && <OpenOrdersWidget symbol={symbol} userAddress={userAddress} />}
+                {activeTab === "positions" && <PositionsWidget userAddress={userAddress} />}
+                {activeTab === "openOrders" && <OpenOrdersWidget userAddress={userAddress} />}
                 {activeTab === "tradeHistory" && (
                   <TradeHistoryWidget symbol={symbol} userAddress={userAddress} initialTimeRange="7d" pageSize={50} />
                 )}
@@ -396,7 +431,7 @@ export function PerpetualsPage() {
               {(
                 [
                   { key: "positions", label: "Positions" },
-                  { key: "openOrders", label: "Open Orders" },
+                  { key: "openOrders", label: openOrdersTabLabel },
                   { key: "tradeHistory", label: "Trades" },
                 ] as const
               ).map((tab) => (
@@ -429,9 +464,13 @@ export function PerpetualsPage() {
                 </div>
               ))}
             </div>
+            {/* Positions / Open Orders are all-coin (no `symbol` filter)
+                to match Axiom and keep the cache key aligned with the
+                webData2 WS write — see the mobile branch above for the
+                full rationale. */}
             <div className="flex-1 min-h-0 overflow-auto" style={{ backgroundColor: '#000000' }}>
-              {activeTab === "positions" && <PositionsWidget symbol={symbol} userAddress={userAddress} />}
-              {activeTab === "openOrders" && <OpenOrdersWidget symbol={symbol} userAddress={userAddress} />}
+              {activeTab === "positions" && <PositionsWidget userAddress={userAddress} />}
+              {activeTab === "openOrders" && <OpenOrdersWidget userAddress={userAddress} />}
               {activeTab === "tradeHistory" && (
                 <TradeHistoryWidget symbol={symbol} userAddress={userAddress} initialTimeRange="7d" pageSize={50} />
               )}
