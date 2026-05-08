@@ -263,7 +263,7 @@ export function PerpetualsPage() {
                   WS frame arrives — no extra REST round-trip on tab
                   switch. */}
               <div className="flex-[2] min-h-0 overflow-auto" style={{ backgroundColor: '#000000' }}>
-                {activeTab === "positions" && <PositionsWidget userAddress={userAddress} />}
+                {activeTab === "positions" && <PositionsWidget userAddress={userAddress} onPlaceOrder={placeOrder} />}
                 {activeTab === "openOrders" && (
                   <OpenOrdersWidget
                     userAddress={userAddress}
@@ -489,7 +489,7 @@ export function PerpetualsPage() {
                 webData2 WS write — see the mobile branch above for the
                 full rationale. */}
             <div className="flex-1 min-h-0 overflow-auto" style={{ backgroundColor: '#000000' }}>
-              {activeTab === "positions" && <PositionsWidget userAddress={userAddress} />}
+              {activeTab === "positions" && <PositionsWidget userAddress={userAddress} onPlaceOrder={placeOrder} />}
               {activeTab === "openOrders" && (
                 <OpenOrdersWidget
                   userAddress={userAddress}
