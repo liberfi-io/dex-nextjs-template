@@ -252,7 +252,7 @@ export function PerpetualsPage() {
                 {activeTab === "positions" && <PositionsWidget userAddress={userAddress} />}
                 {activeTab === "openOrders" && <OpenOrdersWidget userAddress={userAddress} />}
                 {activeTab === "tradeHistory" && (
-                  <TradeHistoryWidget symbol={symbol} userAddress={userAddress} initialTimeRange="7d" pageSize={50} />
+                  <TradeHistoryWidget userAddress={userAddress} />
                 )}
               </div>
             </>
@@ -472,7 +472,7 @@ export function PerpetualsPage() {
               {activeTab === "positions" && <PositionsWidget userAddress={userAddress} />}
               {activeTab === "openOrders" && <OpenOrdersWidget userAddress={userAddress} />}
               {activeTab === "tradeHistory" && (
-                <TradeHistoryWidget symbol={symbol} userAddress={userAddress} initialTimeRange="7d" pageSize={50} />
+                <TradeHistoryWidget userAddress={userAddress} />
               )}
             </div>
           </div>
