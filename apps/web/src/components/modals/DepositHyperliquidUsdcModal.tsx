@@ -17,7 +17,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { debounce } from "lodash-es";
-import { useTranslation } from "@liberfi.io/i18n";
+import { useTranslation } from "@liberfi/ui-base";
 import {
   ModalContent,
   SolanaIcon,
@@ -396,7 +396,7 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
                           disabled={!solBalance.lamports || solBalance.lamports === "0" || isExecuting}
                           className="cursor-pointer px-2 py-0.5 rounded-md text-[10px] uppercase tracking-wider text-zinc-300 bg-zinc-800/60 hover:bg-zinc-700/80 hover:text-[#C7FF2E] transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-zinc-800/60 disabled:hover:text-zinc-300"
                         >
-                          50%
+                          {t("perpetuals.page.halfBtn")}
                         </button>
                         <button
                           type="button"

@@ -61,6 +61,7 @@ export function PerpetualsPage() {
   useHideHeader("tablet");
   useHideBottomNavigationBar();
 
+  const { t } = useTranslation();
   const { isMobile } = useScreen();
 
   const [symbol, setSymbol] = useState("BTC-USDC");
@@ -182,9 +183,10 @@ export function PerpetualsPage() {
     { enabled: !!userAddress },
   );
   const openOrdersCount = openOrdersData?.orders.length ?? 0;
-  const openOrdersTabLabel = openOrdersCount > 0
-    ? `Open Orders (${openOrdersCount})`
-    : "Open Orders";
+  const openOrdersTabLabel =
+    openOrdersCount > 0
+      ? t("perpetuals.page.tab.openOrders", { count: openOrdersCount })
+      : t("perpetuals.page.tab.openOrdersEmpty");
 
   const tokenSymbol = symbol.split("-")[0];
 
@@ -223,9 +225,9 @@ export function PerpetualsPage() {
               <div className="flex-none flex items-center" style={{ height: 36, padding: '0 8px', borderBottom: '1px solid rgba(39,39,42,0.6)' }}>
                 {(
                   [
-                    { key: "positions", label: "Positions" },
+                    { key: "positions", label: t("perpetuals.page.tab.positions") },
                     { key: "openOrders", label: openOrdersTabLabel },
-                    { key: "tradeHistory", label: "Trades" },
+                    { key: "tradeHistory", label: t("perpetuals.page.tab.trades") },
                   ] as const
                 ).map((tab) => (
                   <button
@@ -314,7 +316,7 @@ export function PerpetualsPage() {
             }}
             onClick={() => setShowMobileOrder(true)}
           >
-            Long
+            {t("perpetuals.page.direction.long")}
           </button>
           <button
             type="button"
@@ -330,7 +332,7 @@ export function PerpetualsPage() {
             }}
             onClick={() => setShowMobileOrder(true)}
           >
-            Short
+            {t("perpetuals.page.direction.short")}
           </button>
         </div>
 
@@ -390,8 +392,8 @@ export function PerpetualsPage() {
               <div className="flex-none flex items-center" style={{ height: 36, padding: '0 16px 0 8px', borderBottom: '1px solid rgba(39,39,42,0.6)' }}>
                 {(
                   [
-                    { key: "orderBook", label: "Order Book" },
-                    { key: "trades", label: "Trades" },
+                    { key: "orderBook", label: t("perpetuals.page.tab.orderBook") },
+                    { key: "trades", label: t("perpetuals.page.tab.trades") },
                   ] as const
                 ).map((tab) => (
                   <div
@@ -449,12 +451,12 @@ export function PerpetualsPage() {
           <div className="flex-none flex flex-col" style={{ height: bottomHeight }}>
             <div className="flex-none flex items-center" style={{ height: 36, padding: '0 16px 0 8px', borderBottom: '1px solid rgba(39,39,42,0.6)' }}>
               {(
-                [
-                  { key: "positions", label: "Positions" },
-                  { key: "openOrders", label: openOrdersTabLabel },
-                  { key: "tradeHistory", label: "Trades" },
-                ] as const
-              ).map((tab) => (
+                  [
+                    { key: "positions", label: t("perpetuals.page.tab.positions") },
+                    { key: "openOrders", label: openOrdersTabLabel },
+                    { key: "tradeHistory", label: t("perpetuals.page.tab.trades") },
+                  ] as const
+                ).map((tab) => (
                 <div
                   key={tab.key}
                   style={{
@@ -613,10 +615,11 @@ function MobileTabBar({
   activeTab: MobileMainTab;
   onTabChange: (tab: MobileMainTab) => void;
 }) {
+  const { t } = useTranslation();
   const tabs: { key: MobileMainTab; label: string }[] = [
-    { key: "chart", label: "Chart" },
-    { key: "orderBook", label: "Order Book" },
-    { key: "trades", label: "Trades" },
+    { key: "chart", label: t("perpetuals.page.tab.chart") },
+    { key: "orderBook", label: t("perpetuals.page.tab.orderBook") },
+    { key: "trades", label: t("perpetuals.page.tab.trades") },
   ];
 
   return (
@@ -895,7 +898,7 @@ function TickerItem({
 }
 
 const PerpetualsChart = memo(function PerpetualsChart({ symbol }: { symbol: string }) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const chartRef = useRef<TvChartInstance>(null);
   const [chartReady, setChartReady] = useState(false);
 
@@ -912,8 +915,8 @@ const PerpetualsChart = memo(function PerpetualsChart({ symbol }: { symbol: stri
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone as unknown as Timezone,
       locale: getTvChartLibraryLocale(i18n.language),
       chartNames: {
-        [TvChartType.TradingView]: "TradingView",
-        [TvChartType.Original]: "Original",
+        [TvChartType.TradingView]: t("perpetuals.page.chart.tradingview"),
+        [TvChartType.Original]: t("perpetuals.page.chart.original"),
       },
       // Match the perpetuals page background instead of the default chart bg.
       backgroundColor: "#000000",
@@ -937,7 +940,7 @@ const PerpetualsChart = memo(function PerpetualsChart({ symbol }: { symbol: stri
         TvChartFeature.HeaderQuickSearch,
       ],
     }),
-    [symbol, i18n.language],
+    [symbol, i18n.language, t],
   );
 
   useEffect(() => {
