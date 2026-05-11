@@ -6,10 +6,10 @@ import { HeaderSearchInput } from "./HeaderSearchInput";
 import { HeaderSettingsMenu } from "./HeaderSettingsMenu";
 import { HeaderLaunchPadAction, HeaderLanguageAction } from "./actions";
 import { ChainSelectWidget } from "@liberfi.io/ui-chain-select";
-import { useSwitchChain } from "@liberfi.io/wallet-connector";
+import { useSwitchEvmWalletsToChain } from "@liberfi.io/wallet-connector";
 
 export function Header() {
-  const switchChain = useSwitchChain();
+  const switchChain = useSwitchEvmWalletsToChain();
 
   return (
     <header className="w-full h-full px-4 lg:px-6 pb-2 flex justify-between items-center gap-10 bg-background">

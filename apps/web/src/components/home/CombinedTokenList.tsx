@@ -18,7 +18,7 @@ import {
   TrendingTokenListWidget,
 } from "@liberfi.io/ui-tokens";
 import { capitalize, chainSlug, getNativeToken, txExplorerUrl } from "@liberfi.io/utils";
-import { useSwitchChain } from "@liberfi.io/wallet-connector";
+import { useSwitchEvmWalletsToChain } from "@liberfi.io/wallet-connector";
 import { CombinedPulseList } from "./CombinedPulseList";
 import { useAsyncModal } from "@liberfi.io/ui-scaffold";
 import {
@@ -63,7 +63,7 @@ export function CombinedTokenList() {
   const { chain } = useCurrentChain();
   const chainRef = useValueRef(chain);
 
-  const switchChain = useSwitchChain();
+  const switchChain = useSwitchEvmWalletsToChain();
 
   const ref = useRef<HTMLDivElement>(null);
   const { height } = useResizeObserver<HTMLDivElement>({ ref });

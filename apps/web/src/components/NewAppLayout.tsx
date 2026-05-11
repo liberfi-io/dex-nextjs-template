@@ -43,7 +43,7 @@ import {
 import {
   useAuth,
   useConnectedWallet,
-  useSwitchChain,
+  useSwitchEvmWalletsToChain,
   useWallets,
   type EvmWalletAdapter,
 } from "@liberfi.io/wallet-connector";
@@ -396,7 +396,7 @@ function PageShell({ children }: PropsWithChildren) {
   );
 
   const { chain } = useCurrentChain();
-  const switchChain = useSwitchChain();
+  const switchChain = useSwitchEvmWalletsToChain();
   const { status: authStatus } = useAuth();
 
   const isPredictPage = pathname.startsWith("/predict");
