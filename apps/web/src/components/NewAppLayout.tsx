@@ -118,6 +118,7 @@ import {
 } from "@liberfi/ui-base";
 import { useDexClient } from "@liberfi/react-dex";
 import { DexDataProvider } from "@liberfi/ui-dex";
+import { useCreateOnrampWidgetUrlMutation } from "@liberfi/react-backend";
 import { queryClient } from "../libs/queryClient";
 import { AuthProviders } from "./AuthProviders";
 import { useTranslationAdapter } from "../hooks/useTranslationAdapter";
@@ -131,12 +132,19 @@ import { useAsyncModal } from "@liberfi.io/ui-scaffold";
 import { useAccountInfo } from "@liberfi.io/ui-portfolio";
 import { LaunchPadModal, LAUNCHPAD_MODAL_ID } from "./modals/LaunchPadModal";
 import {
-  DepositHyperliquidUsdcModal,
   DEPOSIT_HL_USDC_MODAL_ID,
+  DepositHyperliquidUsdcModal,
 } from "./modals/DepositHyperliquidUsdcModal";
+import { ReceiveModal, RECEIVE_MODAL_ID } from "./modals/ReceiveModal";
+import { WithdrawModal, WITHDRAW_MODAL_ID } from "./modals/WithdrawModal";
 import { useHyperliquidBalances } from "../hooks/useHyperliquidBalances";
 import { HyperliquidAccountStateSync } from "./HyperliquidAccountStateSync";
 import { HyperliquidUsdcIcon } from "./icons/HyperliquidUsdcIcon";
+import { CashInOutlinedIcon } from "./icons/CashInOutlinedIcon";
+import { ReceiveOutlinedIcon } from "./icons/ReceiveOutlinedIcon";
+import { SendOutlinedIcon } from "./icons/SendOutlinedIcon";
+// TODO: Re-enable when the Convert (闪兑) flow is ready.
+// import { ConvertOutlinedIcon } from "./icons/ConvertOutlinedIcon";
 import { AppBottomToolbar } from "./AppBottomToolbar";
 import { BottomTweets } from "./BottomTweets";
 import { BottomAICopilot } from "./BottomAICopilot";
@@ -185,6 +193,8 @@ export function NewAppLayout({ children, locale }: PropsWithChildren<{ locale: L
               <PageShell>{children}</PageShell>
               <LaunchPadModal />
               <DepositHyperliquidUsdcModal />
+              <ReceiveModal />
+              <WithdrawModal />
               <StyledToaster />
               <SearchModal />
               <PredictSearchModal />
@@ -400,6 +410,10 @@ function PageShell({ children }: PropsWithChildren) {
   const { status: authStatus } = useAuth();
 
   const isPredictPage = pathname.startsWith("/predict");
+  // The Hyperliquid balance trigger only makes sense inside the perpetuals
+  // experience. Hiding it elsewhere keeps the header from advertising a
+  // venue the user isn't currently interacting with.
+  const isPerpetualsPage = pathname.startsWith("/perpetuals");
   const isAuthenticated = authStatus === "authenticated";
 
   const { onOpen: openSearchModal } = useAsyncModal<
@@ -562,7 +576,10 @@ function PageShell({ children }: PropsWithChildren) {
                 {isPredictPage ? (
                   <PredictAccountButton />
                 ) : (
-                  <DexAccountButton />
+                  <>
+                    {isPerpetualsPage && <HyperliquidBalanceButton />}
+                    <DexAccountButton />
+                  </>
                 )}
               </div>
             </div>
@@ -926,24 +943,11 @@ function DexAccountButton() {
     status,
     signIn,
     signOut,
-    balanceUsdFormatted,
     balanceNativeFormatted,
     nativeToken,
     chainNamespace,
     walletAddress,
   } = useAccountInfo();
-
-  const wallets = useWallets();
-  const evmWalletForTrigger = useMemo(
-    () =>
-      wallets.find((w) => w.chainNamespace === "EVM") as
-        | EvmWalletAdapter
-        | undefined,
-    [wallets],
-  );
-  const hlBalancesTrigger = useHyperliquidBalances(
-    evmWalletForTrigger?.address,
-  );
 
   const [isOpen, setIsOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -1022,21 +1026,6 @@ function DexAccountButton() {
             <span className="text-zinc-500 ml-1">{nativeToken.symbol}</span>
           )}
         </span>
-        {evmWalletForTrigger && (
-          <>
-            <span
-              className="h-3 w-px bg-zinc-700/80 mx-0.5"
-              aria-hidden="true"
-            />
-            <HyperliquidUsdcIcon size={16} />
-            <span className="text-xs font-medium text-zinc-100 tabular-nums">
-              {formatHlUsdc(hlBalancesTrigger.perpUsdc)}
-              {!isMobile && (
-                <span className="text-zinc-500 ml-1">USDC</span>
-              )}
-            </span>
-          </>
-        )}
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="12"
@@ -1080,7 +1069,6 @@ function DexAccountButton() {
             <DexAccountMenuContent
               walletAddress={walletAddress}
               chainNamespace={chainNamespace}
-              balanceUsdFormatted={balanceUsdFormatted}
               balanceNativeFormatted={balanceNativeFormatted}
               nativeToken={nativeToken}
               copied={copied}
@@ -1101,7 +1089,6 @@ function DexAccountButton() {
           <DexAccountMenuContent
             walletAddress={walletAddress}
             chainNamespace={chainNamespace}
-            balanceUsdFormatted={balanceUsdFormatted}
             balanceNativeFormatted={balanceNativeFormatted}
             nativeToken={nativeToken}
             copied={copied}
@@ -1114,26 +1101,14 @@ function DexAccountButton() {
   );
 }
 
-function DexAccountMenuContent({
-  walletAddress,
-  chainNamespace,
-  balanceUsdFormatted,
-  balanceNativeFormatted,
-  nativeToken,
-  copied,
-  onCopy,
-  onSignOut,
-}: {
-  walletAddress: string;
-  chainNamespace: string;
-  balanceUsdFormatted: string;
-  balanceNativeFormatted: string;
-  nativeToken: PredefinedToken | undefined;
-  copied: boolean;
-  onCopy: () => void;
-  onSignOut: () => void;
-}) {
-  const { t } = useTranslation();
+// ---------------------------------------------------------------------------
+// HyperliquidBalanceButton — shows only Hyperliquid USDC balance in trigger
+// ---------------------------------------------------------------------------
+
+function HyperliquidBalanceButton() {
+  const { isMobile } = useScreen();
+  const { status } = useAccountInfo();
+
   const wallets = useWallets();
   const evmWallet = useMemo(
     () =>
@@ -1142,17 +1117,320 @@ function DexAccountMenuContent({
         | undefined,
     [wallets],
   );
-  const hlBalances = useHyperliquidBalances(evmWallet?.address);
-  const { onOpen: openHlUsdcDeposit } = useAsyncModal(
-    DEPOSIT_HL_USDC_MODAL_ID,
+  const evmAddress = evmWallet?.address;
+  const hlBalances = useHyperliquidBalances(evmAddress);
+
+  const [isOpen, setIsOpen] = useState(false);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(async () => {
+    if (!evmAddress) return;
+    await navigator.clipboard.writeText(evmAddress);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [evmAddress]);
+
+  const handleMouseEnter = useCallback(() => {
+    if (isMobile) return;
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    setIsOpen(true);
+  }, [isMobile]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (isMobile) return;
+    closeTimer.current = setTimeout(() => setIsOpen(false), 150);
+  }, [isMobile]);
+
+  useEffect(() => {
+    return () => {
+      if (closeTimer.current) clearTimeout(closeTimer.current);
+    };
+  }, []);
+
+  const { onOpen: openHlDeposit } = useAsyncModal(DEPOSIT_HL_USDC_MODAL_ID);
+  const handleDeposit = useCallback(() => {
+    setIsOpen(false);
+    void openHlDeposit();
+  }, [openHlDeposit]);
+
+  // Only render when authenticated and an EVM wallet is connected
+  if (status !== "authenticated" || !evmAddress) return null;
+
+  return (
+    <div
+      className="relative"
+      ref={ref}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <button
+        type="button"
+        onClick={() => setIsOpen((prev) => !prev)}
+        className={cn(TRIGGER_CLASS, "gap-1.5 px-2.5 text-zinc-300")}
+      >
+        <HyperliquidUsdcIcon size={16} />
+        <span className="text-xs font-medium text-zinc-100 tabular-nums">
+          {formatHlUsdc(hlBalances.perpUsdc)}
+          {!isMobile && (
+            <span className="text-zinc-500 ml-1">USDC</span>
+          )}
+        </span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={cn(
+            "text-zinc-500 transition-transform duration-200",
+            isOpen && "rotate-180",
+          )}
+          aria-hidden="true"
+        >
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </button>
+
+      {/* Mobile: bottom sheet */}
+      {isMobile && isOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center"
+          onClick={() => setIsOpen(false)}
+        >
+          <div className="absolute inset-0 bg-black/60" />
+          <div
+            className="relative w-full max-w-sm mb-safe animate-in slide-in-from-bottom duration-200"
+            style={{
+              borderRadius: "14px 14px 0 0",
+              border: "1px solid rgba(39,39,42,1)",
+              borderBottom: "none",
+              background: "rgba(24,24,27,1)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-center pt-3 pb-1">
+              <div className="w-8 h-1 rounded-full bg-zinc-700" />
+            </div>
+            <HyperliquidAccountMenuContent
+              evmAddress={evmAddress}
+              availableMargin={hlBalances.availableMargin}
+              accountValue={hlBalances.accountValue}
+              copied={copied}
+              onCopy={handleCopy}
+              onDeposit={handleDeposit}
+            />
+            <div className="pb-safe" />
+          </div>
+        </div>
+      )}
+
+      {/* Tablet & Desktop: popover */}
+      {!isMobile && isOpen && (
+        <div
+          className="absolute right-0 mt-2 w-72 z-50 overflow-hidden"
+          style={DROPDOWN_STYLE}
+        >
+          <HyperliquidAccountMenuContent
+            evmAddress={evmAddress}
+            availableMargin={hlBalances.availableMargin}
+            accountValue={hlBalances.accountValue}
+            copied={copied}
+            onCopy={handleCopy}
+            onDeposit={handleDeposit}
+          />
+        </div>
+      )}
+    </div>
   );
+}
+
+// ---------------------------------------------------------------------------
+// HyperliquidAccountMenuContent — content shown inside the Hyperliquid
+// balance dropdown. Intentionally not sharing layout with
+// `DexAccountMenuContent`: that one is the per-chain wallet menu (receive
+// / withdraw / convert / buy + sign out), while this one is a focused
+// Hyperliquid summary with a single Deposit CTA.
+// ---------------------------------------------------------------------------
+
+function HyperliquidAccountMenuContent({
+  evmAddress,
+  availableMargin,
+  accountValue,
+  copied,
+  onCopy,
+  onDeposit,
+}: {
+  evmAddress: string;
+  availableMargin: number;
+  accountValue: number;
+  copied: boolean;
+  onCopy: () => void;
+  onDeposit: () => void;
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <>
+      {/* EVM address + Hyperliquid balance summary */}
+      <div className="p-2">
+        <div className="w-full flex items-start gap-3 px-3 py-3.5 rounded-[10px] hover:bg-[rgba(39,39,42,0.5)] transition-all">
+          {/* Avatar size matches the Dex wallet dropdown for visual
+              consistency; top-aligned with the address row to keep a
+              clean horizontal baseline regardless of how many balance
+              rows are shown. */}
+          <GradientAvatar seed={evmAddress} size={44} className="rounded-xl shrink-0" />
+          <div className="flex-1 min-w-0">
+            {/* Row 1: EVM address (always 0x…) + copy */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-zinc-300 truncate">
+                {truncateAddress(evmAddress)}
+              </span>
+              <button
+                type="button"
+                className="p-1 rounded hover:bg-zinc-700 text-zinc-500 hover:text-white transition-colors cursor-pointer"
+                title="Copy Address"
+                onClick={onCopy}
+              >
+                {copied ? (
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                ) : (
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                    <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                  </svg>
+                )}
+              </button>
+            </div>
+            {/* Row 2: available margin (withdrawable) */}
+            <div className="flex items-center justify-between gap-2 text-xs mt-1.5">
+              <span className="text-zinc-500">
+                {t("perpetuals.placeOrder.availableMargin")}
+              </span>
+              <span className="text-zinc-300 tabular-nums font-medium">
+                {formatHlUsdc(availableMargin)}{" "}
+                <span className="text-zinc-500">USDC</span>
+              </span>
+            </div>
+            {/* Row 3: account value (totalEquity) */}
+            <div className="flex items-center justify-between gap-2 text-xs mt-1">
+              <span className="text-zinc-500">
+                {t("perpetuals.placeOrder.perpsAccountValue")}
+              </span>
+              <span className="text-zinc-300 tabular-nums font-medium">
+                {formatHlUsdc(accountValue)}{" "}
+                <span className="text-zinc-500">USDC</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Single deposit CTA — replaces the wallet menu's action row +
+          sign-out section. Keeps the chrome/colour of a secondary row
+          rather than a primary brand button, so the dropdown stays
+          information-first. */}
+      <div style={{ borderTop: "1px solid rgba(39,39,42,1)" }} className="p-2">
+        <button
+          type="button"
+          onClick={onDeposit}
+          className="flex items-center gap-2.5 w-full px-3 py-2 text-sm rounded-[10px] transition-colors cursor-pointer text-zinc-200 hover:bg-[rgba(39,39,42,0.6)]"
+        >
+          {/* Icon matches the "Buy / 购买" action in the Dex wallet
+              dropdown to keep the "add funds" affordance visually
+              consistent across both menus. */}
+          <div className="flex items-center justify-center w-7 h-7 rounded-[10px] bg-[rgba(39,39,42,1)] text-zinc-300">
+            <CashInOutlinedIcon width={16} height={16} />
+          </div>
+          {t("extend.hlDeposit.entryShort")}
+        </button>
+      </div>
+    </>
+  );
+}
+
+function DexAccountMenuContent({
+  walletAddress,
+  chainNamespace,
+  balanceNativeFormatted,
+  nativeToken,
+  copied,
+  onCopy,
+  onSignOut,
+}: {
+  walletAddress: string;
+  chainNamespace: string;
+  balanceNativeFormatted: string;
+  nativeToken: PredefinedToken | undefined;
+  copied: boolean;
+  onCopy: () => void;
+  onSignOut: () => void;
+}) {
+  const { t } = useTranslation();
+  const { chain } = useCurrentChain();
+  const { onOpen: openReceiveModal } = useAsyncModal(RECEIVE_MODAL_ID);
+  const { onOpen: openWithdrawModal } = useAsyncModal(WITHDRAW_MODAL_ID);
+  const { mutate: createOnrampWidgetUrl, isPending: isCreatingOnramp } =
+    useCreateOnrampWidgetUrlMutation();
+
+  // Open the fiat on-ramp widget in a new browser tab. The widget URL is
+  // single-use and minted server-side by dex-server (POST /api/onramp/
+  // widget-url → strategy-routed to Transak or another configured
+  // provider). The on-ramp purchases the chain's native token (SOL / ETH /
+  // BNB) so the prefilled token matches the wallet shown in this dropdown.
+  // To survive popup blockers — which would otherwise strip `window.open`
+  // calls made after an `await` — we open `about:blank` synchronously
+  // inside the click handler and patch its `location` once the mutation
+  // resolves.
+  const handleAddCash = useCallback(() => {
+    if (!walletAddress || isCreatingOnramp) return;
+
+    const win = window.open("about:blank", "_blank");
+    if (win) {
+      win.opener = null;
+    }
+
+    createOnrampWidgetUrl(
+      { chain, walletAddress, cryptoCurrency: nativeToken?.symbol },
+      {
+        onSuccess: (data) => {
+          if (win && !win.closed) {
+            win.location.href = data.widgetUrl;
+          } else {
+            window.open(data.widgetUrl, "_blank", "noopener,noreferrer");
+          }
+        },
+        onError: (err) => {
+          if (win && !win.closed) {
+            win.close();
+          }
+          toast.error(err.message || t("extend.account.add_cash_failed"));
+        },
+      },
+    );
+  }, [
+    chain,
+    walletAddress,
+    nativeToken,
+    isCreatingOnramp,
+    createOnrampWidgetUrl,
+    t,
+  ]);
 
   return (
     <>
       {/* Wallet address + copy */}
       <div className="p-2">
-        <div className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[10px] hover:bg-[rgba(39,39,42,0.5)] transition-all">
-          <GradientAvatar seed={walletAddress} size={28} />
+        <div className="w-full flex items-center gap-3 px-3 py-3.5 rounded-[10px] hover:bg-[rgba(39,39,42,0.5)] transition-all">
+          <GradientAvatar seed={walletAddress} size={44} className="rounded-xl" />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-zinc-300 truncate">
@@ -1178,64 +1456,44 @@ function DexAccountMenuContent({
                 </button>
               )}
             </div>
-            <div className="flex items-center gap-1.5 text-xs mt-0.5">
+            <div className="flex items-center gap-1.5 text-xs mt-2">
               <span className="text-zinc-500">
-                {chainNamespace.toUpperCase()}
+                {nativeToken?.symbol ?? chainNamespace.toUpperCase()} 总余额：
+              </span>
+              {nativeToken && <TokenIcon symbol={nativeToken.symbol} size={16} />}
+              <span className="text-zinc-300 tabular-nums font-medium">
+                {balanceNativeFormatted}
               </span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Balance */}
-      <div style={{ borderTop: "1px solid rgba(39,39,42,1)" }} className="p-2">
-        <div className="flex items-center justify-between gap-3 px-3 py-2 rounded-[10px]">
-          <div className="flex items-center gap-2.5">
-            {nativeToken && <TokenIcon symbol={nativeToken.symbol} size={20} />}
-            <span className="text-sm text-zinc-400">
-              {nativeToken?.symbol ?? "—"}
-            </span>
-          </div>
-          <span className="text-sm font-medium text-zinc-100 tabular-nums">
-            {balanceNativeFormatted}
-          </span>
+      {/* Action buttons */}
+      <div style={{ borderTop: "1px solid rgba(39,39,42,1)" }} className="px-2 py-3">
+        <div className="flex items-center justify-around">
+          <WalletActionButton
+            icon={<ReceiveOutlinedIcon width={18} height={18} />}
+            label={t("extend.account.receive")}
+            onClick={() => openReceiveModal()}
+          />
+          <WalletActionButton
+            icon={<SendOutlinedIcon width={18} height={18} />}
+            label={t("extend.account.withdraw")}
+            onClick={() => openWithdrawModal()}
+          />
+          {/* TODO: Re-enable when the Convert (闪兑) flow is ready.
+          <WalletActionButton
+            icon={<ConvertOutlinedIcon width={18} height={18} />}
+            label={t("extend.account.convert")}
+          />
+          */}
+          <WalletActionButton
+            icon={<CashInOutlinedIcon width={18} height={18} />}
+            label={t("extend.account.add_cash")}
+            onClick={handleAddCash}
+          />
         </div>
-        <div className="border-t border-zinc-800/60 my-1" />
-        <div className="flex items-center justify-between gap-3 px-3 py-2 rounded-[10px]">
-          <div className="flex items-center gap-2.5">
-            <HyperliquidUsdcIcon size={20} />
-            <span className="text-sm text-zinc-400">
-              {t("extend.hlDeposit.usdcLabel")}
-            </span>
-          </div>
-          <span className="text-sm font-medium text-zinc-100 tabular-nums">
-            {evmWallet
-              ? formatHlUsdc(hlBalances.perpUsdc)
-              : "—"}
-          </span>
-        </div>
-        <div className="flex items-center justify-between gap-3 px-3 py-2">
-          <span className="text-sm text-zinc-300 font-medium">
-            {t("common.totalValue")}
-          </span>
-          <span className="text-sm font-bold text-[#c7ff2e] tabular-nums">
-            {balanceUsdFormatted}
-          </span>
-        </div>
-      </div>
-
-      {/* Deposit Hyperliquid USDC entry */}
-      <div style={{ borderTop: "1px solid rgba(39,39,42,1)" }} className="p-2">
-        <button
-          type="button"
-          onClick={() => openHlUsdcDeposit()}
-          className="flex items-center gap-2.5 w-full px-3 py-2 text-sm rounded-[10px] transition-colors cursor-pointer text-zinc-200 hover:bg-[rgba(39,39,42,0.5)]"
-        >
-          <div className="flex items-center justify-center w-7 h-7 rounded-[10px] bg-[#97FCE4]/10">
-            <HyperliquidUsdcIcon size={18} />
-          </div>
-          <span>{t("extend.hlDeposit.entry")}</span>
-        </button>
       </div>
 
       {/* Sign out */}
@@ -1259,11 +1517,35 @@ function DexAccountMenuContent({
   );
 }
 
-function formatHlUsdc(s: string): string {
-  const n = Number(s);
+function WalletActionButton({
+  icon,
+  label,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  onClick?: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex flex-col items-center gap-1.5 px-4 cursor-pointer group"
+    >
+      <div className="w-9 h-9 flex items-center justify-center rounded-full bg-zinc-700/60 text-zinc-300 group-hover:bg-zinc-700 group-hover:text-white transition-colors">
+        {icon}
+      </div>
+      <span className="text-xs text-zinc-500 group-hover:text-zinc-300 transition-colors whitespace-nowrap">
+        {label}
+      </span>
+    </button>
+  );
+}
+
+function formatHlUsdc(value: string | number): string {
+  const n = typeof value === "number" ? value : Number(value);
   if (!Number.isFinite(n)) return "0";
   if (n === 0) return "0";
   if (n < 0.01) return n.toFixed(6);
   return n.toFixed(2);
 }
-
