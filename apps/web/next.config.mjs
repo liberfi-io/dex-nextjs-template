@@ -117,6 +117,13 @@ const nextConfig = {
         source: "/perpetuals-api/:path*",
         destination: (process.env.PERPETUALS_API_URL || "") + "/:path*",
       },
+      // dex-server REST endpoints (transfer build/send and other native
+      // backend features). Kept under its own prefix so the Next.js API
+      // routes can stay separate from the Go service surface.
+      {
+        source: "/dex-tx-api/:path*",
+        destination: (process.env.DEX_SERVER_URL || "") + "/api/:path*",
+      },
     ];
   },
   webpack(config) {
@@ -134,6 +141,16 @@ const nextConfig = {
       "@tanstack/react-query": path.resolve(
         __dirname,
         "node_modules/@tanstack/react-query",
+      ),
+      // react-hot-toast keeps its toast queue in module-level state, so the
+      // <Toaster> renderer (imported by @liberfi.io/ui via StyledToaster)
+      // and toast emitters (e.g. @liberfi/ui-base's useTimerToast) MUST
+      // resolve to the same module instance. Without this pin, USE_LOCAL_SDK
+      // causes react-sdk to load its own React-19-pinned copy while the
+      // consumer uses the React-18 copy — emitted toasts never render.
+      "react-hot-toast": path.resolve(
+        __dirname,
+        "node_modules/react-hot-toast",
       ),
     };
 

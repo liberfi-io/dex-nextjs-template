@@ -19,6 +19,7 @@
         "CHANNELS_URL",
         "PREDICT_URL",
         "PERPETUALS_API_URL",
+        "DEX_SERVER_URL",
         "DEX_AUTH0_AUDIENCE",
         "DEX_AUTH0_CLIENT_ID",
         "DEX_AUTH0_CLIENT_SECRET",
@@ -32,9 +33,13 @@
         "PRIVY_APP_SECRET",
         "USE_LOCAL_SDK",
         "LOCAL_SDK_ROOT",
-        "SOLANA_RPC_URL",
-        "ETH_RPC_URL",
-        "BSC_RPC_URL"
+                "SOLANA_RPC_URL",
+                "ETH_RPC_URL",
+                "BSC_RPC_URL",
+                "POLYGON_RPC_URL",
+                "BASE_RPC_URL",
+                "TRON_RPC_URL",
+                "HYPERLIQUID_RPC_URL"
       ]
     },
     "dev": {
