@@ -425,8 +425,15 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
                 {/* Gaining card */}
                 <ExchangeCard
                   label={t("extend.hlDeposit.gaining")}
-                  balanceLabel={t("extend.hlDeposit.balance")}
-                  balanceValue={evm ? formatHlUsdc(hlBalances.perpUsdc) : "—"}
+                  // The deposit-margin flow lands funds in the Hyperliquid
+                  // perp account, so the figure to surface here is what's
+                  // immediately usable for opening positions (withdrawable
+                  // / availableBalance) — not the total account value,
+                  // which can be inflated by open PnL and isn't free
+                  // margin. Reusing the perpetuals form's i18n key keeps
+                  // the wording consistent across both places.
+                  balanceLabel={t("perpetuals.placeOrder.availableMargin")}
+                  balanceValue={evm ? formatHlUsdc(hlBalances.availableMargin) : "—"}
                   amountInput={
                     <div className="flex items-center gap-2">
                       <span className="text-3xl font-medium text-white tabular-nums">
@@ -640,8 +647,8 @@ function base64ToBytes(b64: string): Uint8Array {
   return Uint8Array.from(Buffer.from(b64, "base64"));
 }
 
-function formatHlUsdc(s: string): string {
-  const n = Number(s);
+function formatHlUsdc(value: string | number): string {
+  const n = typeof value === "number" ? value : Number(value);
   if (!Number.isFinite(n) || n === 0) return "0.00";
   if (n < 0.01) return n.toFixed(6);
   return n.toFixed(3);

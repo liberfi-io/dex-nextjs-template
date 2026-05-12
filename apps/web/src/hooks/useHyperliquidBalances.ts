@@ -26,6 +26,20 @@ export type HyperliquidBalances = {
   spotUsdc: string;
   /** Spot USOL balance, e.g. "0.0" */
   spotUsol: string;
+  /**
+   * Total perp account value, in USDC. Sourced from `Account.totalEquity`
+   * which itself parses Hyperliquid's
+   * `clearinghouseState.marginSummary.accountValue`. Matches the
+   * "合约账户价值 / Account Value" figure shown on the perpetuals form.
+   */
+  accountValue: number;
+  /**
+   * Withdrawable margin, in USDC. Sourced from
+   * `Account.availableBalance`, i.e. Hyperliquid's `withdrawable` field
+   * which already nets out cross-margin reservations. Matches the
+   * "可用保证金 / Available Margin" figure shown on the perpetuals form.
+   */
+  availableMargin: number;
   isLoading: boolean;
   isError: boolean;
   refetch: () => Promise<unknown>;
@@ -35,6 +49,8 @@ const DEFAULT: HyperliquidBalances = {
   perpUsdc: "0",
   spotUsdc: "0",
   spotUsol: "0",
+  accountValue: 0,
+  availableMargin: 0,
   isLoading: false,
   isError: false,
   refetch: async () => undefined,
@@ -82,6 +98,8 @@ export function useHyperliquidBalances(
       perpUsdc: pickAccountValue(account),
       spotUsdc: usdc?.totalRaw ?? usdc?.total.toString() ?? "0",
       spotUsol: usol?.totalRaw ?? usol?.total.toString() ?? "0",
+      accountValue: account.totalEquity,
+      availableMargin: account.availableBalance,
       isLoading,
       isError: false,
       refetch: async () => undefined,
