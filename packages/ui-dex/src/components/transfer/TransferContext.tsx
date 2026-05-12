@@ -22,9 +22,9 @@ import {
   useWallet,
   useWalletPortfolios,
 } from "@liberfi/ui-base";
-import { ClientError } from "graphql-request";
 import {
-  UnsignedTransactionDto,
+  TransferApiError,
+  UnsignedTransferTransaction,
   useCreateTransferTransactionMutation,
   useSendTransferTransactionMutation,
 } from "@liberfi/react-backend";
@@ -40,7 +40,7 @@ export type TransferContextValue = {
   amount?: string;
   amountInUsd?: string;
   setAmount: (amount: string | undefined) => void;
-  transaction?: UnsignedTransactionDto | null;
+  transaction?: UnsignedTransferTransaction | null;
   transactionError?: Error | null;
   isCreatingTransaction: boolean;
   transfer: () => Promise<void>;
@@ -181,10 +181,15 @@ export function TransferProvider({
       return;
     }
 
+    // Legacy flow is Solana-only and the new dex-server transfer API
+    // currently supports native tokens only. tokenAddress is preserved
+    // in form state for UX (balance, USD value), but it is not sent to
+    // the backend — the build endpoint always builds a native SOL
+    // transfer for `chain=sol`.
     createTransferTransactionAsync({
+      chain: Chain.SOLANA,
       sourceAddress: user.solanaAddress,
       destinationAddress: walletAddress,
-      mintAddress: tokenAddress,
       amount: amountInDecimals,
     });
   }, [
@@ -247,7 +252,7 @@ export function TransferProvider({
       const signedTx = Buffer.from(signedTxBuffer).toString("base64");
 
       // send tx
-      const result = await sendTransactionAsync({ signedTx });
+      const result = await sendTransactionAsync({ chain: Chain.SOLANA, signedTx });
       console.info("send transaction result", result);
 
       const txHash = result.txSignature;
@@ -276,8 +281,8 @@ export function TransferProvider({
       console.error("transfer error", error);
 
       let message: string | undefined;
-      if (error instanceof ClientError) {
-        message = error.response.errors?.[0]?.message;
+      if (error instanceof TransferApiError) {
+        message = error.message;
       } else if (error instanceof Error) {
         message = error.message;
       }

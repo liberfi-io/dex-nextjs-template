@@ -1,15 +1,40 @@
 import { Chain } from "@liberfi/core";
 import { chainSlug } from "@liberfi.io/utils";
-import { capitalize } from "lodash-es";
 import { PublicKey } from "@solana/web3.js";
 
-// 示例: https://opencrypto.pro/widget-page/mobileTran?widgetId=STlhSHJkZEc&tradeType=buy&cryptoCoin=USDT&network=Solana&walletAddress=2efnxsDRZRoFgdPRk2CadaN8SvmiZMHChd285AAjPU86&locale=en&fiatCoin=USD&fiatAmt=200
+const TRANSAK_BASE_URL = "https://global.transak.com";
+
+/** Maps internal Chain enum to Transak's network identifier. */
+const TRANSAK_NETWORK_MAP: Partial<Record<Chain, string>> = {
+  [Chain.SOLANA]: "solana",
+  [Chain.ETHEREUM]: "ethereum",
+  [Chain.BINANCE]: "bsc",
+  [Chain.POLYGON]: "polygon",
+  [Chain.ARBITRUM]: "arbitrum",
+  [Chain.OPTIMISM]: "optimism",
+  [Chain.BASE]: "base",
+};
+
+/** Default token per network for the buy flow. */
+const TRANSAK_DEFAULT_TOKEN: Partial<Record<Chain, string>> = {
+  [Chain.SOLANA]: "SOL",
+  [Chain.ETHEREUM]: "ETH",
+  [Chain.BINANCE]: "BNB",
+  [Chain.POLYGON]: "MATIC",
+  [Chain.ARBITRUM]: "ETH",
+  [Chain.OPTIMISM]: "ETH",
+  [Chain.BASE]: "ETH",
+};
+
+const getTransakApiKey = () =>
+  process.env.NEXT_PUBLIC_TRANSAK_API_KEY ?? "";
+
 export const getBuyTokenUrl = ({
   chainId,
   walletAddress,
   language = "en",
-  token = "usdt",
-  fiatCurrency = "usd",
+  token,
+  fiatCurrency = "USD",
   fiatAmount = "200",
 }: {
   chainId: Chain;
@@ -19,26 +44,30 @@ export const getBuyTokenUrl = ({
   fiatCurrency?: string;
   fiatAmount?: number | string;
 }) => {
+  const network = TRANSAK_NETWORK_MAP[chainId] ?? "solana";
+  const cryptoCurrency = token?.toUpperCase() ?? TRANSAK_DEFAULT_TOKEN[chainId] ?? "USDT";
   const params = new URLSearchParams({
-    widgetId: "STlhSHJkZEc",
-    tradeType: "buy",
-    cryptoCoin: token.toUpperCase(),
+    apiKey: getTransakApiKey(),
+    network,
+    cryptoCurrencyCode: cryptoCurrency,
     walletAddress,
-    network: capitalize(chainSlug(chainId)),
-    fiatCoin: fiatCurrency.toUpperCase(),
-    fiatAmt: fiatAmount.toString(),
-    locale: language,
+    fiatCurrency: fiatCurrency.toUpperCase(),
+    fiatAmount: fiatAmount.toString(),
+    defaultPaymentMethod: "credit_debit_card",
+    disableWalletAddressForm: "true",
+    isFeeCalculationHidden: "false",
+    hideMenu: "true",
+    ...(language && { language }),
   });
-  return `https://opencrypto.pro/widget-page/mobileTran?${params.toString()}`;
+  return `${TRANSAK_BASE_URL}?${params.toString()}`;
 };
 
-// 示例: https://opencrypto.pro/widget-page/mobileTran?widgetId=STlhSHJkZEc&tradeType=sell&cryptoCoin=USDT&network=Solana&walletAddress=2efnxsDRZRoFgdPRk2CadaN8SvmiZMHChd285AAjPU86&locale=en&fiatCoin=USD&fiatAmt=200
 export const getSellTokenUrl = ({
   chainId,
   walletAddress,
   language = "en",
-  token = "usdt",
-  fiatCurrency = "usd",
+  token,
+  fiatCurrency = "USD",
   fiatAmount = "200",
 }: {
   chainId: Chain;
@@ -48,17 +77,22 @@ export const getSellTokenUrl = ({
   fiatCurrency?: string;
   fiatAmount?: number | string;
 }) => {
+  const network = TRANSAK_NETWORK_MAP[chainId] ?? "solana";
+  const cryptoCurrency = token?.toUpperCase() ?? TRANSAK_DEFAULT_TOKEN[chainId] ?? "USDT";
   const params = new URLSearchParams({
-    widgetId: "STlhSHJkZEc",
-    tradeType: "sell",
-    cryptoCoin: token.toUpperCase(),
+    apiKey: getTransakApiKey(),
+    network,
+    cryptoCurrencyCode: cryptoCurrency,
     walletAddress,
-    network: capitalize(chainSlug(chainId)),
-    fiatCoin: fiatCurrency.toUpperCase(),
-    fiatAmt: fiatAmount.toString(),
-    locale: language,
+    fiatCurrency: fiatCurrency.toUpperCase(),
+    fiatAmount: fiatAmount.toString(),
+    defaultPaymentMethod: "credit_debit_card",
+    disableWalletAddressForm: "true",
+    hideMenu: "true",
+    transakFlowType: "sell",
+    ...(language && { language }),
   });
-  return `https://opencrypto.pro/widget-page/mobileTran?${params.toString()}`;
+  return `${TRANSAK_BASE_URL}?${params.toString()}`;
 };
 
 export const getTxExplorerUrl = (chainId: Chain, txHash: string) => {

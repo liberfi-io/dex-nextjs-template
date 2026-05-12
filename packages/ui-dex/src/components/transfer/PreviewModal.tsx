@@ -6,7 +6,7 @@ import { WithdrawOutlinedIcon } from "../../assets";
 import { Number } from "../Number";
 import { useTranslation } from "@liberfi/ui-base";
 import { SOL_TOKEN_SYMBOL } from "../../libs";
-import { UnsignedTransactionDto } from "@liberfi/react-backend";
+import { UnsignedTransferTransaction } from "@liberfi/react-backend";
 
 export type PreviewModalProps = {
   isOpen: boolean;
@@ -30,7 +30,7 @@ export function PreviewModal({ isOpen, onOpenChange }: PreviewModalProps) {
   } = useTransferContext();
 
   // 本地缓存 transaction，避免刷新时为 null
-  const [transaction, setTransaction] = useState<UnsignedTransactionDto | null | undefined>();
+  const [transaction, setTransaction] = useState<UnsignedTransferTransaction | null | undefined>();
 
   useEffect(() => {
     if (!isCreatingTransaction) {
