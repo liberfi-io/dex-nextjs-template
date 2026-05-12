@@ -680,6 +680,8 @@ export default {
         "depositTitle": "Deposit",
         "depositInfo": "{{chain}} Wallet — Send USDC on {{chain}} to this address. Only send assets on the {{chain}} network.",
         "depositMinAmount": "Minimum deposit: ${{amount}}",
+        "network": "Network",
+        "minDepositUsd": "Minimum {{amount}} USD",
         "yourAddress": "Your {{chain}} Address",
         "walletNotConnected": "Wallet not connected",
         "currentBalance": "Current Balance",
