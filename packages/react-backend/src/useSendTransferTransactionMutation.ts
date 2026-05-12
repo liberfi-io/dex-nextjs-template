@@ -1,32 +1,66 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
-import { gql, GraphQLClient } from "graphql-request";
-import { Mutation, SendTransactionInput, SignedTransactionDto } from "./types";
-import { useGraphQLClient } from "./GraphQLClientProvider";
+import { Chain } from "@liberfi.io/types";
 
-export const SEND_TRANSACTION_MUTATION = gql`
-  mutation SendTransaction($input: SendTransactionInput!) {
-    sendTransaction(input: $input) {
-      txSignature
-    }
+import {
+  TransferApiError,
+  chainToTransferSymbol,
+  postTransfer,
+} from "./transferRestClient";
+
+/**
+ * Input for `useSendTransferTransactionMutation`.
+ *
+ * `signedTx` encoding is chain-specific:
+ *   - Solana: base64-encoded fully-signed VersionedTransaction
+ *   - EVM:    `0x`-prefixed hex of the fully-signed RLP transaction
+ */
+export type SendTransferTransactionInput = {
+  chain: Chain;
+  signedTx: string;
+};
+
+/**
+ * Backend response — the network-issued signature/hash. For Solana this
+ * is a base58 signature; for EVM it is a `0x`-prefixed 32-byte hash.
+ */
+export type SignedTransferResult = {
+  txSignature: string;
+};
+
+export async function sendTransferTransaction(
+  input: SendTransferTransactionInput,
+  signal?: AbortSignal,
+): Promise<SignedTransferResult> {
+  const symbol = chainToTransferSymbol(input.chain);
+  if (!symbol) {
+    throw new TransferApiError(
+      400,
+      "unsupported_chain",
+      `Chain ${input.chain} is not supported by the transfer API`,
+    );
   }
-`;
-
-export async function sendTransaction(client: GraphQLClient, input: SendTransactionInput) {
-  const res = await client.request<Mutation>(SEND_TRANSACTION_MUTATION, { input });
-  return res.sendTransaction;
+  return postTransfer<
+    Omit<SendTransferTransactionInput, "chain">,
+    SignedTransferResult
+  >(symbol, "send", { signedTx: input.signedTx }, signal);
 }
 
+/**
+ * Broadcast a fully-signed native-token transfer via dex-server.
+ *
+ * See `useCreateTransferTransactionMutation` for the surrounding
+ * Build → Sign → Send flow.
+ */
 export const useSendTransferTransactionMutation = (
   options: Omit<
-    UseMutationOptions<SignedTransactionDto, Error, SendTransactionInput>,
+    UseMutationOptions<SignedTransferResult, Error, SendTransferTransactionInput>,
     "mutationFn"
   > = {},
 ) => {
-  const client = useGraphQLClient();
   return useMutation({
     ...options,
-    mutationFn: async (input: SendTransactionInput) => {
-      return await sendTransaction(client, input);
+    mutationFn: async (input: SendTransferTransactionInput) => {
+      return await sendTransferTransaction(input);
     },
   });
 };
