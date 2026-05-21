@@ -661,7 +661,10 @@ export default {
         "portfolio": "持倉"
       },
       "account": {
-        "totalBalance": "USDC 總餘額"
+        "totalBalance": "USDC 總餘額",
+        "availableBalance": "可用餘額",
+        "positions": "倉位",
+        "portfolioTotal": "投資組合總值"
       },
       "deposit": {
         "title": "充值",

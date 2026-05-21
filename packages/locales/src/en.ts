@@ -661,7 +661,10 @@ export default {
         "portfolio": "Portfolio"
       },
       "account": {
-        "totalBalance": "Total USDC"
+        "totalBalance": "Total USDC",
+        "availableBalance": "Available Balance",
+        "positions": "Positions",
+        "portfolioTotal": "Portfolio Total"
       },
       "deposit": {
         "title": "Deposit",

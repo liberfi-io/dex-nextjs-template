@@ -76,10 +76,17 @@ type Screen = "main" | "deposit" | "withdraw";
  * When provided, lets the caller jump directly to the Deposit (or Withdraw)
  * screen with a specific wallet (e.g. "evm" for Polymarket, "solana" for
  * Kalshi) preselected, instead of always landing on the Main choice screen.
+ *
+ * `lockWallet` further hides the in-modal wallet selector and the back
+ * button on the deposit / withdraw screens — use it when the caller has
+ * already chosen the venue (e.g. opening the modal from a per-venue
+ * deposit button) and re-presenting the wallet picker would only force
+ * the user to re-confirm a decision they already made one click ago.
  */
 export type FundWalletParams = {
   initialScreen?: Screen;
   initialWallet?: WalletSource;
+  lockWallet?: boolean;
 };
 
 // ---------------------------------------------------------------------------
@@ -123,6 +130,7 @@ function FundWalletContent({
   const [selectedWallet, setSelectedWallet] = useState<WalletSource>(
     params?.initialWallet ?? "solana",
   );
+  const walletLocked = params?.lockWallet === true;
 
   const goMain = useCallback(() => setScreen("main"), []);
 
@@ -132,8 +140,13 @@ function FundWalletContent({
         <DepositScreen
           selectedWallet={selectedWallet}
           onSelectWallet={setSelectedWallet}
-          onBack={goMain}
+          // When the wallet is locked there's no MainScreen to go back
+          // to — the caller picked the venue, so the only meaningful
+          // exit is the close button. Suppressing the back arrow keeps
+          // the header honest about that.
+          onBack={walletLocked ? undefined : goMain}
           onClose={onClose}
+          walletLocked={walletLocked}
         />
       );
     case "withdraw":
@@ -141,8 +154,9 @@ function FundWalletContent({
         <WithdrawScreen
           selectedWallet={selectedWallet}
           onSelectWallet={setSelectedWallet}
-          onBack={goMain}
+          onBack={walletLocked ? undefined : goMain}
           onClose={onClose}
+          walletLocked={walletLocked}
         />
       );
     default:
@@ -1029,11 +1043,13 @@ function DepositScreen({
   onSelectWallet,
   onBack,
   onClose,
+  walletLocked,
 }: {
   selectedWallet: WalletSource;
   onSelectWallet: (w: WalletSource) => void;
-  onBack: () => void;
+  onBack?: () => void;
   onClose: () => void;
+  walletLocked?: boolean;
 }) {
   const { t } = useTranslation();
   const {
@@ -1053,7 +1069,16 @@ function DepositScreen({
         onClose={onClose}
       />
       <div className="px-5 pb-5 space-y-4">
-        <WalletSelector selected={selectedWallet} onSelect={onSelectWallet} />
+        {/* Hide the wallet picker entirely when the caller has locked
+            the wallet. The deposit body that follows already includes
+            chain / address context so the user still knows which
+            wallet they're funding. */}
+        {!walletLocked && (
+          <WalletSelector
+            selected={selectedWallet}
+            onSelect={onSelectWallet}
+          />
+        )}
 
         {isSolana ? (
           <KalshiDepositBody
@@ -1082,11 +1107,13 @@ function WithdrawScreen({
   onSelectWallet,
   onBack,
   onClose,
+  walletLocked,
 }: {
   selectedWallet: WalletSource;
   onSelectWallet: (w: WalletSource) => void;
-  onBack: () => void;
+  onBack?: () => void;
   onClose: () => void;
+  walletLocked?: boolean;
 }) {
   const { t } = useTranslation();
   const {
@@ -1277,7 +1304,15 @@ function WithdrawScreen({
     <div>
       <ModalHeader title={t("extend.predict.fundWallet.withdrawTitle")} onBack={onBack} onClose={onClose} />
       <div className="px-5 pb-5 space-y-4">
-        <WalletSelector selected={selectedWallet} onSelect={onSelectWallet} />
+        {/* See DepositScreen for rationale on the locked-wallet
+            branch: the deposit/withdraw body already names the chain
+            and source address, so the picker is pure noise here. */}
+        {!walletLocked && (
+          <WalletSelector
+            selected={selectedWallet}
+            onSelect={onSelectWallet}
+          />
+        )}
 
         {/* Info banner */}
         <div className="bg-amber-500/5 border border-amber-500/20 rounded-[10px] px-3 py-2.5">

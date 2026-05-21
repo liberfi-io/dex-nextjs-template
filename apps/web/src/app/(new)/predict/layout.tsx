@@ -10,7 +10,9 @@ import { PredictSubNav } from "src/components/PredictSubNav";
  * the predict section instead of being open on every page.
  *
  * Note: PredictWalletProvider lives in the root layout (NewAppLayout →
- * ServiceProviders) so the header's PredictAccountButton can also access it.
+ * ServiceProviders) so the header's PredictBalanceIndicator dropdown
+ * (which surfaces addresses, KYC / Setup status, and sign-out) can also
+ * access it.
  */
 function PredictWsConnector() {
   const { wsClient } = usePredictWsClient();

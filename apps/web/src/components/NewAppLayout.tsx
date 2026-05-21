@@ -153,8 +153,6 @@ import { SendOutlinedIcon } from "./icons/SendOutlinedIcon";
 import { AppBottomToolbar } from "./AppBottomToolbar";
 import { BottomTweets } from "./BottomTweets";
 import { BottomAICopilot } from "./BottomAICopilot";
-import { PredictDepositButton } from "./PredictDepositButton";
-import { PredictAccountButton } from "./PredictAccountButton";
 import { PredictBalanceIndicator } from "./PredictBalanceIndicator";
 import { FundWalletModal } from "./FundWalletModal";
 
@@ -552,46 +550,59 @@ function PageShell({ children }: PropsWithChildren) {
                   <SearchIcon width={14} height={14} />
                 </button>
 
-                {!isPredictPage && (
-                  <ChainSelectDropdown
-                    className="max-sm:hidden"
-                    candidates={[Chain.SOLANA, Chain.ETHEREUM, Chain.BINANCE]}
-                    onSwitchChain={switchChain}
-                    onSuccess={(c) => {
-                      onChainSwitchedUrl(c);
-                      toast.success(
-                        t("common.chainSwitched", {
-                          chain: capitalize(chainSlug(c) ?? "") ?? "",
-                        }),
-                      );
-                    }}
-                    onError={(e) =>
-                      toast.error(
-                        e instanceof Error
-                          ? e.message
-                          : t("common.chainSwitchFailed"),
-                      )
-                    }
-                  />
-                )}
+                {/* Chain selector is always shown — including on the predict
+                    module — so users can manage their underlying on-chain
+                    wallet (which funds Polymarket / Kalshi deposits) without
+                    leaving the predict experience. */}
+                <ChainSelectDropdown
+                  className="max-sm:hidden"
+                  candidates={[Chain.SOLANA, Chain.ETHEREUM, Chain.BINANCE]}
+                  onSwitchChain={switchChain}
+                  onSuccess={(c) => {
+                    onChainSwitchedUrl(c);
+                    toast.success(
+                      t("common.chainSwitched", {
+                        chain: capitalize(chainSlug(c) ?? "") ?? "",
+                      }),
+                    );
+                  }}
+                  onError={(e) =>
+                    toast.error(
+                      e instanceof Error
+                        ? e.message
+                        : t("common.chainSwitchFailed"),
+                    )
+                  }
+                />
 
-                {!isPredictPage && <LaunchPadButton />}
-
-                {isPredictPage && isAuthenticated && <PredictBalanceIndicator />}
-                {isPredictPage && isAuthenticated && <PredictDepositButton />}
+                {/* Global utility cluster — chain switch, launchpad
+                    entry, language switch — stays together on the left
+                    of the right-hand action group on every page,
+                    including the predict module. Page-specific actions
+                    (predict balance / deposit, perpetuals HL balance,
+                    wallet account) come after this cluster. */}
+                <LaunchPadButton />
 
                 <div className="hidden sm:block">
                   <LanguageButton />
                 </div>
 
-                {isPredictPage ? (
-                  <PredictAccountButton />
-                ) : (
-                  <>
-                    {isPerpetualsPage && <HyperliquidBalanceButton />}
-                    <DexAccountButton />
-                  </>
-                )}
+                {/* On the predict module the balance indicator is the
+                    single header entry for prediction-market wallets:
+                    its dropdown carries per-venue deposit / withdraw
+                    actions inline, so a standalone header deposit
+                    button would just duplicate functionality and clutter
+                    the action cluster.
+
+                    Predict-specific account info (addresses + KYC /
+                    Setup status) is also merged into this same
+                    dropdown, so the predict module needs nothing extra
+                    here — the on-chain wallet trigger (DexAccountButton)
+                    below covers funding the underlying chain wallet,
+                    same as every other module. */}
+                {isPredictPage && isAuthenticated && <PredictBalanceIndicator />}
+                {!isPredictPage && isPerpetualsPage && <HyperliquidBalanceButton />}
+                <DexAccountButton />
               </div>
             </div>
           </ScaffoldHeader>
