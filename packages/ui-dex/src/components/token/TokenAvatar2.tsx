@@ -119,13 +119,13 @@ export function TokenAvatar2({
 
   return (
     <div className={clsx("relative justify-center items-center w-15 h-15", className)}>
-      {/* if progress is not displayed, fill the background with the protocol family color */}
-      {!displayProgress && (
+      {/* if progress is not displayed and protocol family exists, fill the background with the protocol family color */}
+      {!displayProgress && formattedProtocolFamily && (
         <div
           className={clsx(
             "absolute inset-0",
             `rounded-${radius}`,
-            formattedProtocolFamily ? `bg-${formattedProtocolFamily}` : "bg-bullish",
+            `bg-${formattedProtocolFamily}`,
             classNames?.background,
           )}
         />
