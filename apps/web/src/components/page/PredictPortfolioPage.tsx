@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useCallback, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useChainAwareRouter } from "../../hooks/useChainAwareRouter";
 import { useTranslation } from "@liberfi.io/i18n";
 import { Chain } from "@liberfi.io/types";
 import {
@@ -590,7 +590,7 @@ function PositionsPanel({
 
 function PositionRow({ position }: { position: PredictPosition }) {
   const { t } = useTranslation();
-  const router = useRouter();
+  const router = useChainAwareRouter();
   const { onOpen: openSellModal } = useAsyncModal<PredictSellModalParams>(PREDICT_SELL_MODAL_ID);
   const { onOpen: openRedeemModal } = useAsyncModal<PredictRedeemModalParams>(PREDICT_REDEEM_MODAL_ID);
   const pnl = position.pnl ?? 0;
@@ -823,7 +823,7 @@ function PositionRow({ position }: { position: PredictPosition }) {
 
 function OrdersPanel({ solanaAddr, evmAddr }: { solanaAddr: string; evmAddr: string }) {
   const { t } = useTranslation();
-  const router = useRouter();
+  const router = useChainAwareRouter();
   const wallets = useWallets();
   const evmWallet = useMemo(
     () => wallets.find((w) => w.chainNamespace === "EVM" && w.isConnected) as EvmWalletAdapter | undefined,
@@ -1192,7 +1192,7 @@ function OrderRow({
 
 function TradesPanel({ solanaAddr, evmAddr }: { solanaAddr: string; evmAddr: string }) {
   const { t } = useTranslation();
-  const router = useRouter();
+  const router = useChainAwareRouter();
 
   const {
     data: tradesData,

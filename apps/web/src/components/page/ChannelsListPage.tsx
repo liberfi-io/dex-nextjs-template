@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useChainAwareRouter } from "../../hooks/useChainAwareRouter";
 import { cn } from "@liberfi.io/ui";
 import {
   ChannelEditButton,
@@ -10,7 +10,7 @@ import {
 import { Channel } from "@liberfi.io/ui-channels";
 
 export function ChannelsListPage() {
-  const router = useRouter();
+  const router = useChainAwareRouter();
 
   return (
     <div className={cn("relative w-full h-full")}>
@@ -43,7 +43,7 @@ export function ChannelsListPage() {
 }
 
 function HeaderActions({ channel }: { channel: Channel }) {
-  const router = useRouter();
+  const router = useChainAwareRouter();
   return (
     <div className="flex items-center gap-2">
       <ChannelEditButton

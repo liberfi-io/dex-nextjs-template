@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useChainAwareRouter } from "../../hooks/useChainAwareRouter";
+import { ChainAwareLink } from "../ChainAwareLink";
 import type { LinkComponentType } from "@liberfi.io/ui";
 import { MatchesPage } from "@liberfi.io/ui-predict";
 import type {
@@ -12,7 +12,7 @@ import type {
 import { predictEventHref } from "./predict-source";
 
 const NoPrefetchLink: LinkComponentType = (props) => (
-  <Link prefetch={false} {...props} />
+  <ChainAwareLink prefetch={false} {...props} />
 );
 
 function hrefForMatchSide(
@@ -27,7 +27,7 @@ function hrefForMatchSide(
 }
 
 export function PredictMatchesPage() {
-  const router = useRouter();
+  const router = useChainAwareRouter();
 
   const handleSelect = useCallback(
     (match: MatchMarketFlat, source: ProviderSource) => {

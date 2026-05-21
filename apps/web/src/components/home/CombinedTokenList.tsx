@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useChainAwareRouter } from "../../hooks/useChainAwareRouter";
 import { useResizeObserver, useValueRef } from "@liberfi.io/hooks";
 import { useTranslation } from "@liberfi.io/i18n";
 import { useDexClient } from "@liberfi.io/react";
@@ -19,6 +19,7 @@ import {
 } from "@liberfi.io/ui-tokens";
 import { capitalize, chainSlug, getNativeToken, txExplorerUrl } from "@liberfi.io/utils";
 import { useSwitchEvmWalletsToChain } from "@liberfi.io/wallet-connector";
+import { useChainSwitchUrlHandler } from "../../hooks/useChainSwitchUrlHandler";
 import { CombinedPulseList } from "./CombinedPulseList";
 import { useAsyncModal } from "@liberfi.io/ui-scaffold";
 import {
@@ -56,7 +57,7 @@ function useTabs(chain: Chain) {
 export function CombinedTokenList() {
   const { t } = useTranslation();
 
-  const router = useRouter();
+  const router = useChainAwareRouter();
 
   const { client } = useDexClient();
 
@@ -64,6 +65,7 @@ export function CombinedTokenList() {
   const chainRef = useValueRef(chain);
 
   const switchChain = useSwitchEvmWalletsToChain();
+  const onChainSwitchedUrl = useChainSwitchUrlHandler();
 
   const ref = useRef<HTMLDivElement>(null);
   const { height } = useResizeObserver<HTMLDivElement>({ ref });
@@ -288,13 +290,14 @@ export function CombinedTokenList() {
                 className="sm:hidden"
                 onSwitchChain={switchChain}
                 candidates={[Chain.SOLANA, Chain.ETHEREUM, Chain.BINANCE]}
-                onSuccess={(c) =>
+                onSuccess={(c) => {
+                  onChainSwitchedUrl(c);
                   toast.success(
                     t("common.chainSwitched", {
                       chain: capitalize(chainSlug(c) ?? "") ?? "",
                     }),
-                  )
-                }
+                  );
+                }}
                 onError={(e) =>
                   toast.error(e instanceof Error ? e.message : t("common.chainSwitchFailed"))
                 }

@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ChainAwareLink } from "./ChainAwareLink";
 import { useTranslation } from "@liberfi.io/i18n";
 import {
   ChartLineIcon,
@@ -69,7 +69,7 @@ export function PredictSubNav() {
     >
       <div className="w-full px-6 max-lg:px-4 max-sm:px-3 flex items-center justify-center gap-1 h-11">
         {items.map((item) => (
-          <Link
+          <ChainAwareLink
             key={item.key}
             href={item.href}
             prefetch
@@ -84,7 +84,7 @@ export function PredictSubNav() {
           >
             {item.icon}
             {item.label}
-          </Link>
+          </ChainAwareLink>
         ))}
       </div>
     </nav>

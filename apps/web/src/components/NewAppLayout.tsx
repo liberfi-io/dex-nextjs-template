@@ -23,8 +23,7 @@ import {
   useRef,
   useState,
 } from "react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import Cookies from "js-cookie";
 import { QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { ChainStreamClient } from "@chainstream-io/sdk";
@@ -68,7 +67,9 @@ import {
 import { predictEventHref } from "./page/predict-source";
 import { PortfolioClient } from "@liberfi.io/ui-portfolio/client";
 
-const NoPrefetchLink: LinkComponentType = (props) => <Link prefetch={false} {...props} />;
+const NoPrefetchLink: LinkComponentType = (props) => (
+  <ChainAwareLink prefetch={false} {...props} />
+);
 import { PortfolioClientProvider, PortfolioProvider } from "@liberfi.io/ui-portfolio";
 import {
   StyledToaster,
@@ -121,7 +122,11 @@ import { DexDataProvider } from "@liberfi/ui-dex";
 import { useCreateOnrampWidgetUrlMutation } from "@liberfi/react-backend";
 import { queryClient } from "../libs/queryClient";
 import { AuthProviders } from "./AuthProviders";
+import { useChainAwareRouter } from "../hooks/useChainAwareRouter";
+import { useChainUrlSync } from "../hooks/useChainUrlSync";
+import { useChainSwitchUrlHandler } from "../hooks/useChainSwitchUrlHandler";
 import { useTranslationAdapter } from "../hooks/useTranslationAdapter";
+import { ChainAwareLink } from "./ChainAwareLink";
 import { browserAppSdk } from "../libs/browser/BrowserAppSdk";
 import en from "@liberfi/locales/locales/en/translation.json";
 import zh from "@liberfi/locales/locales/zh/translation.json";
@@ -315,6 +320,10 @@ function ServiceProviders({ children }: PropsWithChildren) {
   const { chain } = useCurrentChain();
   const wallet = useConnectedWallet(chain);
 
+  // Bidirectional `?chain=<slug>` URL sync: read from URL on mount / query
+  // change, and redirect away from token detail pages on conflict.
+  useChainUrlSync();
+
   return (
     <DexClientProvider client={dexClient}>
       <APIClientProvider client={apiClient} subscribeClient={apiClient}>
@@ -387,7 +396,7 @@ function LegacyBridge({ children }: PropsWithChildren) {
 function PageShell({ children }: PropsWithChildren) {
   const { t } = useTranslation();
   const pathname = usePathname();
-  const router = useRouter();
+  const router = useChainAwareRouter();
 
   const navItems: NavItem[] = useMemo(
     () =>
@@ -407,6 +416,7 @@ function PageShell({ children }: PropsWithChildren) {
 
   const { chain } = useCurrentChain();
   const switchChain = useSwitchEvmWalletsToChain();
+  const onChainSwitchedUrl = useChainSwitchUrlHandler();
   const { status: authStatus } = useAuth();
 
   const isPredictPage = pathname.startsWith("/predict");
@@ -547,13 +557,14 @@ function PageShell({ children }: PropsWithChildren) {
                     className="max-sm:hidden"
                     candidates={[Chain.SOLANA, Chain.ETHEREUM, Chain.BINANCE]}
                     onSwitchChain={switchChain}
-                    onSuccess={(c) =>
+                    onSuccess={(c) => {
+                      onChainSwitchedUrl(c);
                       toast.success(
                         t("common.chainSwitched", {
                           chain: capitalize(chainSlug(c) ?? "") ?? "",
                         }),
-                      )
-                    }
+                      );
+                    }}
                     onError={(e) =>
                       toast.error(
                         e instanceof Error
@@ -629,7 +640,7 @@ function NavTab({
   onNavigate: (href: string) => void;
 }) {
   return (
-    <Link
+    <ChainAwareLink
       href={item.href}
       prefetch
       data-active={active}
@@ -643,7 +654,7 @@ function NavTab({
       aria-current={active ? "page" : undefined}
     >
       {item.label}
-    </Link>
+    </ChainAwareLink>
   );
 }
 

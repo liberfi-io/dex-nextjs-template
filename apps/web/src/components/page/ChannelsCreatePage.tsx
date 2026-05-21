@@ -1,13 +1,13 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useChainAwareRouter } from "../../hooks/useChainAwareRouter";
 import { cn } from "@liberfi.io/ui";
 import { CreateChannelWidget } from "@liberfi.io/ui-channels";
 import { useTranslation } from "@liberfi.io/i18n";
 
 export function ChannelsCreatePage() {
   const { t } = useTranslation();
-  const router = useRouter();
+  const router = useChainAwareRouter();
 
   return (
     <div className={cn("w-full h-full px-4 max-sm:px-0 flex flex-col gap-2.5 overflow-y-auto")}>

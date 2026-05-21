@@ -1,11 +1,15 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { IRouter, NavigateOptions } from "@liberfi/ui-dex";
+import { useChainAwareRouter } from "./useChainAwareRouter";
 
 export function useRouterAdapter() {
-  const router = useRouter();
+  // Use the chain-aware router so legacy navigation through the IRouter
+  // adapter (consumed by `@liberfi/ui-dex` and other packages) also
+  // preserves the `?chain=<abbr>` query parameter automatically.
+  const router = useChainAwareRouter();
 
   const navigate = useCallback(
     (toOrDelta: string | number, options?: NavigateOptions) => {

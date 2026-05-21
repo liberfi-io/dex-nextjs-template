@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useChainAwareRouter } from "../../hooks/useChainAwareRouter";
+import { ChainAwareLink } from "../ChainAwareLink";
 import { useTranslation } from "@liberfi.io/i18n";
 import { toast, type LinkComponentType } from "@liberfi.io/ui";
 import { EventsPage } from "@liberfi.io/ui-predict";
@@ -15,11 +15,11 @@ import {
 import { predictEventHref } from "./predict-source";
 
 const NoPrefetchLink: LinkComponentType = (props) => (
-  <Link prefetch={false} {...props} />
+  <ChainAwareLink prefetch={false} {...props} />
 );
 
 export function PredictListPageV2() {
-  const router = useRouter();
+  const router = useChainAwareRouter();
   const { t } = useTranslation();
   const { onOpen: openFundWallet } =
     useAsyncModal<FundWalletParams>(FUND_WALLET_MODAL_ID);

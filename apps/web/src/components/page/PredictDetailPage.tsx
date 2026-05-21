@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useChainAwareRouter } from "../../hooks/useChainAwareRouter";
 import { useTranslation } from "@liberfi.io/i18n";
 import { cn, toast } from "@liberfi.io/ui";
 import { Chain } from "@liberfi.io/types";
@@ -18,7 +18,7 @@ import { predictEventHref } from "./predict-source";
 import { EventActivitySection } from "./EventActivitySection";
 
 export function PredictDetailPage({ id, source }: { id: string; source: ProviderSource }) {
-  const router = useRouter();
+  const router = useChainAwareRouter();
   const { t } = useTranslation();
   const { onOpen: openFundWallet } =
     useAsyncModal<FundWalletParams>(FUND_WALLET_MODAL_ID);
