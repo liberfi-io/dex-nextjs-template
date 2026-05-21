@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       expiresIn: process.env.JWT_EXPIRES_IN as any,
       algorithm: "HS256",
     });
-    const response = NextResponse.json({ accessToken: token });
+    const response = NextResponse.json({ accessToken: token, user });
 
     response.cookies.set(process.env.JWT_COOKIE_NAME, token, {
       httpOnly: true,
