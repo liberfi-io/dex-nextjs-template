@@ -17,7 +17,7 @@ import {
   TokenListResolutionSelectorWidget,
   TrendingTokenListWidget,
 } from "@liberfi.io/ui-tokens";
-import { capitalize, chainDisplayName, chainSlug, getNativeToken, txExplorerUrl } from "@liberfi.io/utils";
+import { chainDisplayName, chainSlug, getNativeToken, txExplorerUrl } from "@liberfi.io/utils";
 import { useSwitchEvmWalletsToChain } from "@liberfi.io/wallet-connector";
 import { useChainSwitchUrlHandler } from "../../hooks/useChainSwitchUrlHandler";
 import { CombinedPulseList } from "./CombinedPulseList";
