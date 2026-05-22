@@ -108,7 +108,7 @@ import {
   type SearchModalParams,
   type SearchModalResult,
 } from "@liberfi.io/ui-tokens";
-import { capitalize, chainDisplayName, chainSlug, truncateAddress } from "@liberfi.io/utils";
+import { chainDisplayName, chainSlug, truncateAddress } from "@liberfi.io/utils";
 import type { PredefinedToken } from "@liberfi.io/utils";
 import {
   useDexTokenProvider,
