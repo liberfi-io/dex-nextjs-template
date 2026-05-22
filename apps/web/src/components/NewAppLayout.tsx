@@ -562,7 +562,7 @@ function PageShell({ children }: PropsWithChildren) {
                     onChainSwitchedUrl(c);
                     toast.success(
                       t("common.chainSwitched", {
-                        chain: capitalize(chainSlug(c) ?? "") ?? "",
+                        chain: chainDisplayName(c),
                       }),
                     );
                   }}

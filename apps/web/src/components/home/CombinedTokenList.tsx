@@ -17,7 +17,7 @@ import {
   TokenListResolutionSelectorWidget,
   TrendingTokenListWidget,
 } from "@liberfi.io/ui-tokens";
-import { capitalize, chainSlug, getNativeToken, txExplorerUrl } from "@liberfi.io/utils";
+import { capitalize, chainDisplayName, chainSlug, getNativeToken, txExplorerUrl } from "@liberfi.io/utils";
 import { useSwitchEvmWalletsToChain } from "@liberfi.io/wallet-connector";
 import { useChainSwitchUrlHandler } from "../../hooks/useChainSwitchUrlHandler";
 import { CombinedPulseList } from "./CombinedPulseList";
@@ -294,7 +294,7 @@ export function CombinedTokenList() {
                   onChainSwitchedUrl(c);
                   toast.success(
                     t("common.chainSwitched", {
-                      chain: capitalize(chainSlug(c) ?? "") ?? "",
+                      chain: chainDisplayName(c),
                     }),
                   );
                 }}
