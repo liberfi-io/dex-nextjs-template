@@ -1,6 +1,5 @@
 @import "@liberfi.io/ui/tailwind/tailwind.css";
 @import "@liberfi.io/ui-tokens/tailwind/tailwind.css";
-@import "./theme.css";
 
 @source "../../src/**/*.{js,ts,jsx,tsx,mdx}";
 @source "../../node_modules/@liberfi/ui-base/dist/**/*.{js,ts,jsx,tsx}";
@@ -10,9 +9,7 @@
 @source "../../../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}";
 @source "../../../../node_modules/@heroui/react/dist/**/*.{js,ts,jsx,tsx}";
 @source "../../../../node_modules/@liberfi.io/ui/dist/**/*.{js,ts,jsx,tsx}";
-@source "../../../../../react-sdk/packages/ui/dist/**/*.{js,ts,jsx,tsx}";
 @source "../../../../node_modules/@liberfi.io/ui-tokens/dist/**/*.{js,ts,jsx,tsx}";
-@source "../../../../../react-sdk/packages/ui-tokens/dist/**/*.{js,ts,jsx,tsx}";
 @source "../../../../node_modules/@liberfi.io/ui-scaffold/dist/**/*.{js,ts,jsx,tsx}";
 @source "../../../../node_modules/@liberfi.io/ui-media-track/dist/**/*.{js,ts,jsx,tsx}";
 @source "../../../../node_modules/@liberfi.io/ui-channels/dist/**/*.{js,ts,jsx,tsx}";
