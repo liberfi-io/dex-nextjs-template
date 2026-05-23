@@ -42,7 +42,7 @@ importers:
         specifier: ^0.0.3
         version: 0.0.3(@types/react@18.3.23)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@chainstream-io/sdk':
-        specifier: 2.0.14
+        specifier: ^2.0.14
         version: 2.0.14
       '@heroui/react':
         specifier: ^2.8.10
@@ -51,62 +51,62 @@ importers:
         specifier: ^2.4.26
         version: 2.4.26(tailwindcss@4.1.11)
       '@liberfi.io/client':
-        specifier: ^0.3.19
-        version: 0.3.19
+        specifier: ^0.3.20
+        version: 0.3.20
       '@liberfi.io/hooks':
-        specifier: ^0.1.197
-        version: 0.1.197(react@18.3.1)
+        specifier: ^0.1.198
+        version: 0.1.198(react@18.3.1)
       '@liberfi.io/i18n':
-        specifier: ^0.1.202
-        version: 0.1.202(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
+        specifier: ^0.1.203
+        version: 0.1.203(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
       '@liberfi.io/react':
-        specifier: ^0.3.19
-        version: 0.3.19(@tanstack/react-query@5.90.5(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^0.3.20
+        version: 0.3.20(@tanstack/react-query@5.90.5(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@liberfi.io/react-predict':
-        specifier: ^0.3.3
-        version: 0.3.3(@tanstack/react-query@5.90.5(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^0.3.4
+        version: 0.3.4(@tanstack/react-query@5.90.5(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@liberfi.io/types':
-        specifier: ^0.4.5
-        version: 0.4.5
+        specifier: ^0.4.6
+        version: 0.4.6
       '@liberfi.io/ui':
-        specifier: ^0.3.5
-        version: 0.3.5(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11)
+        specifier: ^0.3.6
+        version: 0.3.6(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11)
       '@liberfi.io/ui-chain-select':
-        specifier: ^2.0.4
-        version: 2.0.4(@liberfi.io/ui@0.3.5(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^2.0.5
+        version: 2.0.5(@liberfi.io/ui@0.3.6(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@liberfi.io/ui-channels':
-        specifier: ^0.1.210
-        version: 0.1.210(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(@tanstack/react-query@5.90.5(react@18.3.1))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwind-merge@3.4.0)(tailwindcss@4.1.11)(typescript@5.8.3)
+        specifier: ^0.1.211
+        version: 0.1.211(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(@tanstack/react-query@5.90.5(react@18.3.1))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwind-merge@3.4.0)(tailwindcss@4.1.11)(typescript@5.8.3)
       '@liberfi.io/ui-media-track':
-        specifier: ^0.1.200
-        version: 0.1.200(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(@tanstack/react-query@5.90.5(react@18.3.1))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwind-merge@3.4.0)(tailwindcss@4.1.11)(typescript@5.8.3)
+        specifier: ^0.1.201
+        version: 0.1.201(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(@tanstack/react-query@5.90.5(react@18.3.1))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwind-merge@3.4.0)(tailwindcss@4.1.11)(typescript@5.8.3)
       '@liberfi.io/ui-perpetuals':
-        specifier: ^1.1.2
-        version: 1.1.2(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(@liberfi.io/wallet-connector@0.2.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@tanstack/react-query@5.90.5(react@18.3.1))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwind-merge@3.4.0)(tailwindcss@4.1.11)(typescript@5.8.3)
+        specifier: ^1.1.3
+        version: 1.1.3(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(@liberfi.io/wallet-connector@0.2.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@tanstack/react-query@5.90.5(react@18.3.1))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwind-merge@3.4.0)(tailwindcss@4.1.11)(typescript@5.8.3)
       '@liberfi.io/ui-portfolio':
-        specifier: ^3.0.4
-        version: 3.0.4(lqdiclxizvunteaouuazmtcipi)
+        specifier: ^3.0.5
+        version: 3.0.5(pi6v7quvam5hcuf4ccjazjvngy)
       '@liberfi.io/ui-predict':
-        specifier: ^4.0.3
-        version: 4.0.3(ubbzugtei4xnpl7tnozv2r6a4e)
+        specifier: ^4.0.4
+        version: 4.0.4(ueni3thzizbskqrp6kp5vcrcv4)
       '@liberfi.io/ui-scaffold':
-        specifier: ^2.0.4
-        version: 2.0.4(@liberfi.io/i18n@0.1.202(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3))(@liberfi.io/ui@0.3.5(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^2.0.5
+        version: 2.0.5(@liberfi.io/i18n@0.1.203(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3))(@liberfi.io/ui@0.3.6(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@liberfi.io/ui-tokens':
-        specifier: ^3.0.5
-        version: 3.0.5(egigevmlocsczvmrntvnhteuga)
+        specifier: ^3.0.6
+        version: 3.0.6(bzueptdoj7ph2lkhp4xoexyhvm)
       '@liberfi.io/ui-trade':
-        specifier: ^3.0.5
-        version: 3.0.5(yinj4lqz5z24i7isw5635zrzhe)
+        specifier: ^3.0.6
+        version: 3.0.6(p47n5emx36o6lshgajz2ijjmc4)
       '@liberfi.io/utils':
-        specifier: ^0.2.4
-        version: 0.2.4
+        specifier: ^0.2.5
+        version: 0.2.5
       '@liberfi.io/wallet-connector':
-        specifier: ^0.2.4
-        version: 0.2.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^0.2.5
+        version: 0.2.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@liberfi.io/wallet-connector-privy':
-        specifier: ^1.1.2
-        version: 1.1.2(vigou5kgfj7amxevwp7zop4bgy)
+        specifier: ^1.1.3
+        version: 1.1.3(3p5422uhoc5g4qfzypozv5gvf4)
       '@liberfi/core':
         specifier: workspace:*
         version: link:../../packages/core
@@ -377,8 +377,8 @@ importers:
         specifier: ^9.20.0
         version: 9.30.1
       '@liberfi.io/types':
-        specifier: ^0.4.5
-        version: 0.4.5
+        specifier: ^0.4.6
+        version: 0.4.6
       '@stylistic/eslint-plugin':
         specifier: ^2.12.1
         version: 2.13.0(eslint@9.30.1(jiti@2.4.2))(typescript@5.8.3)
@@ -498,8 +498,8 @@ importers:
         specifier: ^4.1.2
         version: 4.1.6(encoding@0.1.13)(graphql@16.11.0)
       '@liberfi.io/types':
-        specifier: ^0.4.5
-        version: 0.4.5
+        specifier: ^0.4.6
+        version: 0.4.6
       '@stylistic/eslint-plugin':
         specifier: ^2.12.1
         version: 2.13.0(eslint@9.30.1(jiti@2.4.2))(typescript@5.8.3)
@@ -558,7 +558,7 @@ importers:
   packages/react-dex:
     dependencies:
       '@chainstream-io/sdk':
-        specifier: 2.0.14
+        specifier: ^2.0.14
         version: 2.0.14
       '@liberfi/core':
         specifier: workspace:*
@@ -640,7 +640,7 @@ importers:
   packages/react-launchpad:
     dependencies:
       '@chainstream-io/sdk':
-        specifier: 2.0.14
+        specifier: ^2.0.14
         version: 2.0.14
       '@liberfi/core':
         specifier: workspace:*
@@ -722,7 +722,7 @@ importers:
   packages/react-redpacket:
     dependencies:
       '@chainstream-io/sdk':
-        specifier: 2.0.14
+        specifier: ^2.0.14
         version: 2.0.14
       '@liberfi/core':
         specifier: workspace:*
@@ -801,7 +801,7 @@ importers:
   packages/ui-base:
     dependencies:
       '@chainstream-io/sdk':
-        specifier: 2.0.14
+        specifier: ^2.0.14
         version: 2.0.14
       '@heroui/framer-utils':
         specifier: ^2.1.28
@@ -940,20 +940,20 @@ importers:
         specifier: ^9.20.0
         version: 9.30.1
       '@liberfi.io/client':
-        specifier: ^0.3.19
-        version: 0.3.19
+        specifier: ^0.3.20
+        version: 0.3.20
       '@liberfi.io/hooks':
-        specifier: ^0.1.197
-        version: 0.1.197(react@18.3.1)
+        specifier: ^0.1.198
+        version: 0.1.198(react@18.3.1)
       '@liberfi.io/react':
-        specifier: ^0.3.19
-        version: 0.3.19(@tanstack/react-query@5.90.5(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^0.3.20
+        version: 0.3.20(@tanstack/react-query@5.90.5(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@liberfi.io/ui-portfolio':
-        specifier: ^3.0.4
-        version: 3.0.4(lqdiclxizvunteaouuazmtcipi)
+        specifier: ^3.0.5
+        version: 3.0.5(pi6v7quvam5hcuf4ccjazjvngy)
       '@liberfi.io/wallet-connector':
-        specifier: ^0.2.4
-        version: 0.2.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^0.2.5
+        version: 0.2.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@storybook/addon-essentials':
         specifier: ^8.4.7
         version: 8.6.14(@types/react@18.3.23)(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10))
@@ -1108,7 +1108,7 @@ importers:
   packages/ui-dex:
     dependencies:
       '@chainstream-io/sdk':
-        specifier: 2.0.14
+        specifier: ^2.0.14
         version: 2.0.14
       '@heroui/framer-utils':
         specifier: ^2.1.28
@@ -1253,26 +1253,26 @@ importers:
         specifier: ^9.20.0
         version: 9.30.1
       '@liberfi.io/client':
-        specifier: ^0.3.19
-        version: 0.3.19
+        specifier: ^0.3.20
+        version: 0.3.20
       '@liberfi.io/react':
-        specifier: ^0.3.19
-        version: 0.3.19(@tanstack/react-query@5.90.5(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^0.3.20
+        version: 0.3.20(@tanstack/react-query@5.90.5(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@liberfi.io/types':
-        specifier: ^0.4.5
-        version: 0.4.5
+        specifier: ^0.4.6
+        version: 0.4.6
       '@liberfi.io/ui':
-        specifier: ^0.3.5
-        version: 0.3.5(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11)
+        specifier: ^0.3.6
+        version: 0.3.6(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11)
       '@liberfi.io/ui-chain-select':
-        specifier: ^2.0.4
-        version: 2.0.4(@liberfi.io/ui@0.3.5(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^2.0.5
+        version: 2.0.5(@liberfi.io/ui@0.3.6(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@liberfi.io/ui-portfolio':
-        specifier: ^3.0.4
-        version: 3.0.4(lqdiclxizvunteaouuazmtcipi)
+        specifier: ^3.0.5
+        version: 3.0.5(pi6v7quvam5hcuf4ccjazjvngy)
       '@liberfi.io/wallet-connector':
-        specifier: ^0.2.4
-        version: 0.2.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^0.2.5
+        version: 0.2.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@storybook/addon-essentials':
         specifier: ^8.4.7
         version: 8.6.14(@types/react@18.3.23)(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10))
@@ -1433,7 +1433,7 @@ importers:
   packages/ui-launchpad:
     dependencies:
       '@chainstream-io/sdk':
-        specifier: 2.0.14
+        specifier: ^2.0.14
         version: 2.0.14
       '@heroui/framer-utils':
         specifier: ^2.1.28
@@ -1581,14 +1581,14 @@ importers:
         specifier: ^9.20.0
         version: 9.30.1
       '@liberfi.io/types':
-        specifier: ^0.4.5
-        version: 0.4.5
+        specifier: ^0.4.6
+        version: 0.4.6
       '@liberfi.io/ui':
-        specifier: ^0.3.5
-        version: 0.3.5(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11)
+        specifier: ^0.3.6
+        version: 0.3.6(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11)
       '@liberfi.io/ui-media-track':
-        specifier: ^0.1.200
-        version: 0.1.200(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(@tanstack/react-query@5.90.5(react@18.3.1))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwind-merge@3.5.0)(tailwindcss@4.1.11)(typescript@5.8.3)
+        specifier: ^0.1.201
+        version: 0.1.201(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(@tanstack/react-query@5.90.5(react@18.3.1))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwind-merge@3.5.0)(tailwindcss@4.1.11)(typescript@5.8.3)
       '@storybook/addon-essentials':
         specifier: ^8.4.7
         version: 8.6.14(@types/react@18.3.23)(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10))
@@ -1755,7 +1755,7 @@ importers:
   packages/ui-redpacket:
     dependencies:
       '@chainstream-io/sdk':
-        specifier: 2.0.14
+        specifier: ^2.0.14
         version: 2.0.14
       '@heroui/framer-utils':
         specifier: ^2.1.28
@@ -1894,14 +1894,14 @@ importers:
         specifier: ^9.20.0
         version: 9.30.1
       '@liberfi.io/client':
-        specifier: ^0.3.19
-        version: 0.3.19
+        specifier: ^0.3.20
+        version: 0.3.20
       '@liberfi.io/types':
-        specifier: ^0.4.5
-        version: 0.4.5
+        specifier: ^0.4.6
+        version: 0.4.6
       '@liberfi.io/ui-portfolio':
-        specifier: ^3.0.4
-        version: 3.0.4(lqdiclxizvunteaouuazmtcipi)
+        specifier: ^3.0.5
+        version: 3.0.5(pi6v7quvam5hcuf4ccjazjvngy)
       '@storybook/addon-essentials':
         specifier: ^8.4.7
         version: 8.6.14(@types/react@18.3.23)(storybook@8.6.14(bufferutil@4.0.9)(prettier@3.6.2)(utf-8-validate@5.0.10))
@@ -4159,129 +4159,129 @@ packages:
   '@jridgewell/trace-mapping@0.3.29':
     resolution: {integrity: sha512-uw6guiW/gcAGPDhLmd77/6lW8QLeiV5RUTsAX46Db6oLhGaVj4lhnPwb184s1bkc8kdVg/+h988dro8GRDpmYQ==}
 
-  '@liberfi.io/client@0.3.19':
-    resolution: {integrity: sha512-y81lYRZ9pilSWhTzwp1YwPlBhx8i7phidmM9wibeKbwTLv57RN1e+p3QoUruvdXVoXHHdEoruWNC2qTIQ/hc+w==}
+  '@liberfi.io/client@0.3.20':
+    resolution: {integrity: sha512-JJBkTxoC6OATDwacVP2wdZ2Diyhkp8SHZ3zjXgo7o8WDBVlkxl18ja6cvpdJ9PXx+QHfmcHYJCVIcooLEmMHvg==}
 
-  '@liberfi.io/hooks@0.1.197':
-    resolution: {integrity: sha512-vGujdxQYYcm93MByXG1BFdQ2pFBO87qy7D8iEuEY+ZHrHjVyJdLGFREiV+SvG4Mr7tUaay9wW6z86n2AvGpPxQ==}
+  '@liberfi.io/hooks@0.1.198':
+    resolution: {integrity: sha512-Q1mJvHwYo392GLkTvdAI8gkEBiOtXoFboQphV+pHCJPCbCL1qbUmjhedBPMOjVgWAZrrKfzFDatW0j2RIWKN0A==}
     peerDependencies:
       react: '>=18'
 
-  '@liberfi.io/i18n@0.1.202':
-    resolution: {integrity: sha512-9JjpJjEBT1qy7roGxqBpSSUeiWIPJURrw/0SjNKmD0lV3a5oFkOZy2cVrSd+xJ1gTOP44w7D3zSVvFX2a1dWQQ==}
+  '@liberfi.io/i18n@0.1.203':
+    resolution: {integrity: sha512-A5aXD5j1B2YdzYPiUfMd7lY/ZQMIbPcF3g1LH30X9GW5lGnmodpECP1O9jmfNi12DejrI/P7NibT7j7RrCgGog==}
     hasBin: true
     peerDependencies:
       react: '>=18'
       react-dom: '>=18'
 
-  '@liberfi.io/react-predict@0.3.3':
-    resolution: {integrity: sha512-9bCquWKeTxeiZwKI04FOL6u6gW+Tj28aJ+q9QERYp5fp4dlSJ79oEubPzDbb7OEJfO9MYqK8e8VDQ2LKfD+IZg==}
+  '@liberfi.io/react-predict@0.3.4':
+    resolution: {integrity: sha512-iYht8EV7ezj+c1+zdjT36ipwHNFUs0iJwWtrzEaNebOkAfiAka0e8WDK8f7KE+2c9A8j8aNLKAUc/8DiHIGgQA==}
     peerDependencies:
       '@tanstack/react-query': '>=5'
       react: '>=18'
       react-dom: '>=18'
 
-  '@liberfi.io/react@0.3.19':
-    resolution: {integrity: sha512-193FI3+7wQyx/Qt76YE6Lte+wzHO4rw13ukTvf0Hk7mDBB/b9anwWioG9CMQ1vEfmaeVcSnaJpb3qHcSfvQWkA==}
+  '@liberfi.io/react@0.3.20':
+    resolution: {integrity: sha512-fAg+wo4iLR41DteguY1bI8WHZkkdEHA6rRnl6WQIdPajSn9LUrJ5+HEhqEEHv3n3mjk5eOWnbYwvt9RmiEauAQ==}
     peerDependencies:
       '@tanstack/react-query': ^5.90.2
       react: '>=18'
       react-dom: '>=18'
 
-  '@liberfi.io/types@0.4.5':
-    resolution: {integrity: sha512-7twOTPc2Ewa4gkpIwr8TtQcCcN/NAbS6FjgtL2FLzRJLQfS+8YoNTI2jZ2SJJdkmmjJmv2CAfsFqP2O2jRqxDw==}
+  '@liberfi.io/types@0.4.6':
+    resolution: {integrity: sha512-JEutcJ5efXXoiD41+CdCWjDGcJS0kNCexlqitdU17WGLPyFLlx654reOfJ+fBRPCno6nk2UKjnICuft2z7H1+A==}
 
-  '@liberfi.io/ui-chain-select@2.0.4':
-    resolution: {integrity: sha512-zLHz773gnM8MHmSd6EuJtahrk3do5iTf6sIHWsOmwruzQGO+ldqVVIX29hsHS9Ev8+zeAQDZVdqOpT1mdmOcsw==}
+  '@liberfi.io/ui-chain-select@2.0.5':
+    resolution: {integrity: sha512-ElTBf3T574ZnHhvxMtZ8xUiW3K50L9oY2+d/pCPXC9PPbz9iBzgzjH14VYcYH0hAHfpUZJziaww13rMWiCanvQ==}
     peerDependencies:
-      '@liberfi.io/ui': 0.3.5
+      '@liberfi.io/ui': 0.3.6
       jotai: '>=2.15.1'
       react: '>=18'
       react-dom: '>=18'
 
-  '@liberfi.io/ui-channels@0.1.210':
-    resolution: {integrity: sha512-Ne+WQKXtFdrfSTClcKT9O8Wufp5YUa7TNCKE3r8CNM+L5MyYicJOOhDmuFeldY761DFutTkUb3G9cyULciuGBA==}
+  '@liberfi.io/ui-channels@0.1.211':
+    resolution: {integrity: sha512-QqdhJuV73ynTRLQapkIG7rfofaItd5+zVW+WZZD6gm9jUmkY/LIc3452qsAiiudrubvSbfHo0/2DeWfW4s8O6A==}
     peerDependencies:
       '@tanstack/react-query': ^5.90.2
       react: '>=18'
       react-dom: '>=18'
 
-  '@liberfi.io/ui-media-track@0.1.200':
-    resolution: {integrity: sha512-Zpx/w7f4P7l/7VnVSv5bZtSdQCuvB3Ah54LyQ8Dz+FzFl/ZN1+xQMU4dmgxuB7A9/RPM5TTr8T4BuWhmUNHeaA==}
+  '@liberfi.io/ui-media-track@0.1.201':
+    resolution: {integrity: sha512-vDO6tm9OAIRzbRS0qP1eK5hDCLyksQj4Cl69O6W02YjhUw8IFDQiBJU1xZJpveBB99IO8lsMkuuFUbN+hxNsXg==}
     peerDependencies:
       '@tanstack/react-query': ^5.90.2
       react: '>=18'
       react-dom: '>=18'
 
-  '@liberfi.io/ui-perpetuals@1.1.2':
-    resolution: {integrity: sha512-KJEvbbCWNXGobe5WO9w8UWTfmr+w/iVKtH1PQcABsr1nEzF6k9xsSgmHGQgxW8jyemXulbMtLMGvm6T4xfSsWw==}
+  '@liberfi.io/ui-perpetuals@1.1.3':
+    resolution: {integrity: sha512-dl+n/pTO4qAJeovK9ltALWQSXyuVJJb4+Y57mJGzLRop0ETFTrxxkpaGPVfolIfpQevJ30uBxXzeXh53wu1Leg==}
     peerDependencies:
-      '@liberfi.io/wallet-connector': 0.2.4
+      '@liberfi.io/wallet-connector': 0.2.5
       '@tanstack/react-query': ^5.90.2
       react: '>=18'
       react-dom: '>=18'
       react-hook-form: 7.66.1
 
-  '@liberfi.io/ui-portfolio@3.0.4':
-    resolution: {integrity: sha512-lEpYvL0o1G9ukcl9uU6UzPvP2YWdARTqetaMkfvAZ0B2h+jl7Cm//B+jkRK6GF7c8k93WGWCj1xtkOGFN/7w4w==}
+  '@liberfi.io/ui-portfolio@3.0.5':
+    resolution: {integrity: sha512-YnBGQFSRIM1W0Uq5WsHIEBYpOKmnbCE9zzU2FKCb1ASnudPtW/9gAxTO2y8RhRk6L1G2G9qXHnUGCqXHQ2Uttw==}
     peerDependencies:
-      '@liberfi.io/i18n': 0.1.202
-      '@liberfi.io/react': 0.3.19
-      '@liberfi.io/ui': 0.3.5
-      '@liberfi.io/ui-chain-select': 2.0.4
-      '@liberfi.io/wallet-connector': 0.2.4
+      '@liberfi.io/i18n': 0.1.203
+      '@liberfi.io/react': 0.3.20
+      '@liberfi.io/ui': 0.3.6
+      '@liberfi.io/ui-chain-select': 2.0.5
+      '@liberfi.io/wallet-connector': 0.2.5
       '@tanstack/react-query': ^5.90.2
       react: '>=18'
       react-dom: '>=18'
 
-  '@liberfi.io/ui-predict@4.0.3':
-    resolution: {integrity: sha512-WMGK+NHMrMhE4JMRcT9K9+HqycSzl+ueQ/7ky8fqAOKF4jeeJlNF/GrvR6PdAipt8nJ77xvk1hNKipxeZWaq4w==}
+  '@liberfi.io/ui-predict@4.0.4':
+    resolution: {integrity: sha512-wdU3I8zgTJbkTKl0R58iYfsU9HI+mWk7wg3TI1Fr8ylsEHeIytLCdD/a1ChI0JEXejxcy9M32O61/oHZx5r0Xg==}
     peerDependencies:
-      '@liberfi.io/i18n': 0.1.202
-      '@liberfi.io/react-predict': 0.3.3
-      '@liberfi.io/ui': 0.3.5
-      '@liberfi.io/ui-scaffold': 2.0.4
-      '@liberfi.io/wallet-connector': 0.2.4
+      '@liberfi.io/i18n': 0.1.203
+      '@liberfi.io/react-predict': 0.3.4
+      '@liberfi.io/ui': 0.3.6
+      '@liberfi.io/ui-scaffold': 2.0.5
+      '@liberfi.io/wallet-connector': 0.2.5
       '@tanstack/react-query': ^5.90.2
       jotai: '>=2.15.1'
       react: '>=18'
       react-dom: '>=18'
 
-  '@liberfi.io/ui-scaffold@2.0.4':
-    resolution: {integrity: sha512-9zt06iUbc6eex5su8nwFqjOBJCn2LxmVxZF8ogqyxpd6QZweaXyiAOVF1FAFzvQYiZoPnrs4qZOKay4Fv9j29A==}
+  '@liberfi.io/ui-scaffold@2.0.5':
+    resolution: {integrity: sha512-8k7W0zv64PSSx6+EUcbaHPHHB/BVLQBoNymluCMT6L/XWqUPgx6uHsRSDSnWdfFEA/QDWAOBqwjDPdK+fRxb6w==}
     peerDependencies:
-      '@liberfi.io/i18n': 0.1.202
-      '@liberfi.io/ui': 0.3.5
+      '@liberfi.io/i18n': 0.1.203
+      '@liberfi.io/ui': 0.3.6
       jotai: '>=2.15.1'
       react: '>=18'
       react-dom: '>=18'
 
-  '@liberfi.io/ui-tokens@3.0.5':
-    resolution: {integrity: sha512-keBj16vdQg6f2IGpMidk+VBU9UrFqpdMTK7q1gC9gmDTONxRr6eXAMklv7Sw4//jbqIYRmIYONJGyereA9SgJg==}
+  '@liberfi.io/ui-tokens@3.0.6':
+    resolution: {integrity: sha512-Qkhu+kZZvZVFM8ZvCRxV3aZnyh2XC3QiW4MXeYG4qlfbTqSCaCjCUzzIIcS5zDhJk5paTBfLIvRD+rdex2jgAQ==}
     peerDependencies:
-      '@liberfi.io/i18n': 0.1.202
-      '@liberfi.io/react': 0.3.19
-      '@liberfi.io/ui': 0.3.5
-      '@liberfi.io/ui-scaffold': 2.0.4
+      '@liberfi.io/i18n': 0.1.203
+      '@liberfi.io/react': 0.3.20
+      '@liberfi.io/ui': 0.3.6
+      '@liberfi.io/ui-scaffold': 2.0.5
       jotai: '>=2.15.1'
       react: '>=18'
       react-dom: '>=18'
 
-  '@liberfi.io/ui-trade@3.0.5':
-    resolution: {integrity: sha512-ovLbf/hmH9ln6A8JHnvbFxwxeA+hgXNNDHnW2w6hWMkxMQxs2Z1rfhOyHIX7qlVeUNw0+RMC3cTlUwXlcFOv1g==}
+  '@liberfi.io/ui-trade@3.0.6':
+    resolution: {integrity: sha512-wMTGixY6yOkaCvYe9p/mq8KmqlNiGKnjHzCLVijZx5uAaWqQ9X3YJyUDDlnFzIziQmfu6WZmDFDFmXEUXUxAqg==}
     peerDependencies:
-      '@liberfi.io/i18n': 0.1.202
-      '@liberfi.io/react': 0.3.19
-      '@liberfi.io/ui': 0.3.5
-      '@liberfi.io/ui-chain-select': 2.0.4
-      '@liberfi.io/ui-scaffold': 2.0.4
-      '@liberfi.io/wallet-connector': 0.2.4
+      '@liberfi.io/i18n': 0.1.203
+      '@liberfi.io/react': 0.3.20
+      '@liberfi.io/ui': 0.3.6
+      '@liberfi.io/ui-chain-select': 2.0.5
+      '@liberfi.io/ui-scaffold': 2.0.5
+      '@liberfi.io/wallet-connector': 0.2.5
       jotai: '>=2.15.1'
       react: '>=18'
       react-dom: '>=18'
 
-  '@liberfi.io/ui@0.3.5':
-    resolution: {integrity: sha512-iKD0vEcwn3RVTuL6rqIv7fqa9Vd/tbkINhCt1fY5OSTMgHw/DPfQHb49MXIOX635L3hHRBtutI/NbxptfyFLRg==}
+  '@liberfi.io/ui@0.3.6':
+    resolution: {integrity: sha512-UkBwlSlNoqzfjp2c+KmMdKwntSam7Z7eBWh6ns7DhuzI8hrhNngmOrXoOv0uosd+gqEfzq0CsZ/Vjeh+XyKyhg==}
     peerDependencies:
       '@heroui/react': '>=2.8.0'
       framer-motion: '>=12.0.0'
@@ -4295,21 +4295,21 @@ packages:
       tailwindcss:
         optional: true
 
-  '@liberfi.io/utils@0.2.4':
-    resolution: {integrity: sha512-UDdbkVIPzhutxzduclRe81AnNtgCxdRZnG9Masjc4pNMUYOk+4i3kwI8OZUNvbXy8xLLydtqslUvDwv7JaRdew==}
+  '@liberfi.io/utils@0.2.5':
+    resolution: {integrity: sha512-R6/hvUJUur/1SN4WizE/aiGWel15WGE+RGzltJ5rnW900s4J60laoSYIlQO90nmyQ+0b2OJAdkYNL78KBvlPPg==}
 
-  '@liberfi.io/wallet-connector-privy@1.1.2':
-    resolution: {integrity: sha512-6ZUX1b1S/d9LyQdc3SlyBD1Vm5Wo4U7tUlnc8QVCfbf/9BoUaM6p9dHfTRFud06KMxoLnNhspIKAfhGqYPCDiw==}
+  '@liberfi.io/wallet-connector-privy@1.1.3':
+    resolution: {integrity: sha512-zUZdVR408UdT8krh32GVbb4ywCTmc7QnuYJFlTylALGPyicgkRGpJ0W4j+Acu8apKoQB4Ge9O+q7PSFw6MB6iA==}
     peerDependencies:
-      '@liberfi.io/wallet-connector': 0.2.4
+      '@liberfi.io/wallet-connector': 0.2.5
       '@privy-io/react-auth': ^3.16.0
       '@solana/kit': ^3.0.3
       ethers: ^6.15.0
       react: '>=18'
       react-dom: '>=18'
 
-  '@liberfi.io/wallet-connector@0.2.4':
-    resolution: {integrity: sha512-0qFPMebN1twSp2cA2ZcbctvFpRQDkwSTjk5QdpR4BUrr8dAYxZOxtYa7uhnY8Hxn40UUhusajnLCQmx1gh2Msw==}
+  '@liberfi.io/wallet-connector@0.2.5':
+    resolution: {integrity: sha512-H7hyIDWWq5E15Vd/jJZkJTesU0gkAM0lasRGkoy6axbZi761pX8ad4Bn2ub+1CjNCyRoryYo0zLkj+haXrVLQw==}
     peerDependencies:
       react: '>=18'
       react-dom: '>=18'
@@ -16489,20 +16489,20 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.4
 
-  '@liberfi.io/client@0.3.19':
+  '@liberfi.io/client@0.3.20':
     dependencies:
       '@chainstream-io/sdk': 2.0.14
-      '@liberfi.io/types': 0.4.5
-      '@liberfi.io/utils': 0.2.4
+      '@liberfi.io/types': 0.4.6
+      '@liberfi.io/utils': 0.2.5
     transitivePeerDependencies:
       - debug
 
-  '@liberfi.io/hooks@0.1.197(react@18.3.1)':
+  '@liberfi.io/hooks@0.1.198(react@18.3.1)':
     dependencies:
       eventemitter3: 5.0.1
       react: 18.3.1
 
-  '@liberfi.io/i18n@0.1.202(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)':
+  '@liberfi.io/i18n@0.1.203(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)':
     dependencies:
       i18next: 25.10.10(typescript@5.8.3)
       i18next-browser-languagedetector: 8.2.1
@@ -16513,41 +16513,41 @@ snapshots:
       - react-native
       - typescript
 
-  '@liberfi.io/react-predict@0.3.3(@tanstack/react-query@5.90.5(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@liberfi.io/react-predict@0.3.4(@tanstack/react-query@5.90.5(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@liberfi.io/utils': 0.2.4
+      '@liberfi.io/utils': 0.2.5
       '@tanstack/react-query': 5.90.5(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@liberfi.io/react@0.3.19(@tanstack/react-query@5.90.5(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@liberfi.io/react@0.3.20(@tanstack/react-query@5.90.5(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@liberfi.io/types': 0.4.5
+      '@liberfi.io/types': 0.4.6
       '@tanstack/react-query': 5.90.5(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@liberfi.io/types@0.4.5': {}
+  '@liberfi.io/types@0.4.6': {}
 
-  '@liberfi.io/ui-chain-select@2.0.4(@liberfi.io/ui@0.3.5(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@liberfi.io/ui-chain-select@2.0.5(@liberfi.io/ui@0.3.6(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@liberfi.io/types': 0.4.5
-      '@liberfi.io/ui': 0.3.5(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11)
-      '@liberfi.io/utils': 0.2.4
+      '@liberfi.io/types': 0.4.6
+      '@liberfi.io/ui': 0.3.6(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11)
+      '@liberfi.io/utils': 0.2.5
       jotai: 2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@liberfi.io/ui-channels@0.1.210(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(@tanstack/react-query@5.90.5(react@18.3.1))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwind-merge@3.4.0)(tailwindcss@4.1.11)(typescript@5.8.3)':
+  '@liberfi.io/ui-channels@0.1.211(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(@tanstack/react-query@5.90.5(react@18.3.1))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwind-merge@3.4.0)(tailwindcss@4.1.11)(typescript@5.8.3)':
     dependencies:
       '@hookform/resolvers': 5.2.2(react-hook-form@7.66.1(react@18.3.1))
-      '@liberfi.io/hooks': 0.1.197(react@18.3.1)
-      '@liberfi.io/i18n': 0.1.202(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
-      '@liberfi.io/react': 0.3.19(@tanstack/react-query@5.90.5(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@liberfi.io/types': 0.4.5
-      '@liberfi.io/ui': 0.3.5(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11)
-      '@liberfi.io/utils': 0.2.4
-      '@liberfi.io/wallet-connector': 0.2.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@liberfi.io/hooks': 0.1.198(react@18.3.1)
+      '@liberfi.io/i18n': 0.1.203(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
+      '@liberfi.io/react': 0.3.20(@tanstack/react-query@5.90.5(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@liberfi.io/types': 0.4.6
+      '@liberfi.io/ui': 0.3.6(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11)
+      '@liberfi.io/utils': 0.2.5
+      '@liberfi.io/wallet-connector': 0.2.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tanstack/react-query': 5.90.5(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
@@ -16566,14 +16566,14 @@ snapshots:
       - tailwindcss
       - typescript
 
-  '@liberfi.io/ui-media-track@0.1.200(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(@tanstack/react-query@5.90.5(react@18.3.1))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwind-merge@3.4.0)(tailwindcss@4.1.11)(typescript@5.8.3)':
+  '@liberfi.io/ui-media-track@0.1.201(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(@tanstack/react-query@5.90.5(react@18.3.1))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwind-merge@3.4.0)(tailwindcss@4.1.11)(typescript@5.8.3)':
     dependencies:
       '@chainstream-io/centrifuge': 1.0.8
-      '@liberfi.io/hooks': 0.1.197(react@18.3.1)
-      '@liberfi.io/i18n': 0.1.202(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
-      '@liberfi.io/types': 0.4.5
-      '@liberfi.io/ui': 0.3.5(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11)
-      '@liberfi.io/utils': 0.2.4
+      '@liberfi.io/hooks': 0.1.198(react@18.3.1)
+      '@liberfi.io/i18n': 0.1.203(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
+      '@liberfi.io/types': 0.4.6
+      '@liberfi.io/ui': 0.3.6(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11)
+      '@liberfi.io/utils': 0.2.5
       '@tanstack/react-query': 5.90.5(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
@@ -16589,14 +16589,14 @@ snapshots:
       - tailwindcss
       - typescript
 
-  '@liberfi.io/ui-media-track@0.1.200(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(@tanstack/react-query@5.90.5(react@18.3.1))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwind-merge@3.5.0)(tailwindcss@4.1.11)(typescript@5.8.3)':
+  '@liberfi.io/ui-media-track@0.1.201(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(@tanstack/react-query@5.90.5(react@18.3.1))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwind-merge@3.5.0)(tailwindcss@4.1.11)(typescript@5.8.3)':
     dependencies:
       '@chainstream-io/centrifuge': 1.0.8
-      '@liberfi.io/hooks': 0.1.197(react@18.3.1)
-      '@liberfi.io/i18n': 0.1.202(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
-      '@liberfi.io/types': 0.4.5
-      '@liberfi.io/ui': 0.3.5(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11)
-      '@liberfi.io/utils': 0.2.4
+      '@liberfi.io/hooks': 0.1.198(react@18.3.1)
+      '@liberfi.io/i18n': 0.1.203(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
+      '@liberfi.io/types': 0.4.6
+      '@liberfi.io/ui': 0.3.6(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11)
+      '@liberfi.io/utils': 0.2.5
       '@tanstack/react-query': 5.90.5(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
@@ -16612,14 +16612,14 @@ snapshots:
       - tailwindcss
       - typescript
 
-  '@liberfi.io/ui-perpetuals@1.1.2(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(@liberfi.io/wallet-connector@0.2.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@tanstack/react-query@5.90.5(react@18.3.1))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwind-merge@3.4.0)(tailwindcss@4.1.11)(typescript@5.8.3)':
+  '@liberfi.io/ui-perpetuals@1.1.3(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(@liberfi.io/wallet-connector@0.2.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@tanstack/react-query@5.90.5(react@18.3.1))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwind-merge@3.4.0)(tailwindcss@4.1.11)(typescript@5.8.3)':
     dependencies:
-      '@liberfi.io/hooks': 0.1.197(react@18.3.1)
-      '@liberfi.io/i18n': 0.1.202(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
-      '@liberfi.io/types': 0.4.5
-      '@liberfi.io/ui': 0.3.5(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11)
-      '@liberfi.io/utils': 0.2.4
-      '@liberfi.io/wallet-connector': 0.2.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@liberfi.io/hooks': 0.1.198(react@18.3.1)
+      '@liberfi.io/i18n': 0.1.203(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
+      '@liberfi.io/types': 0.4.6
+      '@liberfi.io/ui': 0.3.6(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11)
+      '@liberfi.io/utils': 0.2.5
+      '@liberfi.io/wallet-connector': 0.2.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tanstack/react-query': 5.90.5(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
@@ -16636,15 +16636,15 @@ snapshots:
       - tailwindcss
       - typescript
 
-  '@liberfi.io/ui-portfolio@3.0.4(lqdiclxizvunteaouuazmtcipi)':
+  '@liberfi.io/ui-portfolio@3.0.5(pi6v7quvam5hcuf4ccjazjvngy)':
     dependencies:
-      '@liberfi.io/i18n': 0.1.202(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
-      '@liberfi.io/react': 0.3.19(@tanstack/react-query@5.90.5(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@liberfi.io/types': 0.4.5
-      '@liberfi.io/ui': 0.3.5(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11)
-      '@liberfi.io/ui-chain-select': 2.0.4(@liberfi.io/ui@0.3.5(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@liberfi.io/utils': 0.2.4
-      '@liberfi.io/wallet-connector': 0.2.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@liberfi.io/i18n': 0.1.203(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
+      '@liberfi.io/react': 0.3.20(@tanstack/react-query@5.90.5(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@liberfi.io/types': 0.4.6
+      '@liberfi.io/ui': 0.3.6(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11)
+      '@liberfi.io/ui-chain-select': 2.0.5(@liberfi.io/ui@0.3.6(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@liberfi.io/utils': 0.2.5
+      '@liberfi.io/wallet-connector': 0.2.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tanstack/react-query': 5.90.5(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
@@ -16654,16 +16654,16 @@ snapshots:
       - react-is
       - redux
 
-  '@liberfi.io/ui-predict@4.0.3(ubbzugtei4xnpl7tnozv2r6a4e)':
+  '@liberfi.io/ui-predict@4.0.4(ueni3thzizbskqrp6kp5vcrcv4)':
     dependencies:
-      '@liberfi.io/hooks': 0.1.197(react@18.3.1)
-      '@liberfi.io/i18n': 0.1.202(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
-      '@liberfi.io/react-predict': 0.3.3(@tanstack/react-query@5.90.5(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@liberfi.io/types': 0.4.5
-      '@liberfi.io/ui': 0.3.5(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11)
-      '@liberfi.io/ui-scaffold': 2.0.4(@liberfi.io/i18n@0.1.202(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3))(@liberfi.io/ui@0.3.5(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@liberfi.io/utils': 0.2.4
-      '@liberfi.io/wallet-connector': 0.2.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@liberfi.io/hooks': 0.1.198(react@18.3.1)
+      '@liberfi.io/i18n': 0.1.203(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
+      '@liberfi.io/react-predict': 0.3.4(@tanstack/react-query@5.90.5(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@liberfi.io/types': 0.4.6
+      '@liberfi.io/ui': 0.3.6(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11)
+      '@liberfi.io/ui-scaffold': 2.0.5(@liberfi.io/i18n@0.1.203(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3))(@liberfi.io/ui@0.3.6(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@liberfi.io/utils': 0.2.5
+      '@liberfi.io/wallet-connector': 0.2.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tanstack/react-query': 5.90.5(react@18.3.1)
       canvas-confetti: 1.9.4
       jotai: 2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1)
@@ -16677,50 +16677,50 @@ snapshots:
       - react-is
       - redux
 
-  '@liberfi.io/ui-scaffold@2.0.4(@liberfi.io/i18n@0.1.202(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3))(@liberfi.io/ui@0.3.5(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@liberfi.io/ui-scaffold@2.0.5(@liberfi.io/i18n@0.1.203(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3))(@liberfi.io/ui@0.3.6(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@liberfi.io/hooks': 0.1.197(react@18.3.1)
-      '@liberfi.io/i18n': 0.1.202(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
-      '@liberfi.io/ui': 0.3.5(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11)
-      '@liberfi.io/utils': 0.2.4
+      '@liberfi.io/hooks': 0.1.198(react@18.3.1)
+      '@liberfi.io/i18n': 0.1.203(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
+      '@liberfi.io/ui': 0.3.6(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11)
+      '@liberfi.io/utils': 0.2.5
       jotai: 2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1)
       jotai-family: 1.0.1(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@liberfi.io/ui-tokens@3.0.5(egigevmlocsczvmrntvnhteuga)':
+  '@liberfi.io/ui-tokens@3.0.6(bzueptdoj7ph2lkhp4xoexyhvm)':
     dependencies:
-      '@liberfi.io/hooks': 0.1.197(react@18.3.1)
-      '@liberfi.io/i18n': 0.1.202(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
-      '@liberfi.io/react': 0.3.19(@tanstack/react-query@5.90.5(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@liberfi.io/types': 0.4.5
-      '@liberfi.io/ui': 0.3.5(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11)
-      '@liberfi.io/ui-scaffold': 2.0.4(@liberfi.io/i18n@0.1.202(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3))(@liberfi.io/ui@0.3.5(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@liberfi.io/utils': 0.2.4
+      '@liberfi.io/hooks': 0.1.198(react@18.3.1)
+      '@liberfi.io/i18n': 0.1.203(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
+      '@liberfi.io/react': 0.3.20(@tanstack/react-query@5.90.5(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@liberfi.io/types': 0.4.6
+      '@liberfi.io/ui': 0.3.6(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11)
+      '@liberfi.io/ui-scaffold': 2.0.5(@liberfi.io/i18n@0.1.203(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3))(@liberfi.io/ui@0.3.6(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@liberfi.io/utils': 0.2.5
       jotai: 2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
       react-window: 2.2.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-window-infinite-loader: 2.0.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
-  '@liberfi.io/ui-trade@3.0.5(yinj4lqz5z24i7isw5635zrzhe)':
+  '@liberfi.io/ui-trade@3.0.6(p47n5emx36o6lshgajz2ijjmc4)':
     dependencies:
-      '@liberfi.io/hooks': 0.1.197(react@18.3.1)
-      '@liberfi.io/i18n': 0.1.202(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
-      '@liberfi.io/react': 0.3.19(@tanstack/react-query@5.90.5(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@liberfi.io/types': 0.4.5
-      '@liberfi.io/ui': 0.3.5(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11)
-      '@liberfi.io/ui-chain-select': 2.0.4(@liberfi.io/ui@0.3.5(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@liberfi.io/ui-scaffold': 2.0.4(@liberfi.io/i18n@0.1.202(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3))(@liberfi.io/ui@0.3.5(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@liberfi.io/utils': 0.2.4
-      '@liberfi.io/wallet-connector': 0.2.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@liberfi.io/hooks': 0.1.198(react@18.3.1)
+      '@liberfi.io/i18n': 0.1.203(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
+      '@liberfi.io/react': 0.3.20(@tanstack/react-query@5.90.5(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@liberfi.io/types': 0.4.6
+      '@liberfi.io/ui': 0.3.6(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11)
+      '@liberfi.io/ui-chain-select': 2.0.5(@liberfi.io/ui@0.3.6(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@liberfi.io/ui-scaffold': 2.0.5(@liberfi.io/i18n@0.1.203(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3))(@liberfi.io/ui@0.3.6(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@liberfi.io/utils': 0.2.5
+      '@liberfi.io/wallet-connector': 0.2.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       bignumber.js: 9.3.1
       jotai: 2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1)
       jotai-family: 1.0.1(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@liberfi.io/ui@0.3.5(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11)':
+  '@liberfi.io/ui@0.3.6(@heroui/react@2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11))(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(jotai@2.15.1(@babel/core@7.28.0)(@babel/template@7.27.2)(@types/react@18.3.23)(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.66.1(react@18.3.1))(react-hot-toast@2.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11)':
     dependencies:
       '@heroui/react': 2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11)
       clsx: 2.1.1
@@ -16739,25 +16739,25 @@ snapshots:
     optionalDependencies:
       tailwindcss: 4.1.11
 
-  '@liberfi.io/utils@0.2.4':
+  '@liberfi.io/utils@0.2.5':
     dependencies:
-      '@liberfi.io/types': 0.4.5
+      '@liberfi.io/types': 0.4.6
       bignumber.js: 9.3.1
 
-  '@liberfi.io/wallet-connector-privy@1.1.2(vigou5kgfj7amxevwp7zop4bgy)':
+  '@liberfi.io/wallet-connector-privy@1.1.3(3p5422uhoc5g4qfzypozv5gvf4)':
     dependencies:
-      '@liberfi.io/types': 0.4.5
-      '@liberfi.io/wallet-connector': 0.2.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@liberfi.io/types': 0.4.6
+      '@liberfi.io/wallet-connector': 0.2.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@privy-io/react-auth': 3.18.0(@solana-program/memo@0.8.0(@solana/kit@5.5.1(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)))(@solana-program/system@0.10.0(@solana/kit@5.5.1(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)))(@solana-program/token@0.9.0(@solana/kit@5.5.1(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)))(@solana/kit@5.5.1(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10))(@solana/sysvars@5.5.1(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3))(@tanstack/query-core@5.90.5)(@tanstack/react-query@5.90.5(react@18.3.1))(@types/react@18.3.23)(bufferutil@4.0.9)(encoding@0.1.13)(fastestsmallesttextencoderdecoder@1.0.22)(immer@11.1.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)(use-sync-external-store@1.4.0(react@18.3.1))(utf-8-validate@5.0.10)(zod@4.1.13)
       '@solana/kit': 5.5.1(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
       ethers: 6.15.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@liberfi.io/wallet-connector@0.2.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@liberfi.io/wallet-connector@0.2.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@liberfi.io/types': 0.4.5
-      '@liberfi.io/utils': 0.2.4
+      '@liberfi.io/types': 0.4.6
+      '@liberfi.io/utils': 0.2.5
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
