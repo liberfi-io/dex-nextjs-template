@@ -59,7 +59,7 @@ export function CombinedPulseList({ chain, onSelectToken }: CombinedPulseListPro
           <PulseNewListWidget
             chain={chain}
             title={t("tokens.pulse.new")}
-            className="min-w-115 lg:border-r-0 rounded-lg lg:rounded-r-none"
+            className="lg:border-r-0 rounded-lg lg:rounded-r-none"
             hideHeader={isMobile}
             onSelectToken={onSelectToken}
             renderItemAction={(token) =>
@@ -71,7 +71,7 @@ export function CombinedPulseList({ chain, onSelectToken }: CombinedPulseListPro
                   output={token.address}
                   radius="full"
                   size="sm"
-                  className="w-auto min-w-auto absolute right-0 -bottom-4"
+                  className="w-auto relative -top-[7px]"
                 />
               )
             }
@@ -85,7 +85,7 @@ export function CombinedPulseList({ chain, onSelectToken }: CombinedPulseListPro
           <PulseFinalStretchListWidget
             chain={chain}
             title={t("tokens.pulse.finalStretch")}
-            className="min-w-115 lg:border-r-0 rounded-lg lg:rounded-none"
+            className="lg:border-r-0 rounded-lg lg:rounded-none"
             hideHeader={isMobile}
             onSelectToken={onSelectToken}
             renderItemAction={(token) =>
@@ -97,7 +97,7 @@ export function CombinedPulseList({ chain, onSelectToken }: CombinedPulseListPro
                   output={token.address}
                   radius="full"
                   size="sm"
-                  className="w-auto min-w-auto absolute right-0 -bottom-4"
+                  className="w-auto relative -top-[7px]"
                 />
               )
             }
@@ -111,7 +111,7 @@ export function CombinedPulseList({ chain, onSelectToken }: CombinedPulseListPro
           <PulseMigratedListWidget
             chain={chain}
             title={t("tokens.pulse.migrated")}
-            className="min-w-115 rounded-lg lg:rounded-l-none"
+            className="rounded-lg lg:rounded-l-none"
             hideHeader={isMobile}
             onSelectToken={onSelectToken}
             renderItemAction={(token) =>
@@ -123,7 +123,7 @@ export function CombinedPulseList({ chain, onSelectToken }: CombinedPulseListPro
                   output={token.address}
                   radius="full"
                   size="sm"
-                  className="w-auto min-w-auto absolute right-0 -bottom-4"
+                  className="w-auto relative -top-[7px]"
                 />
               )
             }
