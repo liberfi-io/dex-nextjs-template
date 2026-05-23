@@ -188,7 +188,7 @@ export function CombinedTokenList() {
                     output={token.address}
                     size="sm"
                     radius="full"
-                    className="w-auto absolute right-0 top-1/2 -translate-y-1/2"
+                    className="w-auto lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2 max-lg:relative max-lg:-top-2"
                   />
                 )}
               </div>
@@ -210,7 +210,7 @@ export function CombinedTokenList() {
                     output={token.address}
                     size="sm"
                     radius="full"
-                    className="w-auto absolute right-0 top-1/2 -translate-y-1/2"
+                    className="w-auto lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2 max-lg:relative max-lg:-top-2"
                   />
                 )}
               </div>
@@ -232,7 +232,7 @@ export function CombinedTokenList() {
                     output={token.address}
                     size="sm"
                     radius="full"
-                    className="w-auto absolute right-0 top-1/2 -translate-y-1/2"
+                    className="w-auto lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2 max-lg:relative max-lg:-top-2"
                   />
                 )}
               </div>
