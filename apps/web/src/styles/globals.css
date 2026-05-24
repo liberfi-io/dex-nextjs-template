@@ -1,24 +1,35 @@
 @import "@liberfi.io/ui/tailwind/tailwind.css";
 @import "@liberfi.io/ui-tokens/tailwind/tailwind.css";
 
+/*
+ * Forward-port newer @theme tokens that ship in react-sdk @liberfi.io/ui
+ * `src/tailwind/tailwind.css` but have not been released to npm yet (this
+ * consumer is pinned to v0.3.6 which lacks them). Remove a row once the
+ * corresponding token lands in the published @liberfi.io/ui version we
+ * depend on.
+ */
+@theme {
+  --color-border-light: hsl(var(--heroui-default-100));
+}
+
 @source "../../src/**/*.{js,ts,jsx,tsx,mdx}";
 @source "../../node_modules/@liberfi/ui-base/dist/**/*.{js,ts,jsx,tsx}";
 @source "../../node_modules/@liberfi/ui-dex/dist/**/*.{js,ts,jsx,tsx}";
 @source "../../node_modules/@liberfi/ui-redpacket/dist/**/*.{js,ts,jsx,tsx}";
 @source "../../node_modules/@liberfi/ui-launchpad/dist/**/*.{js,ts,jsx,tsx}";
-@source "../../../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}";
-@source "../../../../node_modules/@heroui/react/dist/**/*.{js,ts,jsx,tsx}";
-@source "../../../../node_modules/@liberfi.io/ui/dist/**/*.{js,ts,jsx,tsx}";
-@source "../../../../node_modules/@liberfi.io/ui-tokens/dist/**/*.{js,ts,jsx,tsx}";
-@source "../../../../node_modules/@liberfi.io/ui-scaffold/dist/**/*.{js,ts,jsx,tsx}";
-@source "../../../../node_modules/@liberfi.io/ui-media-track/dist/**/*.{js,ts,jsx,tsx}";
-@source "../../../../node_modules/@liberfi.io/ui-channels/dist/**/*.{js,ts,jsx,tsx}";
-@source "../../../../node_modules/@liberfi.io/ui-chain-select/dist/**/*.{js,ts,jsx,tsx}";
-@source "../../../../node_modules/@liberfi.io/ui-predict/dist/**/*.{js,ts,jsx,tsx}";
-@source "../../../../node_modules/@liberfi.io/ui-portfolio/dist/**/*.{js,ts,jsx,tsx}";
-@source "../../../../node_modules/@liberfi.io/ui-trade/dist/**/*.{js,ts,jsx,tsx}";
-@source "../../../../node_modules/@liberfi.io/ui-perpetuals/dist/**/*.{js,ts,jsx,tsx}";
-@source "../../../../node_modules/@agent-widget/react/dist/**/*.{js,ts,jsx,tsx}";
+@source "../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}";
+@source "../../node_modules/@heroui/react/dist/**/*.{js,ts,jsx,tsx}";
+@source "../../node_modules/@liberfi.io/ui/dist/**/*.{js,ts,jsx,tsx}";
+@source "../../node_modules/@liberfi.io/ui-tokens/dist/**/*.{js,ts,jsx,tsx}";
+@source "../../node_modules/@liberfi.io/ui-scaffold/dist/**/*.{js,ts,jsx,tsx}";
+@source "../../node_modules/@liberfi.io/ui-media-track/dist/**/*.{js,ts,jsx,tsx}";
+@source "../../node_modules/@liberfi.io/ui-channels/dist/**/*.{js,ts,jsx,tsx}";
+@source "../../node_modules/@liberfi.io/ui-chain-select/dist/**/*.{js,ts,jsx,tsx}";
+@source "../../node_modules/@liberfi.io/ui-predict/dist/**/*.{js,ts,jsx,tsx}";
+@source "../../node_modules/@liberfi.io/ui-portfolio/dist/**/*.{js,ts,jsx,tsx}";
+@source "../../node_modules/@liberfi.io/ui-trade/dist/**/*.{js,ts,jsx,tsx}";
+@source "../../node_modules/@liberfi.io/ui-perpetuals/dist/**/*.{js,ts,jsx,tsx}";
+@source "../../node_modules/@agent-widget/react/dist/**/*.{js,ts,jsx,tsx}";
 
 @layer base {
   :root {

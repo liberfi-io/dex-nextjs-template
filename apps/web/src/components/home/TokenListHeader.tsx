@@ -65,7 +65,7 @@ export function TokenListHeader({
   }, [filters]);
 
   return (
-    <div className="flex-none flex flex-col w-full max-sm:pt-2.5 max-w-379 sm:max-w-403 mx-auto">
+    <div className="flex-none flex flex-col w-full max-sm:pt-2.5 max-w-362 sm:max-w-403 mx-auto">
       <div className="w-full flex justify-between items-center relative bg-background z-10 max-sm:px-3 overflow-x-scroll">
         {/* switch token list type */}
         <StyledPlainTabs

@@ -29,7 +29,7 @@ export function TokenListTap() {
         className={clsx(
           // "w-full h-20 mt-0 lg:pt-6 z-20 bg-background text-neutral",
           "w-full h-20 lg:h-10 mt-0 z-20 bg-background text-neutral flex-none",
-          "max-w-379 sm:max-w-403 mx-auto",
+          "max-w-362 sm:max-w-403 mx-auto",
           "flex flex-col lg:flex-row justify-between lg:items-center lg:gap-4",
           // "sticky top-[var(--header-height)] lg:top-[calc(var(--header-height)-24px)]",
           "sticky top-[var(--header-height)]",

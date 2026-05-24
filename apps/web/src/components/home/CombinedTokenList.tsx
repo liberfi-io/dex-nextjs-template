@@ -179,7 +179,7 @@ export function CombinedTokenList() {
             {...commonProps}
             onSelectToken={handleSelectToken}
             ActionsComponent={({ token }) => (
-              <div className="w-full h-full relative">
+              <div className="w-full h-full flex items-center justify-end">
                 {nativeToken && (
                   <InstantTradeListButtonWidget
                     id="token-list"
@@ -188,7 +188,7 @@ export function CombinedTokenList() {
                     output={token.address}
                     size="sm"
                     radius="full"
-                    className="w-auto lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2 max-lg:relative max-lg:-top-[7px]"
+                    className="w-auto"
                   />
                 )}
               </div>
@@ -201,7 +201,7 @@ export function CombinedTokenList() {
             {...commonProps}
             onSelectToken={handleSelectToken}
             ActionsComponent={({ token }) => (
-              <div className="w-full h-full relative">
+              <div className="w-full h-full flex items-center justify-end">
                 {nativeToken && (
                   <InstantTradeListButtonWidget
                     id="token-list"
@@ -210,7 +210,7 @@ export function CombinedTokenList() {
                     output={token.address}
                     size="sm"
                     radius="full"
-                    className="w-auto lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2 max-lg:relative max-lg:-top-[7px]"
+                    className="w-auto"
                   />
                 )}
               </div>
@@ -223,7 +223,7 @@ export function CombinedTokenList() {
             {...commonProps}
             onSelectToken={handleSelectToken}
             ActionsComponent={({ token }) => (
-              <div className="w-full h-full relative">
+              <div className="w-full h-full flex items-center justify-end">
                 {nativeToken && (
                   <InstantTradeListButtonWidget
                     id="token-list"
@@ -232,7 +232,7 @@ export function CombinedTokenList() {
                     output={token.address}
                     size="sm"
                     radius="full"
-                    className="w-auto lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2 max-lg:relative max-lg:-top-[7px]"
+                    className="w-auto"
                   />
                 )}
               </div>
@@ -251,135 +251,135 @@ export function CombinedTokenList() {
       onSwapError={handleSwapError}
     >
       <div className="w-full h-full flex flex-col">
-        <div className="flex-1 flex flex-col gap-3 sm:gap-4 p-4 min-h-0">
-        <div
-          className={cn(
-            "w-full mx-auto flex flex-col sm:flex-row sm:justify-between sm:items-center sm:gap-0 flex-none sm:h-8",
-            "max-w-379 sm:max-w-403",
-          )}
-        >
-          <div className="flex justify-between items-center w-full sm:w-auto gap-4">
-            <HorizontalScrollContainer
-              className="flex-auto min-w-0 max-sm:h-8"
-              classNames={{
-                content: "items-center gap-4 sm:gap-6 whitespace-nowrap",
-                leftArrow: "from-content1/60",
-                rightArrow: "from-content1/60",
-              }}
-            >
-              {tabs.map((tab) => (
-                <button
-                  key={tab}
-                  type="button"
-                  onClick={() => setActiveTab(tab)}
-                  className={cn(
-                    "text-sm sm:text-base font-medium transition-all cursor-pointer",
-                    activeTab === tab
-                      ? "text-foreground hover:opacity-70"
-                      : "text-zinc-500 hover:text-zinc-300",
-                  )}
-                >
-                  {t(TAB_I18N_KEYS[tab])}
-                </button>
-              ))}
-            </HorizontalScrollContainer>
-
-            <div className="flex-none sm:hidden flex justify-end items-center gap-2">
-              <ChainSelectWidget
-                size="sm"
-                className="sm:hidden"
-                onSwitchChain={switchChain}
-                candidates={[Chain.SOLANA, Chain.ETHEREUM, Chain.BINANCE]}
-                onSuccess={(c) => {
-                  onChainSwitchedUrl(c);
-                  toast.success(
-                    t("common.chainSwitched", {
-                      chain: chainDisplayName(c),
-                    }),
-                  );
+        <div className="flex-1 flex flex-col gap-3 sm:gap-4 py-4 lg:px-4 min-h-0">
+          <div
+            className={cn(
+              "w-full mx-auto flex flex-col sm:flex-row sm:justify-between sm:items-center sm:gap-0 flex-none sm:h-8 max-lg:px-4",
+              "max-w-362 sm:max-w-403",
+            )}
+          >
+            <div className="flex justify-between items-center w-full sm:w-auto gap-4">
+              <HorizontalScrollContainer
+                className="flex-auto min-w-0 max-sm:h-8"
+                classNames={{
+                  content: "items-center gap-4 sm:gap-6 whitespace-nowrap",
+                  leftArrow: "from-content1/60",
+                  rightArrow: "from-content1/60",
                 }}
-                onError={(e) =>
-                  toast.error(e instanceof Error ? e.message : t("common.chainSwitchFailed"))
-                }
-              />
-              <Button
-                isIconOnly
-                radius="full"
-                size="sm"
-                aria-label={t("tokens.listHeader.filter")}
-                onPress={() => setIsMobileControlsOpen((prev) => !prev)}
-                className="sm:hidden text-neutral hover:text-foreground transition-colors bg-transparent"
               >
-                <SettingsIcon width={20} height={20} />
-              </Button>
+                {tabs.map((tab) => (
+                  <button
+                    key={tab}
+                    type="button"
+                    onClick={() => setActiveTab(tab)}
+                    className={cn(
+                      "text-sm sm:text-base font-medium transition-all cursor-pointer",
+                      activeTab === tab
+                        ? "text-foreground hover:opacity-70"
+                        : "text-zinc-500 hover:text-zinc-300",
+                    )}
+                  >
+                    {t(TAB_I18N_KEYS[tab])}
+                  </button>
+                ))}
+              </HorizontalScrollContainer>
+
+              <div className="flex-none sm:hidden flex justify-end items-center gap-2">
+                <ChainSelectWidget
+                  size="sm"
+                  className="sm:hidden"
+                  onSwitchChain={switchChain}
+                  candidates={[Chain.SOLANA, Chain.ETHEREUM, Chain.BINANCE]}
+                  onSuccess={(c) => {
+                    onChainSwitchedUrl(c);
+                    toast.success(
+                      t("common.chainSwitched", {
+                        chain: chainDisplayName(c),
+                      }),
+                    );
+                  }}
+                  onError={(e) =>
+                    toast.error(e instanceof Error ? e.message : t("common.chainSwitchFailed"))
+                  }
+                />
+                <Button
+                  isIconOnly
+                  radius="full"
+                  size="sm"
+                  aria-label={t("tokens.listHeader.filter")}
+                  onPress={() => setIsMobileControlsOpen((prev) => !prev)}
+                  className="sm:hidden text-neutral hover:text-foreground transition-colors bg-transparent"
+                >
+                  <SettingsIcon width={20} height={20} />
+                </Button>
+              </div>
+            </div>
+
+            {/* desktop: always visible as inline controls */}
+            <div className="hidden sm:flex justify-end items-center gap-6">
+              {showTokenListControls && (
+                <>
+                  <TokenListResolutionSelectorWidget
+                    resolution={resolution}
+                    onResolutionChange={setResolution}
+                  />
+                  <TokenListFilterWidget
+                    protocols={chain === Chain.SOLANA ? SOLANA_TOKEN_PROTOCOLS : undefined}
+                    resolution={resolution}
+                    filters={filters}
+                    onFiltersChange={setFilters}
+                  />
+                </>
+              )}
+              {nativeToken && (
+                <AmountPresetInputWidget
+                  id="token-list"
+                  chain={chain}
+                  token={nativeToken}
+                  size="sm"
+                  className="max-w-55"
+                  onPresetClick={handlePresetClick}
+                />
+              )}
+            </div>
+
+            {/* mobile: expand/collapse — instant toggle */}
+            <div
+              className={cn(
+                "sm:hidden flex justify-end items-center gap-2 pt-2 relative z-20",
+                !isMobileControlsOpen && "hidden",
+              )}
+            >
+              {showTokenListControls && (
+                <>
+                  <TokenListResolutionSelectorWidget
+                    resolution={resolution}
+                    onResolutionChange={setResolution}
+                  />
+                  <TokenListFilterWidget
+                    protocols={chain === Chain.SOLANA ? SOLANA_TOKEN_PROTOCOLS : undefined}
+                    resolution={resolution}
+                    filters={filters}
+                    onFiltersChange={setFilters}
+                  />
+                </>
+              )}
+              {nativeToken && (
+                <AmountPresetInputWidget
+                  id="token-list"
+                  chain={chain}
+                  token={nativeToken}
+                  size="sm"
+                  className="max-w-50"
+                  onPresetClick={handlePresetClick}
+                />
+              )}
             </div>
           </div>
 
-          {/* desktop: always visible as inline controls */}
-          <div className="hidden sm:flex justify-end items-center gap-6">
-            {showTokenListControls && (
-              <>
-                <TokenListResolutionSelectorWidget
-                  resolution={resolution}
-                  onResolutionChange={setResolution}
-                />
-                <TokenListFilterWidget
-                  protocols={chain === Chain.SOLANA ? SOLANA_TOKEN_PROTOCOLS : undefined}
-                  resolution={resolution}
-                  filters={filters}
-                  onFiltersChange={setFilters}
-                />
-              </>
-            )}
-            {nativeToken && (
-              <AmountPresetInputWidget
-                id="token-list"
-                chain={chain}
-                token={nativeToken}
-                size="sm"
-                className="max-w-55"
-                onPresetClick={handlePresetClick}
-              />
-            )}
+          <div className="w-full flex-auto flex flex-col min-h-0" ref={ref}>
+            {tokenListContent}
           </div>
-
-          {/* mobile: expand/collapse — instant toggle */}
-          <div
-            className={cn(
-              "sm:hidden flex justify-end items-center gap-2 pt-2 relative z-20",
-              !isMobileControlsOpen && "hidden",
-            )}
-          >
-            {showTokenListControls && (
-              <>
-                <TokenListResolutionSelectorWidget
-                  resolution={resolution}
-                  onResolutionChange={setResolution}
-                />
-                <TokenListFilterWidget
-                  protocols={chain === Chain.SOLANA ? SOLANA_TOKEN_PROTOCOLS : undefined}
-                  resolution={resolution}
-                  filters={filters}
-                  onFiltersChange={setFilters}
-                />
-              </>
-            )}
-            {nativeToken && (
-              <AmountPresetInputWidget
-                id="token-list"
-                chain={chain}
-                token={nativeToken}
-                size="sm"
-                className="max-w-50"
-                onPresetClick={handlePresetClick}
-              />
-            )}
-          </div>
-        </div>
-
-        <div className="w-full flex-auto flex flex-col min-h-0" ref={ref}>
-          {tokenListContent}
-        </div>
         </div>
       </div>
     </InstantTradeSwapProvider>

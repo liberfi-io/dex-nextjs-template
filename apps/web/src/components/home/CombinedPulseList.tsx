@@ -33,7 +33,7 @@ export function CombinedPulseList({ chain, onSelectToken }: CombinedPulseListPro
   const nativeToken = useMemo(() => getNativeToken(chain), [chain]);
 
   return (
-    <div className="w-full h-full mx-auto max-w-379 sm:max-w-403 flex flex-col gap-2 lg:gap-4">
+    <div className="w-full h-full mx-auto max-w-362 sm:max-w-403 flex flex-col gap-2 lg:gap-4 max-lg:px-4">
       <div className="flex-none w-full flex items-center gap-4 lg:hidden">
         {PULSE_TABS.map((tab) => (
           <button

@@ -27,7 +27,7 @@ import { usePathname } from "next/navigation";
 import Cookies from "js-cookie";
 import { QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { ChainStreamClient } from "@chainstream-io/sdk";
-import { Chain } from "@liberfi.io/types";
+import { Chain, Token } from "@liberfi.io/types";
 import { Client } from "@liberfi.io/client";
 import { DexClientProvider as APIClientProvider } from "@liberfi.io/react";
 import { DexClientProvider } from "@liberfi/react-dex";
@@ -67,9 +67,7 @@ import {
 import { predictEventHref } from "./page/predict-source";
 import { PortfolioClient } from "@liberfi.io/ui-portfolio/client";
 
-const NoPrefetchLink: LinkComponentType = (props) => (
-  <ChainAwareLink prefetch={false} {...props} />
-);
+const NoPrefetchLink: LinkComponentType = (props) => <ChainAwareLink prefetch={false} {...props} />;
 import { PortfolioClientProvider, PortfolioProvider } from "@liberfi.io/ui-portfolio";
 import {
   StyledToaster,
@@ -81,7 +79,6 @@ import {
   LogoIcon,
   MiniLogoIcon,
   RocketIcon,
-  SearchIcon,
   SignInIcon,
   SolanaIcon,
   // SignalIcon,
@@ -91,6 +88,8 @@ import {
   WalletIcon,
   cn,
   useScreen,
+  Button,
+  ChevronDownIcon,
 } from "@liberfi.io/ui";
 import type { LinkComponentType } from "@liberfi.io/ui";
 import {
@@ -101,13 +100,7 @@ import {
   type NavItem,
   DraggablePanelProvider,
 } from "@liberfi.io/ui-scaffold";
-import {
-  SearchTokensButton,
-  SearchModal,
-  SEARCH_MODAL_ID,
-  type SearchModalParams,
-  type SearchModalResult,
-} from "@liberfi.io/ui-tokens";
+import { SearchTokensButton, SearchModal } from "@liberfi.io/ui-tokens";
 import { chainDisplayName, chainSlug, truncateAddress } from "@liberfi.io/utils";
 import type { PredefinedToken } from "@liberfi.io/utils";
 import {
@@ -329,22 +322,19 @@ function ServiceProviders({ children }: PropsWithChildren) {
           <ChannelsProvider client={channelsClient}>
             <PredictProvider client={predictClient} wsClient={predictWsClient}>
               <PolymarketProvider>
-              <PortfolioClientProvider client={portfolioClient}>
-                <PortfolioProvider chain={chain} address={wallet?.address ?? ""}>
-                  <PerpetualsProvider
-                    client={perpetualsClient}
-                    depositClient={perpDepositClient}
-                  >
-                    {/* Drives the Hyperliquid `webData2` subscription for the
+                <PortfolioClientProvider client={portfolioClient}>
+                  <PortfolioProvider chain={chain} address={wallet?.address ?? ""}>
+                    <PerpetualsProvider client={perpetualsClient} depositClient={perpDepositClient}>
+                      {/* Drives the Hyperliquid `webData2` subscription for the
                     whole app — replaces the 10s `clearinghouseState` /
                     `spotClearinghouseState` poll with a single push channel
                     that updates `usePositionsQuery`, `useOrdersQuery`, and
                     `useHyperliquidBalances` in real time. */}
-                    <HyperliquidAccountStateSync />
-                    {children}
-                  </PerpetualsProvider>
-                </PortfolioProvider>
-              </PortfolioClientProvider>
+                      <HyperliquidAccountStateSync />
+                      {children}
+                    </PerpetualsProvider>
+                  </PortfolioProvider>
+                </PortfolioClientProvider>
               </PolymarketProvider>
             </PredictProvider>
           </ChannelsProvider>
@@ -424,13 +414,7 @@ function PageShell({ children }: PropsWithChildren) {
   const isPerpetualsPage = pathname.startsWith("/perpetuals");
   const isAuthenticated = authStatus === "authenticated";
 
-  const { onOpen: openSearchModal } = useAsyncModal<
-    SearchModalParams,
-    SearchModalResult
-  >(SEARCH_MODAL_ID);
-
-  const { onOpen: openPredictSearch, onClose: closePredictSearch } =
-    useAsyncModal(PREDICT_SEARCH_MODAL_ID);
+  const { onClose: closePredictSearch } = useAsyncModal(PREDICT_SEARCH_MODAL_ID);
 
   const handlePredictHover = useCallback(
     (event: PredictEvent) => {
@@ -448,26 +432,22 @@ function PageShell({ children }: PropsWithChildren) {
     [handlePredictHover],
   );
 
-  const handleOpenSearch = useCallback(async () => {
-    if (isPredictPage) {
-      openPredictSearch({ params: searchModalParams });
-    } else {
-      const result = await openSearchModal({ params: { chains: [chain] } });
-      if (result) {
-        const slug = chainSlug(result.chain);
-        if (slug) {
-          router.push(`/tokens/${slug}/${result.address}`);
-        }
-      }
-    }
-  }, [isPredictPage, openPredictSearch, searchModalParams, openSearchModal, chain, router]);
-
   const handleSelectPredictEvent = useCallback(
     (event: PredictEvent) => {
       router.push(predictEventHref(event));
       closePredictSearch();
     },
     [router, closePredictSearch],
+  );
+
+  const handleSelectToken = useCallback(
+    (token: Token) => {
+      const slug = chainSlug(token.chain);
+      if (slug) {
+        router.push(`/tokens/${slug}/${token.address}`);
+      }
+    },
+    [router],
   );
 
   return (
@@ -486,11 +466,8 @@ function PageShell({ children }: PropsWithChildren) {
         toolbar={<AppBottomToolbar />}
         toolbarVisible={["desktop"]}
         header={
-          <ScaffoldHeader className="!bg-[#0a0a0b] !border-none">
-            <div
-              className="w-full h-full px-6 max-lg:px-4 max-sm:px-3 flex items-center gap-6 max-lg:gap-4 max-sm:gap-2"
-              style={{ borderBottom: "1px solid rgba(39,39,42,0.6)" }}
-            >
+          <ScaffoldHeader>
+            <div className="w-full h-full px-6 max-lg:px-4 max-sm:px-3 flex items-center gap-6 max-lg:gap-4 max-sm:gap-2">
               {/* Left: Logo + desktop nav tabs */}
               <div className="shrink-0 flex items-center gap-1">
                 <Logo icon={<LogoIcon />} miniIcon={<MiniLogoIcon />} />
@@ -499,18 +476,11 @@ function PageShell({ children }: PropsWithChildren) {
                     const active =
                       item.href === "/"
                         ? !navItemsConfig.some(
-                            (other) =>
-                              other.href !== "/" &&
-                              pathname.startsWith(other.href),
+                            (other) => other.href !== "/" && pathname.startsWith(other.href),
                           )
                         : pathname.startsWith(item.href);
                     return (
-                      <NavTab
-                        key={item.key}
-                        item={item}
-                        active={active}
-                        onNavigate={onNavigate}
-                      />
+                      <NavTab key={item.key} item={item} active={active} onNavigate={onNavigate} />
                     );
                   })}
                 </div>
@@ -520,42 +490,40 @@ function PageShell({ children }: PropsWithChildren) {
               <div className="hidden lg:flex flex-1 min-w-0 justify-center">
                 {isPredictPage ? (
                   <SearchEventsButton
-                    displayMode="desktop"
                     onSelectEvent={handleSelectPredictEvent}
                     modalParams={searchModalParams}
-                    className="!w-56 !min-w-0 !rounded-full !bg-zinc-900/60 !border-[1px] !border-zinc-800 hover:!border-zinc-700 !h-[32px] !min-h-0 !transition-none [&_kbd]:!rounded-full [&_kbd]:!bg-zinc-800/60 [&_kbd]:!border-zinc-700/50 [&_kbd]:!text-zinc-500 [&_kbd]:!font-mono [&_kbd]:!text-[10px]"
+                    className="max-lg:hidden"
                   />
                 ) : (
                   <SearchTokensButton
                     chains={[chain]}
-                    onSelectToken={(token) => {
-                      const slug = chainSlug(token.chain);
-                      if (slug) {
-                        router.push(`/tokens/${slug}/${token.address}`);
-                      }
-                    }}
-                    className="!w-56 !min-w-0 !rounded-full !bg-zinc-900/60 !border-[1px] !border-zinc-800 hover:!border-zinc-700 !h-[32px] !min-h-0 !transition-none [&_kbd]:!rounded-full [&_kbd]:!bg-zinc-800/60 [&_kbd]:!border-zinc-700/50 [&_kbd]:!text-zinc-500 [&_kbd]:!font-mono [&_kbd]:!text-[10px]"
+                    onSelectToken={handleSelectToken}
+                    className="max-lg:hidden"
                   />
                 )}
               </div>
 
               {/* Right: search icon (tablet/mobile) + chain select + launchpad + language + account */}
               <div className="shrink-0 ml-auto flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={handleOpenSearch}
-                  aria-label="Search"
-                  className="lg:hidden flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium transition-colors border bg-zinc-800/60 text-zinc-300 border-zinc-700/50 hover:bg-zinc-800 hover:text-white cursor-pointer focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-                >
-                  <SearchIcon width={14} height={14} />
-                </button>
+                {isPredictPage ? (
+                  <SearchEventsButton
+                    onSelectEvent={handleSelectPredictEvent}
+                    modalParams={searchModalParams}
+                    className="lg:hidden"
+                  />
+                ) : (
+                  <SearchTokensButton
+                    chains={[chain]}
+                    onSelectToken={handleSelectToken}
+                    className="lg:hidden"
+                  />
+                )}
 
                 {/* Chain selector is always shown — including on the predict
                     module — so users can manage their underlying on-chain
                     wallet (which funds Polymarket / Kalshi deposits) without
                     leaving the predict experience. */}
                 <ChainSelectDropdown
-                  className="max-sm:hidden"
                   candidates={[Chain.SOLANA, Chain.ETHEREUM, Chain.BINANCE]}
                   onSwitchChain={switchChain}
                   onSuccess={(c) => {
@@ -567,11 +535,7 @@ function PageShell({ children }: PropsWithChildren) {
                     );
                   }}
                   onError={(e) =>
-                    toast.error(
-                      e instanceof Error
-                        ? e.message
-                        : t("common.chainSwitchFailed"),
-                    )
+                    toast.error(e instanceof Error ? e.message : t("common.chainSwitchFailed"))
                   }
                 />
 
@@ -656,10 +620,8 @@ function NavTab({
       prefetch
       data-active={active}
       className={cn(
-        "px-3 py-1.5 text-sm font-medium rounded-[10px] transition-colors cursor-pointer whitespace-nowrap focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
-        active
-          ? "text-[#c7ff2e]"
-          : "text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/40",
+        "px-3 py-1.5 text-sm font-medium rounded-lg transition-colors cursor-pointer whitespace-nowrap focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
+        active ? "text-primary" : "text-neutral hover:bg-content2 hover:text-foreground",
       )}
       aria-label={item.label}
       aria-current={active ? "page" : undefined}
@@ -738,10 +700,7 @@ function LanguageButton() {
       </button>
 
       {isOpen && (
-        <div
-          className="absolute right-0 mt-2 w-36 z-50 overflow-hidden"
-          style={DROPDOWN_STYLE}
-        >
+        <div className="absolute right-0 mt-2 w-36 z-50 overflow-hidden" style={DROPDOWN_STYLE}>
           <div className="p-1">
             {languages.map((lang) => {
               const selected = lang.localCode === locale;
@@ -749,9 +708,7 @@ function LanguageButton() {
                 <button
                   key={lang.localCode}
                   type="button"
-                  onClick={() =>
-                    handleSelect(lang.localCode as LocaleCode)
-                  }
+                  onClick={() => handleSelect(lang.localCode as LocaleCode)}
                   className={cn(
                     "w-full flex items-center justify-between px-3 py-2 rounded-[10px] text-sm transition-all cursor-pointer",
                     selected
@@ -804,6 +761,9 @@ function ChainSelectDropdown({
   onError?: (error: unknown) => void;
 }) {
   const { chain } = useCurrentChain();
+
+  const { isDesktop } = useScreen();
+
   const { selectChain, isSwitching } = useSelectChain({
     onSwitchChain,
     onSuccess,
@@ -837,44 +797,46 @@ function ChainSelectDropdown({
 
   return (
     <div className={cn("relative", className)} ref={ref}>
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        disabled={isSwitching}
-        className={cn(
-          TRIGGER_CLASS,
-          "gap-1.5 px-2.5 text-zinc-300 hover:text-white",
-        )}
-      >
-        <ChainIcon chain={chain} size={16} />
-        <span className="text-xs font-medium">
-          {chainDisplayName(chain)}
-        </span>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="10"
-          height="10"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className={cn(
-            "text-zinc-500 transition-transform duration-200",
-            isOpen && "rotate-180",
-          )}
-          aria-hidden="true"
+      {isDesktop ? (
+        <Button
+          size="sm"
+          radius="full"
+          variant="bordered"
+          onPress={() => setIsOpen(!isOpen)}
+          className="bg-content2 border-transparent hover:border-border"
+          startContent={<ChainIcon chain={chain} size={18} />}
+          endContent={
+            <ChevronDownIcon
+              width={16}
+              height={16}
+              className={cn(
+                "text-neutral transition-transform duration-200",
+                isOpen && "rotate-180",
+              )}
+            />
+          }
+          disableRipple
+          disabled={isSwitching}
         >
-          <path d="m6 9 6 6 6-6" />
-        </svg>
-      </button>
+          {chainDisplayName(chain)}
+        </Button>
+      ) : (
+        <Button
+          size="sm"
+          radius="full"
+          variant="bordered"
+          onPress={() => setIsOpen(!isOpen)}
+          isIconOnly
+          className="max-lg:hidden bg-content2 border-1 border-border"
+          disableRipple
+          disabled={isSwitching}
+        >
+          <ChainIcon chain={chain} size={18} />
+        </Button>
+      )}
 
       {isOpen && (
-        <div
-          className="absolute right-0 mt-2 w-44 z-50 overflow-hidden"
-          style={DROPDOWN_STYLE}
-        >
+        <div className="absolute right-0 mt-2 w-44 z-50 overflow-hidden" style={DROPDOWN_STYLE}>
           <div className="p-1">
             {candidates.map((c) => {
               const selected = c === chain;
@@ -891,9 +853,7 @@ function ChainSelectDropdown({
                   )}
                 >
                   <ChainIcon chain={c} size={18} />
-                  <span className="flex-1 text-left">
-                    {chainDisplayName(c)}
-                  </span>
+                  <span className="flex-1 text-left">{chainDisplayName(c)}</span>
                   {selected && (
                     <svg
                       viewBox="0 0 24 24"
@@ -923,7 +883,7 @@ function ChainIcon({ chain, size }: { chain: Chain; size: number }) {
   if (chain === Chain.SOLANA) return <SolanaIcon width={size} height={size} />;
   if (chain === Chain.ETHEREUM) return <EthereumIcon width={size} height={size} />;
   if (chain === Chain.BINANCE) return <BinanceIcon width={size} height={size} />;
-  return <div style={{ width: size, height: size }} className="rounded-full bg-zinc-700" />;
+  return <div style={{ width: size, height: size }} className="rounded-full bg-content2" />;
 }
 
 // ---------------------------------------------------------------------------
@@ -939,9 +899,7 @@ function GradientAvatar({
   size?: number;
   className?: string;
 }) {
-  const hash = seed
-    ? seed.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0)
-    : 0;
+  const hash = seed ? seed.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) : 0;
   const c1 = `hsl(${(hash * 37) % 360}, 70%, 60%)`;
   const c2 = `hsl(${(hash * 73) % 360}, 65%, 45%)`;
   const c3 = `hsl(${(hash * 113) % 360}, 75%, 55%)`;
@@ -1039,9 +997,7 @@ function DexAccountButton() {
         onClick={() => setIsOpen((prev) => !prev)}
         className={cn(TRIGGER_CLASS, "gap-1.5 px-2.5 text-zinc-300")}
       >
-        {nativeToken && (
-          <TokenIcon symbol={nativeToken.symbol} size={16} />
-        )}
+        {nativeToken && <TokenIcon symbol={nativeToken.symbol} size={16} />}
         <span className="text-xs font-medium text-zinc-100 tabular-nums">
           {balanceNativeFormatted}
           {!isMobile && nativeToken && (
@@ -1058,10 +1014,7 @@ function DexAccountButton() {
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className={cn(
-            "text-zinc-500 transition-transform duration-200",
-            isOpen && "rotate-180",
-          )}
+          className={cn("text-zinc-500 transition-transform duration-200", isOpen && "rotate-180")}
           aria-hidden="true"
         >
           <path d="m6 9 6 6 6-6" />
@@ -1104,10 +1057,7 @@ function DexAccountButton() {
 
       {/* Tablet & Desktop: popover */}
       {!isMobile && isOpen && (
-        <div
-          className="absolute right-0 mt-2 w-72 z-50 overflow-hidden"
-          style={DROPDOWN_STYLE}
-        >
+        <div className="absolute right-0 mt-2 w-72 z-50 overflow-hidden" style={DROPDOWN_STYLE}>
           <DexAccountMenuContent
             walletAddress={walletAddress}
             chainNamespace={chainNamespace}
@@ -1133,10 +1083,7 @@ function HyperliquidBalanceButton() {
 
   const wallets = useWallets();
   const evmWallet = useMemo(
-    () =>
-      wallets.find((w) => w.chainNamespace === "EVM") as
-        | EvmWalletAdapter
-        | undefined,
+    () => wallets.find((w) => w.chainNamespace === "EVM") as EvmWalletAdapter | undefined,
     [wallets],
   );
   const evmAddress = evmWallet?.address;
@@ -1196,9 +1143,7 @@ function HyperliquidBalanceButton() {
         <HyperliquidUsdcIcon size={16} />
         <span className="text-xs font-medium text-zinc-100 tabular-nums">
           {formatHlUsdc(hlBalances.perpUsdc)}
-          {!isMobile && (
-            <span className="text-zinc-500 ml-1">USDC</span>
-          )}
+          {!isMobile && <span className="text-zinc-500 ml-1">USDC</span>}
         </span>
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -1210,10 +1155,7 @@ function HyperliquidBalanceButton() {
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className={cn(
-            "text-zinc-500 transition-transform duration-200",
-            isOpen && "rotate-180",
-          )}
+          className={cn("text-zinc-500 transition-transform duration-200", isOpen && "rotate-180")}
           aria-hidden="true"
         >
           <path d="m6 9 6 6 6-6" />
@@ -1255,10 +1197,7 @@ function HyperliquidBalanceButton() {
 
       {/* Tablet & Desktop: popover */}
       {!isMobile && isOpen && (
-        <div
-          className="absolute right-0 mt-2 w-72 z-50 overflow-hidden"
-          style={DROPDOWN_STYLE}
-        >
+        <div className="absolute right-0 mt-2 w-72 z-50 overflow-hidden" style={DROPDOWN_STYLE}>
           <HyperliquidAccountMenuContent
             evmAddress={evmAddress}
             availableMargin={hlBalances.availableMargin}
@@ -1321,11 +1260,29 @@ function HyperliquidAccountMenuContent({
                 onClick={onCopy}
               >
                 {copied ? (
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
                 ) : (
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
                     <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
                   </svg>
@@ -1334,22 +1291,16 @@ function HyperliquidAccountMenuContent({
             </div>
             {/* Row 2: available margin (withdrawable) */}
             <div className="flex items-center justify-between gap-2 text-xs mt-1.5">
-              <span className="text-zinc-500">
-                {t("perpetuals.placeOrder.availableMargin")}
-              </span>
+              <span className="text-zinc-500">{t("perpetuals.placeOrder.availableMargin")}</span>
               <span className="text-zinc-300 tabular-nums font-medium">
-                {formatHlUsdc(availableMargin)}{" "}
-                <span className="text-zinc-500">USDC</span>
+                {formatHlUsdc(availableMargin)} <span className="text-zinc-500">USDC</span>
               </span>
             </div>
             {/* Row 3: account value (totalEquity) */}
             <div className="flex items-center justify-between gap-2 text-xs mt-1">
-              <span className="text-zinc-500">
-                {t("perpetuals.placeOrder.perpsAccountValue")}
-              </span>
+              <span className="text-zinc-500">{t("perpetuals.placeOrder.perpsAccountValue")}</span>
               <span className="text-zinc-300 tabular-nums font-medium">
-                {formatHlUsdc(accountValue)}{" "}
-                <span className="text-zinc-500">USDC</span>
+                {formatHlUsdc(accountValue)} <span className="text-zinc-500">USDC</span>
               </span>
             </div>
           </div>
@@ -1438,14 +1389,7 @@ function DexAccountMenuContent({
         },
       },
     );
-  }, [
-    chain,
-    walletAddress,
-    nativeToken,
-    isCreatingOnramp,
-    createOnrampWidgetUrl,
-    t,
-  ]);
+  }, [chain, walletAddress, nativeToken, isCreatingOnramp, createOnrampWidgetUrl, t]);
 
   return (
     <>
@@ -1466,11 +1410,29 @@ function DexAccountMenuContent({
                   onClick={onCopy}
                 >
                   {copied ? (
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
                   ) : (
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
                       <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
                     </svg>
@@ -1526,7 +1488,16 @@ function DexAccountMenuContent({
           className="flex items-center gap-2.5 w-full px-3 py-2 text-sm rounded-[10px] transition-colors cursor-pointer text-red-400 hover:bg-red-500/10"
         >
           <div className="flex items-center justify-center w-7 h-7 rounded-[10px] bg-red-500/10">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
               <polyline points="16 17 21 12 16 7" />
               <line x1="21" y1="12" x2="9" y2="12" />
