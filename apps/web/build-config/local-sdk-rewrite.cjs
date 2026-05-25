@@ -10,6 +10,19 @@
  *   inlined here rather than imported from local-sdk-shared.mjs so the
  *   plugin stays self-contained and CJS-only.
  *
+ * Why `Once` (not the PostCSS 8 `AtRule` visitor):
+ *   Next.js wraps every plugin returned from postcss.config.mjs with its own
+ *   `createLazyPostCssPlugin` (next/dist/build/webpack/config/blocks/css/plugins.js).
+ *   That wrapper is a function with `.postcss = true` whose return value is the
+ *   real plugin descriptor. PostCSS only auto-registers visitor entries
+ *   (`AtRule.import`, `AtRule.source`, ...) when it sees the descriptor object
+ *   directly — through Next's lazy wrapper, those visitors never fire on
+ *   globals.css's @import / @source nodes, so dist→src rewrites silently
+ *   no-op and Tailwind ends up loading the published @liberfi.io/ui dist
+ *   (with stale theme tokens — e.g. content1 = #171816 instead of the local
+ *   src #0e1211). The `Once` callback runs unconditionally, so we walk the
+ *   tree manually and dispatch by AtRule name.
+ *
  * Activation:
  *   No-op unless USE_LOCAL_SDK=true AND NODE_ENV !== "production" AND
  *   sdkRoot resolves to an existing packages/ dir. Safe to keep registered
@@ -92,51 +105,59 @@ function localSdkRewrite(options) {
     );
   }
 
+  function rewriteImport(node) {
+    const raw = node.params.trim().replace(/^['"]|['"]$/g, "");
+    if (!raw.startsWith(`${NPM_SCOPE}/`)) return;
+
+    // Longest-prefix match against known package names so e.g. "@liberfi.io/ui-tokens/..."
+    // does not mis-match "@liberfi.io/ui".
+    let matched;
+    for (const name of pkgInfoByName.keys()) {
+      if (raw === name || raw.startsWith(`${name}/`)) {
+        if (!matched || name.length > matched.length) matched = name;
+      }
+    }
+    if (!matched) return;
+
+    const info = pkgInfoByName.get(matched);
+    const pkgDir = info.dir;
+    const exp = info.exports;
+    const sub = raw.slice(matched.length).replace(/^\//, "");
+    const exportKey = sub ? `./${sub}` : ".";
+
+    // Try to resolve via package.json exports first — most faithful.
+    // Fall back to assuming "<sub>" maps to "src/<sub>" when no exports
+    // entry matches.
+    let nextRel;
+    if (exp && exp[exportKey] != null) {
+      const target = resolveExportTarget(exp[exportKey]);
+      if (target) nextRel = distTargetToSrc(target);
+    }
+    if (!nextRel) nextRel = sub ? `src/${sub}` : "src/tailwind/tailwind.css";
+
+    node.params = `"${path.join(pkgDir, nextRel)}"`;
+  }
+
+  function rewriteSource(node) {
+    const raw = node.params.trim().replace(/^['"]|['"]$/g, "");
+    // Match a glob anchored at node_modules/@liberfi.io/<pkg>/dist/...
+    const m = raw.match(/node_modules\/(@liberfi\.io\/[^/]+)\/dist\/(.*)$/);
+    if (!m) return;
+    const info = pkgInfoByName.get(m[1]);
+    if (!info) return;
+    node.params = `"${path.join(info.dir, "src", m[2])}"`;
+  }
+
   return {
     postcssPlugin: "local-sdk-rewrite",
-    AtRule: {
-      import(node) {
-        if (!enabled) return;
-        const raw = node.params.trim().replace(/^['"]|['"]$/g, "");
-        if (!raw.startsWith(`${NPM_SCOPE}/`)) return;
-
-        // Longest-prefix match against known package names.
-        let matched;
-        for (const name of pkgInfoByName.keys()) {
-          if (raw === name || raw.startsWith(`${name}/`)) {
-            if (!matched || name.length > matched.length) matched = name;
-          }
-        }
-        if (!matched) return;
-
-        const info = pkgInfoByName.get(matched);
-        const pkgDir = info.dir;
-        const exp = info.exports;
-        const sub = raw.slice(matched.length).replace(/^\//, "");
-        const exportKey = sub ? `./${sub}` : ".";
-
-        // Try to resolve via package.json exports first — most faithful.
-        // Fall back to assuming "<sub>" maps to "src/<sub>" when no exports
-        // entry matches.
-        let nextRel;
-        if (exp && exp[exportKey] != null) {
-          const target = resolveExportTarget(exp[exportKey]);
-          if (target) nextRel = distTargetToSrc(target);
-        }
-        if (!nextRel) nextRel = sub ? `src/${sub}` : "src/tailwind/tailwind.css";
-
-        node.params = `"${path.join(pkgDir, nextRel)}"`;
-      },
-      source(node) {
-        if (!enabled) return;
-        const raw = node.params.trim().replace(/^['"]|['"]$/g, "");
-        // Match a glob anchored at node_modules/@liberfi.io/<pkg>/dist/...
-        const m = raw.match(/node_modules\/(@liberfi\.io\/[^/]+)\/dist\/(.*)$/);
-        if (!m) return;
-        const info = pkgInfoByName.get(m[1]);
-        if (!info) return;
-        node.params = `"${path.join(info.dir, "src", m[2])}"`;
-      },
+    // Run as a `Once` callback (not the PostCSS 8 `AtRule` visitor) — see
+    // the file header for why visitors are silently skipped under Next.js.
+    Once(root) {
+      if (!enabled) return;
+      root.walkAtRules((node) => {
+        if (node.name === "import") rewriteImport(node);
+        else if (node.name === "source") rewriteSource(node);
+      });
     },
   };
 }
