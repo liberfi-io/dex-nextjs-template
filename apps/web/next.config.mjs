@@ -1,89 +1,21 @@
 import { withSentryConfig } from "@sentry/nextjs";
-import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import {
+  getLocalSdkAliases,
+  getLocalSdkWatchOptions,
+} from "./build-config/local-sdk-aliases.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-/**
- * Resolve a package.json "exports" condition value to a concrete file path
- * string. Handles both simple strings and nested condition objects like
- * `{ import: { types: "...", default: "./dist/foo.mjs" }, require: { ... } }`.
- */
-function resolveExportTarget(value) {
-  if (typeof value === "string") return value;
-  if (value == null || typeof value !== "object") return undefined;
-  const entry = value.import ?? value.require ?? value.default;
-  if (typeof entry === "string") return entry;
-  if (entry != null && typeof entry === "object") {
-    return entry.default ?? entry.types;
-  }
-  return undefined;
-}
+// Default LOCAL_SDK_ROOT relative to apps/web/. Lives in build-config so
+// next.config.mjs and postcss.config.mjs resolve the same path.
+const LOCAL_SDK_FALLBACK = "../../../react-sdk";
 
-/**
- * When USE_LOCAL_SDK=true, scans LOCAL_SDK_ROOT/packages and returns webpack
- * resolve.alias entries that redirect every @liberfi.io/* import to the local
- * react-sdk dist output. Combined with `pnpm dev:watch` in react-sdk (which
- * runs tsup --watch for all packages), this gives live reload on SDK changes.
- */
-function getLocalSdkAliases() {
-  if (process.env.USE_LOCAL_SDK !== "true") return {};
-
-  const sdkRoot = path.resolve(
-    __dirname,
-    process.env.LOCAL_SDK_ROOT || "../../../react-sdk",
-  );
-  const packagesDir = path.join(sdkRoot, "packages");
-
-  if (!fs.existsSync(packagesDir)) {
-    console.warn(`[local-sdk] packages dir not found: ${packagesDir}`);
-    return {};
-  }
-
-  const aliases = {};
-
-  for (const entry of fs.readdirSync(packagesDir, { withFileTypes: true })) {
-    if (!entry.isDirectory()) continue;
-    const pkgJsonPath = path.join(packagesDir, entry.name, "package.json");
-    if (!fs.existsSync(pkgJsonPath)) continue;
-
-    const pkgJson = JSON.parse(fs.readFileSync(pkgJsonPath, "utf8"));
-    const name = pkgJson.name;
-    if (!name?.startsWith("@liberfi.io/")) continue;
-
-    const pkgDir = path.join(packagesDir, entry.name);
-
-    const subpathKeys =
-      pkgJson.exports
-        ? Object.keys(pkgJson.exports).filter(
-            (k) => k !== "." && !k.includes("*"),
-          )
-        : [];
-
-    // Use exact-match (`name$`) when the package declares subpath exports,
-    // so that `@pkg/foo/bar` is not caught by the `@pkg/foo` prefix alias.
-    aliases[subpathKeys.length > 0 ? `${name}$` : name] = pkgDir;
-
-    for (const key of subpathKeys) {
-      const subpath = key.replace(/^\.\//, "");
-      const target = resolveExportTarget(pkgJson.exports[key]);
-      if (target) {
-        aliases[`${name}/${subpath}`] = path.join(
-          pkgDir,
-          target.replace(/^\.\//, ""),
-        );
-      }
-    }
-  }
-
-  console.log(
-    `[local-sdk] Linked ${Object.keys(aliases).length} aliases from ${sdkRoot}`,
-  );
-  return aliases;
-}
-
-const localSdkAliases = getLocalSdkAliases();
+const localSdkAliases = getLocalSdkAliases({
+  baseDir: __dirname,
+  fallback: LOCAL_SDK_FALLBACK,
+});
 const useLocalSdk = Object.keys(localSdkAliases).length > 0;
 
 /* eslint-disable no-undef */
@@ -180,17 +112,16 @@ const nextConfig = {
     };
 
     if (useLocalSdk) {
-      const sdkRoot = path.resolve(
-        __dirname,
-        process.env.LOCAL_SDK_ROOT || "../../../react-sdk",
-      );
-      config.watchOptions = {
-        ...config.watchOptions,
-        ignored: [
-          "**/node_modules/**",
-          `!${path.join(sdkRoot, "packages")}/**`,
-        ],
-      };
+      const localWatch = getLocalSdkWatchOptions({
+        baseDir: __dirname,
+        fallback: LOCAL_SDK_FALLBACK,
+      });
+      if (localWatch) {
+        config.watchOptions = {
+          ...config.watchOptions,
+          ...localWatch,
+        };
+      }
     }
 
     config.resolve.fallback = {
