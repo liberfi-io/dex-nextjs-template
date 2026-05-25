@@ -158,6 +158,7 @@ export default {
         "liq": "Liq",
         "liquidity": "Liquidity",
         "volume": "Vol",
+        "supply": "Supply",
         "txs": "Txs",
         "traders": "Traders",
         "holders": "Holders",

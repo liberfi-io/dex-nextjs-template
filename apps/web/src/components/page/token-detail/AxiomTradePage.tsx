@@ -41,7 +41,7 @@ const SPLIT_HANDLE_H = 4;
 const MIN_BOTTOM_REVEAL = 200;
 
 /** Fallback header height before the ResizeObserver has measured the DOM. */
-const FALLBACK_HEADER_H = 70;
+const FALLBACK_HEADER_H = 72;
 
 export interface AxiomTradePageProps {
   chain: Chain;
