@@ -253,6 +253,36 @@ export default {
         "sales": "Sale Volume",
         "total": "Purchase Volume"
       },
+      "basic_info": {
+        "title": "Basic Info",
+        "market_cap": "Market Cap",
+        "liquidity": "Liquidity",
+        "volume_24h": "24h Volume",
+        "holders": "Holders",
+        "supply": "Total Supply",
+        "created_at": "Token Created",
+        "pair": "Pair"
+      },
+      "security_check": {
+        "title": "Security",
+        "safe": "Safe",
+        "review": "Review",
+        "unknown": "Unknown",
+        "items": {
+          "no_transfer_fee": "No Transfer Fee",
+          "no_transfer_fee_tip": "The token does not charge a fee on transfer.",
+          "fee_not_upgradable": "Fee Not Upgradable",
+          "fee_not_upgradable_tip": "The transfer fee cannot be raised by the token owner.",
+          "transferable": "Transferable",
+          "transferable_tip": "Token holders can freely transfer the token.",
+          "not_freezable": "Not Freezable",
+          "not_freezable_tip": "The token authority cannot freeze holder balances.",
+          "not_closable": "Not Closable",
+          "not_closable_tip": "The token program cannot be closed by its owner."
+        },
+        "powered_by": "Powered by GoPlus",
+        "external_link": "https://gopluslabs.io/"
+      },
       "audit": {
         "title": "Token Audit",
         "top10": "Top 10",

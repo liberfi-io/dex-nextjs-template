@@ -253,6 +253,36 @@
         "sales": "賣出量",
         "total": "交易量"
       },
+      "basic_info": {
+        "title": "基礎資訊",
+        "market_cap": "市值",
+        "liquidity": "流動性",
+        "volume_24h": "24h 交易量",
+        "holders": "持有人數",
+        "supply": "總供應量",
+        "created_at": "代幣創建時間",
+        "pair": "幣對"
+      },
+      "security_check": {
+        "title": "安全檢測",
+        "safe": "安全",
+        "review": "需注意",
+        "unknown": "未知",
+        "items": {
+          "no_transfer_fee": "無轉帳稅",
+          "no_transfer_fee_tip": "該代幣轉帳不收取手續費。",
+          "fee_not_upgradable": "轉帳稅不可升級",
+          "fee_not_upgradable_tip": "代幣擁有者無法提高轉帳稅。",
+          "transferable": "可轉帳",
+          "transferable_tip": "持有人可以自由轉移代幣。",
+          "not_freezable": "不可凍結",
+          "not_freezable_tip": "代幣權限方無法凍結持有人帳戶餘額。",
+          "not_closable": "不可關閉",
+          "not_closable_tip": "代幣程式無法被擁有者關閉。"
+        },
+        "powered_by": "由 GoPlus 提供",
+        "external_link": "https://gopluslabs.io/"
+      },
       "audit": {
         "title": "代幣資訊",
         "top10": "前 10",

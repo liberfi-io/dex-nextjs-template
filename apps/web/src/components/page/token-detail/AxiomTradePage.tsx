@@ -5,21 +5,11 @@ import { useHideBottomNavigationBar, useHideHeader } from "@liberfi/ui-base";
 import { TradingChart } from "@liberfi/ui-dex/components/trade";
 import type { Chain } from "@liberfi.io/types";
 import { useScreen } from "@liberfi.io/ui";
-import {
-  AxiomSplitHandle,
-  CollapsibleSection,
-} from "@liberfi.io/ui-scaffold";
-import {
-  TokenAboutWidget,
-  TokenCategoriesWidget,
-  TokenLiquiditiesWidget,
-  TokenReusedImageListWidget,
-  TokenSecurityWidget,
-  TokenSimilarTokensWidget,
-} from "@liberfi.io/ui-tokens";
-import { useTokenQuery } from "@liberfi.io/react";
+import { AxiomSplitHandle } from "@liberfi.io/ui-scaffold";
 import { BottomDataPanel } from "./BottomDataPanel";
 import { AxiomTradeMobilePage } from "./AxiomTradeMobilePage";
+import { SidebarBasicInfo } from "./SidebarBasicInfo";
+import { SidebarSecurityCheck } from "./SidebarSecurityCheck";
 import { SidebarTokenAudit } from "./SidebarTokenAudit";
 import { SidebarVolumeStats } from "./SidebarVolumeStats";
 import { TokenDetailHeader } from "./TokenDetailHeader";
@@ -90,9 +80,6 @@ function AxiomTradeDesktopPage({ chain, address }: AxiomTradePageProps) {
   // referentially stable while still seeing the current value (no need to
   // depend on it inside useCallback).
   const headerHRef = useRef(FALLBACK_HEADER_H);
-
-  const { data: token } = useTokenQuery({ chain, address });
-  const tokenSymbol = token?.symbol;
 
   // Track the actual rendered height of the token header so the drag bounds
   // stay accurate even when header content (avatar, stat grid, line wrap)
@@ -256,39 +243,12 @@ function AxiomTradeDesktopPage({ chain, address }: AxiomTradePageProps) {
             <SidebarVolumeStats chain={chain} address={address} />
             <TradingPanel />
             <SidebarTokenAudit chain={chain} address={address} />
+            <SidebarBasicInfo chain={chain} address={address} />
+            <SidebarSecurityCheck chain={chain} address={address} />
 
-            <CollapsibleSection
-              title="Token Info"
-              defaultOpen
-              className="border-t border-default-100"
-            >
-              <div className="flex flex-col gap-4 p-4 pt-1">
-                <TokenAboutWidget chain={chain} address={address} />
-                <TokenSecurityWidget chain={chain} address={address} />
-                <TokenCategoriesWidget chain={chain} address={address} />
-                <TokenLiquiditiesWidget chain={chain} address={address} />
-              </div>
-            </CollapsibleSection>
-
-            <CollapsibleSection
-              title="Reused Image Tokens"
-              defaultOpen={false}
-              className="border-t border-default-100"
-            >
-              <TokenReusedImageListWidget chain={chain} address={address} />
-            </CollapsibleSection>
-
-            <CollapsibleSection
-              title="Similar Tokens"
-              defaultOpen
-              className="border-t border-default-100"
-            >
-              <TokenSimilarTokensWidget
-                chain={chain}
-                address={address}
-                keyword={tokenSymbol}
-              />
-            </CollapsibleSection>
+            {/* Reused Image Tokens and Similar Tokens sections are
+                intentionally hidden until the GMGN-style redesign for
+                those panels lands. */}
           </div>
         </aside>
       </div>
