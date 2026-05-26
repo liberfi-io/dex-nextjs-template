@@ -227,6 +227,7 @@ export default {
         "buys": "Buys",
         "sales": "Sales",
         "total": "Transactions",
+        "net_buys": "Net Buy",
         "type": "Type",
         "value": "Value",
         "amount": "Amount",

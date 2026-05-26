@@ -227,6 +227,7 @@ export default {
         "buys": "買入",
         "sales": "賣出",
         "total": "交易數",
+        "net_buys": "淨買入",
         "type": "交易類型",
         "value": "金額",
         "amount": "數量",
