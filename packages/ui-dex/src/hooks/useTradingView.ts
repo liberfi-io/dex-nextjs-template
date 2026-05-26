@@ -473,8 +473,12 @@ export const getWidgetOptions = (
     toolbar_bg: backgroundColor,
     debug: true,
     container: "tv-price-chart",
-    library_path: "/static/charting_library/", // relative to public folder
-    custom_css_url: "/static/charting_library/custom-styles.css",
+    // Absolute URL avoids the double-slash that TradingView produces when
+    // host-prefixing a leading-slash library_path; see TvChartLibraryWidgetBridge
+    // for the full explanation. `typeof window` guard keeps SSR safe even
+    // though this hook is only consumed by client components today.
+    library_path: `${typeof window !== "undefined" ? window.location.origin : ""}/static/charting_library/`,
+    custom_css_url: `${typeof window !== "undefined" ? window.location.origin : ""}/static/charting_library/custom-styles.css`,
     custom_font_family: "'Satoshi', system-ui, -apple-system, Helvetica, Arial, sans-serif",
     autosize: true,
     timezone,

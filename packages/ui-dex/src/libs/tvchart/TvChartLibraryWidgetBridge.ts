@@ -478,14 +478,25 @@ export class TvChartLibraryWidgetBridge {
     this.widget = null;
   }
   get libraryPath() {
-    // return "/_next/static/trading_platform/27.3.2-beta.4/charting_library/";
-    return "/static/charting_library/";
+    // Use an absolute URL (origin + path) instead of "/static/charting_library/".
+    //
+    // TradingView internally builds asset URLs as `host + "/" + library_path`.
+    // Passing a leading-slash path like "/static/charting_library/" produces
+    // `host//static/charting_library/` (double slash). On Vercel that URL
+    // is 308-redirected to the single-slash canonical form, which breaks
+    // TradingView's dynamic chunk loading and surfaces as the cryptic
+    // `widgetReady is not a function` → "There was an error when loading
+    // the library" error in production.
+    //
+    // Passing an absolute URL skips TradingView's host-prefixing path
+    // entirely, so the constructed asset URLs always use a single slash.
+    // The class is constructed only on the client (window is required by
+    // `custom_font_family: window.getComputedStyle(...)` in `getOptions`),
+    // so accessing `window.location.origin` here is safe.
+    return `${window.location.origin}/static/charting_library/`;
   }
   get customCssUrl() {
-    // return "light" === this.settings.theme
-    //   ? "/static/custom7.light.css"
-    //   : "/static/custom7.dark.css";
-    return "/static/charting_library/custom-styles.css";
+    return `${window.location.origin}/static/charting_library/custom-styles.css`;
   }
   get localTimezone() {
     return Intl.DateTimeFormat().resolvedOptions().timeZone;
