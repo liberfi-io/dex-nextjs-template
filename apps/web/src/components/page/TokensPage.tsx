@@ -5,9 +5,24 @@ import { useMemo } from "react";
 import { chainIdBySlug } from "@liberfi.io/utils";
 import { AppRoute } from "@liberfi/ui-dex/libs/routes";
 import { TradeDataLoader } from "@liberfi/ui-dex/components/trade";
-import { TradeDataProvider } from "@liberfi/ui-dex/components/trade/providers";
 import { AxiomTradePage } from "./token-detail/AxiomTradePage";
 
+/**
+ * Token detail entry for the (new) route group.
+ *
+ * Note: `TradeDataProvider` is deliberately NOT mounted here. The (new)
+ * `AxiomTradePage` and its descendants do not consume `useTradeDataContext`
+ * (its remaining downstream — `TradeHeader` / `TradeFooter` / `TradeTokenTabs`
+ * / `RealTimeTradeList` — lives in legacy `TradePage` only), so wrapping the
+ * new tree with the provider added zero benefit while forcing every page
+ * render through GraphQL mutations / queries (views / favorites / trades).
+ * Those calls also crashed in production because `NewAppLayout` does not
+ * mount `<GraphQLClientProvider>` — the default empty client made
+ * `client.request` undefined and threw `t.request is not a function`.
+ * Legacy `(legacy)/legacy/tokens/providers.tsx` still mounts the provider
+ * for the legacy `TradePage` consumers; that path keeps working because
+ * the legacy `AppLayout` mounts `GraphQLClientProvider`.
+ */
 export function TokensPage() {
   const { slug } = useParams();
 
@@ -23,9 +38,7 @@ export function TokensPage() {
 
   return (
     <TradeDataLoader chainId={chainId} address={address}>
-      <TradeDataProvider address={address} chain={chainId}>
-        <AxiomTradePage chain={chainId} address={address} />
-      </TradeDataProvider>
+      <AxiomTradePage chain={chainId} address={address} />
     </TradeDataLoader>
   );
 }
