@@ -12,6 +12,14 @@ import { SellTradeSettingsForm } from "./SellTradeSettingsForm";
 
 export type InstantTradeProps = {
   className?: string;
+  /**
+   * Initial trade direction. Defaults to `"buy"`. The mobile trade-bar
+   * sheet uses this so that tapping the red "Sell" CTA opens the panel
+   * already on the Sell tab instead of forcing a second tap. Once
+   * mounted, the user can still switch directions via the in-panel
+   * tablist — `defaultDirection` only seeds the initial state.
+   */
+  defaultDirection?: "buy" | "sell";
 };
 
 /**
@@ -26,10 +34,15 @@ export type InstantTradeProps = {
  * of the contract with that stylesheet; do not remove or rename them
  * without updating `globals.css` in lockstep.
  */
-export function InstantTrade({ className }: InstantTradeProps) {
+export function InstantTrade({
+  className,
+  defaultDirection = "buy",
+}: InstantTradeProps) {
   const { t } = useTranslation();
 
-  const [tradeDirection, setTradeDirection] = useState<"buy" | "sell">("buy");
+  const [tradeDirection, setTradeDirection] = useState<"buy" | "sell">(
+    defaultDirection,
+  );
 
   const [tradeType, setTradeType] = useState<"limit" | "market" | "advanced">("market");
 

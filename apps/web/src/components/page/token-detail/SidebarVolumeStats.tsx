@@ -129,7 +129,14 @@ export function SidebarVolumeStats({ chain, address }: SidebarVolumeStatsProps) 
   const slice = stats?.[active];
 
   return (
-    <div className="flex flex-col gap-3 border-b border-divider p-3">
+    // px-5 + center-aligned data cells: the data row and tab strip now
+    // share the same 4-column flex-1 grid, both with centred cell content,
+    // so `Volume` lines up under `1m` and `Net buy` lines up under `24h`.
+    // Previously the data row used `items-start` / `items-end` on the
+    // outer cells which pulled `$X` and `-$Y` flush against the section
+    // border; the 20px horizontal padding plus centred labels give the
+    // row visible breathing room on both mobile and the desktop sidebar.
+    <div className="flex flex-col gap-3 border-b border-divider px-5 py-3">
       {/* Tab strip — one cell per resolution */}
       <div className="flex items-center gap-0.5 rounded-md bg-content2 p-0.5">
         {RESOLUTIONS.map((res) => (
@@ -225,9 +232,14 @@ function DataRow({
   const netBullish = !net || net.gte(0);
 
   return (
+    // All 4 cells share the same flex-1 + centred-content layout so each
+    // value sits under its corresponding tab in the strip above (Volume
+    // under `1m`, Buys under `5m`, Sells under `1h`, Net Buy under `24h`).
+    // Forcing the outer cells to `text-left` / `text-right` previously
+    // broke that alignment.
     <div className="flex items-center text-[13px] leading-4 text-default-700">
-      {/* Volume — left aligned */}
-      <Cell align="left" label={labels.volume}>
+      {/* Volume */}
+      <Cell label={labels.volume}>
         <span className="text-foreground">
           {formatUsdCompact(slice?.volumesInUsd ?? "")}
         </span>
@@ -255,8 +267,8 @@ function DataRow({
         </span>
       </Cell>
 
-      {/* Net Buy — right aligned, bullish/bearish */}
-      <Cell align="right" label={labels.netBuys}>
+      {/* Net Buy — bullish/bearish, sign-prefixed */}
+      <Cell label={labels.netBuys}>
         <span className={cn(netBullish ? "text-bullish" : "text-bearish")}>
           {net !== undefined
             ? `${netBullish ? "+" : "-"}${formatUsdCompact(net.abs().toString())}`
@@ -270,21 +282,12 @@ function DataRow({
 function Cell({
   label,
   children,
-  align = "center",
 }: {
   label: string;
   children: React.ReactNode;
-  align?: "left" | "center" | "right";
 }) {
   return (
-    <div
-      className={cn(
-        "flex flex-1 flex-col gap-0.5",
-        align === "left" && "items-start text-left",
-        align === "right" && "items-end text-right",
-        align === "center" && "items-center text-center",
-      )}
-    >
+    <div className="flex flex-1 flex-col items-center gap-0.5 text-center">
       <span>{label}</span>
       <span
         className="text-[12px] font-medium tabular-nums"

@@ -3,12 +3,33 @@
 import { cn, Spinner } from "@liberfi.io/ui";
 import { useTranslation } from "@liberfi/ui-base";
 import {
+  createContext,
   ReactNode,
+  RefObject,
   useCallback,
+  useContext,
   useEffect,
   useRef,
   useState,
 } from "react";
+
+/**
+ * Optional external scroll-root container for {@link TableShell}.
+ *
+ * When this Context provides a non-null ref, the shell switches into
+ * "embedded" mode: it stops creating its own `overflow-auto` viewport and
+ * instead inherits the parent's scroll, letting the table body flow as
+ * part of the surrounding page. The {@link InfiniteScrollSentinel} then
+ * observes intersections against the provided root.
+ *
+ * Used by the mobile page (single full-page scroll containing header +
+ * chart + tab bar + table) so that the table rows scroll alongside the
+ * upper content instead of inside an inner viewport.
+ */
+const TableShellScrollRootContext =
+  createContext<RefObject<HTMLDivElement | null> | null>(null);
+
+export const TableShellScrollRootProvider = TableShellScrollRootContext.Provider;
 
 /**
  * Single column definition for {@link TableShell}. Mirrors GMGN's
@@ -85,57 +106,87 @@ export function TableShell({
   className,
 }: TableShellProps) {
   const { t } = useTranslation();
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const externalRootRef = useContext(TableShellScrollRootContext);
+  const ownScrollRef = useRef<HTMLDivElement>(null);
+  // When an external scroll root is provided, the shell runs in "embedded"
+  // mode: no inner overflow-auto, no own scroll container. The
+  // IntersectionObserver still needs a root, so we route the external ref
+  // through.
+  const embedded = externalRootRef !== null;
+  const scrollRootRef = embedded ? externalRootRef : ownScrollRef;
+
+  const tableMarkup = (
+    <>
+      <table
+        className={cn(
+          "w-full table-fixed border-collapse text-[12px]",
+          minWidth,
+        )}
+      >
+        <thead className="sticky top-0 z-10 bg-content1">
+          <tr className="border-b border-divider">
+            {columns.map((col) => (
+              <th
+                key={col.key}
+                className={cn(
+                  "h-9 px-3 align-middle text-[12px] font-medium text-default-500",
+                  alignClass(col.align),
+                  col.width,
+                )}
+                style={{ letterSpacing: "-0.2px" }}
+              >
+                {t(col.labelKey)}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        {children}
+        {infiniteScroll &&
+        (infiniteScroll.hasMore || infiniteScroll.isLoading) ? (
+          <InfiniteScrollSentinel
+            colSpan={columns.length}
+            rootRef={scrollRootRef}
+            {...infiniteScroll}
+          />
+        ) : null}
+      </table>
+      {isInitialLoading ? (
+        <div className="flex items-center justify-center py-10">
+          <Spinner size="sm" />
+        </div>
+      ) : null}
+    </>
+  );
 
   return (
-    <div className={cn("flex h-full flex-col", className)}>
+    <div
+      className={cn(
+        // In embedded mode we let the surrounding scroll container handle
+        // vertical overflow. In standalone mode we behave as before: a
+        // flex column whose body owns the scrolling.
+        embedded ? "flex flex-col" : "flex h-full flex-col",
+        className,
+      )}
+    >
       {toolbar ? (
         <div className="flex items-center gap-2 border-b border-default-100 px-3 py-2">
           {toolbar}
         </div>
       ) : null}
-      <div
-        ref={scrollContainerRef}
-        className="custom-scrollbar min-h-0 flex-1 overflow-auto"
-      >
-        <table
-          className={cn(
-            "w-full table-fixed border-collapse text-[12px]",
-            minWidth,
-          )}
+      {embedded ? (
+        // No inner scroll viewport. The table extends to its natural
+        // height; horizontal overflow (wide minWidth on narrow screens) is
+        // still captured by `overflow-x-auto` so we don't break layouts
+        // wider than the mobile viewport.
+        <div className="overflow-x-auto">{tableMarkup}</div>
+      ) : (
+        <div
+          ref={ownScrollRef}
+          className="custom-scrollbar min-h-0 flex-1 overflow-auto"
         >
-          <thead className="sticky top-0 z-10 bg-content1">
-            <tr className="border-b border-divider">
-              {columns.map((col) => (
-                <th
-                  key={col.key}
-                  className={cn(
-                    "h-9 px-3 align-middle text-[12px] font-medium text-default-500",
-                    alignClass(col.align),
-                    col.width,
-                  )}
-                  style={{ letterSpacing: "-0.2px" }}
-                >
-                  {t(col.labelKey)}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          {children}
-          {infiniteScroll && (infiniteScroll.hasMore || infiniteScroll.isLoading) ? (
-            <InfiniteScrollSentinel
-              colSpan={columns.length}
-              rootRef={scrollContainerRef}
-              {...infiniteScroll}
-            />
-          ) : null}
-        </table>
-        {isInitialLoading ? (
-          <div className="flex items-center justify-center py-10">
-            <Spinner size="sm" />
-          </div>
-        ) : null}
-      </div>
+          {tableMarkup}
+        </div>
+      )}
     </div>
   );
 }

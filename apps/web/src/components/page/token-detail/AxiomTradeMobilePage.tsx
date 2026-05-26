@@ -1,239 +1,183 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import { TradingChart } from "@liberfi/ui-dex/components/trade";
-import { useTokenQuery } from "@liberfi.io/react";
 import type { Chain } from "@liberfi.io/types";
+import { useTokenQuery } from "@liberfi.io/react";
 import {
-  CollapsibleSection,
   TabBarUnderline,
   type TabBarUnderlineItem,
 } from "@liberfi.io/ui-scaffold";
+import { useTranslation } from "@liberfi/ui-base";
+import { useMemo, useRef, useState } from "react";
 import {
-  TokenAboutWidget,
-  TokenActivitiesListWidget,
-  TokenCategoriesWidget,
-  TokenDevTokensListWidget,
-  TokenHoldersListWidget,
-  TokenLiquiditiesWidget,
-  TokenOrdersListWidget,
-  TokenPositionsListWidget,
-  TokenSecurityWidget,
-  TokenStatsFlipWidget,
-  TokenTopTradersListWidget,
-} from "@liberfi.io/ui-tokens";
-import { useCurrentWalletAddress } from "@liberfi/ui-base";
-import { TokenDetailHeader } from "./TokenDetailHeader";
-import { TradingPanel } from "./TradingPanel";
+  BottomEmptyTable,
+  DEV_TOKENS_COLUMNS,
+} from "./bottom-tables/BottomEmptyTable";
+import { BottomHoldersTable } from "./bottom-tables/BottomHoldersTable";
+import { BottomTopTradersTable } from "./bottom-tables/BottomTopTradersTable";
+import { BottomTradesTable } from "./bottom-tables/BottomTradesTable";
+import { TableShellScrollRootProvider } from "./bottom-tables/table-shell";
+import { MobileTradeBar } from "./MobileTradeBar";
+import { SidebarBasicInfo } from "./SidebarBasicInfo";
+import { SidebarSecurityCheck } from "./SidebarSecurityCheck";
+import { SidebarTokenAudit } from "./SidebarTokenAudit";
+import { SidebarVolumeStats } from "./SidebarVolumeStats";
+import { TokenDetailHeaderMobile } from "./TokenDetailHeaderMobile";
 
 export interface AxiomTradeMobilePageProps {
   chain: Chain;
   address: string;
 }
 
-type TopMode = "trade" | "transactions" | "tables";
-type TxTab = "trades" | "holders";
-type TableTab = "positions" | "orders" | "top-traders" | "dev-tokens";
+type BottomTab = "trades" | "holders" | "top-traders" | "dev-tokens";
+
+/** Fixed height (in px) reserved for the bottom-anchored {@link MobileTradeBar}
+ *  trigger. ≈64px = 44px button + 12px top padding + 8px safe-area baseline;
+ *  iOS bumps the bottom inset via `env(safe-area-inset-bottom)`. Used to pad
+ *  the scroll container so the last list row isn't obscured by the floating
+ *  CTA bar. */
+const TRADE_BAR_RESERVE_PX = 64;
+
+/** K-line chart height on mobile. Must match {@link TradingChart}'s intrinsic
+ *  mobile height (`h-[400px]`) — that component sets a fixed 400px below the
+ *  `md` breakpoint, so any container shorter than 400px causes the chart's
+ *  bottom toolbar (timeframe / date-range icons) to bleed into the audit grid
+ *  below it. */
+const MOBILE_CHART_HEIGHT_PX = 400;
 
 /**
- * Mobile token trade page — three-segment top nav (Trade / Transactions /
- * Tables) with a bottom-docked instant buy/sell sheet. The overall flow
- * mirrors Axiom's mobile layout: `Trade` shows the header + compact chart
- * with the trading form pinned to the viewport bottom; `Transactions`
- * focuses on the Trades / Holders lists; `Tables` compresses Positions /
- * Orders / Top Traders / Dev Tokens into a nested tab row.
+ * Mobile token detail page — GMGN-style single-scroll layout.
+ *
+ * Structure (top → bottom, all inside the same scroll container):
+ *
+ *   ┌─ TokenDetailHeaderMobile      (avatar / symbol / price)
+ *   ├─ SidebarVolumeStats           (1m / 5m / 1h / 24h tabs + volume row)
+ *   ├─ TradingChart                 (360px K-line)
+ *   ├─ SidebarTokenAudit            (concentration / cohort grid)
+ *   ├─ SidebarBasicInfo             (collapsible)
+ *   ├─ SidebarSecurityCheck         (collapsible)
+ *   ├─ Sticky TabBarUnderline       (Trades / Holders / Top Traders / Dev)
+ *   └─ Selected bottom table        (renders inline, no internal scroll —
+ *                                    rows flow as part of the page scroll
+ *                                    and infinite-load via the shared
+ *                                    scroll-root observer)
+ *
+ * Fixed elements outside the scroll container:
+ *
+ *   • {@link TradingPanel} anchored to the bottom edge as a floating sheet
+ *     (same component the desktop sidebar uses, reused for visual /
+ *     behavioural consistency).
+ *
+ * Why a single scroll instead of internal table scrolling: GMGN's mobile
+ * page uses a single scrollable column where the holder/activity list
+ * flows directly from the chart — there is no nested scroll. To get the
+ * same feel without duplicating each table, we expose the page's scroll
+ * container via {@link TableShellScrollRootProvider}; tables read the ref
+ * from context and (a) skip their own `overflow-auto` wrapper, (b) attach
+ * the IntersectionObserver-driven sentinel to the page scroll instead.
+ *
+ * All section components are imported as-is from the desktop layout
+ * (`SidebarVolumeStats`, `SidebarTokenAudit`, `SidebarBasicInfo`,
+ * `SidebarSecurityCheck`, the four `Bottom*Table`s) so we only need to
+ * maintain one set of styles + i18n keys per section.
  */
 export function AxiomTradeMobilePage({
   chain,
   address,
 }: AxiomTradeMobilePageProps) {
-  const [topMode, setTopMode] = useState<TopMode>("trade");
+  const { t } = useTranslation();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [tab, setTab] = useState<BottomTab>("trades");
   const { data: token } = useTokenQuery({ chain, address });
-  const wallet = useCurrentWalletAddress() ?? undefined;
 
-  const topItems = useMemo<ReadonlyArray<TabBarUnderlineItem<TopMode>>>(
+  const holdersCount = token?.marketData?.holders;
+
+  const tabItems = useMemo<ReadonlyArray<TabBarUnderlineItem<BottomTab>>>(
     () => [
-      { key: "trade", label: "Trade" },
-      { key: "transactions", label: "Transactions" },
-      { key: "tables", label: "Tables" },
+      { key: "trades", label: t("extend.trade.titles.transactions") },
+      {
+        key: "holders",
+        label: t("extend.trade.titles.holders"),
+        count: holdersCount ?? undefined,
+      },
+      { key: "top-traders", label: t("extend.trade.titles.top_traders") },
+      { key: "dev-tokens", label: t("extend.trade.titles.dev_tokens") },
     ],
-    [],
+    [t, holdersCount],
   );
 
   return (
     <div className="relative flex h-[calc(100vh-0.625rem)] w-full flex-col overflow-hidden bg-background">
-      <TabBarUnderline<TopMode>
-        items={topItems}
-        value={topMode}
-        onChange={setTopMode}
-      />
+      <TableShellScrollRootProvider value={scrollRef}>
+        <div
+          ref={scrollRef}
+          className="custom-scrollbar min-h-0 flex-1 overflow-auto"
+          style={{ paddingBottom: TRADE_BAR_RESERVE_PX }}
+        >
+          <TokenDetailHeaderMobile chain={chain} address={address} />
+          <SidebarVolumeStats chain={chain} address={address} />
 
-      <div className="min-h-0 flex-1 overflow-auto">
-        {topMode === "trade" && (
-          <TradeMode chain={chain} address={address} tokenSymbol={token?.symbol} />
-        )}
-        {topMode === "transactions" && (
-          <TransactionsMode
-            chain={chain}
-            address={address}
-            wallet={wallet}
-            holdersCount={token?.marketData?.holders}
-          />
-        )}
-        {topMode === "tables" && (
-          <TablesMode
-            chain={chain}
-            address={address}
-            wallet={wallet}
-            creator={token?.creators?.[0]?.address}
-            tokenSymbol={token?.symbol}
-          />
-        )}
-      </div>
-    </div>
-  );
-}
+          {/* Chart slot.
+              - `overflow-hidden` clips the TradingView widget's internal
+                toolbars so they cannot bleed into the audit grid below
+                (previously the timeframe / date-range icons rendered
+                ~40px past the container, visually overlapping the
+                "前 10 / 開發者 / 持有人 / 狙擊者" row).
+              - Height is locked to MOBILE_CHART_HEIGHT_PX which equals
+                TradingChart's intrinsic mobile height — keeping them in
+                sync prevents the chart's internal `h-[400px]` from
+                fighting a shorter parent. */}
+          <div
+            style={{ height: MOBILE_CHART_HEIGHT_PX }}
+            className="shrink-0 overflow-hidden border-b border-divider"
+          >
+            <TradingChart />
+          </div>
 
-/* -------------------------- Trade mode -------------------------- */
+          <SidebarTokenAudit chain={chain} address={address} />
+          <SidebarBasicInfo chain={chain} address={address} />
+          <SidebarSecurityCheck chain={chain} address={address} />
 
-function TradeMode({
-  chain,
-  address,
-  tokenSymbol,
-}: {
-  chain: Chain;
-  address: string;
-  tokenSymbol?: string;
-}) {
-  return (
-    <div className="flex flex-col pb-[220px]">
-      <TokenDetailHeader chain={chain} address={address} />
+          {/* Sticky tab bar — anchors to the top of the scroll container
+              once the user scrolls past the chart + info sections, so the
+              user can switch tabs without scrolling back up. The sticky
+              context is the scroll container itself (`top: 0`). */}
+          <div className="sticky top-0 z-20 border-b border-divider bg-content1">
+            <TabBarUnderline<BottomTab>
+              items={tabItems}
+              value={tab}
+              onChange={setTab}
+            />
+          </div>
 
-      <TokenStatsFlipWidget
-        chain={chain}
-        address={address}
-        className="border-b border-default-100"
-      />
-
-      <div className="h-[360px] border-b border-default-100">
-        <TradingChart />
-      </div>
-
-      <CollapsibleSection
-        title="Token Info"
-        defaultOpen={false}
-        className="border-b border-default-100"
-      >
-        <div className="flex flex-col gap-4 p-4 pt-1">
-          <TokenAboutWidget chain={chain} address={address} />
-          <TokenSecurityWidget chain={chain} address={address} />
-          <TokenCategoriesWidget chain={chain} address={address} />
-          <TokenLiquiditiesWidget chain={chain} address={address} />
+          {/* Active table — embedded mode (no internal scroll). The
+              IntersectionObserver sentinel observes the page scroll via
+              the provider above. */}
+          {tab === "trades" && (
+            <BottomTradesTable chain={chain} address={address} />
+          )}
+          {tab === "holders" && (
+            <BottomHoldersTable chain={chain} address={address} />
+          )}
+          {tab === "top-traders" && (
+            <BottomTopTradersTable chain={chain} address={address} />
+          )}
+          {tab === "dev-tokens" && (
+            <BottomEmptyTable
+              columns={DEV_TOKENS_COLUMNS}
+              minWidth="min-w-[760px]"
+            />
+          )}
         </div>
-      </CollapsibleSection>
+      </TableShellScrollRootProvider>
 
-      {/* Bottom sheet — instant trade pinned to the viewport */}
-      <div
-        aria-label={tokenSymbol ? `Trade ${tokenSymbol}` : "Trade"}
-        className="fixed bottom-[var(--bottom-navigation-bar-height,0px)] left-0 right-0 z-20 border-t border-default-100 bg-content1/95 backdrop-blur-overlay"
-      >
-        <TradingPanel />
-      </div>
-    </div>
-  );
-}
-
-/* ----------------------- Transactions mode ---------------------- */
-
-function TransactionsMode({
-  chain,
-  address,
-  wallet,
-  holdersCount,
-}: {
-  chain: Chain;
-  address: string;
-  wallet?: string;
-  holdersCount?: number;
-}) {
-  const [tab, setTab] = useState<TxTab>("trades");
-
-  const items = useMemo<ReadonlyArray<TabBarUnderlineItem<TxTab>>>(
-    () => [
-      { key: "trades", label: "Trades" },
-      { key: "holders", label: "Holders", count: holdersCount ?? undefined },
-    ],
-    [holdersCount],
-  );
-
-  return (
-    <div className="flex h-full flex-col">
-      <TabBarUnderline<TxTab> items={items} value={tab} onChange={setTab} />
-      <div className="min-h-0 flex-1 overflow-auto">
-        {tab === "trades" && (
-          <TokenActivitiesListWidget
-            chain={chain}
-            address={address}
-            youWalletAddress={wallet}
-          />
-        )}
-        {tab === "holders" && (
-          <TokenHoldersListWidget chain={chain} address={address} />
-        )}
-      </div>
-    </div>
-  );
-}
-
-/* -------------------------- Tables mode ------------------------- */
-
-function TablesMode({
-  chain,
-  address,
-  wallet,
-  creator,
-  tokenSymbol,
-}: {
-  chain: Chain;
-  address: string;
-  wallet?: string;
-  creator?: string;
-  tokenSymbol?: string;
-}) {
-  const [tab, setTab] = useState<TableTab>("positions");
-
-  const items = useMemo<ReadonlyArray<TabBarUnderlineItem<TableTab>>>(
-    () => [
-      { key: "positions", label: "Positions" },
-      { key: "orders", label: "Orders" },
-      { key: "top-traders", label: "Top Traders" },
-      { key: "dev-tokens", label: "Dev Tokens" },
-    ],
-    [],
-  );
-
-  return (
-    <div className="flex h-full flex-col">
-      <TabBarUnderline<TableTab> items={items} value={tab} onChange={setTab} />
-      <div className="min-h-0 flex-1 overflow-auto">
-        {tab === "positions" && (
-          <TokenPositionsListWidget chain={chain} wallet={wallet} />
-        )}
-        {tab === "orders" && (
-          <TokenOrdersListWidget
-            chain={chain}
-            wallet={wallet}
-            tokenAddress={address}
-            tokenSymbol={tokenSymbol}
-          />
-        )}
-        {tab === "top-traders" && (
-          <TokenTopTradersListWidget chain={chain} address={address} />
-        )}
-        {tab === "dev-tokens" && (
-          <TokenDevTokensListWidget chain={chain} creator={creator} />
-        )}
-      </div>
+      {/* Mobile trade CTA bar. Replaces the previously always-visible
+          TradingPanel (which covered ~240px of content). The bar shows
+          only the Buy / Sell triggers; tapping either opens a HeroUI
+          bottom-sheet modal containing the full TradingPanel pre-seeded
+          to the tapped direction. This mirrors GMGN's mobile pattern
+          and keeps the chart + lists the primary viewport content. */}
+      <MobileTradeBar tokenSymbol={token?.symbol} />
     </div>
   );
 }
