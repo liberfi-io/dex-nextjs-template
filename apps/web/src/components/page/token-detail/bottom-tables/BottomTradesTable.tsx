@@ -107,7 +107,10 @@ export function BottomTradesTable({ chain, address }: BottomTradesTableProps) {
 function TradeRow({ activity, now }: { activity: Activity; now: number }) {
   const { t } = useTranslation();
   const primary = pickPrimaryToken(activity);
-  const sideMeta = TYPE_META[activity.type];
+  const sideMeta = resolveTypeMeta(activity.type);
+  const sideLabel = sideMeta.labelKey
+    ? t(sideMeta.labelKey)
+    : (sideMeta.fallbackLabel ?? "--");
 
   return (
     <tr className="h-10 border-b border-divider transition-colors hover:bg-content2">
@@ -121,7 +124,7 @@ function TradeRow({ activity, now }: { activity: Activity; now: number }) {
           sideMeta.color,
         )}
       >
-        {t(sideMeta.labelKey)}
+        {sideLabel}
       </td>
       <td
         className={cn(
@@ -203,8 +206,11 @@ function activityKey(a: Activity): string {
 }
 
 interface TypeMeta {
+  /** i18n key — empty when the type is unknown and we fall back to a raw label. */
   labelKey: string;
   color: string;
+  /** Raw label used only when `labelKey` is empty (unknown activity type). */
+  fallbackLabel?: string;
 }
 
 const TYPE_META: Record<ActivityType, TypeMeta> = {
@@ -245,6 +251,23 @@ const TYPE_META: Record<ActivityType, TypeMeta> = {
     color: "text-warning",
   },
 };
+
+/**
+ * Resolve metadata for an activity type with a safe fallback. The backend
+ * may emit a type that the SDK's `ActivityType` union does not yet cover
+ * (e.g. a newly added launchpad event, or a transient malformed row).
+ * Returning a neutral entry instead of `undefined` keeps the whole trades
+ * table from crashing in that case — we surface the raw type as the label
+ * so the data is still inspectable.
+ */
+function resolveTypeMeta(type: ActivityType | string | undefined): TypeMeta {
+  if (type && type in TYPE_META) return TYPE_META[type as ActivityType];
+  return {
+    labelKey: "",
+    color: "text-default-500",
+    fallbackLabel: type ? String(type).replace(/_/g, " ") : "--",
+  };
+}
 
 /**
  * Inline copy of the SDK's `formatAgeShort` helper. We re-implement here
