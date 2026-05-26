@@ -2,7 +2,8 @@ import { Key, useCallback, useRef, useState } from "react";
 import { clsx } from "clsx";
 import { Tab, Tabs } from "@heroui/react";
 import { useTranslation } from "@liberfi/ui-base";
-import { SwitchWallet } from "../../wallet/SwitchWallet";
+import { BuyTokenBalance } from "./BuyTokenBalance";
+import { SellTokenBalance } from "./SellTokenBalance";
 import { SwitchPreset } from "./SwitchPreset";
 import { MarketBuyForm } from "./MarketBuyForm";
 import { MarketSellForm } from "./MarketSellForm";
@@ -13,6 +14,18 @@ export type InstantTradeProps = {
   className?: string;
 };
 
+/**
+ * Right-sidebar instant-trade widget.
+ *
+ * Visual treatment is mostly driven by the `.axiom-trade-panel` overrides
+ * in `globals.css` — those rules use attribute selectors against HeroUI's
+ * data slots (e.g. `[role="tablist"][class*="bg-content2"]`) so that
+ * height, padding, and the per-direction selected colours stay consistent
+ * even when HeroUI bumps its internal variant classes. Keeping the
+ * `bg-content2`-marked classes on the buy/sell `<Tabs>` is therefore part
+ * of the contract with that stylesheet; do not remove or rename them
+ * without updating `globals.css` in lockstep.
+ */
 export function InstantTrade({ className }: InstantTradeProps) {
   const { t } = useTranslation();
 
@@ -32,22 +45,19 @@ export function InstantTrade({ className }: InstantTradeProps) {
 
   return (
     <div className={clsx("flex-none sm:px-3 py-3 bg-content1 rounded-lg", className)}>
-      {/* trade direction */}
+      {/* Trade direction — height / colour / weight are all driven from
+          globals.css (.axiom-trade-panel selectors). `bg-content2` is the
+          marker class those selectors key off; `cursor: hidden` suppresses
+          the floating selection pill so our per-tab tinted bg shows
+          through. */}
       <Tabs
         fullWidth
         size="sm"
-        color={tradeDirection === "buy" ? "primary" : "secondary"}
         selectedKey={tradeDirection}
         onSelectionChange={setTradeDirection as (key: Key) => void}
         classNames={{
           tabList: "bg-content2",
-          tab: clsx(
-            "h-6",
-            tradeDirection === "buy"
-              ? "data-[selected=true]:bg-primary"
-              : "data-[selected=true]:bg-secondary",
-          ),
-          cursor: tradeDirection === "buy" ? "bg-primary" : "bg-secondary",
+          cursor: "hidden",
         }}
         // TODO heroui bug: tab animation conflicts with modal animation
         disableAnimation
@@ -56,12 +66,13 @@ export function InstantTrade({ className }: InstantTradeProps) {
         <Tab key="sell" title={t("extend.trade.sell")} />
       </Tabs>
 
-      <div className="mt-2.5 h-8 flex items-center justify-between">
-        {/* trade type */}
+      <div className="mt-2 h-6 flex items-center justify-between">
+        {/* Trade type — slim underline tab; `rounded-none` keys into the
+            globals.css override block. */}
         <Tabs
           size="sm"
           variant="underlined"
-          classNames={{ tabList: "gap-0", tab: "px-1.5" }}
+          classNames={{ tabList: "gap-0 rounded-none", tab: "px-1.5" }}
           selectedKey={tradeType}
           onSelectionChange={setTradeType as (key: Key) => void}
           // TODO heroui bug: tab animation conflicts with modal animation
@@ -72,8 +83,11 @@ export function InstantTrade({ className }: InstantTradeProps) {
           <Tab key="advanced" title={t("extend.trade.advanced")} /> */}
         </Tabs>
 
-        {/* multi wallets switch */}
-        <SwitchWallet />
+        {/* Balance — replaced the pill-shaped wallet selector with plain
+            small-text "Balance: <amount> <symbol>". The full wallet selector
+            still lives in the top nav and other launch surfaces; inside the
+            trade panel it was visually heavy and redundant. */}
+        {tradeDirection === "buy" ? <BuyTokenBalance /> : <SellTokenBalance />}
       </div>
 
       {/* trade form */}

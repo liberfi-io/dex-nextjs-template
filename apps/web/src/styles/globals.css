@@ -216,41 +216,84 @@
  * signals.
  */
 
-/* Buy/Sell tablist (bg-content2 identifies the primary tab pair) */
+/*
+ * Buy/Sell tablist (bg-content2 identifies the primary tab pair).
+ *
+ * Mirrors the VolumeStats tab strip in the same sidebar:
+ *   - Track: `bg-content2` pill with a 2px inner padding.
+ *   - Active tab: neutral `bg-content3` highlight (NOT a tinted bullish/
+ *     bearish bg — leaves the directional colour to the text only, keeps
+ *     the loud sentiment cue for the CTA further down the form).
+ *   - Active text colour: bullish (buy) / bearish (sell) for a clear
+ *     direction cue without the visual weight of a full coloured pill.
+ *   - Inactive tab: transparent, default-500 text, subtle hover.
+ *
+ * Tab height tuned to 36px so the bar reads as a primary segmented
+ * control (matches the VolumeStats row's tab footprint) rather than the
+ * thin 24px control strip it was previously.
+ */
 .axiom-trade-panel [role="tablist"][class*="bg-content2"] {
-  gap: 4px !important;
-  padding: 4px !important;
+  gap: 2px !important;
+  padding: 2px !important;
   border-radius: 8px !important;
-  border: 1px solid hsl(var(--heroui-default-200)) !important;
-  height: 40px !important;
-  min-height: 40px !important;
-  background-color: transparent !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  background-color: hsl(var(--heroui-content2)) !important;
 }
 .axiom-trade-panel [role="tablist"][class*="bg-content2"] [role="tab"] {
   min-height: 32px !important;
   height: 32px !important;
-  font-size: 16px !important;
-  border-radius: 4px !important;
-  padding: 4px !important;
-  line-height: 24px !important;
+  font-size: 14px !important;
+  border-radius: 6px !important;
+  padding: 0 12px !important;
+  line-height: 20px !important;
+  transition: background-color 150ms ease !important;
 }
-.axiom-trade-panel [role="tablist"][class*="bg-content2"] [role="tab"][data-selected="true"][data-key="buy"] {
-  font-weight: 700 !important;
-  background-color: hsl(var(--heroui-primary)) !important;
-  color: hsl(var(--heroui-primary-foreground)) !important;
+.axiom-trade-panel [role="tablist"][class*="bg-content2"] [role="tab"][data-selected="true"] {
+  font-weight: 600 !important;
+  background-color: hsl(var(--heroui-content3)) !important;
 }
-.axiom-trade-panel [role="tablist"][class*="bg-content2"] [role="tab"][data-selected="true"][data-key="sell"] {
-  font-weight: 700 !important;
-  background-color: hsl(var(--heroui-secondary)) !important;
-  color: hsl(var(--heroui-secondary-foreground)) !important;
+.axiom-trade-panel
+  [role="tablist"][class*="bg-content2"]
+  [role="tab"][data-selected="true"][data-key="buy"]
+  [data-slot="tabContent"] {
+  color: hsl(var(--heroui-primary)) !important;
+}
+.axiom-trade-panel
+  [role="tablist"][class*="bg-content2"]
+  [role="tab"][data-selected="true"][data-key="sell"]
+  [data-slot="tabContent"] {
+  color: hsl(var(--heroui-secondary)) !important;
 }
 .axiom-trade-panel [role="tablist"][class*="bg-content2"] [role="tab"]:not([data-selected="true"]) {
   font-weight: 500 !important;
   background-color: transparent !important;
+}
+.axiom-trade-panel
+  [role="tablist"][class*="bg-content2"]
+  [role="tab"]:not([data-selected="true"]):hover {
+  background-color: hsl(var(--heroui-content3) / 0.6) !important;
+}
+.axiom-trade-panel
+  [role="tablist"][class*="bg-content2"]
+  [role="tab"]:not([data-selected="true"])
+  [data-slot="tabContent"] {
   color: hsl(var(--heroui-default-500)) !important;
 }
+/* Reset HeroUI's default selected pill colour so it doesn't paint over
+   the softer per-tab bg defined above. */
+.axiom-trade-panel
+  [role="tablist"][class*="bg-content2"]
+  [role="tab"][data-selected="true"]
+  [data-slot="cursor"] {
+  display: none !important;
+}
 
-/* Market/Limit/Adv tab (rounded-none tablist) */
+/*
+ * Market/Limit/Adv tab strip (rounded-none tablist).
+ * Slimmer than the buy/sell strip; font-size matched to 12px so the row
+ * reads consistently with the balance line opposite it.
+ */
 .axiom-trade-panel [role="tablist"][class*="rounded-none"] {
   height: 24px !important;
   min-height: 24px !important;
@@ -258,15 +301,15 @@
   padding: 0 !important;
 }
 .axiom-trade-panel [role="tablist"][class*="rounded-none"] [role="tab"] {
-  font-size: 16px !important;
-  line-height: 24px !important;
+  font-size: 12px !important;
+  line-height: 16px !important;
   height: 24px !important;
   min-height: 24px !important;
-  padding: 0 8px !important;
+  padding: 0 6px !important;
 }
 .axiom-trade-panel [role="tablist"][class*="rounded-none"] [role="tab"][data-selected="true"] {
   background-color: transparent !important;
-  font-weight: 400 !important;
+  font-weight: 500 !important;
   color: hsl(var(--heroui-foreground)) !important;
 }
 .axiom-trade-panel [role="tablist"][class*="rounded-none"] [role="tab"]:not([data-selected="true"]) {

@@ -7,6 +7,19 @@ export type AntiMEVInputProps = {
   onChange: (value: boolean | "off" | "reduced" | "secure") => void;
 };
 
+/**
+ * Three-way segmented control for the Anti-MEV mode (off / reduced / secure).
+ *
+ * Previously this used `border-border` for the tabList border, which is not
+ * a token defined in the HeroUI theme — the rule fell back to the browser
+ * default (currentColor) and produced a mismatched, "off-theme" outline
+ * compared with the rest of the preset form. The control now mirrors the
+ * styling of `SwitchPreset`'s P1 / P2 / P3 segmented control:
+ *   - `border-content3 border-1` for the track border
+ *   - `bg-content3` highlight for the selected segment
+ *   - `text-neutral` for inactive, `text-foreground` for active
+ * keeping the visual language consistent across the panel.
+ */
 export function AntiMEVInput({ value, onChange }: AntiMEVInputProps) {
   const { t } = useTranslation();
 
@@ -31,11 +44,18 @@ export function AntiMEVInput({ value, onChange }: AntiMEVInputProps) {
       <div className="flex justify-end">
         <Tabs
           variant="bordered"
-          color="primary"
           size="sm"
+          fullWidth
           disableAnimation
-          radius="lg"
-          classNames={{ tabList: "border-border border-1 gap-0", tab: "min-h-0 h-5 px-2" }}
+          radius="md"
+          classNames={{
+            base: "w-full",
+            tabList: "border-content3 border-1 gap-0 p-0.5 w-full",
+            tab: "min-h-0 h-6 px-1.5 data-[selected=true]:bg-content3",
+            tabContent:
+              "text-xs text-neutral group-data-[selected=true]:text-foreground",
+            cursor: "hidden",
+          }}
           selectedKey={typeof value === "boolean" ? (value ? "secure" : "off") : value}
           onSelectionChange={onChange as (key: Key) => void}
           aria-label={t("extend.trade.settings.mev")}

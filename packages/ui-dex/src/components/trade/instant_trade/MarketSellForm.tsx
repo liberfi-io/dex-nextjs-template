@@ -174,7 +174,10 @@ export function MarketSellForm() {
     <>
       <SellTokenAmount amount={amount} className="mt-2 hidden" />
       <SellAmountInput value={amount} onChange={setAmount} className="mt-2" />
-      <SellTokenBalance className="mt-2" />
+      {/* Token-being-sold balance is now rendered on the right of the
+          market/limit tab in InstantTrade — keep this element hidden to
+          preserve the existing layout spacing in case it's re-enabled. */}
+      <SellTokenBalance className="mt-2 hidden" />
       <SellPreset className="mt-4" />
       <Button
         fullWidth
