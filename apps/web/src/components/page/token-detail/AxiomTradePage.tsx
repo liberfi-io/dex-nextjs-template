@@ -20,6 +20,7 @@ import {
 import { useTokenQuery } from "@liberfi.io/react";
 import { BottomDataPanel } from "./BottomDataPanel";
 import { AxiomTradeMobilePage } from "./AxiomTradeMobilePage";
+import { SidebarTokenAudit } from "./SidebarTokenAudit";
 import { SidebarVolumeStats } from "./SidebarVolumeStats";
 import { TokenDetailHeader } from "./TokenDetailHeader";
 import { TradingPanel } from "./TradingPanel";
@@ -254,6 +255,7 @@ function AxiomTradeDesktopPage({ chain, address }: AxiomTradePageProps) {
           >
             <SidebarVolumeStats chain={chain} address={address} />
             <TradingPanel />
+            <SidebarTokenAudit chain={chain} address={address} />
 
             <CollapsibleSection
               title="Token Info"
