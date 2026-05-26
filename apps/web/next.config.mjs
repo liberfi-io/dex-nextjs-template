@@ -84,6 +84,26 @@ const nextConfig = {
         __dirname,
         "node_modules/react-hot-toast",
       ),
+      // @liberfi.io/wallet-connector{,-privy} export AuthContext and the
+      // Privy auth/wallet contexts. If apps/web's wallet-connector and a
+      // sibling workspace package's wallet-connector resolve to different
+      // versions in pnpm's store (e.g. apps/web on 0.2.7 while
+      // packages/ui-base is still pinned to 0.2.6), each resolved path
+      // runs its own `createContext()`. The `<PrivyAuthProvider>` set up
+      // from apps/web populates one instance; `useAuth()` inside the
+      // sibling package's src then reads the other instance, finds null,
+      // and throws `useAuth must be used within an AuthProvider`. Pin
+      // both to apps/web/node_modules so workspace alias / src loading
+      // can't reintroduce the duplicate even if version drift slips
+      // back in.
+      "@liberfi.io/wallet-connector": path.resolve(
+        __dirname,
+        "node_modules/@liberfi.io/wallet-connector",
+      ),
+      "@liberfi.io/wallet-connector-privy": path.resolve(
+        __dirname,
+        "node_modules/@liberfi.io/wallet-connector-privy",
+      ),
     };
 
     // Workspace package aliases — force every `@liberfi/*` import to
