@@ -96,7 +96,7 @@ export function BottomTradesTable({ chain, address }: BottomTradesTableProps) {
     >
       <tbody>
         {activities.map((a) => (
-          <TradeRow key={a.txHash} activity={a} now={now} />
+          <TradeRow key={activityKey(a)} activity={a} now={now} />
         ))}
       </tbody>
       {isEmpty ? <EmptyBody colSpan={COLUMNS.length} /> : null}
@@ -173,6 +173,33 @@ function TradeRow({ activity, now }: { activity: Activity; now: number }) {
 function pickPrimaryToken(a: Activity) {
   if (a.type === "sell") return a.from;
   return a.to;
+}
+
+/**
+ * Compose a stable, render-unique React key for a single activity row.
+ *
+ * `txHash` alone is *not* unique: Solana routes a single multi-hop swap as
+ * one transaction emitting one inner-instruction per leg, so the API
+ * returns several `Activity` rows sharing the same `txHash`. The
+ * combination of `(txHash, from.address, to.address, poolAddress)`
+ * disambiguates legs — each leg trades a different token pair through a
+ * different pool, so the tuple is unique within a transaction in
+ * practice.
+ *
+ * We deliberately avoid mixing the array index into the key: the
+ * intrinsic compound is stable across re-renders, so a real-time prepend
+ * (e.g. a fresh trade pushed to the top of the list) will not cause every
+ * row below it to re-mount, while load-more appends remain identity-
+ * preserving as before.
+ *
+ * Edge case: two legs through the same pool with the same token pair
+ * (e.g. wash-trade routed twice through one pool in a single tx) would
+ * still collide. If that surfaces in the wild we can add the SDK-level
+ * leg index — for now this is rare enough that I'd rather see the
+ * warning surface a real data-quality issue than mask it with `idx`.
+ */
+function activityKey(a: Activity): string {
+  return `${a.txHash}:${a.from.address}:${a.to.address}:${a.poolAddress ?? ""}`;
 }
 
 interface TypeMeta {
