@@ -107,9 +107,11 @@ import {
   useDexTokenProvider,
   TranslationProvider,
   AppSdkProvider,
+  RouterProvider,
   queryClientSubject,
   dexClientSubject,
 } from "@liberfi/ui-base";
+import { useRouterAdapter } from "../hooks/useRouterAdapter";
 import { useDexClient } from "@liberfi/react-dex";
 import { DexDataProvider } from "@liberfi/ui-dex";
 import { useCreateOnrampWidgetUrlMutation } from "@liberfi/react-backend";
@@ -345,12 +347,21 @@ function ServiceProviders({ children }: PropsWithChildren) {
 }
 
 // ---------------------------------------------------------------------------
-// Legacy bridge (provides TranslationProvider + AppSdkProvider + DexDataProvider
-// so that @liberfi/ui-dex components work inside the new layout)
+// Legacy bridge (provides TranslationProvider + RouterProvider + AppSdkProvider
+// + DexDataProvider so that @liberfi/ui-dex components work inside the new
+// layout)
+//
+// The RouterProvider is required: @liberfi/ui-dex components such as
+// `TvChartWrapper` read `useRouter()` from `@liberfi/ui-base` to obtain the
+// navigation adapter. Without a `<RouterProvider>` ancestor, `useRouter()`
+// returns the empty default and downstream subscriptions (chart symbol
+// change → `navigate(url)`) crash with `TypeError: navigate is not a
+// function` once the chart's RxJS pipeline fires.
 // ---------------------------------------------------------------------------
 
 function LegacyBridge({ children }: PropsWithChildren) {
   const translation = useTranslationAdapter();
+  const router = useRouterAdapter();
 
   const qc = useQueryClient();
   useEffect(() => {
@@ -370,9 +381,11 @@ function LegacyBridge({ children }: PropsWithChildren) {
 
   return (
     <TranslationProvider translation={translation}>
-      <AppSdkProvider appSdk={browserAppSdk}>
-        {ready ? <DexDataProvider>{children}</DexDataProvider> : null}
-      </AppSdkProvider>
+      <RouterProvider router={router}>
+        <AppSdkProvider appSdk={browserAppSdk}>
+          {ready ? <DexDataProvider>{children}</DexDataProvider> : null}
+        </AppSdkProvider>
+      </RouterProvider>
     </TranslationProvider>
   );
 }
