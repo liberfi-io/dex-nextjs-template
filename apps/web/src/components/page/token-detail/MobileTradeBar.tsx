@@ -4,7 +4,6 @@ import {
   Modal,
   ModalContent,
   useDisclosure,
-  type UseDisclosureProps,
 } from "@heroui/react";
 import { cn } from "@liberfi.io/ui";
 import { useTranslation } from "@liberfi/ui-base";
@@ -125,7 +124,7 @@ function TradeSheet({
   direction,
 }: {
   isOpen: boolean;
-  onOpenChange: UseDisclosureProps["onOpenChange"];
+  onOpenChange: (open: boolean) => void;
   onClose: () => void;
   direction: Direction;
 }) {
