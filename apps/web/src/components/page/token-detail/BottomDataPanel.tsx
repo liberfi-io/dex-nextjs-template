@@ -7,23 +7,16 @@ import {
   TabBarUnderline,
   type TabBarUnderlineItem,
 } from "@liberfi.io/ui-scaffold";
+import { useTranslation } from "@liberfi/ui-base";
 import {
-  TokenActivitiesListWidget,
-  TokenDevTokensListWidget,
-  TokenHoldersListWidget,
-  TokenOrdersListWidget,
-  TokenPositionsListWidget,
-  TokenTopTradersListWidget,
-} from "@liberfi.io/ui-tokens";
-import { useCurrentWalletAddress, useTranslation } from "@liberfi/ui-base";
+  BottomEmptyTable,
+  DEV_TOKENS_COLUMNS,
+} from "./bottom-tables/BottomEmptyTable";
+import { BottomHoldersTable } from "./bottom-tables/BottomHoldersTable";
+import { BottomTopTradersTable } from "./bottom-tables/BottomTopTradersTable";
+import { BottomTradesTable } from "./bottom-tables/BottomTradesTable";
 
-type BottomTab =
-  | "trades"
-  | "positions"
-  | "orders"
-  | "holders"
-  | "top-traders"
-  | "dev-tokens";
+type BottomTab = "trades" | "holders" | "top-traders" | "dev-tokens";
 
 export interface BottomDataPanelProps {
   chain: Chain;
@@ -31,34 +24,34 @@ export interface BottomDataPanelProps {
 }
 
 /**
- * Axiom-style bottom data panel with 6 tabs (Trades / Positions / Orders /
- * Holders / Top Traders / Dev Tokens). Composes the matching `@liberfi.io/
- * ui-tokens` widgets for each tab; only the chrome (tab bar + wiring) lives
- * here. Each widget owns its own filter state and data query, so tab
- * switches do not invalidate neighbouring tabs' data.
+ * GMGN-style bottom data panel with 4 tabs (Trades / Holders / Top Traders
+ * / Dev Tokens). Each tab renders a local table component tuned to mirror
+ * GMGN's layout — column labels, alignment, color rules, and compact
+ * formatting all match the design reference §7 (Activity Table) and §8.7
+ * (Holder/Trader/Dev token lists).
+ *
+ * The Top Traders and Dev Tokens tabs are pure header-only placeholders
+ * for now; the upstream data pipeline does not yet expose those signals.
+ * Showing the GMGN column structure now keeps the panel feeling complete
+ * and avoids a layout shift when the data lands later.
  */
 export function BottomDataPanel({ chain, address }: BottomDataPanelProps) {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<BottomTab>("trades");
   const { data: token } = useTokenQuery({ chain, address });
-  const wallet = useCurrentWalletAddress() ?? undefined;
 
   const holdersCount = token?.marketData?.holders;
-  const creator = token?.creators?.[0]?.address;
-  const tokenSymbol = token?.symbol;
 
   const tabItems = useMemo<ReadonlyArray<TabBarUnderlineItem<BottomTab>>>(
     () => [
       { key: "trades", label: t("extend.trade.titles.transactions") },
-      { key: "positions", label: "Positions" },
-      { key: "orders", label: "Orders" },
       {
         key: "holders",
         label: t("extend.trade.titles.holders"),
         count: holdersCount ?? undefined,
       },
-      { key: "top-traders", label: "Top Traders" },
-      { key: "dev-tokens", label: "Dev Tokens" },
+      { key: "top-traders", label: t("extend.trade.titles.top_traders") },
+      { key: "dev-tokens", label: t("extend.trade.titles.dev_tokens") },
     ],
     [t, holdersCount],
   );
@@ -71,33 +64,21 @@ export function BottomDataPanel({ chain, address }: BottomDataPanelProps) {
         onChange={setActiveTab}
       />
 
-      <div className="min-h-0 flex-1 overflow-auto">
+      <div className="min-h-0 flex-1 overflow-hidden">
         {activeTab === "trades" && (
-          <TokenActivitiesListWidget
-            chain={chain}
-            address={address}
-            youWalletAddress={wallet}
-          />
-        )}
-        {activeTab === "positions" && (
-          <TokenPositionsListWidget chain={chain} wallet={wallet} />
-        )}
-        {activeTab === "orders" && (
-          <TokenOrdersListWidget
-            chain={chain}
-            wallet={wallet}
-            tokenAddress={address}
-            tokenSymbol={tokenSymbol}
-          />
+          <BottomTradesTable chain={chain} address={address} />
         )}
         {activeTab === "holders" && (
-          <TokenHoldersListWidget chain={chain} address={address} />
+          <BottomHoldersTable chain={chain} address={address} />
         )}
         {activeTab === "top-traders" && (
-          <TokenTopTradersListWidget chain={chain} address={address} />
+          <BottomTopTradersTable chain={chain} address={address} />
         )}
         {activeTab === "dev-tokens" && (
-          <TokenDevTokensListWidget chain={chain} creator={creator} />
+          <BottomEmptyTable
+            columns={DEV_TOKENS_COLUMNS}
+            minWidth="min-w-[760px]"
+          />
         )}
       </div>
     </div>

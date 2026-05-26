@@ -221,7 +221,56 @@
       "titles": {
         "transactions": "交易",
         "holders": "持有人",
+        "top_traders": "Top Traders",
+        "dev_tokens": "Dev Tokens",
         "info": "資訊"
+      },
+      "bottom_panel": {
+        "no_data": "暫無數據",
+        "loading": "載入中…",
+        "load_more": "載入更多",
+        "trades": {
+          "age": "時間",
+          "type": "類型",
+          "usd": "USD",
+          "amount": "數量",
+          "price": "價格",
+          "market_cap": "市值",
+          "trader": "交易者",
+          "side_buy": "買入",
+          "side_sell": "賣出",
+          "side_add_liq": "加池子",
+          "side_remove_liq": "減池子",
+          "side_red_packet": "紅包"
+        },
+        "holders_table": {
+          "rank": "#",
+          "wallet": "錢包",
+          "tags": "標籤",
+          "amount": "持有量",
+          "value": "價值",
+          "percentage": "佔比",
+          "first_held": "首次持有",
+          "last_active": "最後活躍"
+        },
+        "top_traders_table": {
+          "rank": "#",
+          "trader": "交易者",
+          "realized_pnl": "已實現盈虧",
+          "unrealized_pnl": "未實現盈虧",
+          "total_pnl": "總盈虧",
+          "buys": "買入",
+          "sells": "賣出",
+          "balance": "持倉"
+        },
+        "dev_tokens_table": {
+          "token": "代幣",
+          "created": "創建時間",
+          "liquidity": "流動性",
+          "market_cap": "市值",
+          "holders": "持有人",
+          "status": "狀態"
+        }
       },
       "transactions": {
         "buys": "買入",

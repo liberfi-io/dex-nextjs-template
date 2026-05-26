@@ -221,7 +221,56 @@ export default {
       "titles": {
         "transactions": "Transactions",
         "holders": "Holders",
+        "top_traders": "Top Traders",
+        "dev_tokens": "Dev Tokens",
         "info": "Info"
+      },
+      "bottom_panel": {
+        "no_data": "No data yet",
+        "loading": "Loading…",
+        "load_more": "Load more",
+        "trades": {
+          "age": "Age",
+          "type": "Type",
+          "usd": "USD",
+          "amount": "Amount",
+          "price": "Price",
+          "market_cap": "MCap",
+          "trader": "Trader",
+          "side_buy": "Buy",
+          "side_sell": "Sell",
+          "side_add_liq": "Add Liq",
+          "side_remove_liq": "Remove Liq",
+          "side_red_packet": "Red Packet"
+        },
+        "holders_table": {
+          "rank": "#",
+          "wallet": "Wallet",
+          "tags": "Tags",
+          "amount": "Amount",
+          "value": "Value",
+          "percentage": "%",
+          "first_held": "First held",
+          "last_active": "Last active"
+        },
+        "top_traders_table": {
+          "rank": "#",
+          "trader": "Trader",
+          "realized_pnl": "Realized PnL",
+          "unrealized_pnl": "Unrealized PnL",
+          "total_pnl": "Total PnL",
+          "buys": "Buys",
+          "sells": "Sells",
+          "balance": "Balance"
+        },
+        "dev_tokens_table": {
+          "token": "Token",
+          "created": "Created",
+          "liquidity": "Liquidity",
+          "market_cap": "MCap",
+          "holders": "Holders",
+          "status": "Status"
+        }
       },
       "transactions": {
         "buys": "Buys",
