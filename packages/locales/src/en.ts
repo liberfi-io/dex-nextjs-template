@@ -926,7 +926,33 @@ export default {
       "payout": "Payout",
       "qty": "Qty",
       "total": "Total",
-      "time": "Time"
+      "time": "Time",
+      "copyAddress": "Copy address",
+      "copied": "Copied",
+      "refresh": "Refresh",
+      "noAssets": "No assets yet",
+      "noActivities": "No activities yet",
+      "tabs": {
+        "assets": "Assets",
+        "activities": "Activities"
+      },
+      "allocation": {
+        "title": "Token allocation",
+        "noWallet": "No wallet connected",
+        "noHoldings": "No holdings to display"
+      },
+      "headers": {
+        "token": "Token",
+        "balance": "Balance",
+        "value": "Value",
+        "price": "Price",
+        "change24h": "24h",
+        "pnl": "PnL",
+        "age": "Age",
+        "type": "Type",
+        "amount": "Amount",
+        "tx": "Tx"
+      }
     }
   }
 } as const;
