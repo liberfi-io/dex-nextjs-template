@@ -1,21 +1,25 @@
 "use client";
 
 /**
- * Fetch the SOL balance (in lamports) for an arbitrary Solana address
- * via JSON-RPC `getBalance`. The connected SOL wallet adapter is NOT
- * used because we want this to work regardless of which chain the
- * user is currently active on (e.g. opening the deposit modal from
- * the Hyperliquid perpetuals page).
+ * Fetch a wallet's native SOL balance (in lamports) via the project's
+ * `/api/balance` server route — keeping the self-hosted Solana RPC URL
+ * and its `X-API-KEY` strictly server-side. The connected SOL wallet
+ * adapter is intentionally NOT used so the deposit modal can read this
+ * balance regardless of which chain the user is currently active on
+ * (e.g. opening it from the Hyperliquid perpetuals page).
  *
  * Refetched every 10 s while the address is valid.
  */
 
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Connection, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
+import { PublicKey } from "@solana/web3.js";
 
 const POLL_MS = 10_000;
 const SOL_DECIMALS = 9;
+const LAMPORTS_PER_SOL = 1_000_000_000n;
+// System program / native SOL marker — matches the `/api/balance` route.
+const SOL_NATIVE_ADDRESS = "11111111111111111111111111111111";
 
 export type SolBalance = {
   /** Lamports as a base-10 string (preserves precision for big values). */
@@ -35,13 +39,14 @@ const DEFAULT: SolBalance = {
   refetch: async () => undefined,
 };
 
-let _cached: Connection | undefined;
-function getConnection(): Connection | undefined {
-  if (_cached) return _cached;
-  const url = process.env.NEXT_PUBLIC_SOLANA_RPC_URL;
-  if (!url) return undefined;
-  _cached = new Connection(url, "confirmed");
-  return _cached;
+interface BalanceApiEntry {
+  address: string;
+  balance: string;
+  decimals: number;
+}
+
+interface BalanceApiResponse {
+  balances?: BalanceApiEntry[];
 }
 
 export function solBalanceQueryKey(address?: string) {
@@ -49,8 +54,7 @@ export function solBalanceQueryKey(address?: string) {
 }
 
 export function useSolBalance(address: string | undefined): SolBalance {
-  const conn = getConnection();
-  const enabled = Boolean(address && conn && isValidSolAddress(address));
+  const enabled = Boolean(address && isValidSolAddress(address));
 
   const query = useQuery({
     queryKey: solBalanceQueryKey(address),
@@ -58,15 +62,26 @@ export function useSolBalance(address: string | undefined): SolBalance {
     refetchInterval: POLL_MS,
     staleTime: POLL_MS / 2,
     queryFn: async () => {
-      const lamports = await conn!.getBalance(new PublicKey(address!));
-      return lamports;
+      const url = `/api/balance?chain=sol&address=${encodeURIComponent(
+        address!,
+      )}&tokens=${encodeURIComponent(SOL_NATIVE_ADDRESS)}`;
+      const res = await fetch(url, {
+        method: "GET",
+        headers: { Accept: "application/json" },
+      });
+      if (!res.ok) {
+        throw new Error(`/api/balance returned ${res.status}`);
+      }
+      const body = (await res.json()) as BalanceApiResponse;
+      const entry = body.balances?.find((b) => b.address === SOL_NATIVE_ADDRESS);
+      return entry?.balance ?? "0";
     },
   });
 
   return useMemo<SolBalance>(() => {
     if (!enabled) return DEFAULT;
     const lamports = query.data;
-    if (typeof lamports !== "number") {
+    if (typeof lamports !== "string") {
       return {
         ...DEFAULT,
         isLoading: query.isLoading,
@@ -75,8 +90,8 @@ export function useSolBalance(address: string | undefined): SolBalance {
       };
     }
     return {
-      lamports: lamports.toString(),
-      sol: (lamports / LAMPORTS_PER_SOL).toFixed(SOL_DECIMALS).replace(/\.?0+$/, ""),
+      lamports,
+      sol: formatLamportsAsSol(lamports),
       isLoading: query.isLoading,
       isError: query.isError,
       refetch: query.refetch,
@@ -91,4 +106,16 @@ function isValidSolAddress(addr: string): boolean {
   } catch {
     return false;
   }
+}
+
+// Manually format lamports → SOL to avoid pulling in `LAMPORTS_PER_SOL`
+// (and the rest of `@solana/web3.js`'s Connection surface) just for one
+// division. Trailing zeros are stripped to match the previous output.
+function formatLamportsAsSol(lamports: string): string {
+  const value = BigInt(lamports);
+  const whole = value / LAMPORTS_PER_SOL;
+  const remainder = value % LAMPORTS_PER_SOL;
+  if (remainder === 0n) return whole.toString();
+  const frac = remainder.toString().padStart(SOL_DECIMALS, "0").replace(/0+$/, "");
+  return frac ? `${whole.toString()}.${frac}` : whole.toString();
 }

@@ -7,7 +7,6 @@ declare global {
       NODE_ENV: "development" | "production" | undefined;
       NEXT_PUBLIC_DEFAULT_TOKEN_CHAIN: string;
       NEXT_PUBLIC_DEFAULT_TOKEN_ADDRESS: string;
-      NEXT_PUBLIC_SOLANA_RPC_URL: string;
       NEXT_PUBLIC_GA_MEASUREMENT_ID: string | undefined;
       NEXT_PUBLIC_PINATA_GATEWAY: string;
       NEXT_PUBLIC_PRIVY_APPID: string;
@@ -34,6 +33,7 @@ declare global {
       PRIVY_APP_ID: string;
       PRIVY_APP_SECRET: string;
       SOLANA_RPC_URL: string | undefined;
+      SOLANA_RPC_KEY: string | undefined;
       ETH_RPC_URL: string | undefined;
       BSC_RPC_URL: string | undefined;
       JWT_ISSUER: string;

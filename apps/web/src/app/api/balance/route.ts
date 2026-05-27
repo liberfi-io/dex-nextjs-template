@@ -45,7 +45,14 @@ function getSolConnection(): Connection {
   if (solConnection) return solConnection;
   const url = RPC_URLS.sol;
   if (!url) throw new Error("SOLANA_RPC_URL not configured");
-  solConnection = new Connection(url, "confirmed");
+  // Self-hosted Solana RPC authenticates via the X-API-KEY header instead of
+  // a query string, so we pass it through ConnectionConfig.httpHeaders when
+  // SOLANA_RPC_KEY is provided.
+  const apiKey = process.env.SOLANA_RPC_KEY;
+  solConnection = new Connection(url, {
+    commitment: "confirmed",
+    ...(apiKey ? { httpHeaders: { "X-API-KEY": apiKey } } : {}),
+  });
   return solConnection;
 }
 
