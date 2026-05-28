@@ -74,6 +74,15 @@ const nextConfig = {
         __dirname,
         "node_modules/@tanstack/react-query",
       ),
+      // @liberfi.io/react owns DexClientContext. The app-level
+      // DexClientProvider and hooks imported from workspace packages
+      // (for example @liberfi/ui-base) must resolve to this exact module
+      // instance, otherwise consumers read a different React context and
+      // throw "useDexClient must be used within a DexClientProvider".
+      "@liberfi.io/react": path.resolve(
+        __dirname,
+        "node_modules/@liberfi.io/react",
+      ),
       // react-hot-toast keeps its toast queue in module-level state, so the
       // <Toaster> renderer (imported by @liberfi.io/ui via StyledToaster)
       // and toast emitters (e.g. @liberfi/ui-base's useTimerToast) MUST
