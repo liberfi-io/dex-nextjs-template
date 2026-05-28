@@ -218,7 +218,7 @@ const nextConfig = {
   },
 };
 
-export default process.env.SENTRY_AUTH_TOKEN
+export default process.env.CI && process.env.SENTRY_AUTH_TOKEN
   ? withSentryConfig(nextConfig, {
       org: "singularitylab",
       project: "dex",

@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/nextjs";
+import { isSentryEnabled } from "./sentry.shared";
 
 export async function register() {
   if (process.env.NEXT_RUNTIME === "nodejs") {
@@ -10,4 +11,6 @@ export async function register() {
   }
 }
 
-export const onRequestError = Sentry.captureRequestError;
+export const onRequestError = isSentryEnabled()
+  ? Sentry.captureRequestError
+  : () => undefined;
