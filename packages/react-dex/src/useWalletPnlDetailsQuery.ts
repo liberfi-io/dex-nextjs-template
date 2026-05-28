@@ -1,5 +1,5 @@
 import { useQuery, UseQueryOptions } from "@tanstack/react-query";
-import { ChainStreamClient, PnlDetailsResult } from "@chainstream-io/sdk";
+import { ChainStreamClient, PnlDetailsResult, PnlResolution } from "@chainstream-io/sdk";
 import { Chain } from "@liberfi/core";
 import { useDexClient } from "./DexClientProvider";
 import { QueryKeys } from "./queryKeys";
@@ -10,7 +10,10 @@ export async function fetchWalletPnlDetails(
   chain: Chain,
   walletAddress: string,
 ) {
-  return await client.wallet.getPnlDetails(chainParam(chain), walletAddress, { limit: 100 });
+  return await client.wallet.getPnlDetails(chainParam(chain), walletAddress, {
+    limit: 100,
+    resolution: PnlResolution.all,
+  });
 }
 
 /**
