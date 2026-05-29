@@ -59,7 +59,6 @@ import {
 import { PredictClient, PredictProvider, PolymarketProvider } from "@liberfi.io/react-predict";
 import type { PredictEvent } from "@liberfi.io/react-predict";
 import {
-  SearchEventsButton,
   PredictSearchModal,
   PREDICT_SEARCH_MODAL_ID,
   PredictWalletProvider,
@@ -90,6 +89,8 @@ import {
   useScreen,
   Button,
   ChevronDownIcon,
+  Kbd,
+  SearchIcon,
 } from "@liberfi.io/ui";
 import type { LinkComponentType } from "@liberfi.io/ui";
 import {
@@ -100,7 +101,7 @@ import {
   type NavItem,
   DraggablePanelProvider,
 } from "@liberfi.io/ui-scaffold";
-import { SearchTokensButton, SearchModal } from "@liberfi.io/ui-tokens";
+import { SEARCH_MODAL_ID, SearchModal } from "@liberfi.io/ui-tokens";
 import { chainDisplayName, chainSlug, truncateAddress } from "@liberfi.io/utils";
 import type { PredefinedToken } from "@liberfi.io/utils";
 import {
@@ -427,7 +428,9 @@ function PageShell({ children }: PropsWithChildren) {
   const isPerpetualsPage = pathname.startsWith("/perpetuals");
   const isAuthenticated = authStatus === "authenticated";
 
-  const { onClose: closePredictSearch } = useAsyncModal(PREDICT_SEARCH_MODAL_ID);
+  const { onOpen: openPredictSearch, onClose: closePredictSearch } =
+    useAsyncModal(PREDICT_SEARCH_MODAL_ID);
+  const { onOpen: openTokenSearch, onClose: dismissTokenSearch } = useAsyncModal(SEARCH_MODAL_ID);
 
   const handlePredictHover = useCallback(
     (event: PredictEvent) => {
@@ -462,6 +465,68 @@ function PageShell({ children }: PropsWithChildren) {
     },
     [router],
   );
+
+  const openActiveSearch = useCallback(async () => {
+    if (isPredictPage) {
+      const event = await openPredictSearch({ params: searchModalParams });
+      if (event) {
+        handleSelectPredictEvent(event as PredictEvent);
+      }
+      return;
+    }
+
+    const token = await openTokenSearch({ params: { chains: [chain] } });
+    if (token) {
+      handleSelectToken(token as Token);
+    }
+  }, [
+    chain,
+    handleSelectPredictEvent,
+    handleSelectToken,
+    isPredictPage,
+    openPredictSearch,
+    openTokenSearch,
+    searchModalParams,
+  ]);
+
+  const closeActiveSearch = useCallback(() => {
+    if (isPredictPage) {
+      closePredictSearch();
+      return;
+    }
+
+    dismissTokenSearch();
+  }, [closePredictSearch, dismissTokenSearch, isPredictPage]);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const activeElement = document.activeElement;
+      const isTextInput =
+        !!activeElement &&
+        (activeElement.tagName === "INPUT" ||
+          activeElement.tagName === "TEXTAREA" ||
+          activeElement.getAttribute("contenteditable") === "true");
+
+      if (event.key === "/" && !isTextInput) {
+        event.preventDefault();
+        openActiveSearch();
+      }
+
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeActiveSearch();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [closeActiveSearch, openActiveSearch]);
+
+  const searchLabel = t(
+    isPredictPage ? "predict.search.placeholder" : "tokens.search.placeholder",
+  ) as string;
 
   return (
     <PredictWalletProvider enabled={isPredictPage}>
@@ -501,36 +566,22 @@ function PageShell({ children }: PropsWithChildren) {
 
               {/* Center: Search bar — desktop only */}
               <div className="hidden lg:flex flex-1 min-w-0 justify-center">
-                {isPredictPage ? (
-                  <SearchEventsButton
-                    onSelectEvent={handleSelectPredictEvent}
-                    modalParams={searchModalParams}
-                    className="max-lg:hidden"
-                  />
-                ) : (
-                  <SearchTokensButton
-                    chains={[chain]}
-                    onSelectToken={handleSelectToken}
-                    className="max-lg:hidden"
-                  />
-                )}
+                <HeaderSearchButton
+                  variant="desktop"
+                  label={searchLabel}
+                  onPress={openActiveSearch}
+                  className="max-lg:hidden"
+                />
               </div>
 
               {/* Right: search icon (tablet/mobile) + chain select + launchpad + language + account */}
               <div className="shrink-0 ml-auto flex items-center gap-2">
-                {isPredictPage ? (
-                  <SearchEventsButton
-                    onSelectEvent={handleSelectPredictEvent}
-                    modalParams={searchModalParams}
-                    className="lg:hidden"
-                  />
-                ) : (
-                  <SearchTokensButton
-                    chains={[chain]}
-                    onSelectToken={handleSelectToken}
-                    className="lg:hidden"
-                  />
-                )}
+                <HeaderSearchButton
+                  variant="mobile"
+                  label={searchLabel}
+                  onPress={openActiveSearch}
+                  className="lg:hidden"
+                />
 
                 {/* Chain selector is always shown — including on the predict
                     module — so users can manage their underlying on-chain
@@ -647,6 +698,55 @@ function NavTab({
 // ---------------------------------------------------------------------------
 // Header action buttons — all 32px tall, rounded-full
 // ---------------------------------------------------------------------------
+
+function HeaderSearchButton({
+  variant,
+  label,
+  onPress,
+  className,
+}: {
+  variant: "desktop" | "mobile";
+  label: string;
+  onPress: () => void;
+  className?: string;
+}) {
+  if (variant === "desktop") {
+    return (
+      <Button
+        size="sm"
+        radius="full"
+        onPress={onPress}
+        variant="bordered"
+        startContent={<SearchIcon width={16} height={16} className="text-foreground" />}
+        endContent={
+          <Kbd className="min-w-6 justify-center text-xs text-foreground bg-content3 rounded-lg">
+            /
+          </Kbd>
+        }
+        className={cn(
+          "w-56 min-w-0 h-8 min-h-0 border-transparent hover:border-border bg-content2 pl-3 pr-1.5 text-neutral",
+          className,
+        )}
+      >
+        {label}
+      </Button>
+    );
+  }
+
+  return (
+    <Button
+      size="sm"
+      radius="full"
+      isIconOnly
+      onPress={onPress}
+      variant="bordered"
+      aria-label={label}
+      className={cn("w-8 min-w-0 h-8 min-h-0 border-1 border-border bg-content2", className)}
+    >
+      <SearchIcon width={16} height={16} className="text-foreground" />
+    </Button>
+  );
+}
 
 const TRIGGER_CLASS =
   "flex items-center justify-center h-8 rounded-full text-sm font-medium transition-colors border bg-zinc-800/60 border-zinc-700/50 hover:bg-zinc-800 cursor-pointer focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus";
