@@ -160,9 +160,14 @@ export function CombinedTokenList() {
 
   const handleSelectToken = useCallback(
     (token: Token) => {
-      router.push(tokenDetailRoute(token.chain, token.address));
+      // The list is already filtered to the currently selected chain, so use it
+      // as the authoritative source for the detail route. Relying on
+      // `token.chain` is fragile: any unexpected value yields an empty chain
+      // segment (`/tokens//<address>`) and the detail page falls back to the
+      // default chain (SOL).
+      router.push(tokenDetailRoute(chain, token.address));
     },
-    [router],
+    [router, chain],
   );
 
   const showTokenListControls = activeTab !== "pulse";

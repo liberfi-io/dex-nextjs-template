@@ -62,9 +62,9 @@ export function HomePage() {
 
   const handleSelectToken = useCallback(
     (token: Token) => {
-      navigate(tokenDetailRoute(token.chain, token.address));
+      navigate(tokenDetailRoute(chainId, token.address));
     },
-    [navigate],
+    [navigate, chainId],
   );
 
   return (
