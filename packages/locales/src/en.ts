@@ -94,7 +94,8 @@ export default {
         "3M": "3M",
         "6M": "6M"
       },
-      "copied": "Copied"
+      "copied": "Copied",
+      "copied_token_address": "Copied {{symbol}} token address"
     },
     "search": {
       "history": "History"

@@ -91,10 +91,14 @@ function Content({ token }: { token: Token }) {
       e.preventDefault();
       e.stopPropagation();
       copyToClipboard(token.address, () =>
-        toast.success(t("extend.common.copied")),
+        toast.success(
+          t("extend.common.copied_token_address", {
+            symbol: token.symbol,
+          }),
+        ),
       );
     },
-    [copyToClipboard, token.address, t],
+    [copyToClipboard, token.address, token.symbol, t],
   );
 
   const socials = token.socialMedias ?? {};

@@ -105,9 +105,15 @@ function Content({ token }: { token: Token }) {
     (e: MouseEvent<HTMLElement>) => {
       e.preventDefault();
       e.stopPropagation();
-      copyToClipboard(token.address, () => toast.success("Copied"));
+      copyToClipboard(token.address, () =>
+        toast.success(
+          t("extend.common.copied_token_address", {
+            symbol: token.symbol,
+          }),
+        ),
+      );
     },
-    [copyToClipboard, token.address],
+    [copyToClipboard, token.address, token.symbol, t],
   );
 
   const socials = token.socialMedias ?? {};

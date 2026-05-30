@@ -94,7 +94,8 @@ export default {
         "3M": "3M",
         "6M": "6M"
       },
-      "copied": "複製成功"
+      "copied": "複製成功",
+      "copied_token_address": "已複製 {{symbol}} 代幣地址"
     },
     "search": {
       "history": "搜尋歷史"
