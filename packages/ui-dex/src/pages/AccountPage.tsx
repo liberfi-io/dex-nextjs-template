@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useCurrentChain, useSelectChain } from "@liberfi.io/ui-chain-select";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
   useHideHeader,
   useSetBottomNavigationBarActiveKey,
@@ -27,7 +27,6 @@ export function AccountPage() {
   const [tab, setTab] = useState<"assets" | "activities">("assets");
 
   const { chain: chainId } = useCurrentChain();
-  const { selectChain: setChainId } = useSelectChain();
 
   const [hideLowHoldingAssets, setHideLowHoldingAssets] = useState(false);
 
@@ -42,8 +41,6 @@ export function AccountPage() {
       <AccountTap tab={tab} onTabChange={setTab}>
         {tab === "assets" && (
           <AssetTap
-            chainId={chainId}
-            onChainChange={setChainId}
             hideLowHoldingAssets={hideLowHoldingAssets}
             onHideLowHoldingAssetsChange={setHideLowHoldingAssets}
           />

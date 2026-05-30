@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { chainIdBySlug } from "@liberfi.io/utils";
 import { useCurrentChain, useSelectChain } from "@liberfi.io/ui-chain-select";
 import { useSwitchEvmWalletsToChain } from "@liberfi.io/wallet-connector";
+import type { Chain } from "@liberfi.io/types";
 import { chainQueryValue } from "../libs/chainQuery";
 
 /**
@@ -33,15 +34,31 @@ export function useChainUrlSync(): void {
   const router = useRouter();
   const { chain: currentChain } = useCurrentChain();
   const switchEvmWalletsToChain = useSwitchEvmWalletsToChain();
+
+  const currentChainRef = useRef(currentChain);
+  currentChainRef.current = currentChain;
+
+  const switchRef = useRef(switchEvmWalletsToChain);
+  switchRef.current = switchEvmWalletsToChain;
+
+  const stableSwitchChain = useCallback(
+    (chain: Chain) => switchRef.current(chain),
+    [],
+  );
+
   const { selectChain } = useSelectChain({
-    onSwitchChain: switchEvmWalletsToChain,
+    onSwitchChain: stableSwitchChain,
   });
+
+  const selectChainRef = useRef(selectChain);
+  selectChainRef.current = selectChain;
 
   // Stable dep: searchParams is a new object each render, so derive a string.
   const queryString = searchParams.toString();
 
   useEffect(() => {
-    const slug = searchParams.get("chain");
+    const params = new URLSearchParams(queryString);
+    const slug = params.get("chain");
     if (!slug) return;
 
     const queryChain = chainIdBySlug(slug);
@@ -64,10 +81,7 @@ export function useChainUrlSync(): void {
     }
 
     // Non-detail page: align the atom with the URL query.
-    if (queryChain === currentChain) return;
-    void selectChain(queryChain);
-    // searchParams is intentionally referenced via the captured queryString
-    // dependency. selectChain is referenced as a stable callback.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [queryString, pathname, currentChain, selectChain, router]);
+    if (queryChain === currentChainRef.current) return;
+    void selectChainRef.current(queryChain);
+  }, [queryString, pathname, router]);
 }

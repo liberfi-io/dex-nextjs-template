@@ -1,15 +1,9 @@
-// import { useAppContext, useTranslation } from "../../hooks";
 import { useTranslation } from "@liberfi/ui-base";
-import { Chain } from "@liberfi/core";
-// import { ChainSelect } from "../ChainSelect";
-// import { ChainSelectMobile } from "../ChainSelectMobile";
 import { Button } from "@heroui/react";
 import { SelectedIndicatorIcon, UnselectedIndicatorIcon } from "../../assets";
 import { useCallback } from "react";
 
 export type AssetTapProps = {
-  chainId?: Chain | "";
-  onChainChange: (chainId: Chain) => void;
   hideLowHoldingAssets: boolean;
   onHideLowHoldingAssetsChange: (hideLowHoldingAssets: boolean) => void;
 };
@@ -17,12 +11,8 @@ export type AssetTapProps = {
 export function AssetTap({
   hideLowHoldingAssets,
   onHideLowHoldingAssetsChange,
-}: // chainId,
-// onChainChange,
-AssetTapProps) {
+}: AssetTapProps) {
   const { t } = useTranslation();
-
-  // const { layout } = useAppContext();
 
   const handleToggleShowAllAssets = useCallback(
     () => onHideLowHoldingAssetsChange(!hideLowHoldingAssets),
@@ -46,12 +36,6 @@ AssetTapProps) {
       >
         {t("extend.account.hide_assets")}
       </Button>
-
-      {/* {layout === "desktop" && <ChainSelect chainId={chainId} onSelect={onChainChange} />}
-
-      {layout !== "desktop" && (
-        <ChainSelectMobile chainId={chainId} onSelect={onChainChange} />
-      )} */}
     </div>
   );
 }
