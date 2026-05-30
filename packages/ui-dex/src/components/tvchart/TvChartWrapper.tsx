@@ -1,4 +1,10 @@
-import { AppRoute, CHAIN_QUOTE_TOKEN_SYMBOLS, formatLongNumber, formatShortNumber } from "../../libs";
+import {
+  CHAIN_QUOTE_TOKEN_SYMBOLS,
+  formatLongNumber,
+  formatShortNumber,
+  tokenDetailChainSegment,
+  tokenDetailRoute,
+} from "../../libs";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { useRouter, useTranslation } from "@liberfi/ui-base";
 import { useTvChartTradeHistories } from "../../hooks/tvchart/useTvChartTradeHistories";
@@ -18,12 +24,12 @@ import {
   Timezone,
 } from "../../../../../apps/web/public/static/charting_library";
 import { TvChart, TvChartInstance, TvChartProps } from "./TvChart";
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Subscription } from "rxjs";
 import clsx from "clsx";
 import { chainSlug } from "@liberfi.io/utils";
 import { TvChartDataFeedModule } from "./TvChartDataFeedModule";
-import { isPriceChartAtom, isUSDChartAtom, tokenAddressAtom } from "../../states";
+import { isPriceChartAtom, isUSDChartAtom, tokenAddressAtom, tokenChainAtom } from "../../states";
 import { useAtomValue } from "jotai";
 
 export interface TvChartWrapperProps {
@@ -37,6 +43,10 @@ export const TvChartWrapper = memo(({ className }: TvChartWrapperProps) => {
   const { navigate } = useRouter();
 
   const { chain } = useCurrentChain();
+
+  const tokenChain = useAtomValue(tokenChainAtom);
+
+  const chartChain = tokenChain ?? chain;
 
   const isPriceChart = useAtomValue(isPriceChartAtom);
 
@@ -52,66 +62,104 @@ export const TvChartWrapper = memo(({ className }: TvChartWrapperProps) => {
 
   const subsRef = useRef<Subscription[]>([]);
 
-  // init config
-  const [config, setConfig] = useState<TvChartProps["config"]>({
-    storageId: "kline",
-    tickerSymbol: stringifySymbol({
-      chain: chainSlug(chain)!,
-      address: address ?? "",
-      priceType: isPriceChart ? TvChartPriceType.Price : TvChartPriceType.MarketCap,
-      quote: isUSDChart
-        ? TvChartQuoteType.USD
-        : (CHAIN_QUOTE_TOKEN_SYMBOLS[chain] as TvChartQuoteType),
-    }),
-    resolution: "1m",
-    datafeedModule: TvChartDataFeedModule,
-    theme: TvChartTheme.Dark,
-    layout: TvChartLayout.Layout1A,
-    chartType: TvChartType.TradingView,
-    kLineStyle: TvChartKlineStyle.Candles,
-    timezone: DateTime.local().get("zoneName") as unknown as Timezone,
-    locale: getTvChartLibraryLocale(i18n.language),
-    chartNames: {
-      [TvChartType.TradingView]: "TradingView",
-      [TvChartType.Original]: "Original",
-    },
-    priceFormatterFactory: (symbolInfo: LibrarySymbolInfo | null, _minTick: string) => ({
-      format: (price: number) => {
-        try {
-          if (Number(price) > 1e31) return `${price}`;
-          if (!symbolInfo) return formatLongNumber(price);
-          return (symbolInfo as TvChartSymbolInfo).priceType === TvChartPriceType.Price
-            ? formatLongNumber(price)
-            : formatShortNumber(price);
-        } catch (e) {
-          console.warn(e);
-          return `${price}`;
-        }
-      },
-    }),
-  });
+  const routeSyncedRef = useRef(false);
+
+  const expectedRouteRef = useRef({ chain: "", address: "" });
+
+  const tickerSymbol = useMemo(
+    () =>
+      stringifySymbol({
+        chain: chainSlug(chartChain)!,
+        address: address ?? "",
+        priceType: isPriceChart ? TvChartPriceType.Price : TvChartPriceType.MarketCap,
+        quote: isUSDChart
+          ? TvChartQuoteType.USD
+          : (CHAIN_QUOTE_TOKEN_SYMBOLS[chartChain] as TvChartQuoteType),
+      }),
+    [chartChain, address, isPriceChart, isUSDChart],
+  );
+
+  const chartIdentityKey = `${tokenDetailChainSegment(chartChain)}/${address ?? ""}`;
 
   useEffect(() => {
-    setConfig((prev) => ({
-      ...prev,
+    expectedRouteRef.current = {
+      chain: tokenDetailChainSegment(chartChain),
+      address: address ?? "",
+    };
+    routeSyncedRef.current = false;
+  }, [chartChain, address]);
+
+  const navigateToTickerSymbol = useCallback(
+    (tickerSymbol: string) => {
+      const { chain, address } = parseSymbol(tickerSymbol);
+      const targetChain = tokenDetailChainSegment(chain);
+      if (!targetChain || !address) return;
+
+      const expected = expectedRouteRef.current;
+      const matchesCurrentRoute =
+        targetChain === expected.chain &&
+        address.toLowerCase() === expected.address.toLowerCase();
+
+      if (matchesCurrentRoute) {
+        routeSyncedRef.current = true;
+        return;
+      }
+
+      if (!routeSyncedRef.current) return;
+
+      navigate(tokenDetailRoute(targetChain, address));
+    },
+    [navigate],
+  );
+
+  const config = useMemo<TvChartProps["config"]>(
+    () => ({
+      storageId: "kline",
+      tickerSymbol,
+      resolution: "1m",
+      datafeedModule: TvChartDataFeedModule,
+      theme: TvChartTheme.Dark,
+      layout: TvChartLayout.Layout1A,
+      chartType: TvChartType.TradingView,
+      kLineStyle: TvChartKlineStyle.Candles,
+      timezone: DateTime.local().get("zoneName") as unknown as Timezone,
       locale: getTvChartLibraryLocale(i18n.language),
-    }));
-  }, [i18n.language]);
+      chartNames: {
+        [TvChartType.TradingView]: "TradingView",
+        [TvChartType.Original]: "Original",
+      },
+      priceFormatterFactory: (symbolInfo: LibrarySymbolInfo | null, _minTick: string) => ({
+        format: (price: number) => {
+          try {
+            if (Number(price) > 1e31) return `${price}`;
+            if (!symbolInfo) return formatLongNumber(price);
+            return (symbolInfo as TvChartSymbolInfo).priceType === TvChartPriceType.Price
+              ? formatLongNumber(price)
+              : formatShortNumber(price);
+          } catch (e) {
+            console.warn(e);
+            return `${price}`;
+          }
+        },
+      }),
+    }),
+    [tickerSymbol, i18n.language],
+  );
 
   useEffect(() => {
     if (chartReady) {
       chartRef.current?.setSymbol(
         stringifySymbol({
-          chain: chainSlug(chain)!,
+          chain: chainSlug(chartChain)!,
           address: address ?? "",
           priceType: isPriceChart ? TvChartPriceType.Price : TvChartPriceType.MarketCap,
           quote: isUSDChart
             ? TvChartQuoteType.USD
-            : (CHAIN_QUOTE_TOKEN_SYMBOLS[chain] as TvChartQuoteType),
+            : (CHAIN_QUOTE_TOKEN_SYMBOLS[chartChain] as TvChartQuoteType),
         }),
       );
     }
-  }, [chartReady, chain, address, isPriceChart, isUSDChart]);
+  }, [chartReady, chartChain, address, isPriceChart, isUSDChart]);
 
   const handleChartReady = useCallback(
     (_chartType: TvChartType) => {
@@ -125,8 +173,7 @@ export const TvChartWrapper = memo(({ className }: TvChartWrapperProps) => {
         ?.subscribe(() => {
           const tickerSymbol = chartRef.current?.chartManager?.activeArea?.tickerSymbol;
           if (tickerSymbol) {
-            const { chain, address } = parseSymbol(tickerSymbol);
-            navigate(`${AppRoute.trade}/${chain}/${address}`);
+            navigateToTickerSymbol(tickerSymbol);
           }
         });
 
@@ -139,8 +186,7 @@ export const TvChartWrapper = memo(({ className }: TvChartWrapperProps) => {
         chartRef.current?.chartManager?.activeAreaTickerSymbol$?.subscribe(() => {
           const tickerSymbol = chartRef.current?.chartManager?.activeArea?.tickerSymbol;
           if (tickerSymbol) {
-            const { chain, address } = parseSymbol(tickerSymbol);
-            navigate(`${AppRoute.trade}/${chain}/${address}`);
+            navigateToTickerSymbol(tickerSymbol);
           }
         });
 
@@ -148,7 +194,7 @@ export const TvChartWrapper = memo(({ className }: TvChartWrapperProps) => {
         subsRef.current.push(activeSymbolSubscription);
       }
     },
-    [i18n.language, navigate],
+    [i18n.language, navigateToTickerSymbol],
   );
 
   useEffect(
@@ -165,7 +211,7 @@ export const TvChartWrapper = memo(({ className }: TvChartWrapperProps) => {
     chartRef,
     options: {
       showHistory: true,
-      chain: chain,
+      chain: chartChain,
     },
   });
 
@@ -178,6 +224,7 @@ export const TvChartWrapper = memo(({ className }: TvChartWrapperProps) => {
         )}
       >
         <TvChart
+          key={chartIdentityKey}
           ref={chartRef}
           config={config}
           onChartReady={handleChartReady}

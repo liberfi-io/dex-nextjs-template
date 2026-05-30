@@ -18,9 +18,8 @@ import {
   TokenListResolution,
   TrendingTokenListWidget,
 } from "@liberfi.io/ui-tokens";
-import { chainSlug } from "@liberfi.io/utils";
 import { Token } from "@liberfi.io/types";
-import { AppRoute } from "@liberfi/ui-dex/libs/routes";
+import { tokenDetailRoute } from "@liberfi/ui-dex/libs/routes";
 import { InstantBuyProvider } from "./InstantBuyContext";
 import { InstantBuy } from "./InstsantBuy";
 
@@ -63,10 +62,7 @@ export function HomePage() {
 
   const handleSelectToken = useCallback(
     (token: Token) => {
-      const slug = chainSlug(token.chain);
-      if (slug) {
-        navigate(`${AppRoute.trade}/${slug}/${token.address}`);
-      }
+      navigate(tokenDetailRoute(token.chain, token.address));
     },
     [navigate],
   );

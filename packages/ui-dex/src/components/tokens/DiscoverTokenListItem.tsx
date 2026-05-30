@@ -1,4 +1,4 @@
-import { AppRoute } from "../../libs";
+import { tokenDetailRoute } from "../../libs";
 import { layoutAtom, useAuthenticatedCallback, useRouter } from "@liberfi/ui-base";
 import { Token } from "@chainstream-io/sdk";
 import clsx from "clsx";
@@ -48,7 +48,7 @@ export function DiscoverTokenListItem({
     (e: MouseEvent<HTMLDivElement>) => {
       e.preventDefault();
       e.stopPropagation();
-      navigate(`${AppRoute.trade}/${token.chain}/${token.address}`);
+      navigate(tokenDetailRoute(token.chain, token.address));
     },
     [navigate, token.address, token.chain],
   );

@@ -5,7 +5,6 @@ import { Tab, Tabs } from "@heroui/react";
 import { cn } from "@liberfi.io/ui";
 import { useTranslation } from "@liberfi.io/i18n";
 import { Token } from "@liberfi.io/types";
-import { chainSlug } from "@liberfi.io/utils";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
   PulseNewListWidget,
@@ -20,7 +19,7 @@ import {
   useRouter,
 } from "@liberfi/ui-base";
 import { SwitchWallet } from "@liberfi/ui-dex";
-import { AppRoute } from "@liberfi/ui-dex/libs/routes";
+import { tokenDetailRoute } from "@liberfi/ui-dex/libs/routes";
 import { PulseInstantBuyAmountInput } from "./PulseInstantBuyAmountInput";
 import { PulseInstantBuyProvider } from "./PulseInstantBuyContext";
 import { PulseInstantBuy } from "./PulseInstantBuy";
@@ -38,10 +37,7 @@ export function PulsePage() {
 
   const handleSelectToken = useCallback(
     (token: Token) => {
-      const slug = chainSlug(token.chain);
-      if (slug) {
-        navigate(`${AppRoute.trade}/${slug}/${token.address}`);
-      }
+      navigate(tokenDetailRoute(token.chain, token.address));
     },
     [navigate],
   );

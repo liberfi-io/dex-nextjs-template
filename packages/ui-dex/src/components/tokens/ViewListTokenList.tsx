@@ -30,7 +30,7 @@ import {
 } from "./fields";
 import { ViewListTokenListSkeleton } from "./ViewListTokenListSkeleton";
 import { ViewListTokenListHeaders } from "./ViewListTokenListHeaders";
-import { AppRoute, tokenFilters, tokenSort } from "../../libs";
+import { tokenDetailRoute, tokenFilters, tokenSort } from "../../libs";
 import { Token } from "@chainstream-io/sdk";
 import { useTokenListContext } from "./TokenListContext";
 import { Virtuoso } from "react-virtuoso";
@@ -202,7 +202,7 @@ function ListItem({ token, isViewed, onView, onUnview }: ListItemProps) {
     (e: MouseEvent<HTMLDivElement>) => {
       e.preventDefault();
       e.stopPropagation();
-      navigate(`${AppRoute.trade}/${token.chain}/${token.address}`);
+      navigate(tokenDetailRoute(token.chain, token.address));
     },
     [navigate, token.address, token.chain],
   );

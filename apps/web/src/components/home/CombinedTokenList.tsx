@@ -17,7 +17,7 @@ import {
   TokenListResolutionSelectorWidget,
   TrendingTokenListWidget,
 } from "@liberfi.io/ui-tokens";
-import { chainDisplayName, chainSlug, getNativeToken, txExplorerUrl } from "@liberfi.io/utils";
+import { chainDisplayName, getNativeToken, txExplorerUrl } from "@liberfi.io/utils";
 import { useSwitchEvmWalletsToChain } from "@liberfi.io/wallet-connector";
 import { useChainSwitchUrlHandler } from "../../hooks/useChainSwitchUrlHandler";
 import { CombinedPulseList } from "./CombinedPulseList";
@@ -30,6 +30,7 @@ import {
   type SwapResult,
   type SwapPhase,
 } from "@liberfi.io/ui-trade";
+import { tokenDetailRoute } from "@liberfi/ui-dex/libs/routes";
 
 type ListTab = "trending" | "pulse" | "stocks" | "new";
 
@@ -159,10 +160,7 @@ export function CombinedTokenList() {
 
   const handleSelectToken = useCallback(
     (token: Token) => {
-      const slug = chainSlug(token.chain);
-      if (slug) {
-        router.push(`/tokens/${slug}/${token.address}`);
-      }
+      router.push(tokenDetailRoute(token.chain, token.address));
     },
     [router],
   );

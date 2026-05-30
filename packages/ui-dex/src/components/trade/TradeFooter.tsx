@@ -20,7 +20,7 @@ import { useTradeDataContext } from "./providers";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { uniqBy } from "lodash-es";
 import { useRemoveTokenFromCollectionMutation } from "@liberfi/react-backend";
-import { AppRoute } from "../../libs";
+import { AppRoute, tokenDetailRoute } from "../../libs";
 import { tokenInfoAtom } from "../../states";
 import { useAtomValue } from "jotai";
 import { InstantTrade } from "./instant_trade";
@@ -90,7 +90,7 @@ export function TradeFooter() {
     const idx = tokens.findIndex((it) => it.address === token.address);
     if (idx > 0) {
       const prevToken = tokens[idx - 1];
-      navigate(`${AppRoute.trade}/${prevToken.chain}/${prevToken.address}`);
+      navigate(tokenDetailRoute(prevToken.chain, prevToken.address));
     }
   }, [token, tokens, navigate]);
 
@@ -106,7 +106,7 @@ export function TradeFooter() {
     const idx = tokens.findIndex((it) => it.address === token.address);
     if (idx >= 0 && idx < tokens.length - 1) {
       const nextToken = tokens[idx + 1];
-      navigate(`${AppRoute.trade}/${nextToken.chain}/${nextToken.address}`);
+      navigate(tokenDetailRoute(nextToken.chain, nextToken.address));
     }
   }, [token, tokens, navigate]);
 
@@ -119,7 +119,7 @@ export function TradeFooter() {
       idx < tokens.length - 1 ? tokens[idx + 1] : idx > 0 ? tokens[idx - 1] : undefined;
     handleRemoveViewToken(token.address);
     if (nextToken) {
-      navigate(`${AppRoute.trade}/${nextToken.chain}/${nextToken.address}`);
+      navigate(tokenDetailRoute(nextToken.chain, nextToken.address));
     } else {
       navigate(AppRoute.home);
     }

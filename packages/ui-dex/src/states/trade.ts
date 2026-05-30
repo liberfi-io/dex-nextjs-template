@@ -4,7 +4,11 @@
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import { Token, TokenStats } from "@chainstream-io/sdk";
+import { Chain } from "@liberfi.io/types";
 import { TradeSettingsValuesByChain } from "../types";
+
+// current token chain
+export const tokenChainAtom = atom<Chain | null>(null);
 
 // current token address
 export const tokenAddressAtom = atom<string | null>(null);

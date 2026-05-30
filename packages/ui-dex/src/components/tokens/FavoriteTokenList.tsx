@@ -30,7 +30,7 @@ import {
 } from "./fields";
 import { FavoriteTokenListHeaders } from "./FavoriteTokenListHeaders";
 import { FavoriteTokenListSkeleton } from "./FavoriteTokenListSkeleton";
-import { AppRoute, tokenFilters, tokenSort } from "../../libs";
+import { tokenDetailRoute, tokenFilters, tokenSort } from "../../libs";
 import { useTokenListContext } from "./TokenListContext";
 import { Token } from "@chainstream-io/sdk";
 import { Virtuoso } from "react-virtuoso";
@@ -209,7 +209,7 @@ function ListItem({ token, isFavorite, onFavorite, onUnfavorite }: ListItemProps
     (e: MouseEvent<HTMLDivElement>) => {
       e.preventDefault();
       e.stopPropagation();
-      navigate(`${AppRoute.trade}/${token.chain}/${token.address}`);
+      navigate(tokenDetailRoute(token.chain, token.address));
     },
     [navigate, token.address, token.chain],
   );

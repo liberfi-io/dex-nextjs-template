@@ -2,7 +2,7 @@ import { useTokenListContext } from "./TokenListContext";
 import { ReactElement, useCallback, useEffect, useMemo, useState } from "react";
 import { ListError } from "../ListError";
 import { ListEmptyData } from "../ListEmptyData";
-import { tokenSort, tokenFilters, AppRoute } from "../../libs";
+import { tokenSort, tokenFilters, tokenDetailRoute } from "../../libs";
 import { useAtomValue } from "jotai";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { layoutAtom, useRouter, useTranslation } from "@liberfi/ui-base";
@@ -296,7 +296,7 @@ export function DiscoverTrendingTokenList2({ height }: { height?: number }) {
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              navigate(`${AppRoute.trade}/${token.chain}/${token.address}`);
+              navigate(tokenDetailRoute(token.chain, token.address));
             }}
           >
             {

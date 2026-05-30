@@ -8,7 +8,7 @@ import {
   ViewListOutlinedIcon,
 } from "../../../assets";
 import { Number } from "../../Number";
-import { AppRoute, formatPercentage, tokenPriceChangeRatioInUsd } from "../../../libs";
+import { formatPercentage, tokenDetailRoute, tokenPriceChangeRatioInUsd } from "../../../libs";
 import { Token } from "@chainstream-io/sdk";
 import { useRemoveTokenFromCollectionMutation } from "@liberfi/react-backend";
 import { Button, Skeleton } from "@heroui/react";
@@ -184,7 +184,7 @@ export function TradeTokenTabs() {
                 token={it}
                 active={it.address === token?.address}
                 onRemove={() => handleRemoveViewToken(it.address)}
-                onSelect={() => navigate(`${AppRoute.trade}/${it.chain}/${it.address}`)}
+                onSelect={() => navigate(tokenDetailRoute(it.chain, it.address))}
               />
             ))}
         </div>

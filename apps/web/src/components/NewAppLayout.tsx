@@ -102,7 +102,7 @@ import {
   DraggablePanelProvider,
 } from "@liberfi.io/ui-scaffold";
 import { SEARCH_MODAL_ID, SearchModal } from "@liberfi.io/ui-tokens";
-import { chainDisplayName, chainSlug, truncateAddress } from "@liberfi.io/utils";
+import { chainDisplayName, truncateAddress } from "@liberfi.io/utils";
 import type { PredefinedToken } from "@liberfi.io/utils";
 import {
   useDexTokenProvider,
@@ -115,6 +115,7 @@ import {
 import { useRouterAdapter } from "../hooks/useRouterAdapter";
 import { useDexClient } from "@liberfi/react-dex";
 import { DexDataProvider } from "@liberfi/ui-dex";
+import { tokenDetailRoute } from "@liberfi/ui-dex/libs/routes";
 import { useCreateOnrampWidgetUrlMutation } from "@liberfi/react-backend";
 import { queryClient } from "../libs/queryClient";
 import { AuthProviders } from "./AuthProviders";
@@ -456,12 +457,26 @@ function PageShell({ children }: PropsWithChildren) {
     [router, closePredictSearch],
   );
 
+  const handleHeaderSelectChain = useCallback(
+    async (c: Chain, selectChain: (chain: Chain) => Promise<void>) => {
+      if (pathname.startsWith("/tokens")) {
+        onChainSwitchedUrl(c);
+        toast.success(
+          t("common.chainSwitched", {
+            chain: chainDisplayName(c),
+          }),
+        );
+        return;
+      }
+
+      await selectChain(c);
+    },
+    [onChainSwitchedUrl, pathname, t],
+  );
+
   const handleSelectToken = useCallback(
     (token: Token) => {
-      const slug = chainSlug(token.chain);
-      if (slug) {
-        router.push(`/tokens/${slug}/${token.address}`);
-      }
+      router.push(tokenDetailRoute(token.chain, token.address));
     },
     [router],
   );
@@ -590,6 +605,7 @@ function PageShell({ children }: PropsWithChildren) {
                 <ChainSelectDropdown
                   candidates={[Chain.SOLANA, Chain.ETHEREUM, Chain.BINANCE]}
                   onSwitchChain={switchChain}
+                  onSelectChain={handleHeaderSelectChain}
                   onSuccess={(c) => {
                     onChainSwitchedUrl(c);
                     toast.success(
@@ -864,12 +880,14 @@ function ChainSelectDropdown({
   className,
   candidates,
   onSwitchChain,
+  onSelectChain,
   onSuccess,
   onError,
 }: {
   className?: string;
   candidates: Chain[];
   onSwitchChain?: (chain: Chain) => Promise<void>;
+  onSelectChain?: (chain: Chain, selectChain: (chain: Chain) => Promise<void>) => Promise<void>;
   onSuccess?: (chain: Chain) => void;
   onError?: (error: unknown) => void;
 }) {
@@ -902,10 +920,14 @@ function ChainSelectDropdown({
         setIsOpen(false);
         return;
       }
-      await selectChain(c);
+      if (onSelectChain) {
+        await onSelectChain(c, selectChain);
+      } else {
+        await selectChain(c);
+      }
       setIsOpen(false);
     },
-    [chain, selectChain],
+    [chain, onSelectChain, selectChain],
   );
 
   return (

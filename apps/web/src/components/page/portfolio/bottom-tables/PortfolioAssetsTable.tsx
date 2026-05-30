@@ -10,13 +10,13 @@ import { usePortfolioNetWorthTokensScript } from "@liberfi.io/ui-portfolio";
 import type { Chain, Portfolio, PortfolioPnl, Token } from "@liberfi.io/types";
 import { cn } from "@liberfi.io/ui";
 import {
-  chainSlug,
   formatAmount,
   formatAmountUSD,
   formatPercent,
   formatPriceUSD,
 } from "@liberfi.io/utils";
 import { useTranslation } from "@liberfi/ui-base";
+import { tokenDetailRoute } from "@liberfi/ui-dex/libs/routes";
 import {
   alignClass,
   EmptyBody,
@@ -189,9 +189,7 @@ export function PortfolioAssetsTable({
             pnl={pnlByAddress.get(portfolio.address)}
             token={tokenByAddress.get(portfolio.address)}
             onClick={() => {
-              const slug = chainSlug(chain);
-              if (!slug) return;
-              router.push(`/tokens/${slug}/${portfolio.address}`);
+              router.push(tokenDetailRoute(chain, portfolio.address));
             }}
           />
         ))}

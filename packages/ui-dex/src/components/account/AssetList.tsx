@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useTokensQuery } from "@liberfi/react-dex";
 import { ListEmptyData } from "../ListEmptyData";
 import { AssetListSkeleton } from "./AssetListSkeleton";
-import { AppRoute } from "../../libs";
+import { tokenDetailRoute } from "../../libs";
 import clsx from "clsx";
 import {
   TokenField,
@@ -182,7 +182,7 @@ function AssetItem({ balance, token, compact = false, classNames }: AssetItemPro
           "hover:cursor-pointer rounded-lg hover:bg-content1 lg:group-data-[compact=false]:hover:bg-content3",
           classNames?.item,
         )}
-        onClick={() => navigate(`${AppRoute.trade}/${token?.chain}/${token?.address}`)}
+        onClick={() => token?.address && navigate(tokenDetailRoute(token.chain, token.address))}
       >
         <TokenField
           token={token}

@@ -1,11 +1,12 @@
 import { PropsWithChildren, useEffect, useState } from "react";
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { BigNumber } from "bignumber.js";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSelectChain } from "@liberfi.io/ui-chain-select";
-import { Chain } from "@liberfi/core";
+import { Chain } from "@liberfi.io/types";
 import { QueryKeys, useTokenStatsQuery } from "@liberfi/react-dex";
 import {
+  tokenChainAtom,
   tokenAddressAtom,
   tokenInfoAtom,
   tokenStatsAtom,
@@ -37,11 +38,15 @@ export function TradeDataLoader({
     selectChain(chainId);
   }, [chainId, selectChain]);
 
-  // switch to current token's address
+  // switch to current token identity
+  const setTokenChain = useSetAtom(tokenChainAtom);
   const setTokenAddress = useSetAtom(tokenAddressAtom);
+  const tokenChain = useAtomValue(tokenChainAtom);
+  const tokenAddress = useAtomValue(tokenAddressAtom);
   useEffect(() => {
+    setTokenChain(chainId);
     setTokenAddress(address);
-  }, [address, setTokenAddress]);
+  }, [chainId, address, setTokenChain, setTokenAddress]);
 
   // refetch the latest token info periodically
   useRefreshToken(chainId, address);
@@ -121,5 +126,5 @@ export function TradeDataLoader({
     });
   }, []);
 
-  return ready ? children : <></>;
+  return ready && tokenChain === chainId && tokenAddress === address ? children : <></>;
 }

@@ -3,7 +3,7 @@
 import { useParams, redirect } from "next/navigation";
 import { PropsWithChildren, useMemo } from "react";
 import { chainIdBySlug } from "@liberfi.io/utils";
-import { AppRoute } from "@liberfi/ui-dex/libs/routes";
+import { tokenDetailRoute } from "@liberfi/ui-dex/libs/routes";
 import { TradeDataLoader } from "@liberfi/ui-dex/components/trade";
 import { TradeDataProvider } from "@liberfi/ui-dex/components/trade/providers";
 import { TradePage } from "@liberfi/ui-dex";
@@ -21,7 +21,10 @@ export function Providers({ children }: PropsWithChildren) {
 
   if (!chainId || !address) {
     return redirect(
-      `${AppRoute.trade}/${process.env.NEXT_PUBLIC_DEFAULT_TOKEN_CHAIN}/${process.env.NEXT_PUBLIC_DEFAULT_TOKEN_ADDRESS}`,
+      tokenDetailRoute(
+        process.env.NEXT_PUBLIC_DEFAULT_TOKEN_CHAIN,
+        process.env.NEXT_PUBLIC_DEFAULT_TOKEN_ADDRESS ?? "",
+      ),
     );
   }
 
