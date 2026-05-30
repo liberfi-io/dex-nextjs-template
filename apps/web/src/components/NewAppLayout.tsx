@@ -77,6 +77,7 @@ import {
   HomeIcon,
   LogoIcon,
   MiniLogoIcon,
+  PulseIcon,
   RocketIcon,
   SignInIcon,
   SolanaIcon,
@@ -152,6 +153,7 @@ import { BottomTweets } from "./BottomTweets";
 import { BottomAICopilot } from "./BottomAICopilot";
 import { PredictBalanceIndicator } from "./PredictBalanceIndicator";
 import { FundWalletModal } from "./FundWalletModal";
+import { isPulseSupportedChain } from "../lib/pulse";
 
 const LegacyModals = [
   lazy(() => import("@liberfi/ui-dex/components/modals/WebviewModal")),
@@ -166,6 +168,7 @@ const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
 
 const navItemsConfig: Omit<NavItem, "label">[] = [
   { key: "discover", href: "/", icon: <HomeIcon width={20} height={20} /> },
+  { key: "pulse", href: "/pulse", icon: <PulseIcon width={20} height={20} /> },
   { key: "perpetuals", href: "/perpetuals", icon: <TradeIcon width={20} height={20} /> },
   { key: "predict", href: "/predict", icon: <CoinsIcon width={20} height={20} /> },
   // { key: "channels", href: "/channels", icon: <SignalIcon width={20} height={20} /> },
@@ -400,14 +403,17 @@ function PageShell({ children }: PropsWithChildren) {
   const { t } = useTranslation();
   const pathname = usePathname();
   const router = useChainAwareRouter();
+  const { chain } = useCurrentChain();
 
   const navItems: NavItem[] = useMemo(
     () =>
-      navItemsConfig.map((item) => ({
-        ...item,
-        label: t(`extend.nav.${item.key}`) as string,
-      })),
-    [t],
+      navItemsConfig
+        .filter((item) => item.key !== "pulse" || isPulseSupportedChain(chain))
+        .map((item) => ({
+          ...item,
+          label: t(`extend.nav.${item.key}`) as string,
+        })),
+    [chain, t],
   );
 
   const onNavigate = useCallback(
@@ -417,7 +423,6 @@ function PageShell({ children }: PropsWithChildren) {
     [router],
   );
 
-  const { chain } = useCurrentChain();
   const switchChain = useSwitchEvmWalletsToChain();
   const onChainSwitchedUrl = useChainSwitchUrlHandler();
   const { status: authStatus } = useAuth();

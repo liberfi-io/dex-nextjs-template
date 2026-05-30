@@ -6,7 +6,7 @@ import { useResizeObserver, useValueRef } from "@liberfi.io/hooks";
 import { useTranslation } from "@liberfi.io/i18n";
 import { useDexClient } from "@liberfi.io/react";
 import { Chain, SOLANA_TOKEN_PROTOCOLS, Token } from "@liberfi.io/types";
-import { Button, cn, HorizontalScrollContainer, Link, SettingsIcon, toast } from "@liberfi.io/ui";
+import { Button, cn, HorizontalScrollContainer, Link, toast } from "@liberfi.io/ui";
 import { ChainSelectWidget, useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
   NewTokenListWidget,
@@ -20,7 +20,6 @@ import {
 import { chainDisplayName, getNativeToken, txExplorerUrl } from "@liberfi.io/utils";
 import { useSwitchEvmWalletsToChain } from "@liberfi.io/wallet-connector";
 import { useChainSwitchUrlHandler } from "../../hooks/useChainSwitchUrlHandler";
-import { CombinedPulseList } from "./CombinedPulseList";
 import { useAsyncModal } from "@liberfi.io/ui-scaffold";
 import {
   AmountPresetInputWidget,
@@ -32,14 +31,13 @@ import {
 import { tokenDetailRoute } from "@liberfi/ui-dex/libs/routes";
 import { InstantTradeListButton } from "./InstantTradeListButton";
 
-type ListTab = "trending" | "pulse" | "stocks" | "new";
+type ListTab = "trending" | "stocks" | "new";
 
-const SOLANA_TABS: ListTab[] = ["trending", "pulse", "stocks"];
+const SOLANA_TABS: ListTab[] = ["trending", "stocks"];
 const EVM_TABS: ListTab[] = ["trending", "new"];
 
 const TAB_I18N_KEYS = {
   trending: "tokens.listType.trending",
-  pulse: "tokens.listType.pulse",
   stocks: "tokens.listType.stocks",
   new: "tokens.listType.new",
 } as const;
@@ -73,7 +71,6 @@ export function CombinedTokenList() {
 
   const [filters, setFilters] = useState<TokenListFiltersType | undefined>();
   const [resolution, setResolution] = useState<TokenListResolution>("24h");
-  const [isMobileControlsOpen, setIsMobileControlsOpen] = useState(false);
 
   const { tabs, activeTab, setActiveTab } = useTabs(chain);
   const nativeToken = useMemo(() => getNativeToken(chain), [chain]);
@@ -170,8 +167,6 @@ export function CombinedTokenList() {
     [router, chain],
   );
 
-  const showTokenListControls = activeTab !== "pulse";
-
   const tokenListContent = useMemo(() => {
     const commonProps = { chain, resolution, filters, height };
 
@@ -242,8 +237,6 @@ export function CombinedTokenList() {
             )}
           />
         );
-      case "pulse":
-        return <CombinedPulseList chain={chain} onSelectToken={handleSelectToken} />;
     }
   }, [activeTab, chain, resolution, filters, height, nativeToken, handleSelectToken]);
 
@@ -305,35 +298,21 @@ export function CombinedTokenList() {
                     toast.error(e instanceof Error ? e.message : t("common.chainSwitchFailed"))
                   }
                 />
-                <Button
-                  isIconOnly
-                  radius="full"
-                  size="sm"
-                  aria-label={t("tokens.listHeader.filter")}
-                  onPress={() => setIsMobileControlsOpen((prev) => !prev)}
-                  className="sm:hidden text-neutral hover:text-foreground transition-colors bg-transparent"
-                >
-                  <SettingsIcon width={20} height={20} />
-                </Button>
               </div>
             </div>
 
             {/* desktop: always visible as inline controls */}
             <div className="hidden sm:flex justify-end items-center gap-6">
-              {showTokenListControls && (
-                <>
-                  <TokenListResolutionSelectorWidget
-                    resolution={resolution}
-                    onResolutionChange={setResolution}
-                  />
-                  <TokenListFilterWidget
-                    protocols={chain === Chain.SOLANA ? SOLANA_TOKEN_PROTOCOLS : undefined}
-                    resolution={resolution}
-                    filters={filters}
-                    onFiltersChange={setFilters}
-                  />
-                </>
-              )}
+              <TokenListResolutionSelectorWidget
+                resolution={resolution}
+                onResolutionChange={setResolution}
+              />
+              <TokenListFilterWidget
+                protocols={chain === Chain.SOLANA ? SOLANA_TOKEN_PROTOCOLS : undefined}
+                resolution={resolution}
+                filters={filters}
+                onFiltersChange={setFilters}
+              />
               {nativeToken && (
                 <AmountPresetInputWidget
                   id="token-list"
@@ -346,27 +325,18 @@ export function CombinedTokenList() {
               )}
             </div>
 
-            {/* mobile: expand/collapse — instant toggle */}
-            <div
-              className={cn(
-                "sm:hidden flex justify-end items-center gap-2 pt-2 relative z-20",
-                !isMobileControlsOpen && "hidden",
-              )}
-            >
-              {showTokenListControls && (
-                <>
-                  <TokenListResolutionSelectorWidget
-                    resolution={resolution}
-                    onResolutionChange={setResolution}
-                  />
-                  <TokenListFilterWidget
-                    protocols={chain === Chain.SOLANA ? SOLANA_TOKEN_PROTOCOLS : undefined}
-                    resolution={resolution}
-                    filters={filters}
-                    onFiltersChange={setFilters}
-                  />
-                </>
-              )}
+            {/* mobile: always visible controls */}
+            <div className="sm:hidden flex justify-end items-center gap-2 pt-2 relative z-20">
+              <TokenListResolutionSelectorWidget
+                resolution={resolution}
+                onResolutionChange={setResolution}
+              />
+              <TokenListFilterWidget
+                protocols={chain === Chain.SOLANA ? SOLANA_TOKEN_PROTOCOLS : undefined}
+                resolution={resolution}
+                filters={filters}
+                onFiltersChange={setFilters}
+              />
               {nativeToken && (
                 <AmountPresetInputWidget
                   id="token-list"

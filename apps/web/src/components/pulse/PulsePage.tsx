@@ -1,16 +1,19 @@
 "use client";
 
-import { Key, useCallback, useMemo, useState } from "react";
-import { Tab, Tabs } from "@heroui/react";
-import { cn } from "@liberfi.io/ui";
+import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { cn, HorizontalScrollContainer, PauseIcon, toast } from "@liberfi.io/ui";
 import { useTranslation } from "@liberfi.io/i18n";
-import { Token } from "@liberfi.io/types";
-import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { Chain, Token } from "@liberfi.io/types";
+import { ChainSelectWidget, useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
   PulseNewListWidget,
   PulseFinalStretchListWidget,
   PulseMigratedListWidget,
   PulseListType,
+  PulseList,
+  usePulseNewListScript,
+  usePulseFinalStretchListScript,
+  usePulseMigratedListScript,
 } from "@liberfi.io/ui-tokens";
 import {
   useSetBottomNavigationBarActiveKey,
@@ -18,11 +21,21 @@ import {
   useShowHeader,
   useRouter,
 } from "@liberfi/ui-base";
-import { SwitchWallet } from "@liberfi/ui-dex";
 import { tokenDetailRoute } from "@liberfi/ui-dex/libs/routes";
+import { useSwitchEvmWalletsToChain } from "@liberfi.io/wallet-connector";
+import { chainDisplayName } from "@liberfi.io/utils";
+import { useChainSwitchUrlHandler } from "../../hooks/useChainSwitchUrlHandler";
+import { chainQueryValue } from "../../libs/chainQuery";
 import { PulseInstantBuyAmountInput } from "./PulseInstantBuyAmountInput";
 import { PulseInstantBuyProvider } from "./PulseInstantBuyContext";
 import { PulseInstantBuy } from "./PulseInstantBuy";
+import { isPulseSupportedChain } from "../../lib/pulse";
+
+const PULSE_TAB_I18N_KEYS = {
+  new: "extend.pulse.new",
+  final_stretch: "extend.pulse.final_stretch",
+  migrated: "extend.pulse.migrated",
+} as const;
 
 export function PulsePage() {
   useShowHeader();
@@ -32,8 +45,23 @@ export function PulsePage() {
   const { t } = useTranslation();
   const { chain: chainId } = useCurrentChain();
   const { navigate } = useRouter();
+  const switchChain = useSwitchEvmWalletsToChain();
+  const onChainSwitchedUrl = useChainSwitchUrlHandler();
+  const isPulseSupported = isPulseSupportedChain(chainId);
+
+  useEffect(() => {
+    if (!isPulseSupported) {
+      const chainQuery = chainQueryValue(chainId);
+      navigate(chainQuery ? `/?chain=${chainQuery}` : "/", { replace: true });
+    }
+  }, [chainId, isPulseSupported, navigate]);
 
   const [type, setType] = useState<PulseListType>("new");
+  const [isMobileListPaused, setIsMobileListPaused] = useState(false);
+
+  useEffect(() => {
+    setIsMobileListPaused(false);
+  }, [type]);
 
   const handleSelectToken = useCallback(
     (token: Token) => {
@@ -43,15 +71,15 @@ export function PulsePage() {
   );
 
   const renderNewHeaderExtra = useMemo(
-    () => <PulseInstantBuyAmountInput type="new" variant="bordered" />,
+    () => <PulseInstantBuyAmountInput type="new" size="sm" className="max-w-55" />,
     [],
   );
   const renderFinalStretchHeaderExtra = useMemo(
-    () => <PulseInstantBuyAmountInput type="final_stretch" variant="bordered" />,
+    () => <PulseInstantBuyAmountInput type="final_stretch" size="sm" className="max-w-55" />,
     [],
   );
   const renderMigratedHeaderExtra = useMemo(
-    () => <PulseInstantBuyAmountInput type="migrated" variant="bordered" />,
+    () => <PulseInstantBuyAmountInput type="migrated" size="sm" className="max-w-55" />,
     [],
   );
 
@@ -60,53 +88,90 @@ export function PulsePage() {
     [],
   );
 
+  if (!isPulseSupported) return null;
+
   return (
-    <div
-      className={cn(
-        "max-w-[1920px] mx-auto px-1 lg:px-6",
-        "h-[calc(100vh-var(--header-height)-0.625rem)]",
-        "lg:h-[calc(100vh-var(--header-height)-2.875rem)]",
-        "max-sm:h-[calc(100vh-var(--header-height)-0.625rem-var(--footer-height))]",
-      )}
-    >
-      <div className="w-full h-full flex flex-col gap-2 lg:gap-4 lg:pt-4">
-        {/* header: title + wallet + mobile instant buy input */}
-        <div className="flex-none w-full h-8 px-3 flex items-center justify-between max-lg:justify-start gap-4">
-          <div className="max-lg:hidden">
-            <h1 className="text-lg font-semibold">{t("extend.pulse.title")}</h1>
+    <div className="w-full h-full max-w-[1920px] mx-auto">
+      <div className="w-full h-full flex flex-col gap-3 sm:gap-4 py-4 lg:px-4 min-h-0">
+        <div className="hidden lg:flex flex-none h-8 items-center">
+          <h1 className="text-sm sm:text-base font-medium text-foreground">
+            {t("extend.pulse.title")}
+          </h1>
+        </div>
+
+        <div
+          className={cn(
+            "lg:hidden w-full mx-auto flex flex-col sm:flex-row sm:justify-between sm:items-center sm:gap-0 flex-none sm:h-8 max-lg:px-4",
+            "max-w-362 sm:max-w-403",
+          )}
+        >
+          <div className="flex justify-between items-center w-full sm:w-auto gap-4">
+            <HorizontalScrollContainer
+              className="flex-auto min-w-0 max-sm:h-8"
+              classNames={{
+                content: "items-center gap-4 sm:gap-6 whitespace-nowrap",
+                leftArrow: "from-content1/60",
+                rightArrow: "from-content1/60",
+              }}
+            >
+              {Object.entries(PULSE_TAB_I18N_KEYS).map(([tab, key]) => (
+                <button
+                  key={tab}
+                  type="button"
+                  onClick={() => setType(tab as PulseListType)}
+                  className={cn(
+                    "text-sm sm:text-base font-medium transition-all cursor-pointer",
+                    type === tab
+                      ? "text-foreground hover:opacity-70"
+                      : "text-zinc-500 hover:text-zinc-300",
+                  )}
+                >
+                  {t(key)}
+                </button>
+              ))}
+            </HorizontalScrollContainer>
+
+            <div className="flex-none sm:hidden flex justify-end items-center gap-2">
+              <ChainSelectWidget
+                size="sm"
+                className="sm:hidden"
+                onSwitchChain={switchChain}
+                candidates={[Chain.SOLANA, Chain.ETHEREUM, Chain.BINANCE]}
+                onSuccess={(chain) => {
+                  onChainSwitchedUrl(chain);
+                  toast.success(
+                    t("common.chainSwitched", {
+                      chain: chainDisplayName(chain),
+                    }),
+                  );
+                }}
+                onError={(e) =>
+                  toast.error(e instanceof Error ? e.message : t("common.chainSwitchFailed"))
+                }
+              />
+            </div>
           </div>
-          <div className="flex items-center gap-4 max-lg:w-full max-lg:justify-between">
-            <SwitchWallet />
-            <PulseInstantBuyAmountInput
-              type={type}
-              radius="lg"
-              size="lg"
-              fullWidth
-              className="lg:hidden"
-            />
+
+          <div className="sm:hidden flex justify-end items-center gap-2 pt-2 relative z-20">
+            <div className="w-6 h-8 flex items-center justify-center flex-none">
+              {isMobileListPaused && <PauseIcon className="w-4 h-4 text-primary" />}
+            </div>
+            <PulseInstantBuyAmountInput type={type} size="sm" className="max-w-50" />
           </div>
         </div>
 
         <div className="flex-1 min-h-0 w-full flex flex-col gap-2 lg:gap-4">
-          {/* mobile/tablet tab switching */}
-          <div className="flex-none px-3 w-full flex items-center lg:hidden">
-            <Tabs
-              size="sm"
-              variant="underlined"
-              classNames={{ tabList: "gap-0", tab: "px-1.5" }}
-              selectedKey={type}
-              onSelectionChange={setType as (key: Key) => void}
-              disableAnimation
-            >
-              <Tab key="new" title={t("extend.pulse.new")} />
-              <Tab key="final_stretch" title={t("extend.pulse.final_stretch")} />
-              <Tab key="migrated" title={t("extend.pulse.migrated")} />
-            </Tabs>
-          </div>
-
           {/* three-column list layout */}
           <div className="flex-1 min-h-0 w-full flex justify-between">
-            <div className={cn("flex-1 h-full", { "max-lg:hidden": type !== "new" })}>
+            <MobilePulseList
+              type={type}
+              chain={chainId}
+              renderItemAction={renderItemAction}
+              onSelectToken={handleSelectToken}
+              onPauseChange={setIsMobileListPaused}
+            />
+
+            <div className="flex-1 h-full max-lg:hidden">
               <PulseInstantBuyProvider type="new">
                 <PulseNewListWidget
                   chain={chainId}
@@ -118,11 +183,7 @@ export function PulsePage() {
                 />
               </PulseInstantBuyProvider>
             </div>
-            <div
-              className={cn("flex-1 h-full", {
-                "max-lg:hidden": type !== "final_stretch",
-              })}
-            >
+            <div className="flex-1 h-full max-lg:hidden">
               <PulseInstantBuyProvider type="final_stretch">
                 <PulseFinalStretchListWidget
                   chain={chainId}
@@ -134,7 +195,7 @@ export function PulsePage() {
                 />
               </PulseInstantBuyProvider>
             </div>
-            <div className={cn("flex-1 h-full", { "max-lg:hidden": type !== "migrated" })}>
+            <div className="flex-1 h-full max-lg:hidden">
               <PulseInstantBuyProvider type="migrated">
                 <PulseMigratedListWidget
                   chain={chainId}
@@ -150,5 +211,118 @@ export function PulsePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+type MobilePulseListProps = {
+  type: PulseListType;
+  chain: Chain;
+  renderItemAction: (token: Token) => ReactNode;
+  onSelectToken: (token: Token) => void;
+  onPauseChange: (isPaused: boolean) => void;
+};
+
+function MobilePulseList({ type, ...props }: MobilePulseListProps) {
+  if (type === "final_stretch") {
+    return <MobilePulseFinalStretchList {...props} />;
+  }
+  if (type === "migrated") {
+    return <MobilePulseMigratedList {...props} />;
+  }
+  return <MobilePulseNewList {...props} />;
+}
+
+type MobilePulseTypedListProps = Omit<MobilePulseListProps, "type">;
+
+function MobilePulseNewList({
+  chain,
+  renderItemAction,
+  onSelectToken,
+  onPauseChange,
+}: MobilePulseTypedListProps) {
+  const [isPaused, setIsPaused] = useState(false);
+  const { tokens, isLoading } = usePulseNewListScript({ chain, isPaused });
+
+  const handlePauseChange = useCallback(
+    (paused: boolean) => {
+      setIsPaused(paused);
+      onPauseChange(paused);
+    },
+    [onPauseChange],
+  );
+
+  return (
+    <PulseList
+      title=""
+      tokens={tokens}
+      isLoading={isLoading}
+      renderItemAction={renderItemAction}
+      onSelectToken={onSelectToken}
+      onPauseChange={handlePauseChange}
+      hideHeader
+      className="rounded-lg lg:hidden"
+    />
+  );
+}
+
+function MobilePulseFinalStretchList({
+  chain,
+  renderItemAction,
+  onSelectToken,
+  onPauseChange,
+}: MobilePulseTypedListProps) {
+  const [isPaused, setIsPaused] = useState(false);
+  const { tokens, isLoading } = usePulseFinalStretchListScript({ chain, isPaused });
+
+  const handlePauseChange = useCallback(
+    (paused: boolean) => {
+      setIsPaused(paused);
+      onPauseChange(paused);
+    },
+    [onPauseChange],
+  );
+
+  return (
+    <PulseList
+      title=""
+      tokens={tokens}
+      isLoading={isLoading}
+      renderItemAction={renderItemAction}
+      onSelectToken={onSelectToken}
+      onPauseChange={handlePauseChange}
+      hideHeader
+      className="rounded-lg lg:hidden"
+    />
+  );
+}
+
+function MobilePulseMigratedList({
+  chain,
+  renderItemAction,
+  onSelectToken,
+  onPauseChange,
+}: MobilePulseTypedListProps) {
+  const [isPaused, setIsPaused] = useState(false);
+  const { tokens, isLoading } = usePulseMigratedListScript({ chain, isPaused });
+
+  const handlePauseChange = useCallback(
+    (paused: boolean) => {
+      setIsPaused(paused);
+      onPauseChange(paused);
+    },
+    [onPauseChange],
+  );
+
+  return (
+    <PulseList
+      title=""
+      tokens={tokens}
+      isLoading={isLoading}
+      renderItemAction={renderItemAction}
+      onSelectToken={onSelectToken}
+      onPauseChange={handlePauseChange}
+      hideHeader
+      className="rounded-lg lg:hidden"
+    />
   );
 }

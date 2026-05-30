@@ -2,10 +2,12 @@ import { useCallback, useMemo } from "react";
 import { useAtomValue } from "jotai";
 import { Button } from "@heroui/react";
 import { ROUTES } from "@liberfi/core";
+import { Chain } from "@liberfi.io/types";
+import { PulseIcon } from "@liberfi.io/ui";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
   bottomNavigationBarActiveKeyAtom,
   HomeIcon,
-  PulseIcon,
   // SearchIcon,
   CoinsIcon,
   // SignalIcon,
@@ -17,6 +19,10 @@ import {
   WalletIcon,
 } from "@liberfi/ui-base";
 
+function isPulseSupportedChain(chain: Chain): boolean {
+  return chain === Chain.SOLANA;
+}
+
 const bottomNavigations = [
   {
     key: "token_list",
@@ -24,6 +30,14 @@ const bottomNavigations = [
     href: ROUTES.tokenList.home(),
     icon: <HomeIcon width={20} height={20} />,
     isAuthenticated: false,
+  },
+  {
+    key: "pulse",
+    title: "extend.footer.pulse",
+    href: ROUTES.pulse.home(),
+    icon: <PulseIcon width={20} height={20} />,
+    isAuthenticated: false,
+    isPulse: true,
   },
   {
     key: "predict",
@@ -49,13 +63,6 @@ const bottomNavigations2 = [
     isAuthenticated: false,
   },
   {
-    key: "pulse",
-    title: "extend.footer.pulse",
-    href: ROUTES.pulse.home(),
-    icon: <PulseIcon width={20} height={20} />,
-    isAuthenticated: false,
-  },
-  {
     key: "account",
     title: "extend.footer.account",
     href: ROUTES.account.home(),
@@ -66,6 +73,7 @@ const bottomNavigations2 = [
 
 export function BottomNavigationBar() {
   const { t } = useTranslation();
+  const { chain } = useCurrentChain();
 
   // const appSdk = useAppSdk();
 
@@ -85,11 +93,14 @@ export function BottomNavigationBar() {
 
   const navigations = useMemo(
     () =>
-      bottomNavigations.map((it) => ({
-        ...it,
-        handler: () => (it.isAuthenticated ? handleAuthenticatedNavigate(it) : handleNavigate(it)),
-      })),
-    [handleNavigate, handleAuthenticatedNavigate],
+      bottomNavigations
+        .filter((it) => !it.isPulse || isPulseSupportedChain(chain))
+        .map((it) => ({
+          ...it,
+          handler: () =>
+            it.isAuthenticated ? handleAuthenticatedNavigate(it) : handleNavigate(it),
+        })),
+    [chain, handleNavigate, handleAuthenticatedNavigate],
   );
 
   const navigations2 = useMemo(

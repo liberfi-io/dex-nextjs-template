@@ -1,7 +1,13 @@
 import { useCallback, useMemo } from "react";
 import { Link } from "@heroui/react";
 import { ROUTES } from "@liberfi/core";
+import { Chain } from "@liberfi.io/types";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { useAuthenticatedCallback, useRouter, useTranslation } from "@liberfi/ui-base";
+
+function isPulseSupportedChain(chain: Chain): boolean {
+  return chain === Chain.SOLANA;
+}
 
 const headerLinks = [
   {
@@ -11,16 +17,17 @@ const headerLinks = [
     active: (pathname: string) => pathname === ROUTES.tokenList.home(),
   },
   {
+    label: "extend.header.pulse",
+    href: ROUTES.pulse.home(),
+    isAuthenticated: false,
+    isPulse: true,
+    active: (pathname: string) => pathname.startsWith(ROUTES.pulse.home()),
+  },
+  {
     label: "extend.header.trade",
     href: ROUTES.trade.home(),
     isAuthenticated: false,
     active: (pathname: string) => pathname.startsWith(ROUTES.trade.home()),
-  },
-  {
-    label: "extend.header.pulse",
-    href: ROUTES.pulse.home(),
-    isAuthenticated: false,
-    active: (pathname: string) => pathname.startsWith(ROUTES.pulse.home()),
   },
   {
     label: "extend.header.predict",
@@ -44,6 +51,7 @@ const headerLinks = [
 
 export function HeaderLinks() {
   const { t } = useTranslation();
+  const { chain } = useCurrentChain();
 
   const { usePathname, navigate } = useRouter();
   const pathname = usePathname();
@@ -54,11 +62,14 @@ export function HeaderLinks() {
 
   const links = useMemo(
     () =>
-      headerLinks.map((it) => ({
-        ...it,
-        handler: () => (it.isAuthenticated ? handleAuthenticatedNavigate(it) : handleNavigate(it)),
-      })),
-    [handleNavigate, handleAuthenticatedNavigate],
+      headerLinks
+        .filter((it) => !it.isPulse || isPulseSupportedChain(chain))
+        .map((it) => ({
+          ...it,
+          handler: () =>
+            it.isAuthenticated ? handleAuthenticatedNavigate(it) : handleNavigate(it),
+        })),
+    [chain, handleNavigate, handleAuthenticatedNavigate],
   );
 
   return (

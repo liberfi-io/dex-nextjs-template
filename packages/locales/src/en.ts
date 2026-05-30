@@ -37,6 +37,7 @@ export default {
     },
     "nav": {
       "discover": "Discover",
+      "pulse": "Pulse",
       "perpetuals": "Perpetuals",
       "predict": "Predict",
       "channels": "Channels",
