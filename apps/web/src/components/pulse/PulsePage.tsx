@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { cn, HorizontalScrollContainer, PauseIcon, toast } from "@liberfi.io/ui";
 import { useTranslation } from "@liberfi.io/i18n";
 import { Chain, Token } from "@liberfi.io/types";
@@ -58,6 +58,8 @@ export function PulsePage() {
 
   const [type, setType] = useState<PulseListType>("new");
   const [isMobileListPaused, setIsMobileListPaused] = useState(false);
+  const [pulseListResumeNonce, setPulseListResumeNonce] = useState(0);
+  const [activeInstantBuyCount, setActiveInstantBuyCount] = useState(0);
 
   useEffect(() => {
     setIsMobileListPaused(false);
@@ -83,10 +85,29 @@ export function PulsePage() {
     [],
   );
 
+  const handleInstantBuyStart = useCallback(() => {
+    setActiveInstantBuyCount((count) => count + 1);
+    setIsMobileListPaused(true);
+  }, []);
+
+  const handleInstantBuySettled = useCallback(() => {
+    setIsMobileListPaused(false);
+    setPulseListResumeNonce((nonce) => nonce + 1);
+    setActiveInstantBuyCount((count) => Math.max(0, count - 1));
+  }, []);
+
   const renderItemAction = useCallback(
-    (token: Token) => <PulseInstantBuy token={token} />,
-    [],
+    (token: Token) => (
+      <PulseInstantBuy
+        token={token}
+        onStart={handleInstantBuyStart}
+        onSettled={handleInstantBuySettled}
+      />
+    ),
+    [handleInstantBuySettled, handleInstantBuyStart],
   );
+
+  const isInstantBuying = activeInstantBuyCount > 0;
 
   if (!isPulseSupported) return null;
 
@@ -156,20 +177,29 @@ export function PulsePage() {
             <div className="w-6 h-8 flex items-center justify-center flex-none">
               {isMobileListPaused && <PauseIcon className="w-4 h-4 text-primary" />}
             </div>
-            <PulseInstantBuyAmountInput type={type} size="sm" className="max-w-50" />
+            <PulseInstantBuyAmountInput
+              key={type}
+              type={type}
+              size="sm"
+              className="max-w-50"
+            />
           </div>
         </div>
 
         <div className="flex-1 min-h-0 w-full flex flex-col gap-2 lg:gap-4">
           {/* three-column list layout */}
           <div className="flex-1 min-h-0 w-full flex justify-between">
-            <MobilePulseList
-              type={type}
-              chain={chainId}
-              renderItemAction={renderItemAction}
-              onSelectToken={handleSelectToken}
-              onPauseChange={setIsMobileListPaused}
-            />
+            <PulseInstantBuyProvider key={type} type={type}>
+              <MobilePulseList
+                type={type}
+                chain={chainId}
+                renderItemAction={renderItemAction}
+                onSelectToken={handleSelectToken}
+                onPauseChange={setIsMobileListPaused}
+                forceResumeNonce={pulseListResumeNonce}
+                forcePaused={isInstantBuying}
+              />
+            </PulseInstantBuyProvider>
 
             <div className="flex-1 h-full max-lg:hidden">
               <PulseInstantBuyProvider type="new">
@@ -220,6 +250,8 @@ type MobilePulseListProps = {
   renderItemAction: (token: Token) => ReactNode;
   onSelectToken: (token: Token) => void;
   onPauseChange: (isPaused: boolean) => void;
+  forceResumeNonce: number;
+  forcePaused: boolean;
 };
 
 function MobilePulseList({ type, ...props }: MobilePulseListProps) {
@@ -239,16 +271,34 @@ function MobilePulseNewList({
   renderItemAction,
   onSelectToken,
   onPauseChange,
+  forceResumeNonce,
+  forcePaused,
 }: MobilePulseTypedListProps) {
   const [isPaused, setIsPaused] = useState(false);
   const { tokens, isLoading } = usePulseNewListScript({ chain, isPaused });
+  const lastForceResumeNonceRef = useRef(forceResumeNonce);
+
+  useEffect(() => {
+    if (!forcePaused) return;
+    setIsPaused(true);
+    onPauseChange(true);
+  }, [forcePaused, onPauseChange]);
+
+  useEffect(() => {
+    if (lastForceResumeNonceRef.current === forceResumeNonce) return;
+    lastForceResumeNonceRef.current = forceResumeNonce;
+    if (forcePaused) return;
+    setIsPaused(false);
+    onPauseChange(false);
+  }, [forcePaused, forceResumeNonce, onPauseChange]);
 
   const handlePauseChange = useCallback(
     (paused: boolean) => {
-      setIsPaused(paused);
-      onPauseChange(paused);
+      const nextPaused = forcePaused || paused;
+      setIsPaused(nextPaused);
+      onPauseChange(nextPaused);
     },
-    [onPauseChange],
+    [forcePaused, onPauseChange],
   );
 
   return (
@@ -270,16 +320,34 @@ function MobilePulseFinalStretchList({
   renderItemAction,
   onSelectToken,
   onPauseChange,
+  forceResumeNonce,
+  forcePaused,
 }: MobilePulseTypedListProps) {
   const [isPaused, setIsPaused] = useState(false);
   const { tokens, isLoading } = usePulseFinalStretchListScript({ chain, isPaused });
+  const lastForceResumeNonceRef = useRef(forceResumeNonce);
+
+  useEffect(() => {
+    if (!forcePaused) return;
+    setIsPaused(true);
+    onPauseChange(true);
+  }, [forcePaused, onPauseChange]);
+
+  useEffect(() => {
+    if (lastForceResumeNonceRef.current === forceResumeNonce) return;
+    lastForceResumeNonceRef.current = forceResumeNonce;
+    if (forcePaused) return;
+    setIsPaused(false);
+    onPauseChange(false);
+  }, [forcePaused, forceResumeNonce, onPauseChange]);
 
   const handlePauseChange = useCallback(
     (paused: boolean) => {
-      setIsPaused(paused);
-      onPauseChange(paused);
+      const nextPaused = forcePaused || paused;
+      setIsPaused(nextPaused);
+      onPauseChange(nextPaused);
     },
-    [onPauseChange],
+    [forcePaused, onPauseChange],
   );
 
   return (
@@ -301,16 +369,34 @@ function MobilePulseMigratedList({
   renderItemAction,
   onSelectToken,
   onPauseChange,
+  forceResumeNonce,
+  forcePaused,
 }: MobilePulseTypedListProps) {
   const [isPaused, setIsPaused] = useState(false);
   const { tokens, isLoading } = usePulseMigratedListScript({ chain, isPaused });
+  const lastForceResumeNonceRef = useRef(forceResumeNonce);
+
+  useEffect(() => {
+    if (!forcePaused) return;
+    setIsPaused(true);
+    onPauseChange(true);
+  }, [forcePaused, onPauseChange]);
+
+  useEffect(() => {
+    if (lastForceResumeNonceRef.current === forceResumeNonce) return;
+    lastForceResumeNonceRef.current = forceResumeNonce;
+    if (forcePaused) return;
+    setIsPaused(false);
+    onPauseChange(false);
+  }, [forcePaused, forceResumeNonce, onPauseChange]);
 
   const handlePauseChange = useCallback(
     (paused: boolean) => {
-      setIsPaused(paused);
-      onPauseChange(paused);
+      const nextPaused = forcePaused || paused;
+      setIsPaused(nextPaused);
+      onPauseChange(nextPaused);
     },
-    [onPauseChange],
+    [forcePaused, onPauseChange],
   );
 
   return (

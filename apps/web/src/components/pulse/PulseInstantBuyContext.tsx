@@ -19,26 +19,29 @@ import {
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
   useAppSdk,
-  useAuthenticatedCallback,
   useWalletPrimaryTokenNetWorth,
 } from "@liberfi/ui-base";
 import {
   defaultTradePresetValues,
-  useSwap,
   useTradeBuySettings,
 } from "@liberfi/ui-dex";
+import { useSwap, type SwapPhase } from "@liberfi.io/ui-trade";
+import {
+  useAuthCallback,
+  useConnectedWallet,
+} from "@liberfi.io/wallet-connector";
 import { pulseSettingsAtom } from "../../states/pulse";
 
 type PulseInstantBuyContextType = {
   amount?: number;
   primaryTokenSymbol?: string;
-  buy: (tokenAddress: string) => void;
+  buy: (tokenAddress: string) => Promise<void>;
 };
 
 const PulseInstantBuyContext = createContext<PulseInstantBuyContextType>({
   amount: undefined,
   primaryTokenSymbol: undefined,
-  buy: () => {},
+  buy: async () => {},
 });
 
 export function usePulseInstantBuy() {
@@ -56,6 +59,7 @@ export function PulseInstantBuyProvider({
   const { chain: chainId } = useCurrentChain();
   const { t } = useTranslation();
   const appSdk = useAppSdk();
+  const wallet = useConnectedWallet(chainId);
 
   const pulseSettings = useAtomValue(pulseSettingsAtom);
   const amount = pulseSettings[type]?.instant_buy?.amount;
@@ -63,7 +67,29 @@ export function PulseInstantBuyProvider({
 
   const walletNetWorth = useWalletPrimaryTokenNetWorth();
   const buySettings = useTradeBuySettings(chainId);
-  const { swap } = useSwap();
+  const handleSwapError = useCallback(
+    (error: Error, phase: SwapPhase) => {
+      const phaseLabel = t(`trade.swap.phase.${phase}`);
+      const message = error.message
+        ? t("trade.swap.error", { phase: phaseLabel, reason: error.message })
+        : t("trade.swap.errorUnknown", { phase: phaseLabel });
+      toast.error(message);
+    },
+    [t],
+  );
+
+  const { swap } = useSwap({
+    onSubmitted: ({ txHash }) => {
+      toast.progress({
+        id: txHash,
+        type: "success",
+        message: t("trade.swap.transactionSubmitted"),
+        progress: true,
+        duration: 65_000,
+      });
+    },
+    onError: handleSwapError,
+  });
 
   const primaryTokenSymbol = useMemo(
     () => getPrimaryTokenSymbol(chainId),
@@ -92,8 +118,10 @@ export function PulseInstantBuyProvider({
     primaryTokenSymbol,
     primaryTokenDecimals,
     primaryTokenAddress,
+    chainId,
     walletNetWorth,
     presetSettings,
+    wallet,
     swap,
   });
   depsRef.current = {
@@ -103,8 +131,10 @@ export function PulseInstantBuyProvider({
     primaryTokenSymbol,
     primaryTokenDecimals,
     primaryTokenAddress,
+    chainId,
     walletNetWorth,
     presetSettings,
+    wallet,
     swap,
   };
 
@@ -116,13 +146,16 @@ export function PulseInstantBuyProvider({
       primaryTokenSymbol,
       primaryTokenDecimals,
       primaryTokenAddress,
+      chainId,
       walletNetWorth,
       presetSettings,
+      wallet,
       swap,
     } = depsRef.current;
 
     if (
       !walletNetWorth?.amount ||
+      !wallet ||
       !primaryTokenAddress ||
       !primaryTokenDecimals ||
       !tokenAddress
@@ -165,18 +198,23 @@ export function PulseInstantBuyProvider({
       .toString();
 
     await swap({
-      from: primaryTokenAddress,
-      to: tokenAddress,
+      chain: chainId,
+      wallet,
+      input: primaryTokenAddress,
+      output: tokenAddress,
       amount: amountInDecimals,
       slippage:
         presetSettings.slippage ?? defaultTradePresetValues.slippage!,
       priorityFee: priorityFeeInDecimals,
       tipFee: tipFeeInDecimals,
-      isAntiMev: presetSettings.antiMev,
+      isAntiMev:
+        typeof presetSettings.antiMev === "boolean"
+          ? presetSettings.antiMev
+          : presetSettings.antiMev !== "off",
     });
   }, []);
 
-  const buy = useAuthenticatedCallback(doBuy, [doBuy]);
+  const buy = useAuthCallback(doBuy, [doBuy]);
 
   const contextValue = useMemo(
     () => ({ amount, primaryTokenSymbol, buy }),
