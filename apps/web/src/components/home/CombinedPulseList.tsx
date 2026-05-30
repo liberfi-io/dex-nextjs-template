@@ -10,7 +10,7 @@ import {
   PulseNewListWidget,
 } from "@liberfi.io/ui-tokens";
 import { getNativeToken } from "@liberfi.io/utils";
-import { InstantTradeListButtonWidget } from "@liberfi.io/ui-trade";
+import { InstantTradeListButton } from "./InstantTradeListButton";
 
 type PulseType = "new" | "final_stretch" | "migrated";
 const PULSE_TABS: PulseType[] = ["new", "final_stretch", "migrated"];
@@ -64,7 +64,7 @@ export function CombinedPulseList({ chain, onSelectToken }: CombinedPulseListPro
             onSelectToken={onSelectToken}
             renderItemAction={(token) =>
               nativeToken && (
-                <InstantTradeListButtonWidget
+                <InstantTradeListButton
                   id="token-list"
                   chain={chain}
                   token={nativeToken}
@@ -90,7 +90,7 @@ export function CombinedPulseList({ chain, onSelectToken }: CombinedPulseListPro
             onSelectToken={onSelectToken}
             renderItemAction={(token) =>
               nativeToken && (
-                <InstantTradeListButtonWidget
+                <InstantTradeListButton
                   id="token-list"
                   chain={chain}
                   token={nativeToken}
@@ -116,7 +116,7 @@ export function CombinedPulseList({ chain, onSelectToken }: CombinedPulseListPro
             onSelectToken={onSelectToken}
             renderItemAction={(token) =>
               nativeToken && (
-                <InstantTradeListButtonWidget
+                <InstantTradeListButton
                   id="token-list"
                   chain={chain}
                   token={nativeToken}

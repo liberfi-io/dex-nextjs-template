@@ -24,13 +24,13 @@ import { CombinedPulseList } from "./CombinedPulseList";
 import { useAsyncModal } from "@liberfi.io/ui-scaffold";
 import {
   AmountPresetInputWidget,
-  InstantTradeListButtonWidget,
   InstantTradeSwapProvider,
   type PresetFormModalParams,
   type SwapResult,
   type SwapPhase,
 } from "@liberfi.io/ui-trade";
 import { tokenDetailRoute } from "@liberfi/ui-dex/libs/routes";
+import { InstantTradeListButton } from "./InstantTradeListButton";
 
 type ListTab = "trending" | "pulse" | "stocks" | "new";
 
@@ -184,7 +184,7 @@ export function CombinedTokenList() {
             ActionsComponent={({ token }) => (
               <div className="w-full h-full flex items-center justify-end">
                 {nativeToken && (
-                  <InstantTradeListButtonWidget
+                  <InstantTradeListButton
                     id="token-list"
                     chain={chain}
                     token={nativeToken}
@@ -206,7 +206,7 @@ export function CombinedTokenList() {
             ActionsComponent={({ token }) => (
               <div className="w-full h-full flex items-center justify-end">
                 {nativeToken && (
-                  <InstantTradeListButtonWidget
+                  <InstantTradeListButton
                     id="token-list"
                     chain={chain}
                     token={nativeToken}
@@ -228,7 +228,7 @@ export function CombinedTokenList() {
             ActionsComponent={({ token }) => (
               <div className="w-full h-full flex items-center justify-end">
                 {nativeToken && (
-                  <InstantTradeListButtonWidget
+                  <InstantTradeListButton
                     id="token-list"
                     chain={chain}
                     token={nativeToken}
