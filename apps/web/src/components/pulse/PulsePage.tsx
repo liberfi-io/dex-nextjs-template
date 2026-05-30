@@ -1,9 +1,18 @@
 "use client";
 
-import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { useAtom } from "jotai";
+import { cloneDeep } from "lodash-es";
 import { cn, HorizontalScrollContainer, PauseIcon, toast } from "@liberfi.io/ui";
 import { useTranslation } from "@liberfi.io/i18n";
-import { Chain, Token } from "@liberfi.io/types";
+import { Chain, SOLANA_TOKEN_PROTOCOLS, Token } from "@liberfi.io/types";
 import { ChainSelectWidget, useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
   PulseNewListWidget,
@@ -14,6 +23,8 @@ import {
   usePulseNewListScript,
   usePulseFinalStretchListScript,
   usePulseMigratedListScript,
+  TokenListFilterWidget,
+  type TokenListFiltersType,
 } from "@liberfi.io/ui-tokens";
 import {
   useSetBottomNavigationBarActiveKey,
@@ -30,12 +41,15 @@ import { PulseInstantBuyAmountInput } from "./PulseInstantBuyAmountInput";
 import { PulseInstantBuyProvider } from "./PulseInstantBuyContext";
 import { PulseInstantBuy } from "./PulseInstantBuy";
 import { isPulseSupportedChain } from "../../lib/pulse";
+import { pulseSettingsAtom } from "../../states/pulse";
 
 const PULSE_TAB_I18N_KEYS = {
   new: "extend.pulse.new",
   final_stretch: "extend.pulse.final_stretch",
   migrated: "extend.pulse.migrated",
 } as const;
+
+const PULSE_FILTER_RESOLUTION = "24h";
 
 export function PulsePage() {
   useShowHeader();
@@ -48,6 +62,7 @@ export function PulsePage() {
   const switchChain = useSwitchEvmWalletsToChain();
   const onChainSwitchedUrl = useChainSwitchUrlHandler();
   const isPulseSupported = isPulseSupportedChain(chainId);
+  const [pulseSettings, setPulseSettings] = useAtom(pulseSettingsAtom);
 
   useEffect(() => {
     if (!isPulseSupported) {
@@ -72,17 +87,53 @@ export function PulsePage() {
     [navigate, chainId],
   );
 
+  const filterProtocols = useMemo(
+    () => (chainId === Chain.SOLANA ? SOLANA_TOKEN_PROTOCOLS : undefined),
+    [chainId],
+  );
+
+  const handleFiltersChange = useCallback(
+    (listType: PulseListType, filters?: TokenListFiltersType) =>
+      setPulseSettings((prev) => {
+        const next = cloneDeep(prev);
+        const settings = next[listType] ?? {};
+        settings.filters = filters;
+        next[listType] = settings;
+        return next;
+      }),
+    [setPulseSettings],
+  );
+
+  const renderHeaderExtra = useCallback(
+    (listType: PulseListType) => (
+      <>
+        <PulseInstantBuyAmountInput type={listType} size="sm" className="max-w-55" />
+        <TokenListFilterWidget
+          badgePlacement="icon"
+          desktopOverlay="modal"
+          iconOnly
+          triggerVariant="plain"
+          protocols={filterProtocols}
+          resolution={PULSE_FILTER_RESOLUTION}
+          filters={pulseSettings[listType]?.filters}
+          onFiltersChange={(filters) => handleFiltersChange(listType, filters)}
+        />
+      </>
+    ),
+    [filterProtocols, handleFiltersChange, pulseSettings],
+  );
+
   const renderNewHeaderExtra = useMemo(
-    () => <PulseInstantBuyAmountInput type="new" size="sm" className="max-w-55" />,
-    [],
+    () => renderHeaderExtra("new"),
+    [renderHeaderExtra],
   );
   const renderFinalStretchHeaderExtra = useMemo(
-    () => <PulseInstantBuyAmountInput type="final_stretch" size="sm" className="max-w-55" />,
-    [],
+    () => renderHeaderExtra("final_stretch"),
+    [renderHeaderExtra],
   );
   const renderMigratedHeaderExtra = useMemo(
-    () => <PulseInstantBuyAmountInput type="migrated" size="sm" className="max-w-55" />,
-    [],
+    () => renderHeaderExtra("migrated"),
+    [renderHeaderExtra],
   );
 
   const handleInstantBuyStart = useCallback(() => {
@@ -183,6 +234,14 @@ export function PulsePage() {
               size="sm"
               className="max-w-50"
             />
+            <TokenListFilterWidget
+              badgePlacement="icon"
+              iconOnly
+              protocols={filterProtocols}
+              resolution={PULSE_FILTER_RESOLUTION}
+              filters={pulseSettings[type]?.filters}
+              onFiltersChange={(filters) => handleFiltersChange(type, filters)}
+            />
           </div>
         </div>
 
@@ -198,6 +257,7 @@ export function PulsePage() {
                 onPauseChange={setIsMobileListPaused}
                 forceResumeNonce={pulseListResumeNonce}
                 forcePaused={isInstantBuying}
+                filters={pulseSettings[type]?.filters}
               />
             </PulseInstantBuyProvider>
 
@@ -205,6 +265,7 @@ export function PulsePage() {
               <PulseInstantBuyProvider type="new">
                 <PulseNewListWidget
                   chain={chainId}
+                  filters={pulseSettings.new?.filters}
                   title={t("extend.pulse.new")}
                   renderHeaderExtra={renderNewHeaderExtra}
                   renderItemAction={renderItemAction}
@@ -217,6 +278,7 @@ export function PulsePage() {
               <PulseInstantBuyProvider type="final_stretch">
                 <PulseFinalStretchListWidget
                   chain={chainId}
+                  filters={pulseSettings.final_stretch?.filters}
                   title={t("extend.pulse.final_stretch")}
                   renderHeaderExtra={renderFinalStretchHeaderExtra}
                   renderItemAction={renderItemAction}
@@ -229,6 +291,7 @@ export function PulsePage() {
               <PulseInstantBuyProvider type="migrated">
                 <PulseMigratedListWidget
                   chain={chainId}
+                  filters={pulseSettings.migrated?.filters}
                   title={t("extend.pulse.migrated")}
                   renderHeaderExtra={renderMigratedHeaderExtra}
                   renderItemAction={renderItemAction}
@@ -247,6 +310,7 @@ export function PulsePage() {
 type MobilePulseListProps = {
   type: PulseListType;
   chain: Chain;
+  filters?: TokenListFiltersType;
   renderItemAction: (token: Token) => ReactNode;
   onSelectToken: (token: Token) => void;
   onPauseChange: (isPaused: boolean) => void;
@@ -268,6 +332,7 @@ type MobilePulseTypedListProps = Omit<MobilePulseListProps, "type">;
 
 function MobilePulseNewList({
   chain,
+  filters,
   renderItemAction,
   onSelectToken,
   onPauseChange,
@@ -275,7 +340,11 @@ function MobilePulseNewList({
   forcePaused,
 }: MobilePulseTypedListProps) {
   const [isPaused, setIsPaused] = useState(false);
-  const { tokens, isLoading } = usePulseNewListScript({ chain, isPaused });
+  const { tokens, isLoading } = usePulseNewListScript({
+    chain,
+    filters,
+    isPaused,
+  });
   const lastForceResumeNonceRef = useRef(forceResumeNonce);
 
   useEffect(() => {
@@ -317,6 +386,7 @@ function MobilePulseNewList({
 
 function MobilePulseFinalStretchList({
   chain,
+  filters,
   renderItemAction,
   onSelectToken,
   onPauseChange,
@@ -324,7 +394,11 @@ function MobilePulseFinalStretchList({
   forcePaused,
 }: MobilePulseTypedListProps) {
   const [isPaused, setIsPaused] = useState(false);
-  const { tokens, isLoading } = usePulseFinalStretchListScript({ chain, isPaused });
+  const { tokens, isLoading } = usePulseFinalStretchListScript({
+    chain,
+    filters,
+    isPaused,
+  });
   const lastForceResumeNonceRef = useRef(forceResumeNonce);
 
   useEffect(() => {
@@ -366,6 +440,7 @@ function MobilePulseFinalStretchList({
 
 function MobilePulseMigratedList({
   chain,
+  filters,
   renderItemAction,
   onSelectToken,
   onPauseChange,
@@ -373,7 +448,11 @@ function MobilePulseMigratedList({
   forcePaused,
 }: MobilePulseTypedListProps) {
   const [isPaused, setIsPaused] = useState(false);
-  const { tokens, isLoading } = usePulseMigratedListScript({ chain, isPaused });
+  const { tokens, isLoading } = usePulseMigratedListScript({
+    chain,
+    filters,
+    isPaused,
+  });
   const lastForceResumeNonceRef = useRef(forceResumeNonce);
 
   useEffect(() => {
