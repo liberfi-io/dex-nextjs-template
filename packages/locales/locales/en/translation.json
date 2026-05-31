@@ -252,12 +252,20 @@
         "holders_table": {
           "rank": "#",
           "wallet": "Wallet",
+          "balance_last_active": "Balance / Last Active",
+          "wallet_created": "Wallet Created",
           "tags": "Tags",
           "amount": "Amount",
           "value": "Value",
           "percentage": "%",
           "first_held": "First held",
-          "last_active": "Last active"
+          "last_active": "Last active",
+          "total_buy": "Total Buy / Avg",
+          "total_sell": "Total Sell / Avg",
+          "unrealized_pnl": "Unrealized Profit",
+          "total_profit": "Total Profit",
+          "holdings": "Holdings / USD",
+          "funding": "Funding / Transfer In"
         },
         "top_traders_table": {
           "rank": "#",

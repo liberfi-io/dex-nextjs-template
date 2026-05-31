@@ -1,185 +1,910 @@
 "use client";
 
+import { useTickAge } from "@liberfi.io/hooks";
 import { useTokenHoldersListScript } from "@liberfi.io/ui-tokens";
 import type { Chain, TokenHolder } from "@liberfi.io/types";
-import { cn } from "@liberfi.io/ui";
 import {
-  formatAmount,
+  CheckIcon,
+  cn,
+  CopyIcon,
+  StyledTooltip,
+  TriangleDownIcon,
+  toast,
+  useCopyToClipboard,
+  VirtualList,
+  type VirtualRowComponentProps,
+} from "@liberfi.io/ui";
+import {
+  accountExplorerUrl,
+  formatAge,
+  formatAmountCompact,
   formatAmountUSDCompact,
   formatPercent,
+  SafeBigNumber,
   truncateAddress,
 } from "@liberfi.io/utils";
+import { useTranslation } from "@liberfi/ui-base";
 import {
-  alignClass,
-  EmptyBody,
-  TableShell,
-  type BottomTableColumn,
-} from "./table-shell";
+  MouseEvent,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 export interface BottomHoldersTableProps {
   chain: Chain;
   address: string;
 }
 
-const COLUMNS: ReadonlyArray<BottomTableColumn> = [
-  {
-    key: "rank",
-    labelKey: "extend.trade.bottom_panel.holders_table.rank",
-    width: "w-[8%]",
-    align: "left",
-  },
+const ROW_HEIGHT = 40;
+const TX_LABEL = "TXs";
+const VIRTUAL_OVERSCAN = 72;
+const LOAD_MORE_THRESHOLD = 30;
+const TABLE_WIDTH = 1360;
+const TABLE_SIZE_STYLE = { minWidth: TABLE_WIDTH, width: "100%" };
+const GRID_TEMPLATE_COLUMNS =
+  "minmax(190px, 190fr) minmax(120px, 120fr) minmax(110px, 110fr) minmax(180px, 180fr) minmax(180px, 180fr) minmax(130px, 130fr) minmax(130px, 130fr) minmax(170px, 170fr) minmax(150px, 150fr)";
+
+const HOLDER_COLUMNS: ReadonlyArray<{
+  key: string;
+  labelKey: string;
+  align?: "left" | "right" | "center";
+}> = [
   {
     key: "wallet",
     labelKey: "extend.trade.bottom_panel.holders_table.wallet",
-    width: "w-[24%]",
     align: "left",
   },
   {
-    key: "amount",
-    labelKey: "extend.trade.bottom_panel.holders_table.amount",
-    width: "w-[18%]",
-    align: "right",
-  },
-  {
-    key: "value",
-    labelKey: "extend.trade.bottom_panel.holders_table.value",
-    width: "w-[16%]",
-    align: "right",
-  },
-  {
-    key: "percentage",
-    labelKey: "extend.trade.bottom_panel.holders_table.percentage",
-    width: "w-[12%]",
-    align: "right",
-  },
-  {
     key: "last_active",
-    labelKey: "extend.trade.bottom_panel.holders_table.last_active",
-    width: "w-[14%]",
+    labelKey: "extend.trade.bottom_panel.holders_table.balance_last_active",
+    align: "right",
+  },
+  {
+    key: "first_held",
+    labelKey: "extend.trade.bottom_panel.holders_table.wallet_created",
+    align: "right",
+  },
+  {
+    key: "total_buy",
+    labelKey: "extend.trade.bottom_panel.holders_table.total_buy",
+    align: "right",
+  },
+  {
+    key: "total_sell",
+    labelKey: "extend.trade.bottom_panel.holders_table.total_sell",
+    align: "right",
+  },
+  {
+    key: "unrealized_pnl",
+    labelKey: "extend.trade.bottom_panel.holders_table.unrealized_pnl",
+    align: "right",
+  },
+  {
+    key: "total_profit",
+    labelKey: "extend.trade.bottom_panel.holders_table.total_profit",
+    align: "right",
+  },
+  {
+    key: "holdings",
+    labelKey: "extend.trade.bottom_panel.holders_table.holdings",
+    align: "right",
+  },
+  {
+    key: "funding",
+    labelKey: "extend.trade.bottom_panel.holders_table.funding",
     align: "right",
   },
 ];
 
-/**
- * GMGN-style holders table — replaces the SDK's
- * {@link TokenHoldersListWidget} on the consumer side. Re-uses the SDK's
- * script hook so pagination + sort behavior stay consistent.
- *
- * Columns: # | Wallet | Amount | Value | % | Last Active
- *
- * Values are formatted with the same compact helpers used elsewhere in
- * the page (K/M/B abbreviations); percentages convert from the API's
- * `0-100` scale via `/100` before passing to `formatPercent`. Rank is
- * derived from the holder's index in the sorted list (1-based).
- */
+type HolderSortBy =
+  | "holdingUsd"
+  | "lastActiveAt"
+  | "realizedPnl"
+  | "buyVolume"
+  | "sellVolume";
+
+type HolderRowData = TokenHolder & {
+  addressLabel?: string;
+  avgBuyPriceUsd?: string;
+  avgSellPriceUsd?: string;
+  buyAmountCur?: string;
+  buyVolumeUsd?: string;
+  createdAt?: Date | string | number;
+  exchange?: string;
+  historyTransferInAmount?: string;
+  historyTransferInCost?: string;
+  nativeBalance?: string;
+  roi?: string;
+  sellAmountCur?: string;
+  sellVolumeUsd?: string;
+  totalBuyCount?: number;
+  totalProfit?: string;
+  totalSellCount?: number;
+  transferInCount?: number;
+  unrealizedPnlRatio?: string;
+  unrealizedProfit?: string;
+};
+
+const HOLDER_SORT_BY_COLUMN: Partial<Record<string, HolderSortBy>> = {
+  last_active: "lastActiveAt",
+  total_buy: "buyVolume",
+  total_sell: "sellVolume",
+  total_profit: "realizedPnl",
+  holdings: "holdingUsd",
+};
+
+type TokenHoldersListScriptWithSort = ReturnType<
+  typeof useTokenHoldersListScript
+> & {
+  holders: HolderRowData[];
+  sortBy: HolderSortBy;
+  setSortBy: (s: HolderSortBy) => void;
+};
+
 export function BottomHoldersTable({ chain, address }: BottomHoldersTableProps) {
-  const { holders, isLoading, hasMore, loadMore } = useTokenHoldersListScript({
-    chain,
-    address,
-  });
-  const now = Date.now();
+  const { t } = useTranslation();
+  const { holders, isLoading, sortBy, setSortBy, hasMore, loadMore } =
+    useTokenHoldersListScript({
+      chain,
+      address,
+      limit: 50,
+    }) as unknown as TokenHoldersListScriptWithSort;
+
   const isInitialLoading = isLoading && holders.length === 0;
   const isEmpty = !isLoading && holders.length === 0;
+  const isPaging = isLoading && holders.length > 0;
+  const rowCount = hasMore || isPaging ? holders.length + 1 : holders.length;
+  const rowProps = useMemo<HolderVirtualRowData>(
+    () => ({
+      chain,
+      holders,
+      isPaging,
+    }),
+    [chain, holders, isPaging],
+  );
+
+  const handleRowsRendered = useCallback(
+    (
+      visibleRows: { startIndex: number; stopIndex: number },
+      _allRows: { startIndex: number; stopIndex: number },
+    ) => {
+      if (!hasMore || isLoading) return;
+      if (visibleRows.stopIndex >= holders.length - LOAD_MORE_THRESHOLD) {
+        loadMore();
+      }
+    },
+    [hasMore, holders.length, isLoading, loadMore],
+  );
 
   return (
-    <TableShell
-      columns={COLUMNS}
-      minWidth="min-w-[720px]"
-      isInitialLoading={isInitialLoading}
-      infiniteScroll={{ hasMore, isLoading, onLoadMore: loadMore }}
-    >
-      <tbody>
-        {holders.map((h, idx) => (
-          <HolderRow key={h.address} holder={h} rank={idx + 1} now={now} />
-        ))}
-      </tbody>
-      {isEmpty ? <EmptyBody colSpan={COLUMNS.length} /> : null}
-    </TableShell>
+    <div className="flex h-[70vh] w-full flex-col overflow-hidden md:h-full">
+      <div className="custom-scrollbar min-h-0 flex-1 overflow-x-auto overflow-y-hidden overscroll-x-contain">
+        <div className="flex h-full flex-col" style={TABLE_SIZE_STYLE}>
+          <div
+            className="grid h-9 shrink-0 border-b border-divider bg-content1 text-[12px] font-medium text-default-500"
+            style={{ gridTemplateColumns: GRID_TEMPLATE_COLUMNS }}
+          >
+            {HOLDER_COLUMNS.map((col) => (
+              <div
+                key={col.key}
+                className={cn(
+                  "flex h-full items-center px-3",
+                  justifyClass(col.align),
+                )}
+                style={{ letterSpacing: "-0.2px" }}
+              >
+                {HOLDER_SORT_BY_COLUMN[col.key] ? (
+                  <HolderSortHeader
+                    label={t(col.labelKey)}
+                    sortBeforeSlash={col.key === "holdings"}
+                    sortBy={HOLDER_SORT_BY_COLUMN[col.key]}
+                    activeSortBy={sortBy}
+                    onSortByChange={setSortBy}
+                  />
+                ) : (
+                  t(col.labelKey)
+                )}
+              </div>
+            ))}
+          </div>
+
+          {isInitialLoading ? (
+            <HolderSkeletonRows />
+          ) : isEmpty ? (
+            <EmptyHolders />
+          ) : (
+            <VirtualList
+              className="custom-scrollbar min-h-0 w-full flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain"
+              onRowsRendered={handleRowsRendered}
+              rowComponent={HolderVirtualRow}
+              rowCount={rowCount}
+              rowHeight={ROW_HEIGHT}
+              rowProps={rowProps}
+              overscanCount={VIRTUAL_OVERSCAN}
+            />
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
 
-function HolderRow({
+function HolderSortHeader({
+  label,
+  sortBeforeSlash,
+  sortBy,
+  activeSortBy,
+  onSortByChange,
+}: {
+  label: string;
+  sortBeforeSlash?: boolean;
+  sortBy: HolderSortBy | undefined;
+  activeSortBy: HolderSortBy | undefined;
+  onSortByChange: (sortBy: HolderSortBy) => void;
+}) {
+  if (!sortBy) return label;
+
+  const active = sortBy === activeSortBy;
+  return (
+    <button
+      type="button"
+      className={cn(
+        "inline-flex cursor-pointer items-center gap-1 bg-transparent p-0 font-inherit text-inherit transition-colors",
+        active ? "text-foreground" : "hover:text-foreground",
+      )}
+      aria-pressed={active}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onSortByChange(sortBy);
+      }}
+    >
+      {sortBeforeSlash ? (
+        <SortLabelWithIconBeforeSlash label={label} active={active} />
+      ) : (
+        <>
+          <span>{label}</span>
+          <SortArrow active={active} />
+        </>
+      )}
+    </button>
+  );
+}
+
+function SortLabelWithIconBeforeSlash({
+  label,
+  active,
+}: {
+  label: string;
+  active: boolean;
+}) {
+  const slashIndex = label.indexOf("/");
+  if (slashIndex < 0) {
+    return (
+      <>
+        <span>{label}</span>
+        <SortArrow active={active} />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <span>{label.slice(0, slashIndex).trimEnd()}</span>
+      <SortArrow active={active} />
+      <span>{label.slice(slashIndex)}</span>
+    </>
+  );
+}
+
+function SortArrow({ active }: { active: boolean }) {
+  return (
+    <TriangleDownIcon
+      width={8}
+      height={8}
+      className={cn(active ? "text-foreground" : "text-default-400")}
+      aria-hidden
+    />
+  );
+}
+
+interface HolderVirtualRowData {
+  chain: Chain;
+  holders: HolderRowData[];
+  isPaging: boolean;
+}
+
+function HolderVirtualRow({
+  index,
+  style,
+  chain,
+  holders,
+  isPaging,
+}: VirtualRowComponentProps<HolderVirtualRowData>) {
+  const holder = holders[index];
+  if (!holder) {
+    return (
+      <div style={style}>
+        <LoadMoreRow isLoading={isPaging} />
+      </div>
+    );
+  }
+
+  return (
+    <div style={style}>
+      <HolderRow chain={chain} holder={holder} rank={index + 1} />
+    </div>
+  );
+}
+
+const HolderRow = memo(function HolderRow({
+  chain,
   holder,
   rank,
-  now,
 }: {
-  holder: TokenHolder;
+  chain: Chain;
+  holder: HolderRowData;
   rank: number;
-  now: number;
 }) {
   return (
-    <tr className="h-10 border-b border-divider transition-colors hover:bg-content2">
-      <td
-        className={cn(
-          "px-3 align-middle tabular-nums text-default-500",
-          alignClass("left"),
+    <div
+      className="grid h-10 border-b border-divider text-[12px] transition-colors hover:bg-content2"
+      style={{ gridTemplateColumns: GRID_TEMPLATE_COLUMNS }}
+    >
+      <div className={cn("flex items-center px-3", justifyClass("left"))}>
+        <div className="flex min-w-0 items-center gap-2">
+          <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-content3 text-[10px] font-semibold text-default-700">
+            {rank}
+          </span>
+          <HolderAddressActions chain={chain} address={holder.address} />
+        </div>
+      </div>
+      <BalanceActivityCell
+        chain={chain}
+        nativeBalance={holder.nativeBalance}
+        lastActiveAt={holder.lastActiveAt}
+      />
+      <AgeCell value={holder.createdAt} />
+      <TradeFlowCell
+        side="buy"
+        volumeUsd={holder.buyVolumeUsd}
+        avgPriceUsd={holder.avgBuyPriceUsd}
+        tokenAmount={holder.buyAmountCur}
+        count={holder.totalBuyCount}
+      />
+      <TradeFlowCell
+        side="sell"
+        volumeUsd={holder.sellVolumeUsd}
+        avgPriceUsd={holder.avgSellPriceUsd}
+        tokenAmount={holder.sellAmountCur}
+        count={holder.totalSellCount}
+      />
+      <PnlCell
+        value={holder.unrealizedProfit}
+        ratio={holder.unrealizedPnlRatio}
+      />
+      <PnlCell value={holder.totalProfit} ratio={holder.roi} strong />
+      <HoldingsCell
+        amountInUsd={holder.amountInUsd}
+        ratio={holder.ratio}
+      />
+      <FundingCell holder={holder} />
+    </div>
+  );
+});
+
+const HolderAddressActions = memo(function HolderAddressActions({
+  chain,
+  address,
+}: {
+  chain: Chain;
+  address: string;
+}) {
+  const explorer = useMemo(
+    () => getAccountExplorer(chain, address),
+    [chain, address],
+  );
+  return (
+    <div className="flex min-w-0 items-center gap-1">
+      <HolderAddressCopyButton address={address} />
+      {explorer ? (
+        <StyledTooltip content={`在 ${explorer.name} 打开`} placement="top">
+          <a
+            href={explorer.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex size-4 shrink-0 cursor-pointer items-center justify-center text-neutral transition-colors hover:text-primary-200"
+            aria-label={`在 ${explorer.name} 打开`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <ExternalLinkIcon className="h-3 w-3" />
+          </a>
+        </StyledTooltip>
+      ) : null}
+    </div>
+  );
+});
+
+const HolderAddressCopyButton = memo(function HolderAddressCopyButton({
+  address,
+}: {
+  address: string;
+}) {
+  const { t } = useTranslation();
+  const copyToClipboard = useCopyToClipboard();
+  const [copied, setCopied] = useState(false);
+  const copiedResetTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
+
+  const handleCopyAddress = useCallback(
+    (e: MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+      copyToClipboard(address, () => {
+        toast.success(t("tokens.copied.address"));
+        setCopied(true);
+        if (copiedResetTimerRef.current) {
+          clearTimeout(copiedResetTimerRef.current);
+        }
+        copiedResetTimerRef.current = setTimeout(() => {
+          setCopied(false);
+        }, 2000);
+      });
+    },
+    [address, copyToClipboard, t],
+  );
+
+  useEffect(
+    () => () => {
+      if (copiedResetTimerRef.current) {
+        clearTimeout(copiedResetTimerRef.current);
+      }
+    },
+    [],
+  );
+
+  return (
+    <button
+      type="button"
+      className="group flex min-w-0 cursor-pointer items-center gap-1 text-foreground transition-colors hover:text-primary-200"
+      onClick={handleCopyAddress}
+      aria-label={t("tokens.copied.address")}
+    >
+      <span className="truncate font-mono text-[12px] font-medium">
+        {truncateAddress(address, 4, 4)}
+      </span>
+      {copied ? (
+        <CheckIcon className="h-3 w-3 shrink-0 text-bullish" />
+      ) : (
+        <CopyIcon className="h-3 w-3 shrink-0 text-neutral transition-colors group-hover:text-primary-200" />
+      )}
+    </button>
+  );
+});
+
+const BalanceActivityCell = memo(function BalanceActivityCell({
+  chain,
+  nativeBalance,
+  lastActiveAt,
+}: {
+  chain: Chain;
+  nativeBalance?: string;
+  lastActiveAt?: Date | string | number;
+}) {
+  const date = normalizeDate(lastActiveAt);
+  const ageMs = useTickAge(date ?? Date.now());
+  const ageText = date ? formatAge(ageMs) : "--";
+  const nativeText = formatNativeBalance(chain, nativeBalance);
+  const fullTime = date ? date.toLocaleString() : null;
+
+  return (
+    <div
+      className={cn(
+        "flex flex-col justify-center px-3 tabular-nums",
+        alignClass("right"),
+      )}
+    >
+      <div className="text-[12px] leading-4 text-foreground">
+        {nativeText}
+      </div>
+      <div className="text-[11px] leading-4 text-neutral">
+        {fullTime ? (
+          <StyledTooltip content={fullTime} placement="top">
+            <span>{ageText}</span>
+          </StyledTooltip>
+        ) : (
+          ageText
         )}
-      >
-        {rank}
-      </td>
-      <td className={cn("px-3 align-middle", alignClass("left"))}>
-        <span className="font-mono text-[12px] text-foreground">
-          {truncateAddress(holder.address, 4, 4)}
-        </span>
-      </td>
-      <td
-        className={cn(
-          "px-3 align-middle tabular-nums text-foreground",
-          alignClass("right"),
-        )}
-        style={{ letterSpacing: "-0.2px" }}
-      >
-        {formatAmount(holder.amount)}
-      </td>
-      <td
-        className={cn(
-          "px-3 align-middle tabular-nums text-foreground",
-          alignClass("right"),
-        )}
-        style={{ letterSpacing: "-0.2px" }}
-      >
-        {holder.amountInUsd ? formatAmountUSDCompact(holder.amountInUsd) : "--"}
-      </td>
-      <td
-        className={cn(
-          "px-3 align-middle tabular-nums text-default-500",
-          alignClass("right"),
-        )}
-        style={{ letterSpacing: "-0.2px" }}
-      >
-        {formatRatioFrom100(holder.ratio)}
-      </td>
-      <td
-        className={cn(
-          "px-3 align-middle text-default-500",
-          alignClass("right"),
-        )}
-      >
-        {holder.lastActiveAt ? formatAgeShort(holder.lastActiveAt, now) : "--"}
-      </td>
-    </tr>
+      </div>
+    </div>
+  );
+});
+
+const TradeFlowCell = memo(function TradeFlowCell({
+  side,
+  volumeUsd,
+  avgPriceUsd,
+  tokenAmount,
+  count,
+}: {
+  side: "buy" | "sell";
+  volumeUsd?: string;
+  avgPriceUsd?: string;
+  tokenAmount?: string;
+  count?: number;
+}) {
+  const tone = side === "buy" ? "text-bullish" : "text-bearish";
+  return (
+    <div
+      className={cn(
+        "flex flex-col justify-center px-3 tabular-nums",
+        alignClass("right"),
+      )}
+    >
+      <div className={cn("text-[12px] leading-4", tone)}>
+        {volumeUsd ? formatAmountUSDCompact(volumeUsd) : "--"}
+        <span className="px-1 text-default-500">/</span>
+        {avgPriceUsd ? formatAmountUSDCompact(avgPriceUsd) : "--"}
+      </div>
+      <div className="text-[11px] leading-4 text-neutral">
+        {tokenAmount ? formatAmountCompact(tokenAmount) : "--"}
+        <span className="px-1">/</span>
+        {count ?? "--"} {TX_LABEL}
+      </div>
+    </div>
+  );
+});
+
+const PnlCell = memo(function PnlCell({
+  value,
+  ratio,
+  strong,
+}: {
+  value?: string;
+  ratio?: string;
+  strong?: boolean;
+}) {
+  const n = value === undefined || value === "" ? undefined : Number(value);
+  const tone =
+    n === undefined || Number.isNaN(n)
+      ? "text-default-500"
+      : n > 0
+        ? "text-bullish"
+        : n < 0
+          ? "text-bearish"
+          : "text-default-500";
+
+  return (
+    <div
+      className={cn(
+        "flex flex-col justify-center px-3 tabular-nums",
+        alignClass("right"),
+        strong ? "font-medium" : undefined,
+        tone,
+      )}
+      style={{ letterSpacing: "-0.2px" }}
+    >
+      <div className="text-[12px] leading-4">
+        {value
+          ? formatAmountUSDCompact(value, { showPlusGtThanZero: true })
+          : "--"}
+      </div>
+      <div className="text-[11px] leading-4">
+        {formatRatioFromOne(ratio, { signed: true })}
+      </div>
+    </div>
+  );
+});
+
+const HoldingsCell = memo(function HoldingsCell({
+  amountInUsd,
+  ratio,
+}: {
+  amountInUsd?: string;
+  ratio?: string;
+}) {
+  const ratioValue = parseRatioFrom100(ratio);
+  const ratioText =
+    ratioValue === undefined ? undefined : formatPercent(ratioValue / 100);
+  const progressWidth =
+    ratioValue === undefined ? 0 : Math.max(0, Math.min(100, ratioValue));
+  const hasRatio = ratioText !== undefined;
+
+  return (
+    <div
+      className={cn(
+        "flex flex-col justify-center gap-1 px-3 tabular-nums text-default-500",
+        alignClass("right"),
+      )}
+    >
+      <div className="flex items-center justify-end gap-1 text-[12px] leading-4 text-foreground">
+        <span>{amountInUsd ? formatAmountUSDCompact(amountInUsd) : "--"}</span>
+        {hasRatio ? (
+          <span className="rounded bg-content3 px-1.5 py-0.5 text-[11px] leading-4 text-default-600">
+            {ratioText}
+          </span>
+        ) : null}
+      </div>
+      <div className="flex items-center justify-end">
+        {hasRatio ? (
+          <div className="h-1 w-20 overflow-hidden rounded-full bg-divider">
+            <div
+              className="h-full rounded-full bg-default-500"
+              style={{ width: `${progressWidth}%` }}
+            />
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+});
+
+const FundingCell = memo(function FundingCell({
+  holder,
+}: {
+  holder: HolderRowData;
+}) {
+  const source = holder.exchange ?? holder.addressLabel;
+  const transferAmount = holder.historyTransferInCost
+    ? formatAmountUSDCompact(holder.historyTransferInCost)
+    : holder.historyTransferInAmount
+      ? formatAmountCompact(holder.historyTransferInAmount)
+      : undefined;
+  const transferCount =
+    holder.transferInCount === undefined ? undefined : holder.transferInCount;
+
+  return (
+    <div
+      className={cn(
+        "flex flex-col justify-center px-3 text-default-500",
+        alignClass("right"),
+      )}
+    >
+      <div className="truncate text-[12px] leading-4 text-foreground">
+        {source ?? "--"}
+      </div>
+      <div className="text-[11px] leading-4 text-neutral">
+        {transferAmount ?? "--"}
+        {transferCount !== undefined ? (
+          <span className="pl-1">/ {transferCount}</span>
+        ) : null}
+      </div>
+    </div>
+  );
+});
+
+const AgeCell = memo(function AgeCell({
+  value,
+}: {
+  value?: Date | string | number;
+}) {
+  const date = normalizeDate(value);
+  const ageMs = useTickAge(date ?? Date.now());
+  const ageText = date ? formatAge(ageMs) : "--";
+  const fullTime = date ? date.toLocaleString() : null;
+
+  const content = (
+    <span className={cn(date ? "text-foreground" : "text-default-500")}>
+      {ageText}
+    </span>
+  );
+
+  return (
+    <div
+      className={cn(
+        "flex items-center px-3 text-default-500",
+        justifyClass("right"),
+      )}
+    >
+      {fullTime ? (
+        <StyledTooltip content={fullTime} placement="top">
+          {content}
+        </StyledTooltip>
+      ) : (
+        content
+      )}
+    </div>
+  );
+});
+
+function normalizeDate(value: Date | string | number | undefined): Date | null {
+  if (value == null || value === "") return null;
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? null : value;
+  }
+  const timestamp =
+    typeof value === "number" && value > 0 && value < 1_000_000_000_000
+      ? value * 1000
+      : value;
+  const date = new Date(timestamp);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function EmptyHolders() {
+  const { t } = useTranslation();
+  return (
+    <div
+      className="flex flex-1 items-center justify-center py-16 text-[12px] text-default-500"
+      role="status"
+    >
+      {t("extend.trade.bottom_panel.no_data")}
+    </div>
   );
 }
 
-/** Convert a 0–100 ratio string (e.g. `"12.345"`) to `"12.34%"`. */
-function formatRatioFrom100(value: string | number | undefined): string {
-  if (value === undefined || value === null || value === "") return "--";
-  return formatPercent(Number(value) / 100);
+function LoadMoreRow({ isLoading }: { isLoading: boolean }) {
+  const { t } = useTranslation();
+  return (
+    <div className="flex h-10 items-center justify-center text-[12px] text-default-500">
+      {isLoading ? (
+        <div className="flex items-center gap-2" role="status">
+          <span
+            aria-hidden
+            className="block size-3 animate-spin rounded-full border border-default-300 border-t-default-600"
+          />
+          <span>{t("extend.trade.bottom_panel.loading")}</span>
+        </div>
+      ) : (
+        <span aria-hidden className="block h-px w-px" />
+      )}
+    </div>
+  );
 }
 
-/** Inline copy of SDK's `formatAgeShort`. See BottomTradesTable for rationale. */
-function formatAgeShort(from: Date | string | number | undefined, now: number) {
-  if (from == null) return "--";
-  const t = from instanceof Date ? from.getTime() : new Date(from).getTime();
-  const sec = Math.max(0, Math.floor((now - t) / 1000));
-  if (sec < 60) return `${sec}s`;
-  const min = Math.floor(sec / 60);
-  if (min < 60) return `${min}m`;
-  const hr = Math.floor(min / 60);
-  if (hr < 24) return `${hr}h`;
-  const day = Math.floor(hr / 24);
-  if (day < 30) return `${day}d`;
-  const mo = Math.floor(day / 30);
-  if (mo < 12) return `${mo}mo`;
-  return `${Math.floor(day / 365)}y`;
+function HolderSkeletonRows() {
+  return (
+    <div>
+      {Array.from({ length: 8 }, (_, row) => (
+        <div
+          key={row}
+          className="grid h-12 border-b border-divider"
+          style={{ gridTemplateColumns: GRID_TEMPLATE_COLUMNS }}
+        >
+          {HOLDER_COLUMNS.map((col, idx) => (
+            <div key={col.key} className="flex flex-col justify-center px-3">
+              <div
+                className={cn(
+                  "h-3 animate-pulse rounded-sm bg-content3",
+                  idx === 0 ? "w-28" : idx > 2 ? "ml-auto w-20" : "ml-auto w-14",
+                )}
+              />
+              {idx >= 3 ? (
+                <div className="mt-2 ml-auto h-2 w-16 animate-pulse rounded-sm bg-content3/70" />
+              ) : null}
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function alignClass(align: "left" | "right" | "center" | undefined) {
+  if (align === "right") return "text-right";
+  if (align === "center") return "text-center";
+  return "text-left";
+}
+
+function justifyClass(align: "left" | "right" | "center" | undefined) {
+  if (align === "right") return "justify-end text-right";
+  if (align === "center") return "justify-center text-center";
+  return "justify-start text-left";
+}
+
+function parseRatioFrom100(value: string | number | undefined): number | undefined {
+  if (value === undefined || value === null || value === "") return undefined;
+  const n = Number(value);
+  if (Number.isNaN(n)) return undefined;
+  return n;
+}
+
+function formatRatioFromOne(
+  value: string | number | undefined,
+  options?: { signed?: boolean },
+): string {
+  if (value === undefined || value === null || value === "") return "--";
+  const n = Number(value);
+  if (Number.isNaN(n)) return "--";
+  return formatPercent(n, { showPlusGtThanZero: options?.signed });
+}
+
+function formatNativeBalance(chain: Chain, value: string | undefined): string {
+  if (!value) return "--";
+  const decimals = nativeBalanceDecimals(chain);
+  const amount = new SafeBigNumber(value).shiftedBy(-decimals).toString();
+  return `${formatAmountCompact(amount)} ${nativeSymbol(chain)}`;
+}
+
+function nativeBalanceDecimals(chain: Chain): number {
+  switch (chain) {
+    case "900900900":
+    case "901901901":
+    case "902902902":
+      return 9;
+    default:
+      return 18;
+  }
+}
+
+function nativeSymbol(chain: Chain): string {
+  switch (chain) {
+    case "900900900":
+    case "901901901":
+    case "902902902":
+      return "SOL";
+    case "56":
+    case "97":
+      return "BNB";
+    case "137":
+      return "POL";
+    case "43114":
+      return "AVAX";
+    default:
+      return "ETH";
+  }
+}
+
+function getAccountExplorer(
+  chain: Chain,
+  account: string,
+): { name: string; url: string } | undefined {
+  const url = accountExplorerUrl(chain, account);
+  if (!url) return undefined;
+  return {
+    name: accountExplorerName(chain),
+    url,
+  };
+}
+
+function accountExplorerName(chain: Chain): string {
+  switch (chain) {
+    case "900900900":
+    case "901901901":
+    case "902902902":
+      return "Solscan";
+    case "1":
+      return "Etherscan";
+    case "56":
+    case "97":
+      return "BscScan";
+    case "137":
+      return "Polygonscan";
+    case "43114":
+      return "Snowtrace";
+    case "8453":
+      return "Basescan";
+    case "81457":
+      return "Blast Explorer";
+    case "42161":
+    case "42170":
+    case "421613":
+    case "421614":
+      return "Arbiscan";
+    default:
+      return "Explorer";
+  }
+}
+
+function ExternalLinkIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+      <polyline points="15 3 21 3 21 9" />
+      <line x1="10" y1="14" x2="21" y2="3" />
+    </svg>
+  );
 }

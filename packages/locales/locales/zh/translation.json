@@ -252,12 +252,20 @@
         "holders_table": {
           "rank": "#",
           "wallet": "錢包",
+          "balance_last_active": "餘額 / 最後活躍",
+          "wallet_created": "錢包創建時間",
           "tags": "標籤",
           "amount": "持有量",
           "value": "價值",
           "percentage": "佔比",
           "first_held": "首次持有",
-          "last_active": "最後活躍"
+          "last_active": "最後活躍",
+          "total_buy": "總買入 / 均價",
+          "total_sell": "總賣出 / 均價",
+          "unrealized_pnl": "未實現利潤",
+          "total_profit": "總利潤",
+          "holdings": "持倉佔比 / USD",
+          "funding": "資金來源 / 轉入金額"
         },
         "top_traders_table": {
           "rank": "#",
