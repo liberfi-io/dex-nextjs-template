@@ -1,7 +1,10 @@
 "use client";
 
 import {
-  ReactNode,
+  type ChangeEvent,
+  type ComponentProps,
+  type ComponentType,
+  type ReactNode,
   useCallback,
   useEffect,
   useMemo,
@@ -10,7 +13,13 @@ import {
 } from "react";
 import { useAtom } from "jotai";
 import { cloneDeep } from "lodash-es";
-import { cn, HorizontalScrollContainer, PauseIcon, toast } from "@liberfi.io/ui";
+import {
+  cn,
+  HorizontalScrollContainer,
+  PauseIcon,
+  SearchIcon,
+  toast,
+} from "@liberfi.io/ui";
 import { useTranslation } from "@liberfi.io/i18n";
 import { Chain, SOLANA_TOKEN_PROTOCOLS, Token } from "@liberfi.io/types";
 import { ChainSelectWidget, useCurrentChain } from "@liberfi.io/ui-chain-select";
@@ -50,6 +59,94 @@ const PULSE_TAB_I18N_KEYS = {
 } as const;
 
 const PULSE_FILTER_RESOLUTION = "24h";
+
+const PulseHeaderTokenListFilterWidget = TokenListFilterWidget as ComponentType<
+  ComponentProps<typeof TokenListFilterWidget> & { className?: string }
+>;
+
+function parseKeywordText(value: string): string[] | undefined {
+  const keywords = value
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+  return keywords.length > 0 ? keywords : undefined;
+}
+
+function withKeywordFilters(
+  filters: TokenListFiltersType | undefined,
+  keywords: string[] | undefined,
+): TokenListFiltersType | undefined {
+  const next: TokenListFiltersType = {
+    ...filters,
+    keywords,
+  };
+
+  if (!next.keywords && !next.excludeKeywords && !next.filters?.length) {
+    return undefined;
+  }
+
+  return next;
+}
+
+function areKeywordsEqual(a: string[] | undefined, b: string[] | undefined) {
+  if (!a?.length && !b?.length) return true;
+  if (!a || !b || a.length !== b.length) return false;
+  return a.every((item, index) => item === b[index]);
+}
+
+type PulseKeywordInputProps = {
+  value: string;
+  onValueChange: (value: string) => void;
+  className?: string;
+};
+
+function PulseKeywordInput({
+  value,
+  onValueChange,
+  className,
+}: PulseKeywordInputProps) {
+  const { t } = useTranslation();
+  const [text, setText] = useState(value);
+
+  useEffect(() => {
+    setText((prev) => {
+      if (areKeywordsEqual(parseKeywordText(prev), parseKeywordText(value))) {
+        return prev;
+      }
+      return value;
+    });
+  }, [value]);
+
+  const handleChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const next = event.target.value;
+      setText(next);
+      onValueChange(next);
+    },
+    [onValueChange],
+  );
+
+  return (
+    <div
+      className={cn(
+        "relative flex h-8 w-25 min-w-0 shrink items-center overflow-hidden rounded-full pl-2 pr-2",
+        className,
+      )}
+      style={{
+        border: "1px solid rgba(63,63,70,0.5)",
+        background: "rgba(39,39,42,0.6)",
+      }}
+    >
+      <SearchIcon width={14} height={14} className="flex-none text-zinc-400" />
+      <input
+        value={text}
+        onChange={handleChange}
+        placeholder={t("tokens.filters.keywords.placeholder")}
+        className="min-w-0 flex-1 bg-transparent pl-1.5 text-xs text-foreground outline-none placeholder:text-zinc-500"
+      />
+    </div>
+  );
+}
 
 export function PulsePage() {
   useShowHeader();
@@ -104,12 +201,27 @@ export function PulsePage() {
     [setPulseSettings],
   );
 
+  const handleKeywordsChange = useCallback(
+    (listType: PulseListType, value: string) => {
+      handleFiltersChange(
+        listType,
+        withKeywordFilters(pulseSettings[listType]?.filters, parseKeywordText(value)),
+      );
+    },
+    [handleFiltersChange, pulseSettings],
+  );
+
   const renderHeaderExtra = useCallback(
     (listType: PulseListType) => (
-      <>
-        <PulseInstantBuyAmountInput type={listType} size="sm" className="max-w-55" />
-        <TokenListFilterWidget
+      <div className="flex min-w-0 items-center gap-1 overflow-hidden">
+        <PulseKeywordInput
+          value={pulseSettings[listType]?.filters?.keywords?.join(", ") ?? ""}
+          onValueChange={(value) => handleKeywordsChange(listType, value)}
+        />
+        <PulseInstantBuyAmountInput type={listType} size="sm" className="w-40 flex-none" />
+        <PulseHeaderTokenListFilterWidget
           badgePlacement="icon"
+          className="!h-7 !min-h-7 !w-7 !min-w-7 !p-0"
           desktopOverlay="modal"
           iconOnly
           triggerVariant="plain"
@@ -118,9 +230,9 @@ export function PulsePage() {
           filters={pulseSettings[listType]?.filters}
           onFiltersChange={(filters) => handleFiltersChange(listType, filters)}
         />
-      </>
+      </div>
     ),
-    [filterProtocols, handleFiltersChange, pulseSettings],
+    [filterProtocols, handleFiltersChange, handleKeywordsChange, pulseSettings],
   );
 
   const renderNewHeaderExtra = useMemo(
@@ -224,15 +336,19 @@ export function PulsePage() {
             </div>
           </div>
 
-          <div className="sm:hidden flex justify-end items-center gap-2 pt-2 relative z-20">
+          <div className="sm:hidden flex min-w-0 justify-end items-center gap-2 pt-2 relative z-20">
             <div className="w-6 h-8 flex items-center justify-center flex-none">
               {isMobileListPaused && <PauseIcon className="w-4 h-4 text-primary" />}
             </div>
+            <PulseKeywordInput
+              value={pulseSettings[type]?.filters?.keywords?.join(", ") ?? ""}
+              onValueChange={(value) => handleKeywordsChange(type, value)}
+            />
             <PulseInstantBuyAmountInput
               key={type}
               type={type}
               size="sm"
-              className="max-w-50"
+              className="w-40 flex-none"
             />
             <TokenListFilterWidget
               badgePlacement="icon"
