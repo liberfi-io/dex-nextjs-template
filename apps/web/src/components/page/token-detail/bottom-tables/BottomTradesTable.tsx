@@ -42,10 +42,10 @@ export interface BottomTradesTableProps {
 const ROW_HEIGHT = 40;
 const VIRTUAL_OVERSCAN = 72;
 const LOAD_MORE_THRESHOLD = 30;
-const TABLE_WIDTH = 1470;
+const TABLE_WIDTH = 1280;
 const TABLE_SIZE_STYLE = { minWidth: TABLE_WIDTH, width: "100%" };
 const GRID_TEMPLATE_COLUMNS =
-  "minmax(180px, 180fr) minmax(110px, 110fr) minmax(160px, 160fr) minmax(170px, 170fr) minmax(170px, 170fr) minmax(160px, 160fr) minmax(210px, 210fr) minmax(190px, 190fr)";
+  "minmax(120px, 120fr) minmax(90px, 90fr) minmax(150px, 150fr) minmax(150px, 150fr) minmax(160px, 160fr) minmax(140px, 140fr) minmax(240px, 240fr) minmax(230px, 230fr)";
 
 const ACTIVITY_COLUMNS = [
   {
