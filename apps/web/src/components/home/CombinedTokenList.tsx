@@ -29,6 +29,7 @@ import {
   type SwapPhase,
 } from "@liberfi.io/ui-trade";
 import { tokenDetailRoute } from "@liberfi/ui-dex/libs/routes";
+import { QuickAmountPresetInputWidget } from "../QuickAmountPresetInput";
 import { InstantTradeListButton } from "./InstantTradeListButton";
 
 type ListTab = "trending" | "stocks" | "new";
@@ -338,12 +339,12 @@ export function CombinedTokenList() {
                 onFiltersChange={setFilters}
               />
               {nativeToken && (
-                <AmountPresetInputWidget
+                <QuickAmountPresetInputWidget
                   id="token-list"
                   chain={chain}
                   token={nativeToken}
                   size="sm"
-                  className="max-w-50"
+                  className="w-40 flex-none"
                   onPresetClick={handlePresetClick}
                 />
               )}
