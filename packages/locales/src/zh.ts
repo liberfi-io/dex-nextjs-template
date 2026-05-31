@@ -10,7 +10,7 @@ export default {
       "home": "首頁",
       "trade": "交易",
       "predict": "預測",
-      "pulse": "战壕",
+      "pulse": "Pulse",
       "account": "帳戶",
       "search_placeholder": "代幣名稱 / 地址",
       "launchpad": "創建新代幣",
@@ -23,7 +23,7 @@ export default {
     "footer": {
       "token_list": "首頁",
       "trade": "交易",
-      "pulse": "战壕",
+      "pulse": "Pulse",
       "account": "帳戶",
       "search": "搜尋",
       "track": "推特"
@@ -37,7 +37,7 @@ export default {
     },
     "nav": {
       "discover": "發現",
-      "pulse": "战壕",
+      "pulse": "Pulse",
       "perpetuals": "永續合約",
       "predict": "預測",
       "channels": "頻道",
@@ -738,7 +738,7 @@ export default {
       "error_vesting_cliff_required": "請輸入解鎖間隔"
     },
     "pulse": {
-      "title": "战壕",
+      "title": "Pulse",
       "new": "新幣",
       "final_stretch": "最終衝刺",
       "migrated": "已遷移",
