@@ -222,6 +222,7 @@
       },
       "titles": {
         "transactions": "交易",
+        "activities": "活動",
         "holders": "持有人",
         "top_traders": "交易者",
         "dev_tokens": "Dev Tokens",
@@ -238,7 +239,10 @@
           "amount": "數量",
           "price": "價格",
           "market_cap": "市值",
+          "total_usd": "總額 USD",
+          "gas_fee": "Gas 費用",
           "trader": "交易者",
+          "tx": "Tx",
           "side_buy": "買入",
           "side_sell": "賣出",
           "side_add_liq": "加池子",

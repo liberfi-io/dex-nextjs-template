@@ -222,6 +222,7 @@ export default {
       },
       "titles": {
         "transactions": "Transactions",
+        "activities": "Activities",
         "holders": "Holders",
         "top_traders": "Top Traders",
         "dev_tokens": "Dev Tokens",
@@ -238,7 +239,10 @@ export default {
           "amount": "Amount",
           "price": "Price",
           "market_cap": "MCap",
+          "total_usd": "Total USD",
+          "gas_fee": "Gas Fee",
           "trader": "Trader",
+          "tx": "Tx",
           "side_buy": "Buy",
           "side_sell": "Sell",
           "side_add_liq": "Add Liq",

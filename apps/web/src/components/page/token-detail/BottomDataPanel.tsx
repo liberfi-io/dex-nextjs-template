@@ -44,7 +44,7 @@ export function BottomDataPanel({ chain, address }: BottomDataPanelProps) {
 
   const tabItems = useMemo<ReadonlyArray<TabBarUnderlineItem<BottomTab>>>(
     () => [
-      { key: "trades", label: t("extend.trade.titles.transactions") },
+      { key: "trades", label: t("extend.trade.titles.activities") },
       {
         key: "holders",
         label: t("extend.trade.titles.holders"),

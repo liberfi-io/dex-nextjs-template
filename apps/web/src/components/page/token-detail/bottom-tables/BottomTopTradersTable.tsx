@@ -45,8 +45,9 @@ const ROW_HEIGHT = 40;
 const VIRTUAL_OVERSCAN = 72;
 const LOAD_MORE_THRESHOLD = 30;
 const TABLE_WIDTH = 1280;
+const TABLE_SIZE_STYLE = { minWidth: TABLE_WIDTH, width: "100%" };
 const GRID_TEMPLATE_COLUMNS =
-  "190px 110px 110px 180px 180px 130px 130px 140px 110px";
+  "minmax(190px, 190fr) minmax(110px, 110fr) minmax(110px, 110fr) minmax(180px, 180fr) minmax(180px, 180fr) minmax(130px, 130fr) minmax(130px, 130fr) minmax(140px, 140fr) minmax(110px, 110fr)";
 type TokenTopTradersSortBy =
   | "profit"
   | "buyVolume"
@@ -139,7 +140,7 @@ export function BottomTopTradersTable({
       <div className="custom-scrollbar min-h-0 flex-1 overflow-x-auto overflow-y-hidden overscroll-x-contain">
         <div
           className="flex h-full flex-col"
-          style={{ minWidth: TABLE_WIDTH, width: TABLE_WIDTH }}
+          style={TABLE_SIZE_STYLE}
         >
           <div
             className="grid h-9 shrink-0 border-b border-divider bg-content1 text-[12px] font-medium text-default-500"
