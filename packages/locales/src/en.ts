@@ -258,12 +258,18 @@ export default {
         "top_traders_table": {
           "rank": "#",
           "trader": "Trader",
+          "activity": "Last Active",
+          "first_buy": "First Buy",
+          "total_buy": "Total Buy / Avg",
+          "total_sell": "Total Sell / Avg",
           "realized_pnl": "Realized PnL",
           "unrealized_pnl": "Unrealized PnL",
           "total_pnl": "Total PnL",
           "buys": "Buys",
           "sells": "Sells",
-          "balance": "Balance"
+          "balance": "Balance",
+          "holdings": "Holdings / USD",
+          "transfers": "Transfers"
         },
         "dev_tokens_table": {
           "token": "Token",

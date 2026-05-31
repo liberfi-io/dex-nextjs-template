@@ -223,7 +223,7 @@
       "titles": {
         "transactions": "交易",
         "holders": "持有人",
-        "top_traders": "Top Traders",
+        "top_traders": "交易者",
         "dev_tokens": "Dev Tokens",
         "info": "資訊"
       },
@@ -258,12 +258,18 @@
         "top_traders_table": {
           "rank": "#",
           "trader": "交易者",
+          "activity": "最後活躍",
+          "first_buy": "首次買入",
+          "total_buy": "總買入 / 均價",
+          "total_sell": "總賣出 / 均價",
           "realized_pnl": "已實現盈虧",
           "unrealized_pnl": "未實現盈虧",
           "total_pnl": "總盈虧",
           "buys": "買入",
           "sells": "賣出",
-          "balance": "持倉"
+          "balance": "持倉",
+          "holdings": "持倉佔比 · USD",
+          "transfers": "轉入 / 轉出"
         },
         "dev_tokens_table": {
           "token": "代幣",
