@@ -377,7 +377,7 @@ export function PulsePage() {
               />
             </PulseInstantBuyProvider>
 
-            <div className="flex-1 h-full max-lg:hidden">
+            <div className="min-w-0 flex-1 basis-0 h-full overflow-hidden max-lg:hidden">
               <PulseInstantBuyProvider type="new">
                 <PulseNewListWidget
                   chain={chainId}
@@ -390,7 +390,7 @@ export function PulsePage() {
                 />
               </PulseInstantBuyProvider>
             </div>
-            <div className="flex-1 h-full max-lg:hidden">
+            <div className="min-w-0 flex-1 basis-0 h-full overflow-hidden max-lg:hidden">
               <PulseInstantBuyProvider type="final_stretch">
                 <PulseFinalStretchListWidget
                   chain={chainId}
@@ -403,7 +403,7 @@ export function PulsePage() {
                 />
               </PulseInstantBuyProvider>
             </div>
-            <div className="flex-1 h-full max-lg:hidden">
+            <div className="min-w-0 flex-1 basis-0 h-full overflow-hidden max-lg:hidden">
               <PulseInstantBuyProvider type="migrated">
                 <PulseMigratedListWidget
                   chain={chainId}
