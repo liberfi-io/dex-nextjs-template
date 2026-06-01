@@ -232,6 +232,7 @@ export default {
         "no_data": "No data yet",
         "loading": "Loading…",
         "load_more": "Load more",
+        "open_in_explorer": "Open in {{explorer}}",
         "trades": {
           "age": "Age",
           "type": "Type",

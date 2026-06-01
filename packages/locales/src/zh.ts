@@ -232,6 +232,7 @@ export default {
         "no_data": "暫無數據",
         "loading": "載入中…",
         "load_more": "載入更多",
+        "open_in_explorer": "在 {{explorer}} 打開",
         "trades": {
           "age": "時間",
           "type": "類型",

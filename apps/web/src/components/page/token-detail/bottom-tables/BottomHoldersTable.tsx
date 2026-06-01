@@ -404,21 +404,27 @@ const HolderAddressActions = memo(function HolderAddressActions({
   chain: Chain;
   address: string;
 }) {
+  const { t } = useTranslation();
   const explorer = useMemo(
     () => getAccountExplorer(chain, address),
     [chain, address],
   );
+  const explorerLabel = explorer
+    ? t("extend.trade.bottom_panel.open_in_explorer", {
+        explorer: explorer.name,
+      })
+    : undefined;
   return (
     <div className="flex min-w-0 items-center gap-1">
       <HolderAddressCopyButton address={address} />
       {explorer ? (
-        <StyledTooltip content={`在 ${explorer.name} 打开`} placement="top">
+        <StyledTooltip content={explorerLabel} placement="top">
           <a
             href={explorer.url}
             target="_blank"
             rel="noopener noreferrer"
             className="flex size-4 shrink-0 cursor-pointer items-center justify-center text-neutral transition-colors hover:text-primary-200"
-            aria-label={`在 ${explorer.name} 打开`}
+            aria-label={explorerLabel}
             onClick={(e) => e.stopPropagation()}
           >
             <ExternalLinkIcon className="h-3 w-3" />
