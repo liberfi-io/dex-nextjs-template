@@ -8,8 +8,8 @@ import {
   CheckIcon,
   cn,
   CopyIcon,
+  Sortable,
   StyledTooltip,
-  TriangleDownIcon,
   toast,
   useCopyToClipboard,
   VirtualList,
@@ -45,7 +45,7 @@ const LOAD_MORE_THRESHOLD = 30;
 const TABLE_WIDTH = 1360;
 const TABLE_SIZE_STYLE = { minWidth: TABLE_WIDTH, width: "100%" };
 const GRID_TEMPLATE_COLUMNS =
-  "minmax(190px, 190fr) minmax(120px, 120fr) minmax(110px, 110fr) minmax(180px, 180fr) minmax(180px, 180fr) minmax(130px, 130fr) minmax(130px, 130fr) minmax(170px, 170fr) minmax(150px, 150fr)";
+  "minmax(190px, 190fr) minmax(120px, 120fr) minmax(110px, 110fr) minmax(180px, 180fr) minmax(180px, 180fr) minmax(130px, 130fr) minmax(130px, 130fr) minmax(170px, 170fr)";
 
 const HOLDER_COLUMNS: ReadonlyArray<{
   key: string;
@@ -92,19 +92,18 @@ const HOLDER_COLUMNS: ReadonlyArray<{
     labelKey: "extend.trade.bottom_panel.holders_table.holdings",
     align: "right",
   },
-  {
-    key: "funding",
-    labelKey: "extend.trade.bottom_panel.holders_table.funding",
-    align: "right",
-  },
 ];
 
 type HolderSortBy =
+  | "amountPercentage"
   | "holdingUsd"
+  | "totalPnl"
   | "lastActiveAt"
-  | "realizedPnl"
+  | "unrealizedPnl"
   | "buyVolume"
-  | "sellVolume";
+  | "sellVolume"
+  | "createdAt";
+type HolderSortDirection = "asc" | "desc";
 
 type HolderRowData = TokenHolder & {
   addressLabel?: string;
@@ -130,23 +129,37 @@ type HolderRowData = TokenHolder & {
 
 const HOLDER_SORT_BY_COLUMN: Partial<Record<string, HolderSortBy>> = {
   last_active: "lastActiveAt",
+  first_held: "createdAt",
   total_buy: "buyVolume",
   total_sell: "sellVolume",
-  total_profit: "realizedPnl",
-  holdings: "holdingUsd",
+  unrealized_pnl: "unrealizedPnl",
+  total_profit: "totalPnl",
+  holdings: "amountPercentage",
 };
 
 type TokenHoldersListScriptWithSort = ReturnType<
   typeof useTokenHoldersListScript
 > & {
   holders: HolderRowData[];
-  sortBy: HolderSortBy;
-  setSortBy: (s: HolderSortBy) => void;
+  sortBy: HolderSortBy | undefined;
+  sortDirection: HolderSortDirection | undefined;
+  setSort: (
+    sortBy: HolderSortBy | undefined,
+    direction?: HolderSortDirection,
+  ) => void;
 };
 
 export function BottomHoldersTable({ chain, address }: BottomHoldersTableProps) {
   const { t } = useTranslation();
-  const { holders, isLoading, sortBy, setSortBy, hasMore, loadMore } =
+  const {
+    holders,
+    isLoading,
+    sortBy,
+    sortDirection,
+    setSort,
+    hasMore,
+    loadMore,
+  } =
     useTokenHoldersListScript({
       chain,
       address,
@@ -199,10 +212,15 @@ export function BottomHoldersTable({ chain, address }: BottomHoldersTableProps) 
                 {HOLDER_SORT_BY_COLUMN[col.key] ? (
                   <HolderSortHeader
                     label={t(col.labelKey)}
-                    sortBeforeSlash={col.key === "holdings"}
+                    sortBeforeSlash={
+                      col.key === "total_buy" ||
+                      col.key === "total_sell" ||
+                      col.key === "holdings"
+                    }
                     sortBy={HOLDER_SORT_BY_COLUMN[col.key]}
                     activeSortBy={sortBy}
-                    onSortByChange={setSortBy}
+                    activeSortDirection={sortDirection}
+                    onSortChange={setSort}
                   />
                 ) : (
                   t(col.labelKey)
@@ -237,77 +255,68 @@ function HolderSortHeader({
   sortBeforeSlash,
   sortBy,
   activeSortBy,
-  onSortByChange,
+  activeSortDirection,
+  onSortChange,
 }: {
   label: string;
   sortBeforeSlash?: boolean;
   sortBy: HolderSortBy | undefined;
   activeSortBy: HolderSortBy | undefined;
-  onSortByChange: (sortBy: HolderSortBy) => void;
+  activeSortDirection: HolderSortDirection | undefined;
+  onSortChange: (
+    sortBy: HolderSortBy | undefined,
+    direction?: HolderSortDirection,
+  ) => void;
 }) {
   if (!sortBy) return label;
 
   const active = sortBy === activeSortBy;
+  const sort = active ? (activeSortDirection ?? "desc") : undefined;
+  const handleSortChange = (direction?: HolderSortDirection) => {
+    onSortChange(direction ? sortBy : undefined, direction);
+  };
   return (
-    <button
-      type="button"
-      className={cn(
-        "inline-flex cursor-pointer items-center gap-1 bg-transparent p-0 font-inherit text-inherit transition-colors",
-        active ? "text-foreground" : "hover:text-foreground",
-      )}
-      aria-pressed={active}
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        onSortByChange(sortBy);
-      }}
-    >
+    <span className="inline-flex items-center gap-1">
       {sortBeforeSlash ? (
-        <SortLabelWithIconBeforeSlash label={label} active={active} />
+        <SortLabelWithIconBeforeSlash
+          label={label}
+          sort={sort}
+          onSortChange={handleSortChange}
+        />
       ) : (
-        <>
-          <span>{label}</span>
-          <SortArrow active={active} />
-        </>
+        <Sortable sort={sort} onSortChange={handleSortChange}>
+          {label}
+        </Sortable>
       )}
-    </button>
+    </span>
   );
 }
 
 function SortLabelWithIconBeforeSlash({
   label,
-  active,
+  sort,
+  onSortChange,
 }: {
   label: string;
-  active: boolean;
+  sort?: HolderSortDirection;
+  onSortChange: (direction?: HolderSortDirection) => void;
 }) {
   const slashIndex = label.indexOf("/");
   if (slashIndex < 0) {
     return (
-      <>
-        <span>{label}</span>
-        <SortArrow active={active} />
-      </>
+      <Sortable sort={sort} onSortChange={onSortChange}>
+        {label}
+      </Sortable>
     );
   }
 
   return (
     <>
-      <span>{label.slice(0, slashIndex).trimEnd()}</span>
-      <SortArrow active={active} />
+      <Sortable sort={sort} onSortChange={onSortChange}>
+        {label.slice(0, slashIndex).trimEnd()}
+      </Sortable>
       <span>{label.slice(slashIndex)}</span>
     </>
-  );
-}
-
-function SortArrow({ active }: { active: boolean }) {
-  return (
-    <TriangleDownIcon
-      width={8}
-      height={8}
-      className={cn(active ? "text-foreground" : "text-default-400")}
-      aria-hidden
-    />
   );
 }
 
@@ -391,7 +400,6 @@ const HolderRow = memo(function HolderRow({
         amountInUsd={holder.amountInUsd}
         ratio={holder.ratio}
       />
-      <FundingCell holder={holder} />
     </div>
   );
 });
@@ -552,14 +560,14 @@ const TradeFlowCell = memo(function TradeFlowCell({
       )}
     >
       <div className={cn("text-[12px] leading-4", tone)}>
-        {volumeUsd ? formatAmountInUsd(volumeUsd) : "--"}
+        {formatAmountInUsdOrZero(volumeUsd)}
         <span className="px-1 text-default-500">/</span>
-        {avgPriceUsd ? formatAmountInUsd(avgPriceUsd) : "--"}
+        {formatAmountInUsdOrZero(avgPriceUsd)}
       </div>
       <div className="text-[11px] leading-4 text-neutral">
-        {tokenAmount ? formatAmount(tokenAmount) : "--"}
+        {formatAmountOrZero(tokenAmount)}
         <span className="px-1">/</span>
-        {count ?? "--"} {TX_LABEL}
+        {(count ?? 0).toLocaleString()} {TX_LABEL}
       </div>
     </div>
   );
@@ -574,7 +582,7 @@ const PnlCell = memo(function PnlCell({
   ratio?: string;
   strong?: boolean;
 }) {
-  const n = value === undefined || value === "" ? undefined : Number(value);
+  const n = Number(normalizeNumberLikeOrZero(value));
   const tone =
     n === undefined || Number.isNaN(n)
       ? "text-default-500"
@@ -595,12 +603,10 @@ const PnlCell = memo(function PnlCell({
       style={{ letterSpacing: "-0.2px" }}
     >
       <div className="text-[12px] leading-4">
-        {value
-          ? formatAmountInUsd(value, { showPlusGtThanZero: true })
-          : "--"}
+        {formatAmountInUsdOrZero(value, { showPlusGtThanZero: true })}
       </div>
       <div className="text-[11px] leading-4">
-        {formatRatioFromOne(ratio, { signed: true })}
+        {formatRatioFromOne(normalizeNumberLikeOrZero(ratio), { signed: true })}
       </div>
     </div>
   );
@@ -643,40 +649,6 @@ const HoldingsCell = memo(function HoldingsCell({
               style={{ width: `${progressWidth}%` }}
             />
           </div>
-        ) : null}
-      </div>
-    </div>
-  );
-});
-
-const FundingCell = memo(function FundingCell({
-  holder,
-}: {
-  holder: HolderRowData;
-}) {
-  const source = holder.exchange ?? holder.addressLabel;
-  const transferAmount = holder.historyTransferInCost
-    ? formatAmountInUsd(holder.historyTransferInCost)
-    : holder.historyTransferInAmount
-      ? formatAmount(holder.historyTransferInAmount)
-      : undefined;
-  const transferCount =
-    holder.transferInCount === undefined ? undefined : holder.transferInCount;
-
-  return (
-    <div
-      className={cn(
-        "flex flex-col justify-center px-3 text-default-500",
-        alignClass("right"),
-      )}
-    >
-      <div className="truncate text-[12px] leading-4 text-foreground">
-        {source ?? "--"}
-      </div>
-      <div className="text-[11px] leading-4 text-neutral">
-        {transferAmount ?? "--"}
-        {transferCount !== undefined ? (
-          <span className="pl-1">/ {transferCount}</span>
         ) : null}
       </div>
     </div>
@@ -816,6 +788,21 @@ function formatRatioFromOne(
   const n = Number(value);
   if (Number.isNaN(n)) return "--";
   return formatPercent(n, { showPlusGtThanZero: options?.signed });
+}
+
+function formatAmountInUsdOrZero(
+  value: string | number | undefined,
+  options?: Parameters<typeof formatAmountInUsd>[1],
+): string {
+  return formatAmountInUsd(normalizeNumberLikeOrZero(value), options);
+}
+
+function formatAmountOrZero(value: string | number | undefined): string {
+  return formatAmount(normalizeNumberLikeOrZero(value));
+}
+
+function normalizeNumberLikeOrZero(value: string | number | undefined) {
+  return value === undefined || value === null || value === "" ? "0" : value;
 }
 
 function formatNativeBalance(chain: Chain, value: string | undefined): string {

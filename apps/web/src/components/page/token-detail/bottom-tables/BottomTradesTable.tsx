@@ -10,11 +10,11 @@ import {
   CopyIcon,
   StyledTooltip,
   toast,
-  TriangleDownIcon,
   useCopyToClipboard,
   VirtualList,
   type VirtualRowComponentProps,
 } from "@liberfi.io/ui";
+import { SortAscIcon, SortDescIcon } from "@liberfi/ui-dex/assets/icons";
 import {
   accountExplorerUrl,
   formatAge,
@@ -89,6 +89,20 @@ const ACTIVITY_COLUMNS = [
 ] as const;
 
 type ActivitySortBy = "timestamp" | "totalUsd";
+type ActivitySortDirection = "asc" | "desc";
+
+interface ActivityListScriptState {
+  activities: Activity[];
+  isLoading: boolean;
+  sortBy: ActivitySortBy | undefined;
+  sortDirection: ActivitySortDirection;
+  setSortBy: (
+    sortBy: ActivitySortBy | undefined,
+    direction?: ActivitySortDirection,
+  ) => void;
+  hasMore: boolean;
+  loadMore: () => void;
+}
 
 const ACTIVITY_SORT_BY_COLUMN: Partial<Record<string, ActivitySortBy>> = {
   age: "timestamp",
@@ -105,8 +119,19 @@ const ACTIVITY_SORT_BY_COLUMN: Partial<Record<string, ActivitySortBy>> = {
  * - Missing: track state, developer marker/count, and right-side action icons.
  */
 export function BottomTradesTable({ chain, address }: BottomTradesTableProps) {
-  const { activities, isLoading, sortBy, setSortBy, hasMore, loadMore } =
-    useTokenActivitiesListScript({ chain, address, limit: 50 });
+  const {
+    activities,
+    isLoading,
+    sortBy,
+    sortDirection,
+    setSortBy,
+    hasMore,
+    loadMore,
+  } = useTokenActivitiesListScript({
+    chain,
+    address,
+    limit: 50,
+  }) as unknown as ActivityListScriptState;
   const isInitialLoading = isLoading && activities.length === 0;
   const isEmpty = !isLoading && activities.length === 0;
   const isPaging = isLoading && activities.length > 0;
@@ -138,7 +163,11 @@ export function BottomTradesTable({ chain, address }: BottomTradesTableProps) {
     <div className="flex h-[70vh] w-full flex-col overflow-hidden md:h-full">
       <div className="custom-scrollbar min-h-0 flex-1 overflow-x-auto overflow-y-hidden overscroll-x-contain">
         <div className="flex h-full flex-col" style={TABLE_SIZE_STYLE}>
-          <ActivityHeader sortBy={sortBy} onSortByChange={setSortBy} />
+          <ActivityHeader
+            sortBy={sortBy}
+            sortDirection={sortDirection}
+            onSortByChange={setSortBy}
+          />
 
           {isInitialLoading ? (
             <ActivitySkeletonRows />
@@ -163,10 +192,15 @@ export function BottomTradesTable({ chain, address }: BottomTradesTableProps) {
 
 function ActivityHeader({
   sortBy,
+  sortDirection,
   onSortByChange,
 }: {
   sortBy: ActivitySortBy | undefined;
-  onSortByChange: (sortBy: ActivitySortBy) => void;
+  sortDirection: ActivitySortDirection;
+  onSortByChange: (
+    sortBy: ActivitySortBy | undefined,
+    direction?: ActivitySortDirection,
+  ) => void;
 }) {
   const { t } = useTranslation();
   return (
@@ -188,6 +222,7 @@ function ActivityHeader({
               label={t(col.labelKey)}
               sortBy={ACTIVITY_SORT_BY_COLUMN[col.key]}
               activeSortBy={sortBy}
+              activeSortDirection={sortDirection}
               onSortByChange={onSortByChange}
             />
           ) : (
@@ -203,38 +238,64 @@ function ActivitySortHeader({
   label,
   sortBy,
   activeSortBy,
+  activeSortDirection,
   onSortByChange,
 }: {
   label: string;
   sortBy: ActivitySortBy | undefined;
   activeSortBy: ActivitySortBy | undefined;
-  onSortByChange: (sortBy: ActivitySortBy) => void;
+  activeSortDirection: ActivitySortDirection;
+  onSortByChange: (
+    sortBy: ActivitySortBy | undefined,
+    direction?: ActivitySortDirection,
+  ) => void;
 }) {
   if (!sortBy) return label;
 
   const active = sortBy === activeSortBy;
+  const nextDirection: ActivitySortDirection =
+    active && activeSortDirection === "desc" ? "asc" : "desc";
+  const shouldClearSort = active && activeSortDirection === "asc";
+  const nextSortBy = shouldClearSort ? undefined : sortBy;
+  const ariaLabel = shouldClearSort
+    ? `Clear ${label} sort`
+    : `Sort by ${label} ${nextDirection === "asc" ? "ascending" : "descending"}`;
   return (
     <button
       type="button"
       className={cn(
-        "inline-flex cursor-pointer items-center gap-1 bg-transparent p-0 font-inherit text-inherit transition-colors",
-        active ? "text-foreground" : "hover:text-foreground",
+        "inline-flex cursor-pointer items-center bg-transparent p-0 font-inherit text-inherit",
       )}
       aria-pressed={active}
+      aria-label={ariaLabel}
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        onSortByChange(sortBy);
+        onSortByChange(nextSortBy, shouldClearSort ? undefined : nextDirection);
       }}
     >
       <span>{label}</span>
-      <TriangleDownIcon
-        width={8}
-        height={8}
-        className={cn(active ? "text-foreground" : "text-default-400")}
-        aria-hidden
-      />
+      <SortArrow direction={active ? activeSortDirection : undefined} />
     </button>
+  );
+}
+
+function SortArrow({
+  direction,
+}: {
+  direction?: ActivitySortDirection;
+}) {
+  return (
+    <span className="ml-1 flex h-fit items-center justify-center" aria-hidden>
+      <span className="flex flex-col justify-around">
+        <span className={cn(direction === "asc" && "text-primary")}>
+          <SortAscIcon />
+        </span>
+        <span className={cn("mt-px", direction === "desc" && "text-primary")}>
+          <SortDescIcon />
+        </span>
+      </span>
+    </span>
   );
 }
 
