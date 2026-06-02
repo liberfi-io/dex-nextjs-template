@@ -3,10 +3,10 @@ import { PieActiveShape, PiePayload } from "../../chart";
 import { useTranslation, useWalletPortfolios } from "@liberfi/ui-base";
 import {
   CHART_COLORS,
-  formatAbbreviatingNumber2,
   formatPercentage,
   PIE_MAX_COUNT,
 } from "../../../libs";
+import { formatAmountInUsd } from "@liberfi.io/utils";
 import { Button, Spinner } from "@heroui/react";
 import clsx from "clsx";
 import { reverse, sortBy } from "lodash-es";
@@ -217,9 +217,5 @@ function Empty({ className }: PortfolioChartProps) {
 }
 
 function formatNumberInChart(value: number): string {
-  const { significantDigits, punctuationSymbol, zeros, decimalDigits } =
-    formatAbbreviatingNumber2(value);
-  return `$${significantDigits}${punctuationSymbol ?? ""}${
-    zeros ? `0<tspan style="baseline-shift: sub;" font-size="12px">${zeros}</tspan>` : ""
-  }${decimalDigits ?? ""}`;
+  return formatAmountInUsd(value);
 }

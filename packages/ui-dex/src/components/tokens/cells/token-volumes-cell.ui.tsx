@@ -2,7 +2,7 @@ import { Token } from "@chainstream-io/sdk";
 import { useMemo } from "react";
 import { useTokenListContext } from "../TokenListContext";
 import { tokenBuyVolumesInUsd, tokenSellVolumesInUsd, tokenVolumesInUsd } from "../../../libs";
-import { formatAmountUSD } from "@liberfi/core";
+import { formatAmountInUsd } from "@liberfi.io/utils";
 
 export function TokenVolumesCell({ token }: { token: Token }) {
   const { timeframe } = useTokenListContext();
@@ -15,10 +15,10 @@ export function TokenVolumesCell({ token }: { token: Token }) {
 
   return (
     <div className="flex flex-col gap-1 justify-center items-start">
-      <span>{volumesInUsd ? formatAmountUSD(volumesInUsd) : "--"}</span>
+      <span>{volumesInUsd ? formatAmountInUsd(volumesInUsd) : "--"}</span>
       <div className="flex gap-1">
-        <span className="text-bullish">{buyVolumes ? formatAmountUSD(buyVolumes) : "--"}</span>/
-        <span className="text-bearish">{sellVolumes ? formatAmountUSD(sellVolumes) : "--"}</span>
+        <span className="text-bullish">{buyVolumes ? formatAmountInUsd(buyVolumes) : "--"}</span>/
+        <span className="text-bearish">{sellVolumes ? formatAmountInUsd(sellVolumes) : "--"}</span>
       </div>
     </div>
   );

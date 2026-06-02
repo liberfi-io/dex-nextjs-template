@@ -1,12 +1,8 @@
 import { useMemo } from "react";
 import { useAtomValue } from "jotai";
 import BigNumber from "bignumber.js";
-import {
-  CHAIN_QUOTE_TOKEN_SYMBOLS,
-  formatLongNumber,
-  formatPercentage,
-  formatShortNumber,
-} from "../../../libs";
+import { CHAIN_QUOTE_TOKEN_SYMBOLS, formatPercentage } from "../../../libs";
+import { formatMCap, formatMCapInUsd, formatPrice, formatPriceInUsd } from "@liberfi.io/utils";
 import {
   isPriceChartAtom,
   isUSDChartAtom,
@@ -97,16 +93,16 @@ export function TradeTokenPrice() {
 
     if (isUSDChart) {
       if (isPriceChart) {
-        return `$ ${formatLongNumber(displayPrice)}`;
+        return formatPriceInUsd(displayPrice);
       } else {
-        return `$ ${formatShortNumber(displayPrice)}`;
+        return formatMCapInUsd(displayPrice);
       }
     } else {
       const quoteTokenSymbol = CHAIN_QUOTE_TOKEN_SYMBOLS[chain] ?? "";
       if (isPriceChart) {
-        return `${formatLongNumber(displayPrice)} ${quoteTokenSymbol}`;
+        return `${formatPrice(displayPrice)} ${quoteTokenSymbol}`;
       } else {
-        return `${formatShortNumber(displayPrice)} ${quoteTokenSymbol}`;
+        return `${formatMCap(displayPrice)} ${quoteTokenSymbol}`;
       }
     }
   }, [displayPrice, isUSDChart, isPriceChart, chain]);

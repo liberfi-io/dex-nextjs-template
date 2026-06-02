@@ -3,7 +3,8 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable unused-imports/no-unused-vars */
-import { formatLongNumber, getNumberDefaultPrecision, objectKeys } from "../libs";
+import { getNumberDefaultPrecision, objectKeys } from "../libs";
+import { formatPrice } from "@liberfi.io/utils";
 import { tokenInfoAtom } from "../states";
 import { ChainStreamClient, TokenCandle, Resolution, Token } from "@chainstream-io/sdk";
 import { StreamApi, WsCandle } from "@chainstream-io/sdk/stream";
@@ -131,9 +132,8 @@ export const useTradingView = ({
             format: (price) => {
               try {
                 if (Number(price) > 1e31) return `${price}`;
-                if (!symbolInfo) return formatLongNumber(price);
-                return formatLongNumber(price);
-                // return symbolInfo.priceType === "price" ? formatLongNumber(price) : formatShortNumber(price);
+                if (!symbolInfo) return formatPrice(price);
+                return formatPrice(price);
               } catch (e) {
                 console.warn(e);
                 return `${price}`;

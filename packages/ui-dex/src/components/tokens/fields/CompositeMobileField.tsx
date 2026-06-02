@@ -4,6 +4,7 @@ import { formatAge } from "../../../libs/format";
 import clsx from "clsx";
 import { Token } from "@chainstream-io/sdk";
 import { Number } from "../../Number";
+import { formatMCapInUsd } from "@liberfi.io/utils";
 import { useMemo } from "react";
 import { useAtomValue } from "jotai";
 import { tickAtom } from "@liberfi/ui-base";
@@ -45,11 +46,7 @@ export function CompositeMobileField({ className, token }: CompositeMobileFieldP
             <div className="w-full flex shrink-0 items-center gap-2 overflow-hidden text-xs text-neutral">
               <div className="overflow-hidden text-ellipsis whitespace-nowrap">
                 {token.marketData?.marketCapInUsd ? (
-                  <Number
-                    value={token.marketData.marketCapInUsd}
-                    abbreviate
-                    defaultCurrencySign="$"
-                  />
+                  formatMCapInUsd(token.marketData.marketCapInUsd)
                 ) : (
                   "-"
                 )}

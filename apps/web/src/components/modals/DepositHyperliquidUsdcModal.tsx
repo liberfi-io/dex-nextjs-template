@@ -29,6 +29,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { debounce } from "lodash-es";
 import { formatUnits, parseUnits } from "viem";
+import { formatAmount } from "@liberfi.io/utils";
 import { useTranslation } from "@liberfi/ui-base";
 import {
   ModalContent,
@@ -1049,9 +1050,7 @@ function base64ToBytes(b64: string): Uint8Array {
 
 function formatHlUsdc(value: string | number): string {
   const n = typeof value === "number" ? value : Number(value);
-  if (!Number.isFinite(n) || n === 0) return "0.00";
-  if (n < 0.01) return n.toFixed(6);
-  return n.toFixed(3);
+  return formatAmount(Number.isFinite(n) ? n : 0);
 }
 
 /**
@@ -1064,17 +1063,7 @@ function formatHlUsdc(value: string | number): string {
  *   left after a rounding fee) don't collapse to "0.00".
  */
 function formatUsdcDisplay(value: number): string {
-  if (!Number.isFinite(value) || value === 0) return "0";
-  if (Math.abs(value) < 1) {
-    return value.toLocaleString("en-US", {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 6,
-    });
-  }
-  return value.toLocaleString("en-US", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 4,
-  });
+  return formatAmount(Number.isFinite(value) ? value : 0);
 }
 
 export default DepositHyperliquidUsdcModal;

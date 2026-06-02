@@ -1,5 +1,5 @@
 import { Token } from "@chainstream-io/sdk";
-import { formatAmountUSD } from "@liberfi/core";
+import { formatAmountInUsd } from "@liberfi.io/utils";
 import { useMemo } from "react";
 
 export function TokenLiquidityCell({ token }: { token: Token }) {
@@ -7,5 +7,5 @@ export function TokenLiquidityCell({ token }: { token: Token }) {
     () => token.marketData?.totalTvlInUsd,
     [token.marketData?.totalTvlInUsd],
   );
-  return <>{liquidity ? formatAmountUSD(liquidity) : "--"}</>;
+  return <>{liquidity ? formatAmountInUsd(liquidity) : "--"}</>;
 }

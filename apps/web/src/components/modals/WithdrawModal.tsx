@@ -9,7 +9,7 @@ import { AsyncModal, type RenderAsyncModalProps } from "@liberfi.io/ui-scaffold"
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { useAccountInfo } from "@liberfi.io/ui-portfolio";
 import { Chain } from "@liberfi.io/types";
-import { chainDisplayName } from "@liberfi.io/utils";
+import { chainDisplayName, formatAmount, formatAmountInUsd } from "@liberfi.io/utils";
 import { useTimerToast, useWalletPortfolios } from "@liberfi/ui-base";
 import { useConnectedWallet } from "@liberfi.io/wallet-connector";
 import { isValidWalletAddress } from "@liberfi/ui-dex";
@@ -202,7 +202,7 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
     if (!nativeBalance) return "0";
     const n = Number(nativeBalance.amount);
     if (!n) return "0";
-    return n < 0.0001 ? n.toExponential(4) : n.toLocaleString("en-US", { maximumFractionDigits: 8 });
+    return formatAmount(n);
   }, [nativeBalance]);
 
   // -------------------------------------------------------------------------
@@ -286,7 +286,7 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
     if (!committedAmount || !nativeBalance?.priceInUsd) return null;
     const val = new BigNumber(committedAmount).multipliedBy(nativeBalance.priceInUsd);
     if (!val.isFinite() || val.isZero()) return null;
-    return `$${val.toFixed(2)}`;
+    return formatAmountInUsd(val);
   }, [committedAmount, nativeBalance]);
 
   // -------------------------------------------------------------------------

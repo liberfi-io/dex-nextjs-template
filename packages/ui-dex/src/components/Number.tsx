@@ -1,4 +1,9 @@
-import { formatAbbreviatingNumber2, formatNumber2 } from "../libs";
+import {
+  formatAmount,
+  formatAmountInUsd,
+  formatPrice,
+  formatPriceInUsd,
+} from "@liberfi.io/utils";
 import { useMemo } from "react";
 
 export type NumberProps = {
@@ -8,24 +13,12 @@ export type NumberProps = {
 };
 
 export function Number({ value, defaultCurrencySign = "", abbreviate = false }: NumberProps) {
-  const { currencySign, significantDigits, zeros, decimalDigits, punctuationSymbol, suffix } =
-    useMemo(
-      () => (abbreviate ? formatAbbreviatingNumber2(value) : formatNumber2(value)),
-      [value, abbreviate],
-    );
+  const text = useMemo(() => {
+    if (defaultCurrencySign === "$") {
+      return abbreviate ? formatAmountInUsd(value) : formatPriceInUsd(value);
+    }
+    return abbreviate ? formatAmount(value) : formatPrice(value);
+  }, [value, defaultCurrencySign, abbreviate]);
 
-  return (
-    <>
-      {currencySign ?? defaultCurrencySign}
-      {significantDigits}
-      {punctuationSymbol}
-      {Boolean(zeros) && (
-        <>
-          0<sub>{zeros}</sub>
-        </>
-      )}
-      {decimalDigits}
-      {suffix}
-    </>
-  );
+  return <>{text}</>;
 }

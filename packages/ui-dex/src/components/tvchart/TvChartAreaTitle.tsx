@@ -1,5 +1,6 @@
 import { CloseIcon } from "../../assets";
-import { formatLongNumber, formatPercentage, tokenPriceChangeRatioInUsd } from "../../libs";
+import { formatPercentage, tokenPriceChangeRatioInUsd } from "../../libs";
+import { formatPriceInUsd } from "@liberfi.io/utils";
 import {
   parseSymbol,
   stringifySymbol,
@@ -201,7 +202,7 @@ export function TvChartAreaTitle({ chartManager }: TvChartAreaTitleProps) {
             {symbolInfo.token.symbol}
           </span>
           <div style={{ fontSize: "12px", color: defaultTheme.colors.neutral }}>
-            ${formatLongNumber(symbolInfo.token.marketData?.priceInUsd ?? 0)}
+            {formatPriceInUsd(symbolInfo.token.marketData?.priceInUsd ?? 0)}
             <span
               style={{
                 color: bearish ? defaultTheme.colors.bearish : defaultTheme.colors.bullish,

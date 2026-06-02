@@ -1,5 +1,5 @@
 import { Token } from "@chainstream-io/sdk";
-import { formatAmountUSD } from "@liberfi/core";
+import { formatMCapInUsd } from "@liberfi.io/utils";
 import { useMemo } from "react";
 
 export function TokenMarketCapCell({ token }: { token: Token }) {
@@ -7,5 +7,5 @@ export function TokenMarketCapCell({ token }: { token: Token }) {
     () => token.marketData?.marketCapInUsd,
     [token.marketData?.marketCapInUsd],
   );
-  return <>{marketCap ? formatAmountUSD(marketCap) : "--"}</>;
+  return <>{marketCap ? formatMCapInUsd(marketCap) : "--"}</>;
 }

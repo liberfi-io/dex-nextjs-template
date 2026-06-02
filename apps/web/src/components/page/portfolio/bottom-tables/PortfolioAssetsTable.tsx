@@ -1,6 +1,6 @@
 "use client";
 
-import { formatAmountUSD, formatPriceUSD } from "src/libs/formatters";
+import { formatAmountInUsd, formatPriceInUsd } from "@liberfi.io/utils";
 import { useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useTokensQuery, useWalletPortfolioPnlsQuery } from "@liberfi.io/react";
@@ -263,7 +263,7 @@ function AssetRow({ portfolio, pnl, token, onClick }: AssetRowProps) {
           alignClass("right"),
         )}
       >
-        {valueInUsd != null ? formatAmountUSD(valueInUsd) : "--"}
+        {valueInUsd != null ? formatAmountInUsd(valueInUsd) : "--"}
       </td>
       <td
         className={cn(
@@ -271,7 +271,7 @@ function AssetRow({ portfolio, pnl, token, onClick }: AssetRowProps) {
           alignClass("right"),
         )}
       >
-        {priceInUsd ? formatPriceUSD(priceInUsd) : "--"}
+        {priceInUsd ? formatPriceInUsd(priceInUsd) : "--"}
       </td>
       <td
         className={cn(
@@ -293,7 +293,7 @@ function AssetRow({ portfolio, pnl, token, onClick }: AssetRowProps) {
             )}
           >
             <span className="font-semibold">
-              {formatAmountUSD(profitInUsd, { showPlusGtThanZero: true })}
+              {formatAmountInUsd(profitInUsd, { showPlusGtThanZero: true })}
             </span>
             {profitRatio ? (
               <span className="text-[11px]">

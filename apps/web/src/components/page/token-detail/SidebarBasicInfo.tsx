@@ -1,6 +1,6 @@
 "use client";
 
-import { formatAmountUSD } from "src/libs/formatters";
+import { formatAmountInUsd, formatMCapInUsd } from "@liberfi.io/utils";
 import { useTokenQuery } from "@liberfi.io/react";
 import type { Chain } from "@liberfi.io/types";
 import { formatAmount, truncateAddress } from "@liberfi.io/utils";
@@ -72,15 +72,15 @@ export function SidebarBasicInfo({ chain, address }: SidebarBasicInfoProps) {
       <ul className="flex flex-col">
         <Row
           label={t("extend.trade.basic_info.market_cap")}
-          value={formatAmountUSD(md?.marketCapInUsd ?? "")}
+          value={formatMCapInUsd(md?.marketCapInUsd ?? "")}
         />
         <Row
           label={t("extend.trade.basic_info.liquidity")}
-          value={formatAmountUSD(md?.tvlInUsd ?? "")}
+          value={formatAmountInUsd(md?.tvlInUsd ?? "")}
         />
         <Row
           label={t("extend.trade.basic_info.volume_24h")}
-          value={formatAmountUSD(stats24h?.volumesInUsd ?? "")}
+          value={formatAmountInUsd(stats24h?.volumesInUsd ?? "")}
         />
         <Row
           label={t("extend.trade.basic_info.holders")}

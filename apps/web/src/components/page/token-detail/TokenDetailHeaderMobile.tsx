@@ -1,6 +1,6 @@
 "use client";
 
-import { formatAmountUSD, formatPriceUSD } from "src/libs/formatters";
+import { formatAmountInUsd, formatMCapInUsd, formatPriceInUsd } from "@liberfi.io/utils";
 import { Skeleton } from "@heroui/react";
 import { useTickAge } from "@liberfi.io/hooks";
 import { useTokenQuery } from "@liberfi.io/react";
@@ -54,7 +54,7 @@ export interface TokenDetailHeaderMobileProps {
  *
  * Reuses the exact same primitives as the desktop header
  * ({@link TokenAvatar}, {@link StyledTooltip}, social `<Link>` icons,
- * `formatPriceUSD`, `formatPercent`, bullish/bearish colour tokens) so
+ * `formatPriceInUsd`, `formatPercent`, bullish/bearish colour tokens) so
  * theming, copy-to-clipboard, and tooltip behaviour all stay consistent
  * across breakpoints. The only differences are layout (two stacked rows
  * vs. desktop's single 72px row) and the stat strip — on mobile the
@@ -195,14 +195,14 @@ function Content({ token }: { token: Token }) {
             never confused with the price value. */}
         <div className="flex shrink-0 flex-col items-end justify-center gap-0.5">
           <span className="whitespace-nowrap text-[18px] font-semibold leading-[22px] tabular-nums text-foreground">
-            {formatPriceUSD(md?.priceInUsd ?? "")}
+            {formatPriceInUsd(md?.priceInUsd ?? "")}
           </span>
           <div className="flex items-center gap-1.5 text-[12px] leading-4 tabular-nums">
             <span className="text-default-500">
               {t("extend.token_list.attributes.market_cap")}
             </span>
             <span className="text-default-700">
-              {formatAmountUSD(md?.marketCapInUsd ?? "")}
+              {formatMCapInUsd(md?.marketCapInUsd ?? "")}
             </span>
             {priceChange !== undefined && (
               <span

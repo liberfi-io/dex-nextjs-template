@@ -3,10 +3,10 @@ import { clsx } from "clsx";
 import { Avatar, Button, NumberInput, Tooltip } from "@heroui/react";
 import {
   formatPercent,
-  formatPrice,
   getPrimaryTokenAvatar,
   getPrimaryTokenDecimals,
 } from "@liberfi/core";
+import { formatPrice } from "@liberfi.io/utils";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
   CoinsIcon,

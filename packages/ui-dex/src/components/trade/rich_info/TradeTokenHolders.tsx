@@ -5,6 +5,7 @@ import { ReactNode } from "react";
 import { HoldersList } from "./HoldersList";
 import { Number } from "../../Number";
 import { Token } from "@chainstream-io/sdk";
+import { formatMCapInUsd } from "@liberfi.io/utils";
 import { useAtomValue } from "jotai";
 import { tokenInfoAtom } from "../../../states";
 
@@ -34,7 +35,7 @@ function Content({ token }: { token: Token }) {
           }
           volume={
             token?.marketData?.marketCapInUsd ? (
-              <Number value={token.marketData.marketCapInUsd} abbreviate defaultCurrencySign="$" />
+              formatMCapInUsd(token.marketData.marketCapInUsd)
             ) : (
               "-"
             )

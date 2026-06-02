@@ -1,10 +1,9 @@
 import {
   CHAIN_QUOTE_TOKEN_SYMBOLS,
-  formatLongNumber,
-  formatShortNumber,
   tokenDetailChainSegment,
   tokenDetailRoute,
 } from "../../libs";
+import { formatMCap, formatPrice } from "@liberfi.io/utils";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { useRouter, useTranslation } from "@liberfi/ui-base";
 import { useTvChartTradeHistories } from "../../hooks/tvchart/useTvChartTradeHistories";
@@ -132,10 +131,10 @@ export const TvChartWrapper = memo(({ className }: TvChartWrapperProps) => {
         format: (price: number) => {
           try {
             if (Number(price) > 1e31) return `${price}`;
-            if (!symbolInfo) return formatLongNumber(price);
+            if (!symbolInfo) return formatPrice(price);
             return (symbolInfo as TvChartSymbolInfo).priceType === TvChartPriceType.Price
-              ? formatLongNumber(price)
-              : formatShortNumber(price);
+              ? formatPrice(price)
+              : formatMCap(price);
           } catch (e) {
             console.warn(e);
             return `${price}`;

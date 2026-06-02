@@ -1,4 +1,4 @@
-import { formatAmountUSD, formatPriceUSD } from "src/libs/formatters";
+import { formatAmountInUsd, formatMCapInUsd, formatPriceInUsd } from "@liberfi.io/utils";
 import { Skeleton } from "@heroui/react";
 import { useTickAge } from "@liberfi.io/hooks";
 import { useTokenQuery } from "@liberfi.io/react";
@@ -185,7 +185,7 @@ function Content({ token }: { token: Token }) {
       {/* Hero price + 24h change — modelled on TokenPriceCell */}
       <div className="flex shrink-0 flex-col justify-center gap-0.5">
         <span className="whitespace-nowrap text-[20px] font-semibold leading-6 tabular-nums text-foreground">
-          {formatPriceUSD(md?.priceInUsd ?? "")}
+          {formatPriceInUsd(md?.priceInUsd ?? "")}
         </span>
         {priceChange !== undefined && (
           <span
@@ -208,15 +208,15 @@ function Content({ token }: { token: Token }) {
       <div className="custom-scrollbar flex min-w-0 shrink items-center gap-5 overflow-x-auto">
         <Stat
           label={t("extend.token_list.attributes.market_cap")}
-          value={formatAmountUSD(md?.marketCapInUsd ?? "")}
+          value={formatMCapInUsd(md?.marketCapInUsd ?? "")}
         />
         <Stat
           label={t("extend.token_list.attributes.liquidity")}
-          value={formatAmountUSD(md?.tvlInUsd ?? "")}
+          value={formatAmountInUsd(md?.tvlInUsd ?? "")}
         />
         <Stat
           label={`24h ${t("extend.token_list.attributes.volume")}`}
-          value={formatAmountUSD(volume24h ?? "")}
+          value={formatAmountInUsd(volume24h ?? "")}
         />
         <Stat
           label={t("extend.token_list.attributes.supply")}

@@ -22,7 +22,7 @@ import {
   type EvmWalletAdapter,
 } from "@liberfi.io/wallet-connector";
 import { useTranslation } from "@liberfi.io/i18n";
-import { truncateAddress } from "@liberfi.io/utils";
+import { formatAmount, formatAmountInUsd, truncateAddress } from "@liberfi.io/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   ChartLineIcon,
@@ -50,14 +50,11 @@ function toCents(amount: number): number {
 }
 
 function formatCents(cents: number): string {
-  return (cents / 100).toLocaleString("en-US", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
+  return formatAmountInUsd(cents / 100);
 }
 
 function formatUsdc(amount: number): string {
-  return formatCents(toCents(amount));
+  return formatAmount(Math.floor(amount * 100) / 100);
 }
 
 // Inline deposit / withdraw action button, used inside each verified
@@ -176,7 +173,7 @@ function WalletEntry({
                 {t("extend.predict.account.availableBalance")}:
               </span>
               <span className="text-white font-medium">
-                ${formatUsdc(balance ?? 0)} USDC
+                {formatUsdc(balance ?? 0)} USDC
               </span>
             </>
           )}
@@ -454,7 +451,7 @@ function MergedDropdownContent({
             </span>
           </div>
           <span className="text-sm font-medium text-zinc-100 tabular-nums">
-            ${formatCents(positionsCents)}
+            {formatCents(positionsCents)}
           </span>
         </div>
       </div>
@@ -466,7 +463,7 @@ function MergedDropdownContent({
             {t("extend.predict.account.portfolioTotal")}
           </span>
           <span className="text-sm font-bold text-[#c7ff2e] tabular-nums">
-            {initialLoading ? "..." : `$${formatCents(portfolioTotalCents)}`}
+            {initialLoading ? "..." : formatCents(portfolioTotalCents)}
           </span>
         </div>
       </div>
@@ -720,7 +717,7 @@ export function PredictBalanceIndicator() {
           aria-hidden="true"
         />
         <span className="text-xs font-medium text-zinc-100 tabular-nums">
-          {initialLoading ? "..." : `$${formatCents(portfolioTotalCents)}`}
+          {initialLoading ? "..." : formatCents(portfolioTotalCents)}
         </span>
         <svg
           xmlns="http://www.w3.org/2000/svg"

@@ -30,6 +30,7 @@ import {
   KalshiIcon,
   PolymarketIcon,
 } from "@liberfi.io/ui";
+import { formatAmountInUsd, formatPriceInUsd as formatPrice } from "@liberfi.io/utils";
 import { useAsyncModal } from "@liberfi.io/ui-scaffold";
 import {
   useWallets,
@@ -260,12 +261,12 @@ function EventPositionsPanel({
               </div>
               <div className="min-w-[90px] shrink-0 text-right">
                 <div className="mb-0.5 text-xs text-zinc-500">{t("extend.portfolio.invested")}</div>
-                <div className="text-sm font-medium text-white">${invested.toFixed(2)}</div>
+                <div className="text-sm font-medium text-white">{formatAmountInUsd(invested)}</div>
               </div>
               <div className="min-w-[130px] shrink-0 text-right">
-                <div className="mb-0.5 text-base font-bold text-white">${currentValue.toFixed(2)}</div>
+                <div className="mb-0.5 text-base font-bold text-white">{formatAmountInUsd(currentValue)}</div>
                 <div className={cn("text-xs font-semibold", pnlColor)}>
-                  {pnl >= 0 ? "+" : "-"}${Math.abs(pnl).toFixed(2)} ({pnlPercent >= 0 ? "+" : ""}{pnlPercent.toFixed(1)}%)
+                  {formatAmountInUsd(pnl, { showPlusGtThanZero: true })} ({pnlPercent >= 0 ? "+" : ""}{pnlPercent.toFixed(1)}%)
                 </div>
               </div>
               <div className="shrink-0">
@@ -316,9 +317,9 @@ function EventPositionsPanel({
                 </div>
               </div>
               <div className="shrink-0 text-right">
-                <div className="text-sm font-bold text-white">${currentValue.toFixed(2)}</div>
+                <div className="text-sm font-bold text-white">{formatAmountInUsd(currentValue)}</div>
                 <div className={cn("text-xs font-semibold", pnlColor)}>
-                  {pnl >= 0 ? "+" : "-"}${Math.abs(pnl).toFixed(2)} ({pnlPercent >= 0 ? "+" : ""}{pnlPercent.toFixed(1)}%)
+                  {formatAmountInUsd(pnl, { showPlusGtThanZero: true })} ({pnlPercent >= 0 ? "+" : ""}{pnlPercent.toFixed(1)}%)
                 </div>
               </div>
               {pos.redeemable ? (
@@ -742,7 +743,7 @@ function EventTradesPanel({
                           </div>
                         )}
                         <div className="text-base font-bold text-white">
-                          {usdSize > 0 ? `+$${usdSize.toFixed(2)}` : "$0.00"}
+                          {formatAmountInUsd(usdSize, { showPlusGtThanZero: true })}
                         </div>
                       </>
                     ) : (
@@ -750,7 +751,7 @@ function EventTradesPanel({
                         <div className="font-mono text-xs text-zinc-400">
                           {formatPrice(price)} &times; {formatShares(trade.size)}{t("predict.trade.sharesUnit")}
                         </div>
-                        <div className="text-base font-bold text-white">${usdSize.toFixed(2)}</div>
+                        <div className="text-base font-bold text-white">{formatAmountInUsd(usdSize)}</div>
                       </>
                     )}
                   </div>
@@ -787,7 +788,7 @@ function EventTradesPanel({
                     {isRedeem ? (
                       <>
                         <div className="text-sm font-bold text-white">
-                          {usdSize > 0 ? `+$${usdSize.toFixed(2)}` : "$0.00"}
+                          {formatAmountInUsd(usdSize, { showPlusGtThanZero: true })}
                         </div>
                         {trade.size > 0 && (
                           <div className="font-mono text-xs text-zinc-400">
@@ -797,7 +798,7 @@ function EventTradesPanel({
                       </>
                     ) : (
                       <>
-                        <div className="text-sm font-bold text-white">${usdSize.toFixed(2)}</div>
+                        <div className="text-sm font-bold text-white">{formatAmountInUsd(usdSize)}</div>
                         <div className="font-mono text-xs text-zinc-400">
                           {formatPrice(price)} &times; {formatShares(trade.size)}{t("predict.trade.sharesUnit")}
                         </div>
@@ -865,12 +866,6 @@ function PanelSkeleton() {
 function formatShares(size: number, maxDecimals = 2): string {
   const factor = Math.pow(10, maxDecimals);
   return parseFloat((Math.floor(size * factor) / factor).toFixed(maxDecimals)).toString();
-}
-
-function formatPrice(price: number): string {
-  const cents = price * 100;
-  if (cents < 1 && cents > 0) return "< 1\u00A2";
-  return `${cents.toFixed(1)}\u00A2`;
 }
 
 function formatTimestamp(unixSeconds: number): string {

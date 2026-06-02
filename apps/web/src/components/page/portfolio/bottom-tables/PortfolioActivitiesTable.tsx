@@ -1,6 +1,6 @@
 "use client";
 
-import { formatAmountUSDCompact } from "src/libs/formatters";
+import { formatAmountInUsd } from "@liberfi.io/utils";
 import { useMemo, useRef } from "react";
 import { useTokensQuery } from "@liberfi.io/react";
 import { usePortfolioActivitiesScript } from "@liberfi.io/ui-portfolio";
@@ -224,7 +224,7 @@ function ActivityRow({ activity, now, tokenByAddress }: ActivityRowProps) {
           sideMeta.color,
         )}
       >
-        {primary.amountInUsd ? formatAmountUSDCompact(primary.amountInUsd) : "--"}
+        {primary.amountInUsd ? formatAmountInUsd(primary.amountInUsd) : "--"}
       </td>
       <td
         className={cn(

@@ -2,7 +2,8 @@ import { useMemo } from "react";
 import { clsx } from "clsx";
 import { useAtomValue } from "jotai";
 import { BigNumber } from "bignumber.js";
-import { formatPrice, getPrimaryTokenSymbol, SOL_TOKEN_SYMBOL } from "@liberfi/core";
+import { getPrimaryTokenSymbol, SOL_TOKEN_SYMBOL } from "@liberfi/core";
+import { formatAmount } from "@liberfi.io/utils";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { tokenInfoAtom, tokenLatestPriceAtom, useQuotePrice } from "../../../states";
 
@@ -29,14 +30,14 @@ export function SellTokenAmount({ amount = 1, className }: SellTokenAmountProps)
   const latestPriceInQuote = useMemo(
     () =>
       latestPrice && latestQuotePrice && latestQuotePrice > 0
-        ? formatPrice(new BigNumber(latestPrice).div(latestQuotePrice).times(amount))
+        ? formatAmount(new BigNumber(latestPrice).div(latestQuotePrice).times(amount))
         : "--",
     [latestQuotePrice, latestPrice, amount],
   );
 
   return (
     <div className={clsx("text-xs text-neutral", className)}>
-      {formatPrice(amount)} {tokenInfo?.symbol ?? ""} ≈ {latestPriceInQuote} {primaryTokenSymbol}
+      {formatAmount(amount)} {tokenInfo?.symbol ?? ""} ≈ {latestPriceInQuote} {primaryTokenSymbol}
     </div>
   );
 }

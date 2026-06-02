@@ -19,7 +19,7 @@ import {
 } from "@liberfi.io/ui-portfolio";
 import { formatPercent, truncateAddress } from "@liberfi.io/utils";
 import { useCreateOnrampWidgetUrlMutation } from "@liberfi/react-backend";
-import { formatAmountUSD } from "src/libs/formatters";
+import { formatAmountInUsd } from "@liberfi.io/utils";
 import { CashInOutlinedIcon } from "../../icons/CashInOutlinedIcon";
 import { ReceiveOutlinedIcon } from "../../icons/ReceiveOutlinedIcon";
 import { SendOutlinedIcon } from "../../icons/SendOutlinedIcon";
@@ -101,9 +101,9 @@ export function PortfolioHeader() {
     );
   }, [chain, walletAddress, nativeToken, isCreatingOnramp, createOnrampWidgetUrl, t]);
 
-  const balanceUsd = formatAmountUSD(summary?.balanceInUsd ?? "0");
+  const balanceUsd = formatAmountInUsd(summary?.balanceInUsd ?? "0");
   const profitUsdSign = bullish ? "+" : "";
-  const profitUsdText = `${profitUsdSign}${formatAmountUSD(
+  const profitUsdText = `${profitUsdSign}${formatAmountInUsd(
     Math.abs(totalProfitInUsd).toString(),
   )}`;
   const ratioText = formatPercent(Math.abs(totalProfitRatio));

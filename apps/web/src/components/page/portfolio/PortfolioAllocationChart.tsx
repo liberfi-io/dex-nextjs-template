@@ -8,7 +8,7 @@ import type { Chain, Portfolio } from "@liberfi.io/types";
 import { cn, EmptyIcon } from "@liberfi.io/ui";
 import { formatPercent } from "@liberfi.io/utils";
 import { useTranslation } from "@liberfi/ui-base";
-import { formatAmountUSD } from "src/libs/formatters";
+import { formatAmountInUsd } from "@liberfi.io/utils";
 
 /**
  * Maximum number of named slices in the allocation pie. Anything beyond this
@@ -285,7 +285,7 @@ function computeAllocationSlices(
     key: row.portfolio.address || `slice-${index}`,
     name: row.portfolio.symbol || row.portfolio.name || "—",
     value: row.value,
-    formattedValue: formatAmountUSD(row.value),
+    formattedValue: formatAmountInUsd(row.value),
     formattedPercentage: formatPercent(row.value / total),
     color: ALLOCATION_COLORS[index % (ALLOCATION_COLORS.length - 1)],
   }));
@@ -296,7 +296,7 @@ function computeAllocationSlices(
       key: "__others__",
       name: "Others",
       value: tailValue,
-      formattedValue: formatAmountUSD(tailValue),
+      formattedValue: formatAmountInUsd(tailValue),
       formattedPercentage: formatPercent(tailValue / total),
       color: OTHERS_COLOR,
     });

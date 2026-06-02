@@ -4,13 +4,13 @@ import { BigNumber } from "bignumber.js";
 import { Button } from "@heroui/react";
 import {
   Chain,
-  formatPriceUSD,
   getPrimaryTokenAddress,
   getPrimaryTokenDecimals,
   getPrimaryTokenSymbol,
   SOL_TOKEN_DECIMALS,
   SOL_TOKEN_SYMBOL,
 } from "@liberfi/core";
+import { formatAmountInUsd } from "@liberfi.io/utils";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { useLatestBlockQuery } from "@liberfi/react-dex";
 import {
@@ -90,7 +90,7 @@ export function MarketSellForm() {
     if (!tokenPrice || !primaryTokenPrice) return t("extend.trade.sell");
     // display the amount in usd
     const amountInUsd = new BigNumber(tokenPrice).times(amount);
-    const amountInUsdFormatted = formatPriceUSD(amountInUsd);
+    const amountInUsdFormatted = formatAmountInUsd(amountInUsd);
     const primaryTokenAmount = amountInUsd.div(primaryTokenPrice);
     const primaryTokenAmountFormatted = new BigNumber(primaryTokenAmount)
       .decimalPlaces(primaryTokenDecimals)

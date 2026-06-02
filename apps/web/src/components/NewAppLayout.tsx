@@ -103,7 +103,7 @@ import {
   DraggablePanelProvider,
 } from "@liberfi.io/ui-scaffold";
 import { SEARCH_MODAL_ID, SearchModal } from "@liberfi.io/ui-tokens";
-import { chainDisplayName, truncateAddress } from "@liberfi.io/utils";
+import { chainDisplayName, formatAmount, truncateAddress } from "@liberfi.io/utils";
 import type { PredefinedToken } from "@liberfi.io/utils";
 import {
   useDexTokenProvider,
@@ -1677,8 +1677,5 @@ function WalletActionButton({
 
 function formatHlUsdc(value: string | number): string {
   const n = typeof value === "number" ? value : Number(value);
-  if (!Number.isFinite(n)) return "0";
-  if (n === 0) return "0";
-  if (n < 0.01) return n.toFixed(6);
-  return n.toFixed(2);
+  return formatAmount(Number.isFinite(n) ? n : 0);
 }

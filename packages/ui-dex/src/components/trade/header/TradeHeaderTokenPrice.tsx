@@ -3,6 +3,7 @@ import { Number } from "../../Number";
 import { useTranslation } from "@liberfi/ui-base";
 import { formatPercentage, tokenPriceChangeRatioInUsd } from "../../../libs";
 import { Token } from "@chainstream-io/sdk";
+import { formatMCapInUsd } from "@liberfi.io/utils";
 import { useMemo } from "react";
 
 /**
@@ -49,7 +50,7 @@ export function TradeHeaderTokenPrice({ token }: { token: Token }) {
         <span className="text-neutral">{t("extend.token_list.attributes.market_cap")}</span>
         <div>
           {token.marketData?.marketCapInUsd ? (
-            <Number value={token.marketData.marketCapInUsd} abbreviate defaultCurrencySign="$" />
+            formatMCapInUsd(token.marketData.marketCapInUsd)
           ) : (
             "-"
           )}

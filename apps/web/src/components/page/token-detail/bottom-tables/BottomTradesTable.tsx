@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  formatAmountCompact,
-  formatAmountUSDCompact,
-  formatPriceUSD,
-} from "src/libs/formatters";
+import { formatAmount, formatAmountInUsd, formatPriceInUsd } from "@liberfi.io/utils";
 import { useTickAge } from "@liberfi.io/hooks";
 import { useTokenActivitiesListScript } from "@liberfi.io/ui-tokens";
 import type { Activity, ActivityType, Chain } from "@liberfi.io/types";
@@ -307,7 +303,7 @@ const ActivityRow = memo(function ActivityRow({
         )}
         style={{ letterSpacing: "-0.2px" }}
       >
-        {primary.priceInUsd ? formatPriceUSD(primary.priceInUsd) : "--"}
+        {primary.priceInUsd ? formatPriceInUsd(primary.priceInUsd) : "--"}
       </div>
       <div
         className={cn(
@@ -316,7 +312,7 @@ const ActivityRow = memo(function ActivityRow({
         )}
         style={{ letterSpacing: "-0.2px" }}
       >
-        {formatAmountCompact(primary.amount)}
+        {formatAmount(primary.amount)}
       </div>
       <TotalUsdCell value={primary.amountInUsd} color={sideMeta.color} />
       <div
@@ -350,7 +346,7 @@ function TotalUsdCell({ value, color }: { value?: string; color: string }) {
       )}
       style={{ letterSpacing: "-0.2px" }}
     >
-      {value ? formatAmountUSDCompact(value) : "--"}
+      {value ? formatAmountInUsd(value) : "--"}
     </div>
   );
 }
@@ -647,7 +643,7 @@ function formatGasFee(
   const n = Number(gasFee) / Math.pow(10, nativeDecimals);
   if (!Number.isFinite(n)) return "--";
   if (n > 0 && n < 0.001) return `<0.001 ${nativeSymbol}`;
-  return `${formatAmountCompact(n)} ${nativeSymbol}`;
+  return `${formatAmount(n)} ${nativeSymbol}`;
 }
 
 function getNativeDecimals(chain: Chain): number {

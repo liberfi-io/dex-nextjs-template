@@ -1,6 +1,6 @@
 "use client";
 
-import { formatAmountCompact, formatAmountUSDCompact } from "src/libs/formatters";
+import { formatAmount, formatAmountInUsd } from "@liberfi.io/utils";
 import { useTickAge } from "@liberfi.io/hooks";
 import { useTokenHoldersListScript } from "@liberfi.io/ui-tokens";
 import type { Chain, TokenHolder } from "@liberfi.io/types";
@@ -552,12 +552,12 @@ const TradeFlowCell = memo(function TradeFlowCell({
       )}
     >
       <div className={cn("text-[12px] leading-4", tone)}>
-        {volumeUsd ? formatAmountUSDCompact(volumeUsd) : "--"}
+        {volumeUsd ? formatAmountInUsd(volumeUsd) : "--"}
         <span className="px-1 text-default-500">/</span>
-        {avgPriceUsd ? formatAmountUSDCompact(avgPriceUsd) : "--"}
+        {avgPriceUsd ? formatAmountInUsd(avgPriceUsd) : "--"}
       </div>
       <div className="text-[11px] leading-4 text-neutral">
-        {tokenAmount ? formatAmountCompact(tokenAmount) : "--"}
+        {tokenAmount ? formatAmount(tokenAmount) : "--"}
         <span className="px-1">/</span>
         {count ?? "--"} {TX_LABEL}
       </div>
@@ -596,7 +596,7 @@ const PnlCell = memo(function PnlCell({
     >
       <div className="text-[12px] leading-4">
         {value
-          ? formatAmountUSDCompact(value, { showPlusGtThanZero: true })
+          ? formatAmountInUsd(value, { showPlusGtThanZero: true })
           : "--"}
       </div>
       <div className="text-[11px] leading-4">
@@ -628,7 +628,7 @@ const HoldingsCell = memo(function HoldingsCell({
       )}
     >
       <div className="flex items-center justify-end gap-1 text-[12px] leading-4 text-foreground">
-        <span>{amountInUsd ? formatAmountUSDCompact(amountInUsd) : "--"}</span>
+        <span>{amountInUsd ? formatAmountInUsd(amountInUsd) : "--"}</span>
         {hasRatio ? (
           <span className="rounded bg-content3 px-1.5 py-0.5 text-[11px] leading-4 text-default-600">
             {ratioText}
@@ -656,9 +656,9 @@ const FundingCell = memo(function FundingCell({
 }) {
   const source = holder.exchange ?? holder.addressLabel;
   const transferAmount = holder.historyTransferInCost
-    ? formatAmountUSDCompact(holder.historyTransferInCost)
+    ? formatAmountInUsd(holder.historyTransferInCost)
     : holder.historyTransferInAmount
-      ? formatAmountCompact(holder.historyTransferInAmount)
+      ? formatAmount(holder.historyTransferInAmount)
       : undefined;
   const transferCount =
     holder.transferInCount === undefined ? undefined : holder.transferInCount;
@@ -822,7 +822,7 @@ function formatNativeBalance(chain: Chain, value: string | undefined): string {
   if (!value) return "--";
   const decimals = nativeBalanceDecimals(chain);
   const amount = new SafeBigNumber(value).shiftedBy(-decimals).toString();
-  return `${formatAmountCompact(amount)} ${nativeSymbol(chain)}`;
+  return `${formatAmount(amount)} ${nativeSymbol(chain)}`;
 }
 
 function nativeBalanceDecimals(chain: Chain): number {

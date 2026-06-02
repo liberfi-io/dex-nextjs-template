@@ -2,7 +2,8 @@ import { useMemo, useState } from "react";
 import { BigNumber } from "bignumber.js";
 import { useAtomValue } from "jotai";
 import { Button } from "@heroui/react";
-import { Chain, formatAmountUSD, getPrimaryTokenAddress, getPrimaryTokenDecimals } from "@liberfi/core";
+import { Chain, getPrimaryTokenAddress, getPrimaryTokenDecimals } from "@liberfi/core";
+import { formatAmountInUsd } from "@liberfi.io/utils";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { useLatestBlockQuery } from "@liberfi/react-dex";
 import {
@@ -75,7 +76,7 @@ export function MarketBuyForm() {
     // without the primary token price, just display the amount
     if (!primaryTokenPrice) return `${t("extend.trade.buy")} ${amount} ${balance.symbol}`;
     // with the primary token price, display the amount in usd
-    const amountInUsd = formatAmountUSD(new BigNumber(amount).times(primaryTokenPrice));
+    const amountInUsd = formatAmountInUsd(new BigNumber(amount).times(primaryTokenPrice));
     return `${t("extend.trade.buy")} ${amount} ${balance.symbol} (${amountInUsd})`;
   }, [t, amount, balance, primaryTokenPrice]);
 

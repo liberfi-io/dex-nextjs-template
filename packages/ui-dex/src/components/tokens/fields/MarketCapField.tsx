@@ -1,6 +1,7 @@
 import { ListField } from "../../ListField";
 import { Number } from "../../Number";
 import { Token } from "@chainstream-io/sdk";
+import { formatMCapInUsd } from "@liberfi.io/utils";
 
 export interface MarketCapFieldProps {
   className?: string;
@@ -13,7 +14,7 @@ export function MarketCapField({ className, token }: MarketCapFieldProps) {
       <div className="flex gap-1 text-xs">
         <div className="text-foreground">
           {token.marketData?.marketCapInUsd ? (
-            <Number value={token.marketData.marketCapInUsd} abbreviate defaultCurrencySign="$" />
+            formatMCapInUsd(token.marketData.marketCapInUsd)
           ) : (
             "-"
           )}

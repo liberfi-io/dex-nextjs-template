@@ -1,5 +1,5 @@
 import { launchPadCurvePoints } from "../states";
-import { formatAmount3, formatPrice } from "@liberfi/core";
+import { formatAmount, formatPrice } from "@liberfi.io/utils";
 import { defaultTheme, useTranslation } from "@liberfi/ui-base";
 import { useAtomValue } from "jotai";
 import { useEffect, useRef } from "react";
@@ -41,7 +41,7 @@ export function LaunchPadCurveAreaChart() {
               stroke={defaultTheme.colors.neutral}
               strokeWidth={0.5}
               fontSize={12}
-              tickFormatter={(value) => formatAmount3(value)}
+              tickFormatter={(value) => formatAmount(value)}
               tickMargin={8}
               tickCount={8}
             />

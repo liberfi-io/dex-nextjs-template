@@ -40,6 +40,7 @@ import {
   KalshiIcon,
   ChartLineIcon,
 } from "@liberfi.io/ui";
+import { formatAmountInUsd, formatPriceInUsd as formatPrice } from "@liberfi.io/utils";
 import { useAsyncModal } from "@liberfi.io/ui-scaffold";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { FUND_WALLET_MODAL_ID } from "../FundWalletModal";
@@ -282,7 +283,7 @@ function PortfolioContent() {
                 </div>
                 <div className="flex items-baseline gap-1">
                   <span className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
-                    ${formatCents(netWorthCents)}
+                    {formatAmountInUsd(netWorthCents / 100)}
                   </span>
                 </div>
                 <div className="mt-3 flex items-center gap-2">
@@ -300,7 +301,7 @@ function PortfolioContent() {
                       <TrendingDownIcon className="h-4 w-4" />
                     )}
                     <span>
-                      {allTimePnl >= 0 ? "+" : ""}${formatUsdc(Math.abs(allTimePnl))}
+                      {formatAmountInUsd(allTimePnl, { showPlusGtThanZero: true })}
                     </span>
                   </span>
                   <span className="text-sm text-zinc-500">{t("extend.portfolio.allTimePnl")}</span>
@@ -322,7 +323,7 @@ function PortfolioContent() {
                 <span className="text-sm font-medium">{t("extend.portfolio.buyingPower")}</span>
               </div>
             </div>
-            <div className="text-2xl font-bold text-white">${formatCents(buyingPowerCents)}</div>
+            <div className="text-2xl font-bold text-white">{formatAmountInUsd(buyingPowerCents / 100)}</div>
           </div>
           <div className="flex-1 rounded-2xl border border-zinc-800/50 bg-zinc-900/50 p-5 transition-colors hover:bg-zinc-900/80">
             <div className="mb-2 flex items-center justify-between">
@@ -336,7 +337,7 @@ function PortfolioContent() {
                 </span>
               )}
             </div>
-            <div className="text-2xl font-bold text-white">${formatCents(investedCents)}</div>
+            <div className="text-2xl font-bold text-white">{formatAmountInUsd(investedCents / 100)}</div>
           </div>
         </div>
       </div>
@@ -715,14 +716,14 @@ function PositionRow({ position }: { position: PredictPosition }) {
         {/* Col 3: Invested */}
         <div className="min-w-[90px] shrink-0 text-right">
           <div className="mb-0.5 text-xs text-zinc-500">{t("extend.portfolio.invested")}</div>
-          <div className="text-sm font-medium text-white">${invested.toFixed(2)}</div>
+          <div className="text-sm font-medium text-white">{formatAmountInUsd(invested)}</div>
         </div>
 
         {/* Col 4: Value + PnL */}
         <div className="min-w-[130px] shrink-0 text-right">
-          <div className="mb-0.5 text-base font-bold text-white">${currentValue.toFixed(2)}</div>
+          <div className="mb-0.5 text-base font-bold text-white">{formatAmountInUsd(currentValue)}</div>
           <div className={cn("text-xs font-semibold", pnlColor)}>
-            {pnl >= 0 ? "+" : "-"}${Math.abs(pnl).toFixed(2)} ({pnlPercent >= 0 ? "+" : ""}
+            {formatAmountInUsd(pnl, { showPlusGtThanZero: true })} ({pnlPercent >= 0 ? "+" : ""}
             {pnlPercent.toFixed(1)}%)
           </div>
         </div>
@@ -790,9 +791,9 @@ function PositionRow({ position }: { position: PredictPosition }) {
           </div>
         </div>
         <div className="shrink-0 text-right">
-          <div className="text-sm font-bold text-white">${currentValue.toFixed(2)}</div>
+          <div className="text-sm font-bold text-white">{formatAmountInUsd(currentValue)}</div>
           <div className={cn("text-xs font-semibold", pnlColor)}>
-            {pnl >= 0 ? "+" : "-"}${Math.abs(pnl).toFixed(2)} ({pnlPercent >= 0 ? "+" : ""}{pnlPercent.toFixed(1)}%)
+            {formatAmountInUsd(pnl, { showPlusGtThanZero: true })} ({pnlPercent >= 0 ? "+" : ""}{pnlPercent.toFixed(1)}%)
           </div>
         </div>
         {position.redeemable ? (
@@ -1388,7 +1389,7 @@ function TradeRow({
                 </div>
               )}
               <div className="text-base font-bold text-white">
-                {usdSize > 0 ? `+$${usdSize.toFixed(2)}` : "$0.00"}
+                {formatAmountInUsd(usdSize, { showPlusGtThanZero: true })}
               </div>
             </>
           ) : (
@@ -1396,7 +1397,7 @@ function TradeRow({
               <div className="text-xs font-mono text-zinc-400">
                 {formatPrice(price)} &times; {formatShares(trade.size)}{t("predict.trade.sharesUnit")}
               </div>
-              <div className="text-base font-bold text-white">${usdSize.toFixed(2)}</div>
+              <div className="text-base font-bold text-white">{formatAmountInUsd(usdSize)}</div>
             </>
           )}
         </div>
@@ -1452,7 +1453,7 @@ function TradeRow({
           {isRedeem ? (
             <>
               <div className="text-sm font-bold text-white">
-                {usdSize > 0 ? `+$${usdSize.toFixed(2)}` : "$0.00"}
+                {formatAmountInUsd(usdSize, { showPlusGtThanZero: true })}
               </div>
               {trade.size > 0 && (
                 <div className="font-mono text-xs text-zinc-400">
@@ -1462,7 +1463,7 @@ function TradeRow({
             </>
           ) : (
             <>
-              <div className="text-sm font-bold text-white">${usdSize.toFixed(2)}</div>
+              <div className="text-sm font-bold text-white">{formatAmountInUsd(usdSize)}</div>
               <div className="font-mono text-xs text-zinc-400">
                 {formatPrice(price)} &times; {formatShares(trade.size)}{t("predict.trade.sharesUnit")}
               </div>
@@ -1631,20 +1632,8 @@ function SearchIcon({ className }: { className?: string }) {
   );
 }
 
-
 function toCents(amount: number): number {
   return Math.floor(amount * 100);
-}
-
-function formatUsdc(amount: number): string {
-  return formatCents(toCents(amount));
-}
-
-function formatCents(cents: number): string {
-  return (cents / 100).toLocaleString("en-US", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
 }
 
 /**
@@ -1654,12 +1643,6 @@ function formatCents(cents: number): string {
 function formatShares(size: number, maxDecimals = 2): string {
   const factor = Math.pow(10, maxDecimals);
   return parseFloat((Math.floor(size * factor) / factor).toFixed(maxDecimals)).toString();
-}
-
-function formatPrice(price: number): string {
-  const cents = price * 100;
-  if (cents < 1 && cents > 0) return "< 1\u00A2";
-  return `${cents.toFixed(1)}\u00A2`;
 }
 
 function formatTimestamp(unixSeconds: number): string {

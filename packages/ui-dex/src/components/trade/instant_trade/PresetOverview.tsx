@@ -9,7 +9,8 @@ import {
   ZapFastIcon,
 } from "@liberfi/ui-base";
 import { TradePresetValues } from "../../../types";
-import { formatPercent, formatPrice } from "@liberfi/core";
+import { formatPercent } from "@liberfi/core";
+import { formatPrice } from "@liberfi.io/utils";
 
 export type PresetOverviewProps = {
   preset: TradePresetValues;

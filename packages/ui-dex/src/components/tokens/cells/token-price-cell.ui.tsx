@@ -2,7 +2,7 @@ import { Token } from "@chainstream-io/sdk";
 import { useMemo } from "react";
 import { useTokenListContext } from "../TokenListContext";
 import { formatPercentage, tokenPriceChangeRatioInUsd } from "../../../libs";
-import { formatPriceUSD } from "@liberfi/core";
+import { formatPriceInUsd } from "@liberfi.io/utils";
 import clsx from "clsx";
 import { TriangleDownIcon, TriangleUpIcon } from "@liberfi/ui-base";
 
@@ -22,7 +22,7 @@ export function TokenPriceCell({ token }: { token: Token }) {
   return (
     <div className="flex flex-col gap-1 justify-center items-start">
       <span>
-        {token.marketData?.priceInUsd ? formatPriceUSD(token.marketData.priceInUsd) : "--"}
+        {token.marketData?.priceInUsd ? formatPriceInUsd(token.marketData.priceInUsd) : "--"}
       </span>
       <span
         className={clsx(

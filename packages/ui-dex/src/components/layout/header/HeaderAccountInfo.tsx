@@ -10,7 +10,8 @@ import {
   Image,
   Skeleton,
 } from "@heroui/react";
-import { formatAmountUSD, ROUTES } from "@liberfi/core";
+import { ROUTES } from "@liberfi/core";
+import { formatAmountInUsd } from "@liberfi.io/utils";
 import {
   ChevronDownIcon,
   SignInIcon,
@@ -108,7 +109,7 @@ function Authenticated() {
           }
         >
           <div className="flex flex-col items-start">
-            <p className="text-xs">{formatAmountUSD(walletSummary?.balanceInUsd ?? 0)}</p>
+            <p className="text-xs">{formatAmountInUsd(walletSummary?.balanceInUsd ?? 0)}</p>
             <p
               className="flex items-center gap-0.5 text-xxs text-bearish data-[bullish=true]:text-bullish"
               data-bullish={bullish}
@@ -118,7 +119,7 @@ function Authenticated() {
               ) : (
                 <TriangleDownIcon width={8} height={8} />
               )}
-              <span>{formatAmountUSD(walletSummary?.totalProfitInUsd ?? 0)}</span>
+              <span>{formatAmountInUsd(walletSummary?.totalProfitInUsd ?? 0)}</span>
             </p>
           </div>
         </Button>

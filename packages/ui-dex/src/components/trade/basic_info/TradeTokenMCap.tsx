@@ -2,6 +2,7 @@ import { Token } from "@chainstream-io/sdk";
 import { Number } from "../../Number";
 import { formatAge } from "../../../libs";
 import { tickAtom, useTranslation } from "@liberfi/ui-base";
+import { formatMCapInUsd } from "@liberfi.io/utils";
 import { useAtomValue } from "jotai";
 import { useMemo } from "react";
 
@@ -23,7 +24,7 @@ export function TradeTokenMCap({ token }: { token: Token }) {
       <div className="text-xs text-neutral font-medium">
         <span className="text-foreground">
           {token.marketData?.marketCapInUsd ? (
-            <Number value={token.marketData.marketCapInUsd} abbreviate defaultCurrencySign="$" />
+            formatMCapInUsd(token.marketData.marketCapInUsd)
           ) : (
             "-"
           )}

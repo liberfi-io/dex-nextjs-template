@@ -22,7 +22,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { Chain } from "@liberfi.io/types";
 import { usePredictWallet, KycModal, SetupModal } from "@liberfi.io/ui-predict";
-import { truncateAddress } from "@liberfi.io/utils";
+import { formatAmount, formatAmountInUsd, truncateAddress } from "@liberfi.io/utils";
 import { useConnectedWallet } from "@liberfi.io/wallet-connector";
 import {
   StyledModal,
@@ -245,7 +245,7 @@ function WalletSelector({
             {current.address ? truncateAddress(current.address) : "—"}
           </div>
           <div className="text-xs text-zinc-500">
-            ${formatUsdc(current.balance ?? 0)} USDC · {current.chainName}
+            {formatUsdc(current.balance ?? 0)} USDC · {current.chainName}
           </div>
         </div>
         <ChevronDownIcon
@@ -295,7 +295,7 @@ function WalletSelector({
                       {w.address ? truncateAddress(w.address) : "—"}
                     </div>
                     <div className="text-xs text-zinc-500">
-                      ${formatUsdc(w.balance ?? 0)} USDC · {w.chainName}
+                      {formatUsdc(w.balance ?? 0)} USDC · {w.chainName}
                     </div>
                   </div>
                 </button>
@@ -487,7 +487,7 @@ function MainScreen({
               <div className="flex items-center justify-center gap-2">
                 <UsdcIcon width={24} height={24} />
               <span className="text-2xl font-bold text-[#c7ff2e] tabular-nums">
-                ${formatUsdc(balance ?? 0)}
+                {formatUsdc(balance ?? 0)}
               </span>
               <span className="text-sm text-zinc-500 self-end mb-0.5">USDC</span>
               </div>
@@ -771,7 +771,7 @@ function KalshiDepositBody({
         <div className="flex items-center gap-1.5">
           <UsdcIcon width={14} height={14} />
           <span className="text-sm font-medium text-[#c7ff2e] tabular-nums">
-            ${formatUsdc(balance ?? 0)}
+            {formatUsdc(balance ?? 0)}
           </span>
         </div>
       </div>
@@ -962,7 +962,7 @@ function PolymarketDepositBody({
         <div className="flex items-center gap-1.5">
           <UsdcIcon width={14} height={14} />
           <span className="text-sm font-medium text-[#c7ff2e] tabular-nums">
-            ${formatUsdc(balance ?? 0)}
+            {formatUsdc(balance ?? 0)}
           </span>
         </div>
       </div>
@@ -1174,7 +1174,7 @@ function WithdrawScreen({
 
   const handleMax = useCallback(() => {
     if (balance != null) {
-      setAmount(formatUsdc(balance));
+      setAmount((Math.floor(balance * 100) / 100).toString());
     }
   }, [balance]);
 
@@ -1336,7 +1336,7 @@ function WithdrawScreen({
             <span className="text-xs text-zinc-400">{t("extend.predict.fundWallet.available")}</span>
           </div>
           <span className="text-sm font-medium text-white tabular-nums">
-            ${formatUsdc(balance ?? 0)}
+            {formatUsdc(balance ?? 0)}
           </span>
         </div>
 
@@ -1427,10 +1427,7 @@ function toCents(amount: number): number {
 }
 
 function formatCents(cents: number): string {
-  return (cents / 100).toLocaleString("en-US", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
+  return formatAmount(cents / 100);
 }
 
 function formatUsdc(amount: number): string {
@@ -1444,8 +1441,7 @@ function formatUsdc(amount: number): string {
  * while preserving meaningful cents (e.g. `$0.50`).
  */
 function formatMinAmount(usd: number): string {
-  if (Number.isInteger(usd)) return `$${usd}`;
-  return `$${usd.toFixed(2)}`;
+  return formatAmountInUsd(usd);
 }
 
 const WITHDRAW_ERROR_PATTERNS: [RegExp, string][] = [

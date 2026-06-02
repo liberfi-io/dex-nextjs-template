@@ -3,7 +3,7 @@ import { cn, StyledTooltip } from "@liberfi.io/ui";
 import { Chain, getPrimaryTokenAvatar } from "@liberfi/core";
 import { useTranslation } from "@liberfi/ui-base";
 import { CHAIN_QUOTE_TOKEN_SYMBOLS, useQuotePrice } from "@liberfi/ui-dex";
-import { formatPriceUSD } from "src/libs/formatters";
+import { formatPriceInUsd } from "@liberfi.io/utils";
 
 const avatar = getPrimaryTokenAvatar(Chain.SOLANA);
 
@@ -17,7 +17,7 @@ export function BottomSolPrice() {
       <div className="flex items-center gap-1">
         <Avatar className="w-4.5 h-4.5 bg-transparent" src={avatar} />
         <span className={cn("text-xs font-medium", quotePrice ? "text-bullish" : "text-neutral")}>
-          {quotePrice ? formatPriceUSD(quotePrice) : "--"}
+          {quotePrice ? formatPriceInUsd(quotePrice) : "--"}
         </span>
       </div>
     </StyledTooltip>
