@@ -8,8 +8,8 @@ import {
   CheckIcon,
   cn,
   CopyIcon,
+  Sortable,
   StyledTooltip,
-  TriangleDownIcon,
   toast,
   useCopyToClipboard,
   VirtualList,
@@ -49,15 +49,25 @@ const GRID_TEMPLATE_COLUMNS =
   "minmax(190px, 190fr) minmax(110px, 110fr) minmax(110px, 110fr) minmax(180px, 180fr) minmax(180px, 180fr) minmax(130px, 130fr) minmax(130px, 130fr) minmax(140px, 140fr) minmax(110px, 110fr)";
 type TokenTopTradersSortBy =
   | "profit"
+  | "totalPnl"
+  | "realizedPnl"
+  | "unrealizedPnl"
   | "buyVolume"
   | "sellVolume"
   | "lastActiveAt"
-  | "netflowUsd";
+  | "netflowUsd"
+  | "createdAt";
+type TokenTopTradersSortDirection = "asc" | "desc";
 type TokenTopTradersListScriptWithSort = ReturnType<
   typeof useTokenTopTradersListScript
 > & {
   sortBy: TokenTopTradersSortBy | undefined;
+  sortDirection: TokenTopTradersSortDirection | undefined;
   setSortBy: (s: TokenTopTradersSortBy) => void;
+  setSort: (
+    sortBy: TokenTopTradersSortBy | undefined,
+    direction?: TokenTopTradersSortDirection,
+  ) => void;
 };
 const TOP_TRADER_SORT_BY_COLUMN: Partial<
   Record<string, TokenTopTradersSortBy>
@@ -65,7 +75,8 @@ const TOP_TRADER_SORT_BY_COLUMN: Partial<
   activity: "lastActiveAt",
   total_buy: "buyVolume",
   total_sell: "sellVolume",
-  realized_pnl: "profit",
+  realized_pnl: "realizedPnl",
+  total_pnl: "totalPnl",
 };
 
 type TokenTopTraderRow = ReturnType<
@@ -101,7 +112,15 @@ export function BottomTopTradersTable({
   address,
 }: BottomTopTradersTableProps) {
   const { t } = useTranslation();
-  const { traders, isLoading, sortBy, setSortBy, hasMore, loadMore } =
+  const {
+    traders,
+    isLoading,
+    sortBy,
+    sortDirection,
+    setSort,
+    hasMore,
+    loadMore,
+  } =
     useTokenTopTradersListScript({
       chain,
       address,
@@ -162,7 +181,8 @@ export function BottomTopTradersTable({
                     }
                     sortBy={TOP_TRADER_SORT_BY_COLUMN[col.key]}
                     activeSortBy={sortBy}
-                    onSortByChange={setSortBy}
+                    activeSortDirection={sortDirection}
+                    onSortChange={setSort}
                   />
                 ) : (
                   t(col.labelKey)
@@ -197,77 +217,68 @@ function TopTraderSortHeader({
   sortBeforeSlash,
   sortBy,
   activeSortBy,
-  onSortByChange,
+  activeSortDirection,
+  onSortChange,
 }: {
   label: string;
   sortBeforeSlash?: boolean;
   sortBy: TokenTopTradersSortBy | undefined;
   activeSortBy: TokenTopTradersSortBy | undefined;
-  onSortByChange: (sortBy: TokenTopTradersSortBy) => void;
+  activeSortDirection: TokenTopTradersSortDirection | undefined;
+  onSortChange: (
+    sortBy: TokenTopTradersSortBy | undefined,
+    direction?: TokenTopTradersSortDirection,
+  ) => void;
 }) {
   if (!sortBy) return label;
 
   const active = sortBy === activeSortBy;
+  const sort = active ? activeSortDirection : undefined;
+  const handleSortChange = (direction?: TokenTopTradersSortDirection) => {
+    onSortChange(direction ? sortBy : undefined, direction);
+  };
   return (
-    <button
-      type="button"
-      className={cn(
-        "inline-flex cursor-pointer items-center gap-1 bg-transparent p-0 font-inherit text-inherit transition-colors",
-        active ? "text-foreground" : "hover:text-foreground",
-      )}
-      aria-pressed={active}
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        onSortByChange(sortBy);
-      }}
-    >
+    <span className="inline-flex items-center gap-1">
       {sortBeforeSlash ? (
-        <SortLabelWithIconBeforeSlash label={label} active={active} />
+        <SortLabelWithIconBeforeSlash
+          label={label}
+          sort={sort}
+          onSortChange={handleSortChange}
+        />
       ) : (
-        <>
-          <span>{label}</span>
-          <SortArrow active={active} />
-        </>
+        <Sortable sort={sort} onSortChange={handleSortChange}>
+          {label}
+        </Sortable>
       )}
-    </button>
+    </span>
   );
 }
 
 function SortLabelWithIconBeforeSlash({
   label,
-  active,
+  sort,
+  onSortChange,
 }: {
   label: string;
-  active: boolean;
+  sort?: TokenTopTradersSortDirection;
+  onSortChange: (direction?: TokenTopTradersSortDirection) => void;
 }) {
   const slashIndex = label.indexOf("/");
   if (slashIndex < 0) {
     return (
-      <>
-        <span>{label}</span>
-        <SortArrow active={active} />
-      </>
+      <Sortable sort={sort} onSortChange={onSortChange}>
+        {label}
+      </Sortable>
     );
   }
 
   return (
     <>
-      <span>{label.slice(0, slashIndex).trimEnd()}</span>
-      <SortArrow active={active} />
+      <Sortable sort={sort} onSortChange={onSortChange}>
+        {label.slice(0, slashIndex).trimEnd()}
+      </Sortable>
       <span>{label.slice(slashIndex)}</span>
     </>
-  );
-}
-
-function SortArrow({ active }: { active: boolean }) {
-  return (
-    <TriangleDownIcon
-      width={8}
-      height={8}
-      className={cn(active ? "text-foreground" : "text-default-400")}
-      aria-hidden
-    />
   );
 }
 
@@ -467,14 +478,14 @@ const TradeFlowCell = memo(function TradeFlowCell({
       )}
     >
       <div className={cn("text-[12px] leading-4", tone)}>
-        {volumeUsd ? formatAmountInUsd(volumeUsd) : "--"}
+        {formatAmountInUsdOrZero(volumeUsd)}
         <span className="px-1 text-default-500">/</span>
-        {avgPriceUsd ? formatAmountInUsd(avgPriceUsd) : "--"}
+        {formatAmountInUsdOrZero(avgPriceUsd)}
       </div>
       <div className="text-[11px] leading-4 text-neutral">
-        {tokenAmount ? formatAmount(tokenAmount) : "--"}
+        {formatAmountOrZero(tokenAmount)}
         <span className="px-1">/</span>
-        {count ?? "--"} {TX_LABEL}
+        {(count ?? 0).toLocaleString()} {TX_LABEL}
       </div>
     </div>
   );
@@ -489,7 +500,7 @@ const PnlCell = memo(function PnlCell({
   ratio?: string;
   strong?: boolean;
 }) {
-  const n = value === undefined || value === "" ? undefined : Number(value);
+  const n = value === undefined || value === "" ? 0 : Number(value);
   const tone =
     n === undefined || Number.isNaN(n)
       ? "text-default-500"
@@ -510,12 +521,10 @@ const PnlCell = memo(function PnlCell({
       style={{ letterSpacing: "-0.2px" }}
     >
       <div className="text-[12px] leading-4">
-        {value
-          ? formatAmountInUsd(value, { showPlusGtThanZero: true })
-          : "--"}
+        {formatAmountInUsdOrZero(value, { showPlusGtThanZero: true })}
       </div>
       <div className="text-[11px] leading-4">
-        {formatRatioFromOne(ratio, { signed: true })}
+        {formatRatioFromOne(ratio ?? 0, { signed: true })}
       </div>
     </div>
   );
@@ -708,6 +717,21 @@ function formatRatioFromOne(
   const n = Number(value);
   if (Number.isNaN(n)) return "--";
   return formatPercent(n, { showPlusGtThanZero: options?.signed });
+}
+
+function formatAmountInUsdOrZero(
+  value: string | number | undefined,
+  options?: Parameters<typeof formatAmountInUsd>[1],
+): string {
+  return formatAmountInUsd(normalizeNumberLikeOrZero(value), options);
+}
+
+function formatAmountOrZero(value: string | number | undefined): string {
+  return formatAmount(normalizeNumberLikeOrZero(value));
+}
+
+function normalizeNumberLikeOrZero(value: string | number | undefined) {
+  return value === undefined || value === null || value === "" ? "0" : value;
 }
 
 function parseRatioFrom100(value: string | number | undefined): number | undefined {
