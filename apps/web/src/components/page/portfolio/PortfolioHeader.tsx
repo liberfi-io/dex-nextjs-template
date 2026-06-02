@@ -17,12 +17,9 @@ import {
   useRefetchWalletSummary,
   useWalletSummary,
 } from "@liberfi.io/ui-portfolio";
-import {
-  formatAmountUSD,
-  formatPercent,
-  truncateAddress,
-} from "@liberfi.io/utils";
+import { formatPercent, truncateAddress } from "@liberfi.io/utils";
 import { useCreateOnrampWidgetUrlMutation } from "@liberfi/react-backend";
+import { formatAmountUSD } from "src/libs/formatters";
 import { CashInOutlinedIcon } from "../../icons/CashInOutlinedIcon";
 import { ReceiveOutlinedIcon } from "../../icons/ReceiveOutlinedIcon";
 import { SendOutlinedIcon } from "../../icons/SendOutlinedIcon";

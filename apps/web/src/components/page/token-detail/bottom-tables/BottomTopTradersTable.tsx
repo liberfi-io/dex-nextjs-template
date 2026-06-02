@@ -1,5 +1,6 @@
 "use client";
 
+import { formatAmountCompact, formatAmountUSDCompact } from "src/libs/formatters";
 import { useTickAge } from "@liberfi.io/hooks";
 import { useTokenTopTradersListScript } from "@liberfi.io/ui-tokens";
 import type { Chain } from "@liberfi.io/types";
@@ -15,11 +16,9 @@ import {
   type VirtualRowComponentProps,
 } from "@liberfi.io/ui";
 import {
-  formatAge,
-  formatAmountCompact,
-  formatAmountUSDCompact,
-  formatPercent,
   accountExplorerUrl,
+  formatAge,
+  formatPercent,
   truncateAddress,
 } from "@liberfi.io/utils";
 import { useTranslation } from "@liberfi/ui-base";

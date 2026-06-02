@@ -1,20 +1,13 @@
 "use client";
 
+import { formatAmountUSD, formatPriceUSD } from "src/libs/formatters";
 import { useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
-import {
-  useTokensQuery,
-  useWalletPortfolioPnlsQuery,
-} from "@liberfi.io/react";
+import { useTokensQuery, useWalletPortfolioPnlsQuery } from "@liberfi.io/react";
 import { usePortfolioNetWorthTokensScript } from "@liberfi.io/ui-portfolio";
 import type { Chain, Portfolio, PortfolioPnl, Token } from "@liberfi.io/types";
 import { cn } from "@liberfi.io/ui";
-import {
-  formatAmount,
-  formatAmountUSD,
-  formatPercent,
-  formatPriceUSD,
-} from "@liberfi.io/utils";
+import { formatAmount, formatPercent } from "@liberfi.io/utils";
 import { useTranslation } from "@liberfi/ui-base";
 import { tokenDetailRoute } from "@liberfi/ui-dex/libs/routes";
 import {

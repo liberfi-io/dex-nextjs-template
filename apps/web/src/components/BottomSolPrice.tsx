@@ -1,9 +1,9 @@
 import { Avatar } from "@heroui/react";
 import { cn, StyledTooltip } from "@liberfi.io/ui";
-import { formatPriceUSD } from "@liberfi.io/utils";
 import { Chain, getPrimaryTokenAvatar } from "@liberfi/core";
 import { useTranslation } from "@liberfi/ui-base";
 import { CHAIN_QUOTE_TOKEN_SYMBOLS, useQuotePrice } from "@liberfi/ui-dex";
+import { formatPriceUSD } from "src/libs/formatters";
 
 const avatar = getPrimaryTokenAvatar(Chain.SOLANA);
 

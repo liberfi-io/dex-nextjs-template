@@ -1,3 +1,4 @@
+import { formatAmountUSD, formatPriceUSD } from "src/libs/formatters";
 import { Skeleton } from "@heroui/react";
 import { useTickAge } from "@liberfi.io/hooks";
 import { useTokenQuery } from "@liberfi.io/react";
@@ -21,9 +22,7 @@ import { TokenAvatar } from "@liberfi.io/ui-tokens";
 import {
   formatAge,
   formatAmount,
-  formatAmountUSD,
   formatPercent,
-  formatPriceUSD,
   SafeBigNumber,
   searchTwitterUrl,
 } from "@liberfi.io/utils";

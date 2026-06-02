@@ -1,5 +1,10 @@
 "use client";
 
+import {
+  formatAmountCompact,
+  formatAmountUSDCompact,
+  formatPriceUSD,
+} from "src/libs/formatters";
 import { useTickAge } from "@liberfi.io/hooks";
 import { useTokenActivitiesListScript } from "@liberfi.io/ui-tokens";
 import type { Activity, ActivityType, Chain } from "@liberfi.io/types";
@@ -16,10 +21,7 @@ import {
 } from "@liberfi.io/ui";
 import {
   accountExplorerUrl,
-  formatAmountCompact,
-  formatAmountUSDCompact,
   formatAge,
-  formatPriceUSD,
   txExplorerUrl,
   truncateAddress,
 } from "@liberfi.io/utils";

@@ -1,21 +1,12 @@
 "use client";
 
+import { formatAmountUSDCompact } from "src/libs/formatters";
 import { useMemo, useRef } from "react";
 import { useTokensQuery } from "@liberfi.io/react";
 import { usePortfolioActivitiesScript } from "@liberfi.io/ui-portfolio";
-import type {
-  Activity,
-  ActivityType,
-  Chain,
-  Token,
-} from "@liberfi.io/types";
+import type { Activity, ActivityType, Chain, Token } from "@liberfi.io/types";
 import { cn } from "@liberfi.io/ui";
-import {
-  formatAmount,
-  formatAmountUSDCompact,
-  truncateAddress,
-  txExplorerUrl,
-} from "@liberfi.io/utils";
+import { formatAmount, truncateAddress, txExplorerUrl } from "@liberfi.io/utils";
 import { useTranslation } from "@liberfi/ui-base";
 import {
   alignClass,
