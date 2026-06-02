@@ -24,25 +24,29 @@ import { SidebarTokenAudit } from "./SidebarTokenAudit";
 import { SidebarVolumeStats } from "./SidebarVolumeStats";
 import { TokenDetailHeaderMobile } from "./TokenDetailHeaderMobile";
 
-export interface AxiomTradeMobilePageProps {
+export interface TokenTradeMobilePageProps {
   chain: Chain;
   address: string;
 }
 
 type BottomTab = "trades" | "holders" | "top-traders" | "dev-tokens";
 
-/** Fixed height (in px) reserved for the bottom-anchored {@link MobileTradeBar}
+/**
+ * Fixed height (in px) reserved for the bottom-anchored {@link MobileTradeBar}
  *  trigger. ≈64px = 44px button + 12px top padding + 8px safe-area baseline;
  *  iOS bumps the bottom inset via `env(safe-area-inset-bottom)`. Used to pad
  *  the scroll container so the last list row isn't obscured by the floating
- *  CTA bar. */
+ *  CTA bar.
+ */
 const TRADE_BAR_RESERVE_PX = 64;
 
-/** K-line chart height on mobile. Must match {@link TradingChart}'s intrinsic
+/**
+ * K-line chart height on mobile. Must match {@link TradingChart}'s intrinsic
  *  mobile height (`h-[400px]`) — that component sets a fixed 400px below the
  *  `md` breakpoint, so any container shorter than 400px causes the chart's
  *  bottom toolbar (timeframe / date-range icons) to bleed into the audit grid
- *  below it. */
+ *  below it.
+ */
 const MOBILE_CHART_HEIGHT_PX = 400;
 
 /**
@@ -81,10 +85,10 @@ const MOBILE_CHART_HEIGHT_PX = 400;
  * `SidebarSecurityCheck`, the four `Bottom*Table`s) so we only need to
  * maintain one set of styles + i18n keys per section.
  */
-export function AxiomTradeMobilePage({
+export function TokenTradeMobilePage({
   chain,
   address,
-}: AxiomTradeMobilePageProps) {
+}: TokenTradeMobilePageProps) {
   const { t } = useTranslation();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [tab, setTab] = useState<BottomTab>("trades");

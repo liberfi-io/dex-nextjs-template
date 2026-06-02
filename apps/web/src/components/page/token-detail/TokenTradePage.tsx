@@ -1,13 +1,18 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  type PointerEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useHideBottomNavigationBar, useHideHeader } from "@liberfi/ui-base";
 import { TradingChart } from "@liberfi/ui-dex/components/trade";
 import type { Chain } from "@liberfi.io/types";
 import { useScreen } from "@liberfi.io/ui";
-import { AxiomSplitHandle } from "@liberfi.io/ui-scaffold";
 import { BottomDataPanel } from "./BottomDataPanel";
-import { AxiomTradeMobilePage } from "./AxiomTradeMobilePage";
+import { TokenTradeMobilePage } from "./TokenTradeMobilePage";
 import { SidebarBasicInfo } from "./SidebarBasicInfo";
 import { SidebarSecurityCheck } from "./SidebarSecurityCheck";
 import { SidebarTokenAudit } from "./SidebarTokenAudit";
@@ -34,9 +39,116 @@ const MIN_BOTTOM_REVEAL = 200;
 /** Fallback header height before the ResizeObserver has measured the DOM. */
 const FALLBACK_HEADER_H = 72;
 
-export interface AxiomTradePageProps {
+export interface TokenTradePageProps {
   chain: Chain;
   address: string;
+}
+
+interface TokenSplitHandleProps {
+  orientation?: "horizontal" | "vertical";
+  onDrag: (delta: number) => void;
+  onDragStart?: () => void;
+  onDragEnd?: () => void;
+  grabZone?: number;
+  className?: string;
+}
+
+function TokenSplitHandle({
+  orientation = "horizontal",
+  onDrag,
+  onDragStart,
+  onDragEnd,
+  grabZone = 6,
+  className,
+}: TokenSplitHandleProps) {
+  const isHorizontal = orientation === "horizontal";
+  const [isDragging, setIsDragging] = useState(false);
+  const lastPositionRef = useRef<number | null>(null);
+
+  const handlePointerDown = useCallback(
+    (event: PointerEvent<HTMLDivElement>) => {
+      event.preventDefault();
+      event.currentTarget.setPointerCapture(event.pointerId);
+      lastPositionRef.current = isHorizontal ? event.clientY : event.clientX;
+      setIsDragging(true);
+      onDragStart?.();
+    },
+    [isHorizontal, onDragStart],
+  );
+
+  const handlePointerMove = useCallback(
+    (event: PointerEvent<HTMLDivElement>) => {
+      if (lastPositionRef.current == null) return;
+
+      const currentPosition = isHorizontal ? event.clientY : event.clientX;
+      const delta = currentPosition - lastPositionRef.current;
+
+      if (delta !== 0) {
+        lastPositionRef.current = currentPosition;
+        onDrag(delta);
+      }
+    },
+    [isHorizontal, onDrag],
+  );
+
+  const handlePointerEnd = useCallback(
+    (event: PointerEvent<HTMLDivElement>) => {
+      if (lastPositionRef.current == null) return;
+
+      try {
+        event.currentTarget.releasePointerCapture(event.pointerId);
+      } catch {
+        // Pointer capture may already be released by the browser.
+      }
+      lastPositionRef.current = null;
+      setIsDragging(false);
+      onDragEnd?.();
+    },
+    [onDragEnd],
+  );
+
+  const hitAreaStyle = isHorizontal
+    ? { top: -grabZone, bottom: -grabZone, left: 0, right: 0 }
+    : { left: -grabZone, right: -grabZone, top: 0, bottom: 0 };
+
+  return (
+    <div
+      role="separator"
+      aria-orientation={isHorizontal ? "horizontal" : "vertical"}
+      className={[
+        "group relative flex items-center justify-center bg-default-200 text-default-400 transition-colors duration-150 ease-in-out hover:bg-default-400 hover:text-foreground/80",
+        isHorizontal
+          ? "h-[4px] w-full cursor-ns-resize"
+          : "h-full w-[4px] cursor-ew-resize",
+        isDragging ? "bg-default-400 text-foreground/80" : "",
+        className ?? "",
+      ].join(" ")}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerEnd}
+      onPointerCancel={handlePointerEnd}
+    >
+      <span
+        className={[
+          "flex items-center justify-center gap-[2px]",
+          isHorizontal ? "flex-row" : "flex-col",
+        ].join(" ")}
+        aria-hidden="true"
+      >
+        <span className="size-[2px] rounded-full bg-current" />
+        <span className="size-[2px] rounded-full bg-current" />
+        <span className="size-[2px] rounded-full bg-current" />
+      </span>
+      <div
+        aria-hidden="true"
+        className={[
+          "absolute",
+          isHorizontal ? "cursor-ns-resize" : "cursor-ew-resize",
+        ].join(" ")}
+        style={hitAreaStyle}
+      />
+    </div>
+  );
 }
 
 /**
@@ -49,19 +161,19 @@ export interface AxiomTradePageProps {
  *      (the panel is constrained via `overflow-hidden`; inner `flex-1
  *      overflow-auto` handles the table body).
  */
-export function AxiomTradePage({ chain, address }: AxiomTradePageProps) {
+export function TokenTradePage({ chain, address }: TokenTradePageProps) {
   useHideHeader("tablet");
   useHideBottomNavigationBar();
 
   const { isMobile } = useScreen();
   if (isMobile) {
-    return <AxiomTradeMobilePage chain={chain} address={address} />;
+    return <TokenTradeMobilePage chain={chain} address={address} />;
   }
 
-  return <AxiomTradeDesktopPage chain={chain} address={address} />;
+  return <TokenTradeDesktopPage chain={chain} address={address} />;
 }
 
-function AxiomTradeDesktopPage({ chain, address }: AxiomTradePageProps) {
+function TokenTradeDesktopPage({ chain, address }: TokenTradePageProps) {
   const [chartH, setChartH] = useState(DEFAULT_CHART_H);
   // Dynamic height for the bottom data panel container. Synchronised with
   // the right-sidebar panel's natural content height so the LEFT column's
@@ -191,7 +303,7 @@ function AxiomTradeDesktopPage({ chain, address }: AxiomTradePageProps) {
             <TradingChart />
           </div>
 
-          <AxiomSplitHandle
+          <TokenSplitHandle
             orientation="horizontal"
             onDrag={handleDrag}
           />

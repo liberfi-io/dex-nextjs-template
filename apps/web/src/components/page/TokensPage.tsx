@@ -5,13 +5,13 @@ import { useMemo } from "react";
 import { chainIdBySlug } from "@liberfi.io/utils";
 import { tokenDetailRoute } from "@liberfi/ui-dex/libs/routes";
 import { TradeDataLoader } from "@liberfi/ui-dex/components/trade";
-import { AxiomTradePage } from "./token-detail/AxiomTradePage";
+import { TokenTradePage } from "./token-detail/TokenTradePage";
 
 /**
  * Token detail entry for the (new) route group.
  *
  * Note: `TradeDataProvider` is deliberately NOT mounted here. The (new)
- * `AxiomTradePage` and its descendants do not consume `useTradeDataContext`
+ * `TokenTradePage` and its descendants do not consume `useTradeDataContext`
  * (its remaining downstream — `TradeHeader` / `TradeFooter` / `TradeTokenTabs`
  * / `RealTimeTradeList` — lives in legacy `TradePage` only), so wrapping the
  * new tree with the provider added zero benefit while forcing every page
@@ -41,7 +41,7 @@ export function TokensPage() {
 
   return (
     <TradeDataLoader chainId={chainId} address={address}>
-      <AxiomTradePage chain={chainId} address={address} />
+      <TokenTradePage chain={chainId} address={address} />
     </TradeDataLoader>
   );
 }

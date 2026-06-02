@@ -18,7 +18,7 @@ import { formatAmountInUsd } from "@liberfi.io/utils";
 const MAX_SLICES = 8;
 
 /**
- * Brand-tinted palette aligned with the AxiomTrade dashboard. We reuse a
+ * Brand-tinted palette aligned with the token trade dashboard. We reuse a
  * stable index so the same token always gets the same color across renders
  * (top-by-value ordering is deterministic on the same data set).
  */

@@ -165,9 +165,9 @@ export function PerpetualsPage() {
     setShowSearch(false);
   }, []);
 
-  // Open-orders count rendered next to the tab label (Axiom shows
-  // `Open Orders (N)`). The bottom panel — Positions and Open Orders
-  // alike — mirrors Axiom by showing **all coins**, not filtered by
+  // Open-orders count rendered next to the tab label as
+  // `Open Orders (N)`. The bottom panel — Positions and Open Orders
+  // alike — shows **all coins**, not filtered by
   // the chart symbol. The query runs without a `symbol` filter so:
   //   1. It hits the same react-query cache slot the SDK's `webData2`
   //      WebSocket subscription writes to (via
@@ -255,10 +255,8 @@ export function PerpetualsPage() {
                   remaining ~40%.
 
                   `PositionsWidget` and `OpenOrdersWidget` are mounted
-                  WITHOUT `symbol` so they show **all coins**, matching
-                  Axiom's bottom-panel behaviour (verified via MCP — Axiom
-                  shows BTC + ETH rows together regardless of the
-                  selected chart). This also aligns the widget's
+                  WITHOUT `symbol` so they show **all coins** regardless
+                  of the selected chart. This also aligns the widget's
                   react-query cache key with the slot
                   `useAccountStateSubscription` writes to from the
                   `webData2` push, so the table populates the instant the
@@ -487,7 +485,7 @@ export function PerpetualsPage() {
               ))}
             </div>
             {/* Positions / Open Orders are all-coin (no `symbol` filter)
-                to match Axiom and keep the cache key aligned with the
+                to keep the cache key aligned with the
                 webData2 WS write — see the mobile branch above for the
                 full rationale. */}
             <div className="flex-1 min-h-0 overflow-auto" style={{ backgroundColor: '#000000' }}>

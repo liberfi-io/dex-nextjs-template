@@ -15,7 +15,7 @@ import { PortfolioHeaderSkeleton } from "./skeletons/PortfolioHeaderSkeleton";
 
 /**
  * `/portfolio` page — wallet identity card + token allocation breakdown +
- * tabbed assets/activities tables. Visual rhythm follows AxiomTradePage:
+ * tabbed assets/activities tables. Visual rhythm follows TokenTradePage:
  * a max-width container with an ambient glow, a top "summary row" that
  * reflows from row to column on mobile, and a tall bottom panel that owns
  * its own scroll for the long activity / asset feeds.
@@ -51,7 +51,7 @@ export function PortfolioPage() {
 
   return (
     <div className="relative w-full h-full">
-      {/* Ambient glow — same accent as AxiomTradePage */}
+      {/* Ambient glow — same accent as TokenTradePage */}
       <div
         className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] opacity-[0.07]"
         style={{
