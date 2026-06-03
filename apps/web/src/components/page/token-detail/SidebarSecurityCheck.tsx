@@ -1,7 +1,10 @@
 "use client";
 
-import { useTokenSecurityQuery } from "@liberfi.io/react";
-import type { Chain, TokenSecurity } from "@liberfi.io/types";
+import { useTokenQuery, useTokenSecurityQuery } from "@liberfi.io/react";
+import {
+  Chain,
+  type TokenMarketData,
+} from "@liberfi.io/types";
 import {
   CheckIcon,
   Link,
@@ -10,9 +13,18 @@ import {
   cn,
 } from "@liberfi.io/ui";
 import { CollapsibleSection } from "@liberfi.io/ui-scaffold";
+import { formatPercent, SafeBigNumber } from "@liberfi.io/utils";
 import { useTranslation } from "@liberfi/ui-base";
 import Image from "next/image";
-import { useMemo } from "react";
+import { type ReactNode, useMemo } from "react";
+import { buildSecurityProviderLinks } from "./securityLinks";
+import {
+  getBurnRatio,
+  getHasBlacklist,
+  getIsLpBurned,
+  getMintAuthorityRenounced,
+  type TokenSecurityDetails,
+} from "./securityMetrics";
 
 export interface SidebarSecurityCheckProps {
   chain: Chain;
@@ -27,6 +39,10 @@ interface CheckSpec {
   key: string;
   /** Resolved status from the security payload. */
   status: CheckStatus;
+  /** Optional value rendered before the status icon. */
+  value?: ReactNode;
+  /** Whether to render the status icon. */
+  showIcon?: boolean;
 }
 
 /**
@@ -58,11 +74,18 @@ export function SidebarSecurityCheck({
   address,
 }: SidebarSecurityCheckProps) {
   const { t } = useTranslation();
-  const { data: security } = useTokenSecurityQuery({ chain, address });
+  const { data: token } = useTokenQuery({ chain, address });
+  const { data: securityData } = useTokenSecurityQuery({ chain, address });
+  const security = securityData as TokenSecurityDetails | undefined;
 
   const checks = useMemo<CheckSpec[]>(
-    () => buildChecks(security),
-    [security],
+    () => buildChecks(chain, token?.marketData, security, t),
+    [chain, token?.marketData, security, t],
+  );
+
+  const providerLinks = useMemo(
+    () => buildSecurityProviderLinks(chain, address),
+    [chain, address],
   );
 
   const overall = useMemo<CheckStatus>(() => {
@@ -105,24 +128,34 @@ export function SidebarSecurityCheck({
             label={t(`extend.trade.security_check.items.${c.key}`)}
             tooltip={t(`extend.trade.security_check.items.${c.key}_tip`)}
             status={c.status}
+            value={c.value}
+            showIcon={c.showIcon}
           />
         ))}
       </ul>
 
-      <Link
-        href={t("extend.trade.security_check.external_link")}
-        target="_blank"
-        className="mt-3 flex items-center justify-end gap-1.5 text-[12px] text-default-500 transition-colors hover:text-primary-200"
-      >
-        <Image
-          src="/goplus.svg"
-          alt="GoPlus"
-          width={14}
-          height={12}
-          className="shrink-0"
-        />
-        <span>{t("extend.trade.security_check.powered_by")}</span>
-      </Link>
+      {providerLinks.length > 0 && (
+        <div className="mt-3 flex flex-nowrap items-center gap-3">
+          {providerLinks.map((provider) => (
+            <Link
+              key={provider.key}
+              href={provider.href}
+              target="_blank"
+              rel="noreferrer"
+              className="flex min-w-0 cursor-pointer items-center gap-1 text-[12px] font-medium text-foreground transition-opacity hover:opacity-80"
+            >
+              <Image
+                src={provider.iconSrc}
+                alt={provider.label}
+                width={provider.iconWidth}
+                height={provider.iconHeight}
+                className="shrink-0"
+              />
+              <span>{provider.label}</span>
+            </Link>
+          ))}
+        </div>
+      )}
     </CollapsibleSection>
   );
 }
@@ -131,10 +164,14 @@ function CheckRow({
   label,
   tooltip,
   status,
+  value,
+  showIcon = true,
 }: {
   label: string;
   tooltip: string;
   status: CheckStatus;
+  value?: ReactNode;
+  showIcon?: boolean;
 }) {
   return (
     <li className="flex h-7 items-center justify-between gap-2">
@@ -143,7 +180,10 @@ function CheckRow({
           {label}
         </span>
       </StyledTooltip>
-      <StatusIndicator status={status} />
+      <span className="flex shrink-0 items-center gap-1 text-[12px] font-medium text-foreground tabular-nums">
+        {value}
+        {showIcon && <StatusIndicator status={status} />}
+      </span>
     </li>
   );
 }
@@ -164,14 +204,48 @@ function StatusIndicator({ status }: { status: CheckStatus }) {
  * value that should be considered safe (e.g. `hasTransferFee` is safe when
  * `false`, while `isTransferable` is safe when `true`).
  */
-function buildChecks(security: TokenSecurity | undefined): CheckSpec[] {
+function buildChecks(
+  chain: Chain,
+  marketData: TokenMarketData | undefined,
+  security: TokenSecurityDetails | undefined,
+  t: (key: string) => string,
+): CheckSpec[] {
+  if (chain === Chain.SOLANA) {
+    return [
+      flagCheck("mint_renounced", getMintAuthorityRenounced(security), true),
+      flagCheck("no_blacklist", getHasBlacklist(security), false),
+      burnCheck("lp_burned", security),
+      top10Check(marketData?.top10HoldingsRatio),
+    ];
+  }
+
+  if (chain === Chain.BINANCE || chain === Chain.ETHEREUM) {
+    return [
+      flagCheck("open_source", security?.isOpenSource, true),
+      flagCheck("not_honeypot", security?.isHoneypot, false),
+      flagCheck("ownership_renounced", security?.isOwnershipRenounced, true),
+      flagCheck("no_blacklist", security?.hasBlacklist, false),
+      taxPairCheck(
+        "buy_sell_tax",
+        t("extend.trade.security_check.values.buy"),
+        security?.buyTaxRatio,
+        t("extend.trade.security_check.values.sell"),
+        security?.sellTaxRatio,
+      ),
+      taxPairCheck(
+        "tax_rate",
+        t("extend.trade.security_check.values.average"),
+        security?.averageTaxRatio,
+        t("extend.trade.security_check.values.high"),
+        security?.maxTaxRatio,
+      ),
+      serializedSafetyCheck(security),
+    ];
+  }
+
   return [
     flagCheck("no_transfer_fee", security?.hasTransferFee, false),
-    flagCheck(
-      "fee_not_upgradable",
-      security?.isTransferFeeUpgradable,
-      false,
-    ),
+    flagCheck("fee_not_upgradable", security?.isTransferFeeUpgradable, false),
     flagCheck("transferable", security?.isTransferable, true),
     flagCheck("not_freezable", security?.isFreezable, false),
     flagCheck("not_closable", security?.isClosable, false),
@@ -185,4 +259,69 @@ function flagCheck(
 ): CheckSpec {
   if (value === undefined) return { key, status: "unknown" };
   return { key, status: value === safeWhen ? "safe" : "risk" };
+}
+
+function top10Check(ratio: string | undefined): CheckSpec {
+  if (!ratio) return { key: "top10", status: "unknown" };
+  const status = new SafeBigNumber(ratio).gte(0.1) ? "risk" : "safe";
+  return {
+    key: "top10",
+    status,
+    value: formatPercent(ratio),
+  };
+}
+
+function burnCheck(
+  key: string,
+  security: TokenSecurityDetails | undefined,
+): CheckSpec {
+  const burnRatio = getBurnRatio(security);
+  if (burnRatio !== undefined) {
+    return {
+      key,
+      status: new SafeBigNumber(burnRatio).gt(0) ? "safe" : "risk",
+      value: formatPercent(burnRatio),
+    };
+  }
+  return flagCheck(key, getIsLpBurned(security), true);
+}
+
+function formatRatioValue(ratio: string | undefined): string {
+  return ratio ? formatPercent(ratio) : "--";
+}
+
+function taxPairCheck(
+  key: string,
+  firstLabel: string,
+  firstRatio: string | undefined,
+  secondLabel: string,
+  secondRatio: string | undefined,
+): CheckSpec {
+  return {
+    key,
+    status: "unknown",
+    showIcon: false,
+    value: (
+      <>
+        {firstLabel} {formatRatioValue(firstRatio)} / {secondLabel}{" "}
+        {formatRatioValue(secondRatio)}
+      </>
+    ),
+  };
+}
+
+function serializedSafetyCheck(security: TokenSecurityDetails | undefined): CheckSpec {
+  const score =
+    security?.serializedCriticalVulnCount ?? security?.serializedVulnCount;
+  if (score === undefined && security?.isSerializedSafe === undefined) {
+    return { key: "security_score", status: "unknown" };
+  }
+  return {
+    key: "security_score",
+    status:
+      security?.isSerializedSafe === false || (score ?? 0) > 0
+        ? "risk"
+        : "safe",
+    value: score ?? 0,
+  };
 }

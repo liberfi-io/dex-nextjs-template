@@ -1,7 +1,10 @@
 "use client";
 
-import { useTokenQuery } from "@liberfi.io/react";
-import type { Chain, TokenMarketData } from "@liberfi.io/types";
+import { useTokenQuery, useTokenSecurityQuery } from "@liberfi.io/react";
+import {
+  Chain,
+  type TokenMarketData,
+} from "@liberfi.io/types";
 import {
   CheckIcon,
   StyledTooltip,
@@ -11,6 +14,13 @@ import {
 import { formatAmount, formatPercent, SafeBigNumber } from "@liberfi.io/utils";
 import { useTranslation } from "@liberfi/ui-base";
 import { ReactNode, useMemo } from "react";
+import {
+  getBurnRatio,
+  getHasBlacklist,
+  getIsLpBurned,
+  getMintAuthorityRenounced,
+  type TokenSecurityDetails,
+} from "./securityMetrics";
 
 export interface SidebarTokenAuditProps {
   chain: Chain;
@@ -29,6 +39,8 @@ interface Metric {
   value: ReactNode;
   /** Visual / semantic status of the value. */
   status: Status;
+  /** Whether to render the leading status badge. */
+  showStatusIcon?: boolean;
 }
 
 /**
@@ -47,13 +59,6 @@ interface Metric {
  *   Row 1 — Holding concentration:  Top 10  | DEV       | Holders | Snipers
  *   Row 2 — Holder cohorts:         Insiders | Bundlers | Pro     | KOL
  *
- * A third row of security flags (transfer fee / freezable / closable /
- * transferable) was intentionally omitted — those data points are not yet
- * surfaced by our token data pipeline, and showing placeholders would be
- * misleading. The translation keys and helper code are kept in
- * `extend.trade.audit.*` so the row can be re-enabled once the upstream
- * signals are available without re-laying out the grid.
- *
  * Risk semantics:
  *   - Ratio metrics (Top 10 / DEV / Snipers / Insiders / Bundlers):
  *     `good` (green ✓) when < 10%, `bad` (red ✗) when ≥ 10%.
@@ -68,10 +73,12 @@ interface Metric {
 export function SidebarTokenAudit({ chain, address }: SidebarTokenAuditProps) {
   const { t } = useTranslation();
   const { data: token } = useTokenQuery({ chain, address });
+  const { data: securityData } = useTokenSecurityQuery({ chain, address });
+  const security = securityData as TokenSecurityDetails | undefined;
 
   const metrics = useMemo<Metric[]>(
-    () => buildMetrics(token?.marketData),
-    [token?.marketData],
+    () => buildMetrics(chain, token?.marketData, security),
+    [chain, token?.marketData, security],
   );
 
   return (
@@ -87,6 +94,7 @@ export function SidebarTokenAudit({ chain, address }: SidebarTokenAuditProps) {
             tooltip={t(`extend.trade.audit.${m.key}_tip`)}
             value={m.value}
             status={m.status}
+            showStatusIcon={m.showStatusIcon}
           />
         ))}
       </div>
@@ -99,11 +107,13 @@ function AuditCell({
   tooltip,
   value,
   status,
+  showStatusIcon = true,
 }: {
   label: string;
   tooltip: string;
   value: ReactNode;
   status: Status;
+  showStatusIcon?: boolean;
 }) {
   const valueColor =
     status === "good"
@@ -122,9 +132,8 @@ function AuditCell({
             "flex items-center justify-center gap-1 text-[12px] font-medium tabular-nums",
             valueColor,
           )}
-          style={{ letterSpacing: "-0.2px" }}
         >
-          <StatusBadge status={status} />
+          {showStatusIcon && <StatusBadge status={status} />}
           {value}
         </span>
       </div>
@@ -152,8 +161,12 @@ function StatusBadge({ status }: { status: Status }) {
  * Splitting this out keeps the JSX dumb and makes the risk-classification
  * rules easy to audit/test in isolation.
  */
-function buildMetrics(md: TokenMarketData | undefined): Metric[] {
-  return [
+function buildMetrics(
+  chain: Chain,
+  md: TokenMarketData | undefined,
+  security: TokenSecurityDetails | undefined,
+): Metric[] {
+  const metrics = [
     // Row 1 — holding concentration / dev exposure
     ratioMetric("top10", md?.top10HoldingsRatio),
     ratioMetric("dev", md?.devHoldingsRatio),
@@ -166,6 +179,28 @@ function buildMetrics(md: TokenMarketData | undefined): Metric[] {
     counterMetric("pro", md?.proHolders),
     counterMetric("kol", md?.kolHolders),
   ];
+
+  if (chain === Chain.SOLANA) {
+    return [
+      ...metrics,
+      booleanMetric("mint_renounced", getMintAuthorityRenounced(security), true),
+      booleanMetric("no_blacklist", getHasBlacklist(security), false),
+      burnMetric("lp_burned", security),
+      unknownMetric("rug_pull"),
+    ];
+  }
+
+  if (chain === Chain.BINANCE || chain === Chain.ETHEREUM) {
+    return [
+      ...metrics,
+      booleanMetric("not_honeypot", security?.isHoneypot, false),
+      booleanMetric("open_source", security?.isOpenSource, true),
+      booleanMetric("ownership_renounced", security?.isOwnershipRenounced, true),
+      booleanMetric("lp_locked", security?.isLpLocked, true),
+    ];
+  }
+
+  return metrics;
 }
 
 /**
@@ -196,4 +231,39 @@ function counterMetric(key: string, count: number | undefined): Metric {
     return { key, value: "-", status: "neutral" };
   }
   return { key, value: formatAmount(count.toString()), status: "neutral" };
+}
+
+function booleanMetric(
+  key: string,
+  value: boolean | undefined,
+  safeWhen: boolean,
+): Metric {
+  if (value === undefined) return unknownMetric(key);
+  return { key, value: "", status: value === safeWhen ? "good" : "bad" };
+}
+
+function burnMetric(
+  key: string,
+  security: TokenSecurityDetails | undefined,
+): Metric {
+  const burnRatio = getBurnRatio(security);
+  if (burnRatio !== undefined) {
+    const burned = new SafeBigNumber(burnRatio).gt(0);
+    return {
+      key,
+      value: (
+        <>
+          <span aria-hidden="true">🔥</span>
+          {formatPercent(burnRatio)}
+        </>
+      ),
+      status: burned ? "good" : "bad",
+      showStatusIcon: false,
+    };
+  }
+  return booleanMetric(key, getIsLpBurned(security), true);
+}
+
+function unknownMetric(key: string): Metric {
+  return { key, value: "-", status: "neutral" };
 }
