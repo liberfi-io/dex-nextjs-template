@@ -8,10 +8,7 @@ import {
   type TabBarUnderlineItem,
 } from "@liberfi.io/ui-scaffold";
 import { useTranslation } from "@liberfi/ui-base";
-import {
-  BottomEmptyTable,
-  DEV_TOKENS_COLUMNS,
-} from "./bottom-tables/BottomEmptyTable";
+import { BottomDevTokensTable } from "./bottom-tables/BottomDevTokensTable";
 import { BottomHoldersTable } from "./bottom-tables/BottomHoldersTable";
 import { BottomTopTradersTable } from "./bottom-tables/BottomTopTradersTable";
 import { BottomTradesTable } from "./bottom-tables/BottomTradesTable";
@@ -75,10 +72,7 @@ export function BottomDataPanel({ chain, address }: BottomDataPanelProps) {
           <BottomTopTradersTable chain={chain} address={address} />
         )}
         {activeTab === "dev-tokens" && (
-          <BottomEmptyTable
-            columns={DEV_TOKENS_COLUMNS}
-            minWidth="min-w-[760px]"
-          />
+          <BottomDevTokensTable chain={chain} address={address} />
         )}
       </div>
     </div>

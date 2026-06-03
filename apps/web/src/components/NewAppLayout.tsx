@@ -166,6 +166,28 @@ const LegacyModals = [
 
 const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
 
+type TranslationResource = Record<string, unknown>;
+
+function mergeResources(
+  base: TranslationResource,
+  override: TranslationResource,
+): TranslationResource {
+  const merged: TranslationResource = { ...base };
+  for (const [key, value] of Object.entries(override)) {
+    const baseValue = merged[key];
+    if (isPlainObject(baseValue) && isPlainObject(value)) {
+      merged[key] = mergeResources(baseValue, value);
+      continue;
+    }
+    merged[key] = value;
+  }
+  return merged;
+}
+
+function isPlainObject(value: unknown): value is TranslationResource {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
 const navItemsConfig: Omit<NavItem, "label">[] = [
   { key: "discover", href: "/", icon: <HomeIcon width={20} height={20} /> },
   { key: "pulse", href: "/pulse", icon: <PulseIcon width={20} height={20} /> },
@@ -187,8 +209,8 @@ export function NewAppLayout({ children, locale }: PropsWithChildren<{ locale: L
           locale={locale}
           supportedLanguages={["en", "zh"]}
           resources={{
-            en: { ...en, ...en2 },
-            zh: { ...zh, ...zh2 },
+            en: mergeResources(en2, en),
+            zh: mergeResources(zh2, zh),
           }}
         >
           <ServiceProviders>

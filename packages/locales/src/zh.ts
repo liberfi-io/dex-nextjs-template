@@ -285,12 +285,18 @@ export default {
           "transfers": "轉入 / 轉出"
         },
         "dev_tokens_table": {
-          "token": "代幣",
-          "created": "創建時間",
-          "liquidity": "流動性",
-          "market_cap": "市值",
-          "holders": "持有人",
-          "status": "狀態"
+          "token": "幣種",
+          "created": "時間",
+          "migrated": "遷移",
+          "total_fee": "總手續費",
+          "ath": "歷史最高",
+          "market_cap": "當前市值",
+          "liquidity": "池子",
+          "holders": "持有者",
+          "volume_1h": "1h 成交額",
+          "bundled": "捆綁交易",
+          "status": "狀態",
+          "no_creator": "未找到開發者錢包"
         }
       },
       "transactions": {

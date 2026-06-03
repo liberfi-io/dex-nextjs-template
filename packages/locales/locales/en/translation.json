@@ -286,11 +286,17 @@
         },
         "dev_tokens_table": {
           "token": "Token",
-          "created": "Created",
-          "liquidity": "Liquidity",
-          "market_cap": "MCap",
+          "created": "Age",
+          "migrated": "Migrated",
+          "total_fee": "Total Fees",
+          "ath": "ATH",
+          "market_cap": "Market Cap",
+          "liquidity": "Pool",
           "holders": "Holders",
-          "status": "Status"
+          "volume_1h": "1h Volume",
+          "bundled": "Bundled",
+          "status": "Status",
+          "no_creator": "No creator wallet found"
         }
       },
       "transactions": {

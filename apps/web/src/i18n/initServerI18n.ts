@@ -8,6 +8,28 @@ import zh2 from "@liberfi.io/i18n/locales/zh.json";
 
 let initialized = false;
 
+type TranslationResource = Record<string, unknown>;
+
+function mergeResources(
+  base: TranslationResource,
+  override: TranslationResource,
+): TranslationResource {
+  const merged: TranslationResource = { ...base };
+  for (const [key, value] of Object.entries(override)) {
+    const baseValue = merged[key];
+    if (isPlainObject(baseValue) && isPlainObject(value)) {
+      merged[key] = mergeResources(baseValue, value);
+      continue;
+    }
+    merged[key] = value;
+  }
+  return merged;
+}
+
+function isPlainObject(value: unknown): value is TranslationResource {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
 export async function initServerI18n(lang: LocaleCode) {
   if (initialized) return i18next;
 
@@ -20,10 +42,10 @@ export async function initServerI18n(lang: LocaleCode) {
     initImmediate: false,
     resources: {
       [LocaleEnum.en]: {
-        [defaultNS]: { ...en, ...en2 },
+        [defaultNS]: mergeResources(en2, en),
       },
       [LocaleEnum.zh]: {
-        [defaultNS]: { ...zh, ...zh2 },
+        [defaultNS]: mergeResources(zh2, zh),
       },
     },
   });
