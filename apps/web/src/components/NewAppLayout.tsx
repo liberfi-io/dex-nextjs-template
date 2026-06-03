@@ -166,25 +166,35 @@ const LegacyModals = [
 
 const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
 
-type TranslationResource = Record<string, unknown>;
-
-function mergeResources(
-  base: TranslationResource,
-  override: TranslationResource,
-): TranslationResource {
-  const merged: TranslationResource = { ...base };
-  for (const [key, value] of Object.entries(override)) {
-    const baseValue = merged[key];
-    if (isPlainObject(baseValue) && isPlainObject(value)) {
-      merged[key] = mergeResources(baseValue, value);
-      continue;
-    }
-    merged[key] = value;
-  }
-  return merged;
+type FlatTranslationResource = Record<string, string>;
+interface NestedTranslationResource {
+  [key: string]: string | NestedTranslationResource;
 }
 
-function isPlainObject(value: unknown): value is TranslationResource {
+function mergeResources(
+  base: FlatTranslationResource,
+  override: NestedTranslationResource,
+): FlatTranslationResource {
+  return { ...base, ...flattenResource(override) };
+}
+
+function flattenResource(
+  resource: NestedTranslationResource,
+  prefix = "",
+): FlatTranslationResource {
+  const flattened: FlatTranslationResource = {};
+  for (const [key, value] of Object.entries(resource)) {
+    const nextKey = prefix ? `${prefix}.${key}` : key;
+    if (isPlainObject(value)) {
+      Object.assign(flattened, flattenResource(value, nextKey));
+      continue;
+    }
+    flattened[nextKey] = value;
+  }
+  return flattened;
+}
+
+function isPlainObject(value: unknown): value is NestedTranslationResource {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 

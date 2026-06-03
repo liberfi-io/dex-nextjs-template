@@ -25,7 +25,7 @@
     "@liberfi/react-launchpad": "workspace:*",
     "@liberfi/ui-base": "workspace:*",
     "@liberfi/ui-dex": "workspace:*",
-    "@liberfi.io/utils": "^0.2.29",
+    "@liberfi.io/utils": "^0.2.30",
     "@privy-io/react-auth": "^3.16.0",
     "@react-aria/interactions": "^3.22.5",
     "@solana/web3.js": "^1.98.4",
@@ -63,16 +63,16 @@
     "zod": "^3"
   },
   "peerDependencies": {
-    "@liberfi.io/types": ">=0.4.30",
-    "@liberfi.io/ui": ">=0.3.30",
-    "@liberfi.io/ui-media-track": ">=0.1.225"
+    "@liberfi.io/types": ">=0.4.31",
+    "@liberfi.io/ui": ">=0.3.31",
+    "@liberfi.io/ui-media-track": ">=0.1.226"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^3.2.3",
     "@eslint/js": "^9.20.0",
-    "@liberfi.io/types": "^0.4.30",
-    "@liberfi.io/ui": "^0.3.30",
-    "@liberfi.io/ui-media-track": "^0.1.225",
+    "@liberfi.io/types": "^0.4.31",
+    "@liberfi.io/ui": "^0.3.31",
+    "@liberfi.io/ui-media-track": "^0.1.226",
     "@storybook/addon-essentials": "^8.4.7",
     "@storybook/addon-interactions": "^8.4.7",
     "@storybook/addon-styling-webpack": "^1.0.1",
