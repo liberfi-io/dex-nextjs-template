@@ -30,10 +30,6 @@ const nextConfig = {
         destination: process.env.GRAPHQL_SERVER_ENDPOINT,
       },
       {
-        source: "/dex-api/:path*",
-        destination: process.env.DEX_AGGREGATOR_URL + "/:path*",
-      },
-      {
         source: "/media-track-api/:path*",
         destination: process.env.MEDIA_TRACK_URL + "/:path*",
       },
