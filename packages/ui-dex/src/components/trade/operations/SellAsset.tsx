@@ -4,7 +4,6 @@ import { useSwapContext } from "../../swap/SwapContext";
 import { TokenAvatar } from "../../TokenAvatar";
 import { Button, Skeleton } from "@heroui/react";
 import { useWalletPortfolios } from "@liberfi/ui-base";
-import { useCallback, useMemo } from "react";
 
 export function SellAsset() {
   const { fromToken, fromTokenBalance } = useSwapContext();

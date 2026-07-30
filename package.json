@@ -7,9 +7,12 @@
   "scripts": {
     "build": "turbo run build",
     "build:web": "turbo run build --filter=./apps/web",
-    "lint": "turbo run lint --parallel",
+    "lint": "turbo run lint --parallel && node scripts/verify-lint-baseline.mjs",
     "lint-fix": "turbo run lint-fix --parallel",
     "lint-staged": "lint-staged",
+    "typecheck": "turbo run typecheck",
+    "test": "pnpm test:gates && turbo run test",
+    "test:gates": "node --test scripts/verify-workspace-gates.test.mjs",
     "tsconfig-paths": "tsx scripts/tsconfigPaths.ts"
   },
   "workspaces": [
@@ -17,9 +20,15 @@
     "apps/*"
   ],
   "devDependencies": {
+    "@babel/preset-react": "7.28.5",
+    "@babel/preset-typescript": "7.28.5",
     "@manypkg/get-packages": "^2.2.2",
     "@types/fs-extra": "^11.0.4",
+    "@types/jest": "30.0.0",
+    "babel-jest": "30.2.0",
     "fs-extra": "^11.2.0",
+    "jest": "30.2.0",
+    "jest-environment-jsdom": "30.2.0",
     "jsonc-parser": "^3.3.1",
     "lint-staged": "^15.5.2",
     "tsx": "^4.19.2",

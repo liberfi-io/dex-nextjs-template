@@ -8,7 +8,9 @@
   "type": "module",
   "scripts": {
     "build": "rimraf dist && tsc && tsc-alias",
-    "lint": "eslint",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint src",
+    "test": "jest --config ../../jest.config.cjs --selectProjects @liberfi/ui-base --passWithNoTests",
     "lint-fix": "eslint --fix",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"

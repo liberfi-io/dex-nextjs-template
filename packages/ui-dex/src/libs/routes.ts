@@ -7,7 +7,6 @@ export enum AppRoute {
   account = "/account",
   invite = "/invite",
   holdings = "/holdings",
-  discover = "/",
 }
 
 const TOKEN_DETAIL_CHAIN_SEGMENTS: Record<string, "sol" | "eth" | "bsc"> = {
