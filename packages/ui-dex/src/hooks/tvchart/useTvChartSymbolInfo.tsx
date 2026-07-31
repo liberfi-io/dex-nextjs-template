@@ -3,10 +3,12 @@ import { Token } from "@chainstream-io/sdk";
 import { chainIdBySlug } from "@liberfi.io/utils";
 import { fetchTokenInfo } from "../../states";
 import { parseSymbol, TvChartSymbol, TvChartAreaManager } from "../../libs/tvchart";
+import { useDexDataRuntime } from "../../runtime";
 
 export function useTvChartSymbolInfo(areaManager: TvChartAreaManager | null) {
   const [symbolInfo, setSymbolInfo] = useState<TvChartSymbol | null>(null);
   const [token, setToken] = useState<Token | null>(null);
+  const runtime = useDexDataRuntime();
 
   useEffect(() => {
     if (!areaManager) return;
@@ -24,7 +26,7 @@ export function useTvChartSymbolInfo(areaManager: TvChartAreaManager | null) {
           return;
         }
 
-        const token = await fetchTokenInfo(chainId, address);
+        const token = await fetchTokenInfo(runtime, chainId, address);
         setToken(token);
       } catch (error) {
         console.warn("useTvChartSymbolInfo.fetchSymbolInfo", error);
@@ -40,7 +42,7 @@ export function useTvChartSymbolInfo(areaManager: TvChartAreaManager | null) {
     return () => {
       sub.unsubscribe();
     };
-  }, [areaManager]);
+  }, [areaManager, runtime]);
 
   return { symbolInfo, token };
 }

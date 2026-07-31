@@ -96,7 +96,6 @@ import {
 } from "@liberfi/ui-base";
 import { useRouterAdapter } from "../hooks/useRouterAdapter";
 import { useDexClient } from "@liberfi/react-dex";
-import { DexDataProvider } from "@liberfi/ui-dex";
 import { tokenDetailRoute } from "@liberfi/ui-dex/libs/routes";
 import { useCreateOnrampWidgetUrlMutation } from "@liberfi/react-backend";
 import { queryClient } from "../libs/queryClient";
@@ -262,9 +261,7 @@ function LegacyBridge({ children }: PropsWithChildren) {
   return (
     <TranslationProvider translation={translation}>
       <RouterProvider router={router}>
-        <AppSdkProvider appSdk={browserAppSdk}>
-          {ready ? <DexDataProvider>{children}</DexDataProvider> : null}
-        </AppSdkProvider>
+        <AppSdkProvider appSdk={browserAppSdk}>{ready ? children : null}</AppSdkProvider>
       </RouterProvider>
     </TranslationProvider>
   );

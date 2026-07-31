@@ -25,11 +25,16 @@ const packageProjects = [
   rootDir: `<rootDir>/packages/${name}`,
   testEnvironment: domPackages.has(name) ? "jsdom" : "node",
   testMatch: ["<rootDir>/src/**/*.test.{ts,tsx}", "<rootDir>/src/**/*.spec.{ts,tsx}"],
+  moduleNameMapper: {
+    "^@liberfi/(.+)$": "<rootDir>/../$1/src",
+    "^lodash-es$": "lodash",
+  },
   transform: {
     "^.+\\.[tj]sx?$": [
       "babel-jest",
       {
         presets: [
+          ["@babel/preset-env", { targets: { node: "current" } }],
           ["@babel/preset-react", { runtime: "automatic" }],
           "@babel/preset-typescript",
         ],

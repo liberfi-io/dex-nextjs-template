@@ -1,9 +1,5 @@
-import {
-  CHAIN_QUOTE_TOKEN_SYMBOLS,
-  tokenDetailChainSegment,
-  tokenDetailRoute,
-} from "../../libs";
-import { formatMCap, formatPrice } from "@liberfi.io/utils";
+import { CHAIN_QUOTE_TOKEN_SYMBOLS, tokenDetailChainSegment, tokenDetailRoute } from "../../libs";
+import { chainSlug, formatMCap, formatPrice } from "@liberfi.io/utils";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { useRouter, useTranslation } from "@liberfi/ui-base";
 import { useTvChartTradeHistories } from "../../hooks/tvchart/useTvChartTradeHistories";
@@ -26,16 +22,17 @@ import { TvChart, TvChartInstance, TvChartProps } from "./TvChart";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Subscription } from "rxjs";
 import clsx from "clsx";
-import { chainSlug } from "@liberfi.io/utils";
 import { TvChartDataFeedModule } from "./TvChartDataFeedModule";
 import { isPriceChartAtom, isUSDChartAtom, tokenAddressAtom, tokenChainAtom } from "../../states";
 import { useAtomValue } from "jotai";
+import { useDexDataRuntime } from "../../runtime";
 
 export interface TvChartWrapperProps {
   className?: string;
 }
 
 export const TvChartWrapper = memo(({ className }: TvChartWrapperProps) => {
+  const runtime = useDexDataRuntime();
   // gtag report { key: g.e1.KLineFirstRender, name: "TVWrapper" }
   const { i18n } = useTranslation();
 
@@ -80,6 +77,16 @@ export const TvChartWrapper = memo(({ className }: TvChartWrapperProps) => {
 
   const chartIdentityKey = `${tokenDetailChainSegment(chartChain)}/${address ?? ""}`;
 
+  const RuntimeTvChartDataFeedModule = useMemo(
+    () =>
+      class extends TvChartDataFeedModule {
+        constructor() {
+          super(runtime);
+        }
+      },
+    [runtime],
+  );
+
   useEffect(() => {
     expectedRouteRef.current = {
       chain: tokenDetailChainSegment(chartChain),
@@ -96,8 +103,7 @@ export const TvChartWrapper = memo(({ className }: TvChartWrapperProps) => {
 
       const expected = expectedRouteRef.current;
       const matchesCurrentRoute =
-        targetChain === expected.chain &&
-        address.toLowerCase() === expected.address.toLowerCase();
+        targetChain === expected.chain && address.toLowerCase() === expected.address.toLowerCase();
 
       if (matchesCurrentRoute) {
         routeSyncedRef.current = true;
@@ -116,7 +122,7 @@ export const TvChartWrapper = memo(({ className }: TvChartWrapperProps) => {
       storageId: "kline",
       tickerSymbol,
       resolution: "1m",
-      datafeedModule: TvChartDataFeedModule,
+      datafeedModule: RuntimeTvChartDataFeedModule,
       theme: TvChartTheme.Dark,
       layout: TvChartLayout.Layout1A,
       chartType: TvChartType.TradingView,
@@ -142,7 +148,7 @@ export const TvChartWrapper = memo(({ className }: TvChartWrapperProps) => {
         },
       }),
     }),
-    [tickerSymbol, i18n.language],
+    [RuntimeTvChartDataFeedModule, tickerSymbol, i18n.language],
   );
 
   useEffect(() => {

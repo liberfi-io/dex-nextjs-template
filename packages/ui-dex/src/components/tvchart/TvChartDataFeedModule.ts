@@ -18,11 +18,9 @@ import {
 } from "../../libs/tvchart";
 import { quotePricesSubject, updateTokenLatestPrice } from "../../states";
 import { TokenCandle, Resolution, Token } from "@chainstream-io/sdk";
-import { Unsubscribable, WsCandle } from "@chainstream-io/sdk/stream";
+import { WsCandle } from "@chainstream-io/sdk/stream";
 import { CONFIG } from "@liberfi/core";
 import { chainIdBySlug } from "@liberfi.io/utils";
-import { chainParam, fetchToken, fetchTokenCandles, QueryKeys } from "@liberfi/react-dex";
-import { dexClientSubject, queryClientSubject } from "@liberfi/ui-base";
 import BigNumber from "bignumber.js";
 import { minBy, sortBy, uniqBy } from "lodash-es";
 import { DateTime } from "luxon";
@@ -40,6 +38,7 @@ import {
   SymbolResolveExtension,
   Timezone,
 } from "../../../../../apps/web/public/static/charting_library";
+import { DexDataRuntime } from "../../runtime";
 
 export class TvChartDataFeedModule implements ITvChartDataFeedModule {
   debug: boolean;
@@ -49,7 +48,7 @@ export class TvChartDataFeedModule implements ITvChartDataFeedModule {
   ready: boolean;
 
   orderbookQuotesMap: Record<string, any>;
-  barSubscriptionMap: Map<string, Unsubscribable>;
+  barSubscriptionKeys: Set<string>;
   symbolMap: Map<string, TvChartSymbolInfo>;
   symbolMapSubject: BehaviorSubject<Map<string, TvChartSymbolInfo>> | null;
 
@@ -59,7 +58,7 @@ export class TvChartDataFeedModule implements ITvChartDataFeedModule {
     isLoad: boolean;
   };
 
-  constructor() {
+  constructor(private readonly runtime: DexDataRuntime) {
     this.debug = true;
     this.setting = null;
     this.chartManager = null;
@@ -67,7 +66,7 @@ export class TvChartDataFeedModule implements ITvChartDataFeedModule {
     this.ready = false;
 
     this.orderbookQuotesMap = {};
-    this.barSubscriptionMap = new Map<string, Unsubscribable>();
+    this.barSubscriptionKeys = new Set<string>();
     this.symbolMap = new Map<string, TvChartSymbolInfo>();
     this.symbolMapSubject = new BehaviorSubject(this.symbolMap);
 
@@ -101,10 +100,10 @@ export class TvChartDataFeedModule implements ITvChartDataFeedModule {
   }
 
   onDestroy() {
-    this.barSubscriptionMap.forEach((unsub) => {
-      unsub.unsubscribe();
+    this.barSubscriptionKeys.forEach((key) => {
+      this.runtime.unsubscribeTokenCandles(key);
     });
-    this.barSubscriptionMap.clear();
+    this.barSubscriptionKeys.clear();
 
     Object.entries(this.orderbookQuotesMap).forEach(
       ([listenerGUID, { tickerSubscription, ...rest }]) => {
@@ -129,20 +128,10 @@ export class TvChartDataFeedModule implements ITvChartDataFeedModule {
     const { chain, address, quote, priceType } = parseSymbol(symbolName);
 
     try {
-      const dexClient = dexClientSubject.value;
-      if (!dexClient) throw new Error("DexClient is not ready");
-
-      const queryClient = queryClientSubject.value;
-      if (!queryClient) throw new Error("QueryClient is not ready");
-
       const chainId = chainIdBySlug(chain);
       if (!chainId) throw new Error(`Unsupported chain slug ${chain}`);
 
-      // 基于 queryClient 进行查询，可以利用其缓存机制
-      const token = await queryClient.fetchQuery({
-        queryKey: QueryKeys.token(chainId, address),
-        queryFn: () => fetchToken(dexClient, chainId, address),
-      });
+      const token = await this.runtime.getToken(chainId, address);
       return token ? tokenSymbolInfo(token, quote, priceType) : null;
     } catch (error) {
       console.error("TvChartDataFeedModule.resolveSymbol", error);
@@ -209,12 +198,6 @@ export class TvChartDataFeedModule implements ITvChartDataFeedModule {
       retryDelay: 3e3,
     },
   ) {
-    const dexClient = dexClientSubject.value;
-    if (!dexClient) throw new Error("DexClient is not ready");
-
-    const queryClient = queryClientSubject.value;
-    if (!queryClient) throw new Error("QueryClient is not ready");
-
     const { token, priceType, quote } = symbolInfo as TvChartSymbolInfo;
     const chain = token.chain;
     const chainId = chainIdBySlug(chain);
@@ -240,27 +223,17 @@ export class TvChartDataFeedModule implements ITvChartDataFeedModule {
 
     while (true) {
       try {
-        const candles = await queryClient.fetchQuery({
-          queryKey: QueryKeys.tokenCandles({
+        const candles = await this.runtime.getTokenCandles(
+          {
             chain: chainId,
             tokenAddress: address,
             resolution: resolution as Resolution,
-            from: 0, // 结果是从 to 倒序的，通过 limit 限制查询数量，因此 fromTimestamp 直接传 0 即可
+            from: 0,
             to: timestamp,
             limit,
-          }),
-          queryFn: () =>
-            fetchTokenCandles(dexClient, {
-              chain: chainId,
-              tokenAddress: address,
-              resolution: resolution as Resolution,
-              from: 0,
-              to: timestamp,
-              limit,
-            }),
-          retry: options.retryCount,
-          retryDelay: options.retryDelay,
-        });
+          },
+          { retry: options.retryCount, retryDelay: options.retryDelay },
+        );
 
         const minTime = candles.length > 0 ? minBy(candles, "timestamp")!.timestamp : 0;
         results = uniqBy([...results, ...candles], "timestamp");
@@ -309,7 +282,7 @@ export class TvChartDataFeedModule implements ITvChartDataFeedModule {
     priceType: TvChartPriceType,
   ): Bar {
     // in usd
-    const candleTime = 'timestamp' in candle ? candle.timestamp : candle.time;
+    const candleTime = "timestamp" in candle ? candle.timestamp : candle.time;
     const bar = {
       time: typeof candleTime === "string" ? new Date(candleTime).getTime() : candleTime,
       high: new BigNumber(candle.high).toNumber(),
@@ -349,9 +322,6 @@ export class TvChartDataFeedModule implements ITvChartDataFeedModule {
     listenerGuid: string,
     _onResetCacheNeededCallback: () => void,
   ) {
-    const dexClient = dexClientSubject.value;
-    if (!dexClient) throw new Error("DexClient is not ready");
-
     const { token, priceType, quote } = symbolInfo as TvChartSymbolInfo;
     const { chain, address } = token;
     const resolution = getTvChartResolutionReverse(libraryChartResolution);
@@ -359,8 +329,8 @@ export class TvChartDataFeedModule implements ITvChartDataFeedModule {
     const chainId = chainIdBySlug(chain);
     if (!chainId) throw new Error(`Unsupported chain slug ${chain}`);
 
-    const unsub = dexClient.stream.subscribeTokenCandles({
-      chain: chainParam(chainId),
+    this.runtime.subscribeTokenCandles(listenerGuid, {
+      chain: chainId,
       tokenAddress: address,
       resolution: resolution as Resolution,
       callback: (candle: WsCandle) => {
@@ -372,9 +342,7 @@ export class TvChartDataFeedModule implements ITvChartDataFeedModule {
       },
     });
 
-    if (unsub) {
-      this.barSubscriptionMap.set(listenerGuid, unsub);
-    }
+    this.barSubscriptionKeys.add(listenerGuid);
   }
   findChartBySymbolResolution(
     symbolInfo: LibrarySymbolInfo,
@@ -397,14 +365,14 @@ export class TvChartDataFeedModule implements ITvChartDataFeedModule {
       interval: this.isLoadMarkData.interval,
       symbol: this.isLoadMarkData.symbol,
     };
-    this.barSubscriptionMap.get(listenerGuid)?.unsubscribe();
-    this.barSubscriptionMap.delete(listenerGuid);
+    this.runtime.unsubscribeTokenCandles(listenerGuid);
+    this.barSubscriptionKeys.delete(listenerGuid);
   }
   async getQuotes(
     _symbols: string[],
     _onDataCallback: QuotesCallback,
     _1onErrorCallback: QuotesErrorCallback,
-  ) { }
+  ) {}
   subscribeQuotes(
     symbols: string[],
     _fastSymbols: string[],
@@ -453,11 +421,11 @@ function tokenSymbolInfo(
   const price =
     quote === TvChartQuoteType.USD
       ? priceType === TvChartPriceType.Price
-        ? token.marketData?.priceInUsd ?? undefined
-        : token.marketData?.marketCapInUsd ?? undefined
+        ? (token.marketData?.priceInUsd ?? undefined)
+        : (token.marketData?.marketCapInUsd ?? undefined)
       : priceType === TvChartPriceType.Price
-        ? token.marketData?.priceInSol ?? 0
-        : token.marketData?.marketCapInSol ?? 0;
+        ? (token.marketData?.priceInSol ?? 0)
+        : (token.marketData?.marketCapInSol ?? 0);
 
   // 根据实际价格推算精度
   const precision = calculateDecimalPrecision(price ?? 0, { precision: true });

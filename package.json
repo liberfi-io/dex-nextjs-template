@@ -20,6 +20,7 @@
     "apps/*"
   ],
   "devDependencies": {
+    "@babel/preset-env": "7.28.0",
     "@babel/preset-react": "7.28.5",
     "@babel/preset-typescript": "7.28.5",
     "@manypkg/get-packages": "^2.2.2",

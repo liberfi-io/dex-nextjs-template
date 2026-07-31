@@ -12,8 +12,15 @@ import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { useAuth, useConnectedWallet } from "@liberfi.io/wallet-connector";
 import { DexClientProvider } from "@liberfi/react-dex";
 import { PinataProvider, useDexTokenProvider } from "@liberfi/ui-base";
+import {
+  browserDexDataScheduler,
+  createChainStreamDexDataAdapter,
+  DexDataProvider,
+  DexDataRuntimeProvider,
+} from "@liberfi/ui-dex";
 import { HyperliquidAccountStateSync } from "../components/HyperliquidAccountStateSync";
 import { pinata } from "../libs/pinata";
+import { queryClient } from "../libs/queryClient";
 import { RuntimeConfig } from "./app-runtime.types";
 import { readRuntimeConfig } from "./readRuntimeConfig";
 import { useAppClientBundle } from "./useAppClientBundle";
@@ -54,6 +61,10 @@ export function AppRuntimeProviders({
     dexTokenProvider,
     channelsTokenProvider,
   });
+  const dexDataAdapter = useMemo(
+    () => createChainStreamDexDataAdapter(clients.chainStream),
+    [clients.chainStream],
+  );
   const { chain } = useCurrentChain();
   const wallet = useConnectedWallet(chain);
 
@@ -72,7 +83,13 @@ export function AppRuntimeProviders({
                         depositClient={clients.perpetualDeposit}
                       >
                         <HyperliquidAccountStateSync />
-                        {children}
+                        <DexDataRuntimeProvider
+                          queryClient={queryClient}
+                          adapter={dexDataAdapter}
+                          scheduler={browserDexDataScheduler}
+                        >
+                          <DexDataProvider>{children}</DexDataProvider>
+                        </DexDataRuntimeProvider>
                       </PerpetualsProvider>
                     </PortfolioProvider>
                   </PortfolioClientProvider>

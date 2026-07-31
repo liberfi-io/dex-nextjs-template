@@ -6,9 +6,13 @@ import { BehaviorSubject, EMPTY, filter, switchMap, take } from "rxjs";
 import { flatten, groupBy, isArray, isEqual } from "lodash-es";
 import { Token } from "@chainstream-io/sdk";
 import { Chain } from "@liberfi/core";
-import { parseTickerSymbol, stringifyTickerSymbol, stringifyTickerSymbolByChainSlug } from "../libs";
-import { dexClientSubject, queryClientSubject } from "@liberfi/ui-base";
-import { fetchToken, fetchTokens, QueryKeys, useTokenQuery } from "@liberfi/react-dex";
+import {
+  parseTickerSymbol,
+  stringifyTickerSymbol,
+  stringifyTickerSymbolByChainSlug,
+} from "../libs";
+import { useTokenQuery } from "@liberfi/react-dex";
+import { DexDataRuntime, useDexDataRuntime } from "../runtime";
 
 /**
  * rxjs for non-hooks state management
@@ -96,66 +100,72 @@ export function mergeTokenInfoAfterBaseInfoLoaded(
 
 /**
  * Fetch the token infos and then set it to the token info map state
+ * @param runtime - The instance-scoped data runtime
  * @param chainId - The chain id
  * @param addresses - The token addresses
  */
-async function fetchTokenInfos(chainId: Chain, addresses: string | string[]): Promise<Token[]> {
-  const queryClient = queryClientSubject.value;
-  if (!queryClient) throw new Error("QueryClient subject is not initialized");
-
-  const dexClient = dexClientSubject.value;
-  if (!dexClient) throw new Error("DexClient subject is not initialized");
-
+async function fetchTokenInfos(
+  runtime: DexDataRuntime,
+  chainId: Chain,
+  addresses: string | string[],
+): Promise<Token[]> {
   let tokenInfos: Token[];
 
   if (isArray(addresses) && addresses.length > 1) {
-    tokenInfos = await queryClient.fetchQuery({
-      queryKey: QueryKeys.tokens({
-        chain: chainId,
-        tokenAddresses: addresses,
-      }),
-      queryFn: () => fetchTokens(dexClient, { chain: chainId, tokenAddresses: addresses }),
-    });
+    tokenInfos = await runtime.getTokens({ chain: chainId, tokenAddresses: addresses });
   } else {
     const address = isArray(addresses) ? addresses[0] : addresses;
-    const tokenInfo = await queryClient.fetchQuery({
-      queryKey: QueryKeys.token(chainId, address),
-      queryFn: () => fetchToken(dexClient, chainId, address),
-    });
+    const tokenInfo = await runtime.getToken(chainId, address);
     tokenInfos = [tokenInfo];
   }
   setTokenInfo(tokenInfos, "merge");
   return tokenInfos;
 }
 
-let batchTimer: NodeJS.Timeout | null = null;
-
 const batchWindow = 0;
-const batchTickerSymbols = new Set<string>();
-const batchResolversMap = new Map<
-  string,
-  { resolve: (tokenInfo: Token | null) => void; reject: (err: unknown) => void }
->();
+interface TokenBatchState {
+  timer: unknown;
+  tickerSymbols: Set<string>;
+  resolvers: Map<
+    string,
+    { resolve: (tokenInfo: Token | null) => void; reject: (err: unknown) => void }
+  >;
+}
+const tokenBatchStates = new WeakMap<DexDataRuntime, TokenBatchState>();
+
+function getTokenBatchState(runtime: DexDataRuntime): TokenBatchState {
+  const current = tokenBatchStates.get(runtime);
+  if (current) return current;
+  const created: TokenBatchState = {
+    timer: undefined,
+    tickerSymbols: new Set(),
+    resolvers: new Map(),
+  };
+  tokenBatchStates.set(runtime, created);
+  return created;
+}
 
 /**
  * Combine multiple token info fetch requests
+ * @param runtime - The instance-scoped data runtime
  * @param chainId - The chain id
  * @param address - The token address
  * @returns The token info
  */
-async function fetchTokenInfoInBatch(chainId: Chain, address: string) {
-  if (batchTimer) {
-    clearTimeout(batchTimer);
-    batchTimer = null;
+async function fetchTokenInfoInBatch(runtime: DexDataRuntime, chainId: Chain, address: string) {
+  const batch = getTokenBatchState(runtime);
+  if (batch.timer) {
+    runtime.cancelScheduled(batch.timer);
+    batch.timer = undefined;
   }
 
   const tickerSymbol = stringifyTickerSymbol(chainId, address);
-  batchTickerSymbols.add(tickerSymbol);
+  batch.tickerSymbols.add(tickerSymbol);
 
-  batchTimer = setTimeout(async () => {
-    const resolvers = Array.from(batchResolversMap.entries());
+  batch.timer = runtime.schedule(async () => {
+    const resolvers = Array.from(batch.resolvers.entries());
     try {
-      const validTickerSymbols = Array.from(batchTickerSymbols).filter(
+      const validTickerSymbols = Array.from(batch.tickerSymbols).filter(
         (ts) => parseTickerSymbol(ts) !== null,
       );
       const groupedTickerSymbols = groupBy(
@@ -167,6 +177,7 @@ async function fetchTokenInfoInBatch(chainId: Chain, address: string) {
         await Promise.all(
           Object.entries(groupedTickerSymbols).map(([chainId, tickerSymbols]) =>
             fetchTokenInfos(
+              runtime,
               chainId as Chain,
               tickerSymbols.map((tickerSymbol) => parseTickerSymbol(tickerSymbol)!.address),
             ),
@@ -186,27 +197,28 @@ async function fetchTokenInfoInBatch(chainId: Chain, address: string) {
         reject(err);
       });
     } finally {
-      batchResolversMap.clear();
+      batch.resolvers.clear();
     }
-    batchTimer = null;
-    batchTickerSymbols.clear();
+    batch.timer = undefined;
+    batch.tickerSymbols.clear();
   }, batchWindow);
 
   return new Promise<Token | null>((resolve, reject) => {
-    batchResolversMap.set(tickerSymbol, { resolve, reject });
+    batch.resolvers.set(tickerSymbol, { resolve, reject });
   });
 }
 
 export async function fetchTokenInfo(
+  runtime: DexDataRuntime,
   chainId: Chain,
   address: string,
   mode: string = "single",
 ): Promise<Token | null> {
   // TODO check address is valid
   if (mode === "batch") {
-    return fetchTokenInfoInBatch(chainId, address);
+    return fetchTokenInfoInBatch(runtime, chainId, address);
   } else {
-    const tokenInfos = await fetchTokenInfos(chainId, address);
+    const tokenInfos = await fetchTokenInfos(runtime, chainId, address);
     return tokenInfos[0] || null;
   }
 }
@@ -217,6 +229,7 @@ export async function fetchTokenInfo(
  * @param address - The current selected chart's token address
  */
 export function useTvChartMultiTokens(chainId: Chain, address: string) {
+  const runtime = useDexDataRuntime();
   useLayoutEffect(() => {
     let fetched = false;
     // load the tv chart configs
@@ -231,7 +244,7 @@ export function useTvChartMultiTokens(chainId: Chain, address: string) {
           if (area.dataReady) {
             const parsed = parseTickerSymbol(area.tickerSymbol);
             if (!parsed) return;
-            fetchTokenInfo(parsed.chainId, parsed.address, "batch");
+            fetchTokenInfo(runtime, parsed.chainId, parsed.address, "batch");
             if (parsed.chainId === chainId && parsed.address === address) {
               fetched = true;
             }
@@ -241,9 +254,9 @@ export function useTvChartMultiTokens(chainId: Chain, address: string) {
     }
 
     if (!fetched) {
-      fetchTokenInfo(chainId, address, "batch");
+      fetchTokenInfo(runtime, chainId, address, "batch");
     }
-  }, [chainId, address]);
+  }, [chainId, address, runtime]);
 }
 
 /**
@@ -276,6 +289,7 @@ export function useTokenInfo(
   address: string,
   transform?: (tokenInfo: Token) => Token,
 ): Token | null {
+  const runtime = useDexDataRuntime();
   const [tokenInfo, setTokenInfo] = useState<Token | null>(null);
   // used to avoid re-rendering
   const tokenInfoRef = useRef<Token | null>(null);
@@ -283,7 +297,7 @@ export function useTokenInfo(
   useLayoutEffect(() => {
     // initial load
     if (!getTokenInfo(chainId, address)) {
-      fetchTokenInfo(chainId, address);
+      fetchTokenInfo(runtime, chainId, address);
     }
 
     // reset when the chainId or address changes
@@ -311,7 +325,7 @@ export function useTokenInfo(
       setTokenInfo(null);
       tokenInfoRef.current = null;
     };
-  }, [chainId, address, transform]);
+  }, [chainId, address, runtime, transform]);
 
   return tokenInfo;
 }
