@@ -9,7 +9,7 @@
  *   QueryClientProvider          (withQueryClient)
  *   └─ WalletConnector           (withWalletConnector)
  *       └─ LocaleProvider        (withI18n)
- *           └─ ServiceProviders  (withDex / withMediaTrack / withChannels / withPredict / withPortfolio)
+ *           └─ AppRuntimeProviders (shared client ownership and service providers)
  *               └─ PageShell     (withPage + withToast + withModals)
  */
 
@@ -24,13 +24,8 @@ import {
   useState,
 } from "react";
 import { usePathname } from "next/navigation";
-import Cookies from "js-cookie";
 import { QueryClientProvider, useQueryClient } from "@tanstack/react-query";
-import { ChainStreamClient } from "@chainstream-io/sdk";
 import { Chain, Token } from "@liberfi.io/types";
-import { Client } from "@liberfi.io/client";
-import { DexClientProvider as APIClientProvider } from "@liberfi.io/react";
-import { DexClientProvider } from "@liberfi/react-dex";
 import {
   LocaleCode,
   LocaleProvider,
@@ -41,22 +36,11 @@ import {
 } from "@liberfi.io/i18n";
 import {
   useAuth,
-  useConnectedWallet,
   useSwitchEvmWalletsToChain,
   useWallets,
   type EvmWalletAdapter,
 } from "@liberfi.io/wallet-connector";
 import { useCurrentChain, useSelectChain } from "@liberfi.io/ui-chain-select";
-import { MediaTrackClient } from "@liberfi.io/ui-media-track/client";
-import { MediaTrackProvider } from "@liberfi.io/ui-media-track";
-import { ChannelsClient } from "@liberfi.io/ui-channels/client";
-import { ChannelsProvider } from "@liberfi.io/ui-channels";
-import {
-  PerpetualsProvider,
-  HyperliquidPerpetualsClient,
-  LiberFiPerpDepositClient,
-} from "@liberfi.io/ui-perpetuals";
-import { PredictClient, PredictProvider, PolymarketProvider } from "@liberfi.io/react-predict";
 import type { PredictEvent } from "@liberfi.io/react-predict";
 import {
   PredictSearchModal,
@@ -64,10 +48,8 @@ import {
   PredictWalletProvider,
 } from "@liberfi.io/ui-predict";
 import { predictEventHref } from "./page/predict-source";
-import { PortfolioClient } from "@liberfi.io/ui-portfolio/client";
 
 const NoPrefetchLink: LinkComponentType = (props) => <ChainAwareLink prefetch={false} {...props} />;
-import { PortfolioClientProvider, PortfolioProvider } from "@liberfi.io/ui-portfolio";
 import {
   StyledToaster,
   toast,
@@ -106,7 +88,6 @@ import { SEARCH_MODAL_ID, SearchModal } from "@liberfi.io/ui-tokens";
 import { chainDisplayName, formatAmount, truncateAddress } from "@liberfi.io/utils";
 import type { PredefinedToken } from "@liberfi.io/utils";
 import {
-  useDexTokenProvider,
   TranslationProvider,
   AppSdkProvider,
   RouterProvider,
@@ -141,7 +122,6 @@ import {
 import { ReceiveModal, RECEIVE_MODAL_ID } from "./modals/ReceiveModal";
 import { WithdrawModal, WITHDRAW_MODAL_ID } from "./modals/WithdrawModal";
 import { useHyperliquidBalances } from "../hooks/useHyperliquidBalances";
-import { HyperliquidAccountStateSync } from "./HyperliquidAccountStateSync";
 import { HyperliquidUsdcIcon } from "./icons/HyperliquidUsdcIcon";
 import { CashInOutlinedIcon } from "./icons/CashInOutlinedIcon";
 import { ReceiveOutlinedIcon } from "./icons/ReceiveOutlinedIcon";
@@ -154,6 +134,7 @@ import { BottomAICopilot } from "./BottomAICopilot";
 import { PredictBalanceIndicator } from "./PredictBalanceIndicator";
 import { FundWalletModal } from "./FundWalletModal";
 import { isPulseSupportedChain } from "../lib/pulse";
+import { AppRuntimeProviders } from "../runtime/AppRuntimeProviders";
 
 const LegacyModals = [
   lazy(() => import("@liberfi/ui-dex/components/modals/WebviewModal")),
@@ -163,8 +144,6 @@ const LegacyModals = [
   lazy(() => import("@liberfi/ui-dex/components/modals/SwapModal")),
   lazy(() => import("@liberfi/ui-dex/components/modals/TransferModal")),
 ];
-
-const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
 
 type FlatTranslationResource = Record<string, string>;
 interface NestedTranslationResource {
@@ -223,7 +202,7 @@ export function NewAppLayout({ children, locale }: PropsWithChildren<{ locale: L
             zh: mergeResources(zh2, zh),
           }}
         >
-          <ServiceProviders>
+          <AppRuntimeProviders>
             <LegacyBridge>
               <PageShell>{children}</PageShell>
               <LaunchPadModal />
@@ -240,146 +219,10 @@ export function NewAppLayout({ children, locale }: PropsWithChildren<{ locale: L
                 ))}
               </Suspense>
             </LegacyBridge>
-          </ServiceProviders>
+          </AppRuntimeProviders>
         </LocaleProvider>
       </AuthProviders>
     </QueryClientProvider>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Service providers (withDex + withMediaTrack + withChannels + withPredict + withPortfolio)
-// ---------------------------------------------------------------------------
-
-function ServiceProviders({ children }: PropsWithChildren) {
-  const loader = useMemo(
-    () => ({
-      async set(token: string, expiresAt: Date) {
-        Cookies.set("dex-token", token, {
-          expires: expiresAt,
-          secure: true,
-          sameSite: "strict" as const,
-        });
-      },
-      async get() {
-        return Cookies.get("dex-token") ?? null;
-      },
-    }),
-    [],
-  );
-
-  const dexTokenProvider = useDexTokenProvider(loader);
-
-  const dexClient = useMemo(
-    () =>
-      new ChainStreamClient(dexTokenProvider, {
-        serverUrl: baseUrl + process.env.NEXT_PUBLIC_DEX_AGGREGATOR_URL,
-      }),
-    [dexTokenProvider],
-  );
-
-  const apiClient = useMemo(
-    () =>
-      new Client(dexTokenProvider, {
-        serverUrl: baseUrl + process.env.NEXT_PUBLIC_DEX_AGGREGATOR_URL,
-        nativeBalanceApiUrl: "/api/balance",
-      }),
-    [dexTokenProvider],
-  );
-
-  const mediaTrackClient = useMemo(
-    () =>
-      new MediaTrackClient({
-        endpoint: baseUrl + process.env.NEXT_PUBLIC_MEDIA_TRACK_URL,
-        streamEndpoint: process.env.NEXT_PUBLIC_MEDIA_TRACK_STREAM_URL,
-        accessToken: dexTokenProvider,
-      }),
-    [dexTokenProvider],
-  );
-
-  const { user } = useAuth();
-
-  const channelsTokenProvider = useMemo(
-    () => ({
-      getToken: async () => Promise.resolve(user?.accessToken ?? null),
-    }),
-    [user],
-  );
-
-  const channelsClient = useMemo(
-    () =>
-      new ChannelsClient({
-        endpoint: baseUrl + process.env.NEXT_PUBLIC_CHANNELS_URL,
-        accessToken: channelsTokenProvider ?? { getToken: async () => Promise.resolve(null) },
-      }),
-    [channelsTokenProvider],
-  );
-
-  const predictClient = useMemo(
-    () => new PredictClient(baseUrl + process.env.NEXT_PUBLIC_PREDICT_URL),
-    [],
-  );
-
-  // TODO: re-enable when prediction WS backend is ready
-  const predictWsClient = null;
-  // const predictWsClient = useMemo(() => {
-  //   const wsUrl = process.env.NEXT_PUBLIC_PREDICT_WS_URL;
-  //   if (!wsUrl) return null;
-  //   return createPredictWsClient({ wsUrl, autoConnect: false, autoReconnect: true });
-  // }, []);
-
-  const portfolioClient = useMemo(
-    () => new PortfolioClient(baseUrl + process.env.NEXT_PUBLIC_DEX_AGGREGATOR_URL),
-    [],
-  );
-
-  const perpetualsClient = useMemo(
-    () => new HyperliquidPerpetualsClient({ environment: "mainnet" }),
-    [],
-  );
-
-  // Solana → Hyperliquid deposit client (perpetuals-server REST API).
-  // Only constructed when a backend URL is configured. The widget shows
-  // an inline "not configured" hint when this is undefined.
-  const perpDepositClient = useMemo(() => {
-    const apiPath = process.env.NEXT_PUBLIC_PERPETUALS_API_PATH;
-    if (!apiPath) return undefined;
-    return new LiberFiPerpDepositClient({ baseUrl: baseUrl + apiPath });
-  }, []);
-
-  const { chain } = useCurrentChain();
-  const wallet = useConnectedWallet(chain);
-
-  // Bidirectional `?chain=<slug>` URL sync: read from URL on mount / query
-  // change, and redirect away from token detail pages on conflict.
-  useChainUrlSync();
-
-  return (
-    <DexClientProvider client={dexClient}>
-      <APIClientProvider client={apiClient} subscribeClient={apiClient}>
-        <MediaTrackProvider client={mediaTrackClient}>
-          <ChannelsProvider client={channelsClient}>
-            <PredictProvider client={predictClient} wsClient={predictWsClient}>
-              <PolymarketProvider>
-                <PortfolioClientProvider client={portfolioClient}>
-                  <PortfolioProvider chain={chain} address={wallet?.address ?? ""}>
-                    <PerpetualsProvider client={perpetualsClient} depositClient={perpDepositClient}>
-                      {/* Drives the Hyperliquid `webData2` subscription for the
-                    whole app — replaces the 10s `clearinghouseState` /
-                    `spotClearinghouseState` poll with a single push channel
-                    that updates `usePositionsQuery`, `useOrdersQuery`, and
-                    `useHyperliquidBalances` in real time. */}
-                      <HyperliquidAccountStateSync />
-                      {children}
-                    </PerpetualsProvider>
-                  </PortfolioProvider>
-                </PortfolioClientProvider>
-              </PolymarketProvider>
-            </PredictProvider>
-          </ChannelsProvider>
-        </MediaTrackProvider>
-      </APIClientProvider>
-    </DexClientProvider>
   );
 }
 
@@ -432,6 +275,7 @@ function LegacyBridge({ children }: PropsWithChildren) {
 // ---------------------------------------------------------------------------
 
 function PageShell({ children }: PropsWithChildren) {
+  useChainUrlSync();
   const { t } = useTranslation();
   const pathname = usePathname();
   const router = useChainAwareRouter();

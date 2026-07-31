@@ -1,29 +1,22 @@
 "use client";
 
-import { useEffect } from "react";
 import { usePredictWsClient } from "@liberfi.io/react-predict";
 import { PredictSubNav } from "src/components/PredictSubNav";
+import { usePredictWsRouteLifecycle } from "../../../runtime/usePredictWsRouteLifecycle";
 
 /**
  * Connects the prediction WebSocket when the user enters any /predict route
  * and disconnects when they leave. This keeps the WS connection scoped to
  * the predict section instead of being open on every page.
  *
- * Note: PredictWalletProvider lives in the root layout (NewAppLayout →
- * ServiceProviders) so the header's PredictBalanceIndicator dropdown
+ * Note: PredictWalletProvider lives in the root layout below AppRuntimeProviders,
+ * so the header's PredictBalanceIndicator dropdown
  * (which surfaces addresses, KYC / Setup status, and sign-out) can also
  * access it.
  */
 function PredictWsConnector() {
   const { wsClient } = usePredictWsClient();
-
-  useEffect(() => {
-    if (!wsClient) return;
-    wsClient.connect();
-    return () => {
-      wsClient.disconnect();
-    };
-  }, [wsClient]);
+  usePredictWsRouteLifecycle(wsClient);
 
   return null;
 }
