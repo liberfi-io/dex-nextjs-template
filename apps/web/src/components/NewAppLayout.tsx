@@ -24,7 +24,7 @@ import {
   useState,
 } from "react";
 import { usePathname } from "next/navigation";
-import { QueryClientProvider, useQueryClient } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { Chain, Token } from "@liberfi.io/types";
 import {
   LocaleCode,
@@ -87,15 +87,8 @@ import {
 import { SEARCH_MODAL_ID, SearchModal } from "@liberfi.io/ui-tokens";
 import { chainDisplayName, formatAmount, truncateAddress } from "@liberfi.io/utils";
 import type { PredefinedToken } from "@liberfi.io/utils";
-import {
-  TranslationProvider,
-  AppSdkProvider,
-  RouterProvider,
-  queryClientSubject,
-  dexClientSubject,
-} from "@liberfi/ui-base";
+import { TranslationProvider, AppSdkProvider, RouterProvider } from "@liberfi/ui-base";
 import { useRouterAdapter } from "../hooks/useRouterAdapter";
-import { useDexClient } from "@liberfi/react-dex";
 import { tokenDetailRoute } from "@liberfi/ui-dex/libs/routes";
 import { useCreateOnrampWidgetUrlMutation } from "@liberfi/react-backend";
 import { queryClient } from "../libs/queryClient";
@@ -202,7 +195,7 @@ export function NewAppLayout({ children, locale }: PropsWithChildren<{ locale: L
           }}
         >
           <AppRuntimeProviders>
-            <LegacyBridge>
+            <ApplicationAdapters>
               <PageShell>{children}</PageShell>
               <LaunchPadModal />
               <DepositHyperliquidUsdcModal />
@@ -217,7 +210,7 @@ export function NewAppLayout({ children, locale }: PropsWithChildren<{ locale: L
                   <Modal key={i} />
                 ))}
               </Suspense>
-            </LegacyBridge>
+            </ApplicationAdapters>
           </AppRuntimeProviders>
         </LocaleProvider>
       </AuthProviders>
@@ -226,9 +219,7 @@ export function NewAppLayout({ children, locale }: PropsWithChildren<{ locale: L
 }
 
 // ---------------------------------------------------------------------------
-// Legacy bridge (provides TranslationProvider + RouterProvider + AppSdkProvider
-// + DexDataProvider so that @liberfi/ui-dex components work inside the new
-// layout)
+// Application adapters for legacy ui-dex components.
 //
 // The RouterProvider is required: @liberfi/ui-dex components such as
 // `TvChartWrapper` read `useRouter()` from `@liberfi/ui-base` to obtain the
@@ -238,30 +229,14 @@ export function NewAppLayout({ children, locale }: PropsWithChildren<{ locale: L
 // function` once the chart's RxJS pipeline fires.
 // ---------------------------------------------------------------------------
 
-function LegacyBridge({ children }: PropsWithChildren) {
+function ApplicationAdapters({ children }: PropsWithChildren) {
   const translation = useTranslationAdapter();
   const router = useRouterAdapter();
-
-  const qc = useQueryClient();
-  useEffect(() => {
-    queryClientSubject.next(qc);
-  }, [qc]);
-
-  const dc = useDexClient();
-  useEffect(() => {
-    dexClientSubject.next(dc);
-  }, [dc]);
-
-  // Delay children mount until subjects are synced (mirrors UIKitProvider's ready gate)
-  const [ready, setReady] = useState(false);
-  useEffect(() => {
-    setTimeout(() => setReady(true));
-  }, []);
 
   return (
     <TranslationProvider translation={translation}>
       <RouterProvider router={router}>
-        <AppSdkProvider appSdk={browserAppSdk}>{ready ? children : null}</AppSdkProvider>
+        <AppSdkProvider appSdk={browserAppSdk}>{children}</AppSdkProvider>
       </RouterProvider>
     </TranslationProvider>
   );

@@ -1,15 +1,6 @@
-import { BehaviorSubject } from "rxjs";
 import { atom } from "jotai";
 // import { atomWithStorage } from "jotai/utils";
-import { QueryClient } from "@tanstack/react-query";
-import { ChainStreamClient } from "@chainstream-io/sdk";
 import { Layout } from "./types";
-
-// queryClient for non-hooks usage
-export const queryClientSubject = new BehaviorSubject<QueryClient | null>(null);
-
-// dexClient for non-hooks usage
-export const dexClientSubject = new BehaviorSubject<ChainStreamClient | null>(null);
 
 // tick every second to hold the current timestamp
 export const tickAtom = atom(new Date().getTime());
