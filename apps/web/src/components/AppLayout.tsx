@@ -1,28 +1,33 @@
 "use client";
 
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useState } from "react";
 import { ServiceClientProviders } from "./ServiceClientProviders";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { GraphQLClientProvider } from "@liberfi/react-backend";
 import { UIProviders } from "./UIProviders";
 import { AuthProviders } from "./AuthProviders";
 import { LocaleCode, LocaleProvider } from "@liberfi.io/i18n";
+import type { LocaleProviderProps } from "@liberfi.io/i18n";
+import type { ComponentType } from "react";
 import { queryClient } from "../libs/queryClient";
 import { graphqlClient } from "../libs/graphqlClient";
-import en from "@liberfi/locales/locales/en/translation.json";
-import zh from "@liberfi/locales/locales/zh/translation.json";
-import en2 from "@liberfi.io/i18n/locales/en.json";
-import zh2 from "@liberfi.io/i18n/locales/zh.json";
+import {
+  applicationLocaleProviderProps,
+  createApplicationLocaleRuntime,
+  type ApplicationLocaleRuntime,
+} from "../runtime/createApplicationLocaleRuntime";
+
+const RuntimeLocaleProvider = LocaleProvider as ComponentType<
+  LocaleProviderProps & { runtime?: ApplicationLocaleRuntime }
+>;
 
 export function AppLayout({ children, locale }: PropsWithChildren<{ locale: LocaleCode }>) {
+  const [runtime] = useState(() => createApplicationLocaleRuntime(locale));
   return (
-    <LocaleProvider
+    <RuntimeLocaleProvider
+      {...applicationLocaleProviderProps(runtime)}
       locale={locale}
       supportedLanguages={["en", "zh"]}
-      resources={{
-        en: { ...en, ...en2 },
-        zh: { ...zh, ...zh2 },
-      }}
     >
       <QueryClientProvider client={queryClient}>
         <GraphQLClientProvider client={graphqlClient}>
@@ -33,6 +38,6 @@ export function AppLayout({ children, locale }: PropsWithChildren<{ locale: Loca
           </AuthProviders>
         </GraphQLClientProvider>
       </QueryClientProvider>
-    </LocaleProvider>
+    </RuntimeLocaleProvider>
   );
 }

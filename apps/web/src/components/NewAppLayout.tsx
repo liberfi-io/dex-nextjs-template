@@ -22,6 +22,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type ComponentType,
 } from "react";
 import { usePathname } from "next/navigation";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -33,6 +34,7 @@ import {
   useLocale,
   useChangeLocale,
   useLocaleContext,
+  type LocaleProviderProps,
 } from "@liberfi.io/i18n";
 import {
   useAuth,
@@ -99,10 +101,11 @@ import { useChainSwitchUrlHandler } from "../hooks/useChainSwitchUrlHandler";
 import { useTranslationAdapter } from "../hooks/useTranslationAdapter";
 import { ChainAwareLink } from "./ChainAwareLink";
 import { browserAppSdk } from "../libs/browser/BrowserAppSdk";
-import en from "@liberfi/locales/locales/en/translation.json";
-import zh from "@liberfi/locales/locales/zh/translation.json";
-import en2 from "@liberfi.io/i18n/locales/en.json";
-import zh2 from "@liberfi.io/i18n/locales/zh.json";
+import {
+  applicationLocaleProviderProps,
+  createApplicationLocaleRuntime,
+  type ApplicationLocaleRuntime,
+} from "../runtime/createApplicationLocaleRuntime";
 import { PresetFormModal } from "@liberfi.io/ui-trade";
 import { useAsyncModal } from "@liberfi.io/ui-scaffold";
 import { useAccountInfo } from "@liberfi.io/ui-portfolio";
@@ -137,37 +140,9 @@ const LegacyModals = [
   lazy(() => import("@liberfi/ui-dex/components/modals/TransferModal")),
 ];
 
-type FlatTranslationResource = Record<string, string>;
-interface NestedTranslationResource {
-  [key: string]: string | NestedTranslationResource;
-}
-
-function mergeResources(
-  base: FlatTranslationResource,
-  override: NestedTranslationResource,
-): FlatTranslationResource {
-  return { ...base, ...flattenResource(override) };
-}
-
-function flattenResource(
-  resource: NestedTranslationResource,
-  prefix = "",
-): FlatTranslationResource {
-  const flattened: FlatTranslationResource = {};
-  for (const [key, value] of Object.entries(resource)) {
-    const nextKey = prefix ? `${prefix}.${key}` : key;
-    if (isPlainObject(value)) {
-      Object.assign(flattened, flattenResource(value, nextKey));
-      continue;
-    }
-    flattened[nextKey] = value;
-  }
-  return flattened;
-}
-
-function isPlainObject(value: unknown): value is NestedTranslationResource {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
+const RuntimeLocaleProvider = LocaleProvider as ComponentType<
+  LocaleProviderProps & { runtime?: ApplicationLocaleRuntime }
+>;
 
 const navItemsConfig: Omit<NavItem, "label">[] = [
   { key: "discover", href: "/", icon: <HomeIcon width={20} height={20} /> },
@@ -183,16 +158,14 @@ const navItemsConfig: Omit<NavItem, "label">[] = [
 // ---------------------------------------------------------------------------
 
 export function NewAppLayout({ children, locale }: PropsWithChildren<{ locale: LocaleCode }>) {
+  const [localeRuntime] = useState(() => createApplicationLocaleRuntime(locale));
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProviders>
-        <LocaleProvider
+        <RuntimeLocaleProvider
+          {...applicationLocaleProviderProps(localeRuntime)}
           locale={locale}
           supportedLanguages={["en", "zh"]}
-          resources={{
-            en: mergeResources(en2, en),
-            zh: mergeResources(zh2, zh),
-          }}
         >
           <AppRuntimeProviders>
             <ApplicationAdapters>
@@ -212,7 +185,7 @@ export function NewAppLayout({ children, locale }: PropsWithChildren<{ locale: L
               </Suspense>
             </ApplicationAdapters>
           </AppRuntimeProviders>
-        </LocaleProvider>
+        </RuntimeLocaleProvider>
       </AuthProviders>
     </QueryClientProvider>
   );

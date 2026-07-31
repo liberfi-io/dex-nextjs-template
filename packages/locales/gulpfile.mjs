@@ -7,7 +7,7 @@ import eslint from "gulp-eslint-new";
 import ts from "gulp-typescript";
 
 export async function clean() {
-  return deleteAsync(["./src/**/*", "./dist/**/*"]);
+  return deleteAsync(["./src/en.ts", "./src/zh.ts", "./dist/**/*"]);
 }
 
 export function copyLocales() {

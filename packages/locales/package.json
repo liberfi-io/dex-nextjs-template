@@ -4,7 +4,19 @@
   "author": "AI <ai@liberfi.io>",
   "description": "Liberfi locales",
   "exports": {
-    "./locales/*": "./dist/locales/*"
+    "./locales/*": "./dist/locales/*",
+    "./en": {
+      "types": "./dist/en.d.ts",
+      "default": "./dist/en.js"
+    },
+    "./zh": {
+      "types": "./dist/zh.d.ts",
+      "default": "./dist/zh.js"
+    },
+    "./legacy-aliases": {
+      "types": "./dist/legacy-aliases.d.ts",
+      "default": "./dist/legacy-aliases.js"
+    }
   },
   "scripts": {
     "build": "gulp build",
