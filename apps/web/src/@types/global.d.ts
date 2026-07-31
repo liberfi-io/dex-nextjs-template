@@ -18,6 +18,7 @@ declare global {
       NEXT_PUBLIC_AI_COPILOT_URL: string;
       NEXT_PUBLIC_PREDICT_URL: string;
       NEXT_PUBLIC_PREDICT_WS_URL: string | undefined;
+      NEXT_PUBLIC_ENABLE_PREDICT_WS: string | undefined;
       NEXT_PUBLIC_PERPETUALS_API_PATH: string | undefined;
       SENTRY_AUTH_TOKEN: string | undefined;
       GRAPHQL_SERVER_ENDPOINT: string;

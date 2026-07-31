@@ -1,4 +1,5 @@
 import { resolveRuntimeConfigPolicy } from "../runtime-lifecycle-policy";
+import { readRuntimeConfig } from "../readRuntimeConfig";
 
 const REQUIRED_ENV = {
   NEXT_PUBLIC_DEX_AGGREGATOR_URL: "/dex-api",
@@ -9,6 +10,10 @@ const REQUIRED_ENV = {
 } as const;
 
 describe("runtime configuration policy", () => {
+  it("reads explicit environment and origin inputs without touching browser globals", () => {
+    expect(readRuntimeConfig(REQUIRED_ENV, "").origin).toBe("");
+  });
+
   it("resolves relative HTTP endpoints against the browser origin", () => {
     expect(
       resolveRuntimeConfigPolicy({

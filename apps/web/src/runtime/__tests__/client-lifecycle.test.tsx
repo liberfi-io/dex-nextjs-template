@@ -1,5 +1,7 @@
 import { RuntimeConfig } from "../app-runtime.types";
 import { getChangedRuntimeClients } from "../runtime-lifecycle-policy";
+import { renderHook } from "@testing-library/react";
+import { useAppClientBundle } from "../useAppClientBundle";
 
 const CONFIG: RuntimeConfig = {
   origin: "https://app.example.com",
@@ -28,6 +30,56 @@ function lifecycleInput(overrides: Record<string, unknown> = {}) {
 }
 
 describe("application client lifecycle policy", () => {
+  it("keeps every client stable when hook inputs are referentially stable", () => {
+    const dexTokenProvider = { getToken: async () => "dex-token" };
+    const channelsTokenProvider = { getToken: async () => "channels-token" };
+    const { result, rerender } = renderHook(() =>
+      useAppClientBundle({
+        config: CONFIG,
+        dexTokenProvider,
+        channelsTokenProvider,
+      }),
+    );
+    const first = result.current;
+
+    rerender();
+
+    expect(result.current).toBe(first);
+    for (const key of Object.keys(first) as Array<keyof typeof first>) {
+      expect(result.current[key]).toBe(first[key]);
+    }
+  });
+
+  it("rebuilds only the Channels member when its token provider changes", () => {
+    const dexTokenProvider = { getToken: async () => "dex-token" };
+    const firstChannelsTokenProvider = {
+      getToken: async () => "first-channels-token",
+    };
+    const nextChannelsTokenProvider = {
+      getToken: async () => "next-channels-token",
+    };
+    const { result, rerender } = renderHook(
+      ({ channelsTokenProvider }) =>
+        useAppClientBundle({
+          config: CONFIG,
+          dexTokenProvider,
+          channelsTokenProvider,
+        }),
+      {
+        initialProps: { channelsTokenProvider: firstChannelsTokenProvider },
+      },
+    );
+    const first = result.current;
+
+    rerender({ channelsTokenProvider: nextChannelsTokenProvider });
+
+    expect(result.current).not.toBe(first);
+    expect(result.current.channels).not.toBe(first.channels);
+    for (const key of Object.keys(first) as Array<keyof typeof first>) {
+      if (key !== "channels") expect(result.current[key]).toBe(first[key]);
+    }
+  });
+
   it("does not rebuild clients for an ordinary rerender", () => {
     const before = lifecycleInput();
     const after = lifecycleInput();

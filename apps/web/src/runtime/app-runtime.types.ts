@@ -18,6 +18,18 @@ export interface RuntimeConfigPolicyInput {
   origin: string;
 }
 
+export interface AppClientBundle {
+  chainStream: ChainStreamClient;
+  api: Client;
+  mediaTrack: MediaTrackClient;
+  channels: ChannelsClient;
+  predict: PredictClient;
+  predictWs: PredictWsClient | null;
+  portfolio: PortfolioClient;
+  perpetuals: HyperliquidPerpetualsClient;
+  perpetualDeposit: LiberFiPerpDepositClient | undefined;
+}
+
 export interface RuntimeLifecycleInput {
   config: RuntimeConfig;
   dexTokenProvider: unknown;
@@ -66,3 +78,13 @@ export interface PredictWsRouteLifecycle {
   enter(): void;
   leave(): void;
 }
+import type { ChainStreamClient } from "@chainstream-io/sdk";
+import type { Client } from "@liberfi.io/client";
+import type { PredictClient, PredictWsClient } from "@liberfi.io/react-predict";
+import type { ChannelsClient } from "@liberfi.io/ui-channels/client";
+import type { MediaTrackClient } from "@liberfi.io/ui-media-track/client";
+import type {
+  HyperliquidPerpetualsClient,
+  LiberFiPerpDepositClient,
+} from "@liberfi.io/ui-perpetuals";
+import type { PortfolioClient } from "@liberfi.io/ui-portfolio/client";
