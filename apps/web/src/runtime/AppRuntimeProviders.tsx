@@ -1,6 +1,6 @@
 "use client";
 
-import { PropsWithChildren, useMemo } from "react";
+import { type ComponentType, PropsWithChildren, useMemo } from "react";
 import Cookies from "js-cookie";
 import { DexClientProvider as ApiClientProvider } from "@liberfi.io/react";
 import { PolymarketProvider, PredictProvider } from "@liberfi.io/react-predict";
@@ -21,12 +21,52 @@ import {
 import { HyperliquidAccountStateSync } from "../components/HyperliquidAccountStateSync";
 import { pinata } from "../libs/pinata";
 import { queryClient } from "../libs/queryClient";
-import { RuntimeConfig } from "./app-runtime.types";
+import {
+  type AppClientBundle,
+  type CapabilityBundleV1,
+  RuntimeConfig,
+} from "./app-runtime.types";
 import { readRuntimeConfig } from "./readRuntimeConfig";
 import { useAppClientBundle } from "./useAppClientBundle";
 
 export interface AppRuntimeProvidersProps extends PropsWithChildren {
   config?: RuntimeConfig;
+}
+
+type ReactCapabilityInput = {
+  token: CapabilityBundleV1["token"];
+  wallet: CapabilityBundleV1["wallet"];
+  activity: CapabilityBundleV1["activity"];
+  trade: CapabilityBundleV1["trade"];
+  transaction: CapabilityBundleV1["transaction"];
+  media: CapabilityBundleV1["media"];
+  tokenSubscription: CapabilityBundleV1["subscription"]["token"];
+  walletSubscription: CapabilityBundleV1["subscription"]["wallet"];
+  activitySubscription: CapabilityBundleV1["subscription"]["activity"];
+};
+
+const CapabilityClientProvider = ApiClientProvider as ComponentType<
+  PropsWithChildren<{
+    client: AppClientBundle["api"];
+    subscribeClient: AppClientBundle["api"];
+    capabilities: ReactCapabilityInput;
+  }>
+>;
+
+function projectReactCapabilities(
+  bundle: CapabilityBundleV1,
+): ReactCapabilityInput {
+  return {
+    token: bundle.token,
+    wallet: bundle.wallet,
+    activity: bundle.activity,
+    trade: bundle.trade,
+    transaction: bundle.transaction,
+    media: bundle.media,
+    tokenSubscription: bundle.subscription.token,
+    walletSubscription: bundle.subscription.wallet,
+    activitySubscription: bundle.subscription.activity,
+  };
 }
 
 export function AppRuntimeProviders({
@@ -65,13 +105,21 @@ export function AppRuntimeProviders({
     () => createChainStreamDexDataAdapter(clients.chainStream),
     [clients.chainStream],
   );
+  const reactCapabilities = useMemo(
+    () => projectReactCapabilities(clients.capabilities),
+    [clients.capabilities],
+  );
   const { chain } = useCurrentChain();
   const wallet = useConnectedWallet(chain);
 
   return (
     <PinataProvider client={pinata}>
       <DexClientProvider client={clients.chainStream}>
-        <ApiClientProvider client={clients.api} subscribeClient={clients.api}>
+        <CapabilityClientProvider
+          client={clients.api}
+          subscribeClient={clients.api}
+          capabilities={reactCapabilities}
+        >
           <MediaTrackProvider client={clients.mediaTrack}>
             <ChannelsProvider client={clients.channels}>
               <PredictProvider client={clients.predict} wsClient={clients.predictWs}>
@@ -97,7 +145,7 @@ export function AppRuntimeProviders({
               </PredictProvider>
             </ChannelsProvider>
           </MediaTrackProvider>
-        </ApiClientProvider>
+        </CapabilityClientProvider>
       </DexClientProvider>
     </PinataProvider>
   );

@@ -3,6 +3,7 @@ import { AppClientBundle, RuntimeConfig } from "./app-runtime.types";
 import {
   ChannelsTokenProvider,
   createAppClients,
+  createCapabilityBundle,
   createChannelsClient,
   createDexClients,
   createMediaTrackClient,
@@ -38,6 +39,10 @@ export function useAppClientBundle({
       ),
     [config.mediaTrackStreamUrl, config.mediaTrackUrl, dexTokenProvider],
   );
+  const capabilities = useMemo(
+    () => createCapabilityBundle(dex.api),
+    [dex.api],
+  );
   const channels = useMemo(
     () => createChannelsClient({ channelsUrl: config.channelsUrl }, channelsTokenProvider),
     [channelsTokenProvider, config.channelsUrl],
@@ -66,14 +71,17 @@ export function useAppClientBundle({
 
   return useMemo(
     () =>
-      createAppClients({
-        ...dex,
-        mediaTrack,
-        channels,
-        ...predict,
-        portfolio,
-        ...perpetuals,
-      }),
-    [channels, dex, mediaTrack, perpetuals, portfolio, predict],
+      createAppClients(
+        {
+          ...dex,
+          mediaTrack,
+          channels,
+          ...predict,
+          portfolio,
+          ...perpetuals,
+        },
+        capabilities,
+      ),
+    [capabilities, channels, dex, mediaTrack, perpetuals, portfolio, predict],
   );
 }

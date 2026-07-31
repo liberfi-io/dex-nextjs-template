@@ -9,6 +9,7 @@ import { AuthProviders } from "./AuthProviders";
 import { LocaleCode, LocaleProvider } from "@liberfi.io/i18n";
 import type { LocaleProviderProps } from "@liberfi.io/i18n";
 import type { ComponentType } from "react";
+import * as UiScaffold from "@liberfi.io/ui-scaffold";
 import { queryClient } from "../libs/queryClient";
 import { graphqlClient } from "../libs/graphqlClient";
 import {
@@ -20,24 +21,31 @@ import {
 const RuntimeLocaleProvider = LocaleProvider as ComponentType<
   LocaleProviderProps & { runtime?: ApplicationLocaleRuntime }
 >;
+const ModalCoordinatorProvider = (
+  UiScaffold as typeof UiScaffold & {
+    ModalCoordinatorProvider: ComponentType<PropsWithChildren>;
+  }
+).ModalCoordinatorProvider;
 
 export function AppLayout({ children, locale }: PropsWithChildren<{ locale: LocaleCode }>) {
   const [runtime] = useState(() => createApplicationLocaleRuntime(locale));
   return (
-    <RuntimeLocaleProvider
-      {...applicationLocaleProviderProps(runtime)}
-      locale={locale}
-      supportedLanguages={["en", "zh"]}
-    >
+    <ModalCoordinatorProvider>
       <QueryClientProvider client={queryClient}>
         <GraphQLClientProvider client={graphqlClient}>
           <AuthProviders>
-            <ServiceClientProviders>
-              <UIProviders>{children}</UIProviders>
-            </ServiceClientProviders>
+            <RuntimeLocaleProvider
+              {...applicationLocaleProviderProps(runtime)}
+              locale={locale}
+              supportedLanguages={["en", "zh"]}
+            >
+              <ServiceClientProviders>
+                <UIProviders>{children}</UIProviders>
+              </ServiceClientProviders>
+            </RuntimeLocaleProvider>
           </AuthProviders>
         </GraphQLClientProvider>
       </QueryClientProvider>
-    </RuntimeLocaleProvider>
+    </ModalCoordinatorProvider>
   );
 }

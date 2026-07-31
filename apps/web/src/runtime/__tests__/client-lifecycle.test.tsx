@@ -48,6 +48,10 @@ describe("application client lifecycle policy", () => {
     for (const key of Object.keys(first) as Array<keyof typeof first>) {
       expect(result.current[key]).toBe(first[key]);
     }
+    expect(result.current.capabilities.token).toBe(result.current.api);
+    expect(result.current.capabilities.subscription.activity).toBe(
+      result.current.api,
+    );
   });
 
   it("rebuilds only the Channels member when its token provider changes", () => {

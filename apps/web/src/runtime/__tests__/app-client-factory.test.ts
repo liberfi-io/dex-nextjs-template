@@ -152,6 +152,18 @@ describe("application client factory", () => {
 
     expect(bundle).toBe(members);
     expect(bundle.chainStream).toBe(members.chainStream);
+    expect(Object.keys(bundle.capabilities)).toEqual([
+      "token",
+      "wallet",
+      "activity",
+      "trade",
+      "transaction",
+      "media",
+      "subscription",
+    ]);
+    expect(bundle.capabilities.token).toBe(members.api);
+    expect(bundle.capabilities.subscription.token).toBe(members.api);
+    expect(Object.values(bundle.capabilities)).not.toContain(bundle.chainStream);
     expect(bundle.predictWs).toBeNull();
     expect(bundle.perpetualDeposit).toBeUndefined();
   });

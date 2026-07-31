@@ -28,6 +28,89 @@ export interface AppClientBundle {
   portfolio: PortfolioClient;
   perpetuals: HyperliquidPerpetualsClient;
   perpetualDeposit: LiberFiPerpDepositClient | undefined;
+  capabilities: CapabilityBundleV1;
+}
+
+type TokenDataCapability = Pick<
+  Client,
+  | "getToken"
+  | "getTokens"
+  | "getTokenCandles"
+  | "getTokenSecurity"
+  | "getTokenStats"
+  | "getTokenHolders"
+  | "getTokenTopTraders"
+  | "getTokenMarketData"
+  | "getNewTokens"
+  | "getNewPools"
+  | "getFinalStretchTokens"
+  | "getMigratedTokens"
+  | "getTrendingTokens"
+  | "getStockTokens"
+  | "searchTokens"
+  | "getTokensByCreator"
+>;
+type WalletDataCapability = Pick<
+  Client,
+  | "getWalletPortfolios"
+  | "getWalletPnl"
+  | "getWalletPortfolioPnls"
+  | "getWalletPortfoliosByTokens"
+  | "getWalletPortfolioPnlsByTokens"
+  | "getWalletLimitOrders"
+>;
+type ActivityDataCapability = Pick<
+  Client,
+  | "getWalletTrades"
+  | "getTokenTrades"
+  | "getWalletActivities"
+  | "getTokenActivities"
+>;
+type TradeCapability = Pick<Client, "swapRoute">;
+type TransactionCapability = Pick<
+  Client,
+  "getLatestBlock" | "sendTx" | "checkTxSuccess"
+>;
+type MediaCapability = Pick<Client, "getPresignedUploadUrl">;
+type TokenSubscriptionCapability = Pick<
+  Client,
+  | "subscribeToken"
+  | "subscribeTokens"
+  | "subscribeTokenCandles"
+  | "subscribeNewTokens"
+  | "subscribeNewTokensMetadata"
+  | "subscribeNewPools"
+  | "subscribeTrendingTokens"
+  | "subscribeMigratedTokens"
+  | "subscribeFinalStretchTokens"
+  | "subscribeStockTokens"
+>;
+type WalletSubscriptionCapability = Pick<
+  Client,
+  | "subscribeWalletPnl"
+  | "subscribeWalletPortfolios"
+  | "subscribeWalletPortfolioPnls"
+>;
+type ActivitySubscriptionCapability = Pick<
+  Client,
+  | "subscribeWalletTrades"
+  | "subscribeTokenTrades"
+  | "subscribeWalletActivities"
+  | "subscribeTokenActivities"
+>;
+
+export interface CapabilityBundleV1 {
+  token: TokenDataCapability;
+  wallet: WalletDataCapability;
+  activity: ActivityDataCapability;
+  trade: TradeCapability;
+  transaction: TransactionCapability;
+  media: MediaCapability;
+  subscription: {
+    token: TokenSubscriptionCapability;
+    wallet: WalletSubscriptionCapability;
+    activity: ActivitySubscriptionCapability;
+  };
 }
 
 export interface RuntimeLifecycleInput {
@@ -50,6 +133,7 @@ export type RuntimeClientKey =
   | "perpetualDeposit";
 
 export type RuntimeProviderKey =
+  | "modal-coordinator"
   | "query-client"
   | "auth"
   | "locale"

@@ -10,6 +10,7 @@ import {
 } from "./app-runtime.types";
 
 export const APP_RUNTIME_PROVIDER_ORDER: readonly RuntimeProviderKey[] = [
+  "modal-coordinator",
   "query-client",
   "auth",
   "locale",

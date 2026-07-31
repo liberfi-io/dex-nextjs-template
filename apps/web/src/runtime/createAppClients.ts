@@ -10,7 +10,11 @@ import { ChannelsClient } from "@liberfi.io/ui-channels/client";
 import { MediaTrackClient } from "@liberfi.io/ui-media-track/client";
 import { HyperliquidPerpetualsClient, LiberFiPerpDepositClient } from "@liberfi.io/ui-perpetuals";
 import { PortfolioClient } from "@liberfi.io/ui-portfolio/client";
-import { AppClientBundle, RuntimeConfig } from "./app-runtime.types";
+import {
+  AppClientBundle,
+  CapabilityBundleV1,
+  RuntimeConfig,
+} from "./app-runtime.types";
 
 export type DexTokenProvider = ConstructorParameters<typeof ChainStreamClient>[0];
 export type DexRuntimeConfig = Pick<RuntimeConfig, "dexAggregatorUrl">;
@@ -167,8 +171,25 @@ export function createPredictClients(
   };
 }
 
-export function createAppClients(members: AppClientBundle): AppClientBundle {
-  const requiredMembers: Array<keyof AppClientBundle> = [
+type AppClientMembers = Omit<AppClientBundle, "capabilities">;
+
+export function createCapabilityBundle(api: Client): CapabilityBundleV1 {
+  return {
+    token: api,
+    wallet: api,
+    activity: api,
+    trade: api,
+    transaction: api,
+    media: api,
+    subscription: { token: api, wallet: api, activity: api },
+  };
+}
+
+export function createAppClients(
+  members: AppClientMembers,
+  capabilities = createCapabilityBundle(members.api),
+): AppClientBundle {
+  const requiredMembers: Array<keyof AppClientMembers> = [
     "chainStream",
     "api",
     "mediaTrack",
@@ -182,5 +203,5 @@ export function createAppClients(members: AppClientBundle): AppClientBundle {
       throw new Error(`Missing required application client: ${member}`);
     }
   }
-  return members;
+  return Object.assign(members, { capabilities });
 }

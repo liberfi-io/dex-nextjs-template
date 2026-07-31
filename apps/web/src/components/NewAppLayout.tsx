@@ -107,7 +107,7 @@ import {
   type ApplicationLocaleRuntime,
 } from "../runtime/createApplicationLocaleRuntime";
 import { PresetFormModal } from "@liberfi.io/ui-trade";
-import { useAsyncModal } from "@liberfi.io/ui-scaffold";
+import * as UiScaffold from "@liberfi.io/ui-scaffold";
 import { useAccountInfo } from "@liberfi.io/ui-portfolio";
 import { LaunchPadModal, LAUNCHPAD_MODAL_ID } from "./modals/LaunchPadModal";
 import {
@@ -143,6 +143,12 @@ const LegacyModals = [
 const RuntimeLocaleProvider = LocaleProvider as ComponentType<
   LocaleProviderProps & { runtime?: ApplicationLocaleRuntime }
 >;
+const ModalCoordinatorProvider = (
+  UiScaffold as typeof UiScaffold & {
+    ModalCoordinatorProvider: ComponentType<PropsWithChildren>;
+  }
+).ModalCoordinatorProvider;
+const useAsyncModal = UiScaffold.useAsyncModal;
 
 const navItemsConfig: Omit<NavItem, "label">[] = [
   { key: "discover", href: "/", icon: <HomeIcon width={20} height={20} /> },
@@ -160,34 +166,36 @@ const navItemsConfig: Omit<NavItem, "label">[] = [
 export function NewAppLayout({ children, locale }: PropsWithChildren<{ locale: LocaleCode }>) {
   const [localeRuntime] = useState(() => createApplicationLocaleRuntime(locale));
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProviders>
-        <RuntimeLocaleProvider
-          {...applicationLocaleProviderProps(localeRuntime)}
-          locale={locale}
-          supportedLanguages={["en", "zh"]}
-        >
-          <AppRuntimeProviders>
-            <ApplicationAdapters>
-              <PageShell>{children}</PageShell>
-              <LaunchPadModal />
-              <DepositHyperliquidUsdcModal />
-              <ReceiveModal />
-              <WithdrawModal />
-              <StyledToaster />
-              <SearchModal />
-              <PredictSearchModal />
-              <PresetFormModal />
-              <Suspense>
-                {LegacyModals.map((Modal, i) => (
-                  <Modal key={i} />
-                ))}
-              </Suspense>
-            </ApplicationAdapters>
-          </AppRuntimeProviders>
-        </RuntimeLocaleProvider>
-      </AuthProviders>
-    </QueryClientProvider>
+    <ModalCoordinatorProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProviders>
+          <RuntimeLocaleProvider
+            {...applicationLocaleProviderProps(localeRuntime)}
+            locale={locale}
+            supportedLanguages={["en", "zh"]}
+          >
+            <AppRuntimeProviders>
+              <ApplicationAdapters>
+                <PageShell>{children}</PageShell>
+                <LaunchPadModal />
+                <DepositHyperliquidUsdcModal />
+                <ReceiveModal />
+                <WithdrawModal />
+                <StyledToaster />
+                <SearchModal />
+                <PredictSearchModal />
+                <PresetFormModal />
+                <Suspense>
+                  {LegacyModals.map((Modal, i) => (
+                    <Modal key={i} />
+                  ))}
+                </Suspense>
+              </ApplicationAdapters>
+            </AppRuntimeProviders>
+          </RuntimeLocaleProvider>
+        </AuthProviders>
+      </QueryClientProvider>
+    </ModalCoordinatorProvider>
   );
 }
 
