@@ -1,16 +1,10 @@
 import { withSentryConfig } from "@sentry/nextjs";
 import path from "path";
 import { fileURLToPath } from "url";
-import {
-  getLocalSdkAliases,
-  getLocalSdkWatchOptions,
-} from "./build-config/local-sdk-aliases.mjs";
+import { getLocalSdkAliases, getLocalSdkWatchOptions } from "./build-config/local-sdk-aliases.mjs";
+import { getSingletonAliases, LOCAL_SDK_FALLBACK } from "./build-config/local-sdk-shared.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-// Default LOCAL_SDK_ROOT relative to apps/web/. Lives in build-config so
-// next.config.mjs and postcss.config.mjs resolve the same path.
-const LOCAL_SDK_FALLBACK = "../../../react-sdk";
 
 const localSdkAliases = getLocalSdkAliases({
   baseDir: __dirname,
@@ -57,58 +51,24 @@ const nextConfig = {
   webpack(config) {
     config.optimization.minimize = process.env.NODE_ENV === "production";
 
-    // Singleton aliases — these MUST resolve from apps/web/node_modules
-    // regardless of local-sdk mode, to avoid duplicate instances of
-    // packages that hold React Context or module-level global state.
-    const singletonAliases = {
-      jotai: path.resolve(__dirname, "node_modules/jotai"),
-      "react-hook-form": path.resolve(
-        __dirname,
-        "node_modules/react-hook-form",
-      ),
-      "@tanstack/react-query": path.resolve(
-        __dirname,
-        "node_modules/@tanstack/react-query",
-      ),
-      // @liberfi.io/react owns DexClientContext. The app-level
-      // DexClientProvider and hooks imported from workspace packages
-      // (for example @liberfi/ui-base) must resolve to this exact module
-      // instance, otherwise consumers read a different React context and
-      // throw "useDexClient must be used within a DexClientProvider".
-      "@liberfi.io/react": path.resolve(
-        __dirname,
-        "node_modules/@liberfi.io/react",
-      ),
-      // react-hot-toast keeps its toast queue in module-level state, so the
-      // <Toaster> renderer (imported by @liberfi.io/ui via StyledToaster)
-      // and toast emitters (e.g. @liberfi/ui-base's useTimerToast) MUST
-      // resolve to the same module instance. Without this pin, USE_LOCAL_SDK
-      // causes react-sdk to load its own React-19-pinned copy while the
-      // consumer uses the React-18 copy — emitted toasts never render.
-      "react-hot-toast": path.resolve(
-        __dirname,
-        "node_modules/react-hot-toast",
-      ),
-      // @liberfi.io/wallet-connector{,-privy} export AuthContext and the
-      // Privy auth/wallet contexts. If apps/web's wallet-connector and a
-      // sibling workspace package's wallet-connector resolve to different
-      // versions in pnpm's store (e.g. apps/web on 0.2.7 while
-      // packages/ui-base is still pinned to 0.2.6), each resolved path
-      // runs its own `createContext()`. The `<PrivyAuthProvider>` set up
-      // from apps/web populates one instance; `useAuth()` inside the
-      // sibling package's src then reads the other instance, finds null,
-      // and throws `useAuth must be used within an AuthProvider`. Pin
-      // both to apps/web/node_modules so workspace alias / src loading
-      // can't reintroduce the duplicate even if version drift slips
-      // back in.
-      "@liberfi.io/wallet-connector": path.resolve(
-        __dirname,
-        "node_modules/@liberfi.io/wallet-connector",
-      ),
-      "@liberfi.io/wallet-connector-privy": path.resolve(
-        __dirname,
-        "node_modules/@liberfi.io/wallet-connector-privy",
-      ),
+    // Framework and state-library entrypoints always resolve from the app.
+    // Exact aliases keep root imports from swallowing their explicit subpaths.
+    const singletonAliases = getSingletonAliases({ baseDir: __dirname });
+    const applicationSingletonAliases = {
+      "react-hot-toast$": path.resolve(__dirname, "node_modules/react-hot-toast"),
+      ...(useLocalSdk
+        ? {}
+        : {
+            "@liberfi.io/react": path.resolve(__dirname, "node_modules/@liberfi.io/react"),
+            "@liberfi.io/wallet-connector": path.resolve(
+              __dirname,
+              "node_modules/@liberfi.io/wallet-connector",
+            ),
+            "@liberfi.io/wallet-connector-privy": path.resolve(
+              __dirname,
+              "node_modules/@liberfi.io/wallet-connector-privy",
+            ),
+          }),
     };
 
     // Workspace package aliases — force every `@liberfi/*` import to
@@ -170,6 +130,7 @@ const nextConfig = {
       ...config.resolve.alias,
       ...libAliases,
       ...singletonAliases,
+      ...applicationSingletonAliases,
       ...workspaceAliases,
     };
 

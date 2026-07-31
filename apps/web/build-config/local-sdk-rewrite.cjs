@@ -100,9 +100,7 @@ function localSdkRewrite(options) {
     for (const { name, dir, pkgJson } of scanSdkPackages(sdkRoot)) {
       pkgInfoByName.set(name, { dir, exports: pkgJson.exports || null });
     }
-    console.log(
-      `[local-sdk-postcss] CSS rewrites enabled → ${sdkRoot} (${pkgInfoByName.size} packages)`,
-    );
+    console.log(`[local-sdk-postcss] CSS rewrites enabled (${pkgInfoByName.size} packages)`);
   }
 
   function rewriteImport(node) {

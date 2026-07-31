@@ -12,8 +12,8 @@
  * (e.g. wildcard exports like @liberfi.io/i18n's "./locales/*" point at
  * build-time-generated JSON that has no src twin).
  *
- * Returns `{}` (a no-op alias map) when link mode is disabled, so the
- * caller can spread it unconditionally.
+ * The entry collector exposes source classification for contract tests;
+ * the alias-map facade remains a no-op when link mode is disabled.
  */
 import fs from "fs";
 import path from "path";
@@ -37,9 +37,12 @@ function distTargetToSrc(pkgDir, target) {
   const distRel = target.replace(/^\.\//, "");
   if (!distRel.startsWith("dist/")) return undefined;
 
-  const withoutExt = distRel
-    .replace(/^dist\//, "src/")
-    .replace(/\.(js|mjs|cjs|d\.ts)$/, "");
+  const withoutExt = distRel.replace(/^dist\//, "src/").replace(/\.(js|mjs|cjs|d\.ts)$/, "");
+
+  if (distRel.endsWith(".css")) {
+    const cssCandidate = distRel.replace(/^dist\//, "src/");
+    if (fs.existsSync(path.join(pkgDir, cssCandidate))) return cssCandidate;
+  }
 
   // Try src/foo.tsx, src/foo.ts, src/foo.js then src/foo/index.tsx, etc.
   for (const ext of SRC_EXT_CANDIDATES) {
@@ -57,19 +60,24 @@ function distTargetToSrc(pkgDir, target) {
  * @param {object} options
  * @param {string} options.baseDir   - Absolute dir of next.config.mjs.
  * @param {string} [options.fallback] - Default LOCAL_SDK_ROOT relative to baseDir.
+ * @returns {{entrypoint: string, target: string, source: "src"|"dist"|"generated"}[]}
  */
-export function getLocalSdkAliases({ baseDir, fallback } = {}) {
+export function getLocalSdkAliasEntries({ baseDir, fallback } = {}) {
   const sdkRoot = resolveSdkRoot(baseDir, fallback);
-  if (!isLocalSdkEnabled(sdkRoot)) return {};
+  if (!isLocalSdkEnabled(sdkRoot)) return [];
 
-  const aliases = {};
+  const entries = [];
   for (const { name, dir: pkgDir, pkgJson } of scanSdkPackages(sdkRoot)) {
     // Root alias: prefer src/index.{tsx,ts}; fall back to pkgDir (which then
     // resolves via package.json "main"/"exports" to dist).
     const srcIndex = ["src/index.tsx", "src/index.ts"].find((f) =>
       fs.existsSync(path.join(pkgDir, f)),
     );
-    aliases[`${name}$`] = srcIndex ? path.join(pkgDir, srcIndex) : pkgDir;
+    entries.push({
+      entrypoint: `${name}$`,
+      target: srcIndex ? path.join(pkgDir, srcIndex) : pkgDir,
+      source: srcIndex ? "src" : "dist",
+    });
 
     if (!pkgJson.exports) continue;
 
@@ -84,7 +92,11 @@ export function getLocalSdkAliases({ baseDir, fallback } = {}) {
           const prefix = key.replace(/^\.\//, "").replace(/\/?\*$/, "");
           const targetDir = value.replace(/^\.\//, "").replace(/\/?\*$/, "");
           if (prefix && targetDir) {
-            aliases[`${name}/${prefix}`] = path.join(pkgDir, targetDir);
+            entries.push({
+              entrypoint: `${name}/${prefix}`,
+              target: path.join(pkgDir, targetDir),
+              source: "generated",
+            });
           }
         }
         continue;
@@ -97,14 +109,26 @@ export function getLocalSdkAliases({ baseDir, fallback } = {}) {
       // Prefer src twin; fall back to dist when src is missing.
       const srcRel = distTargetToSrc(pkgDir, target);
       const finalRel = srcRel || target.replace(/^\.\//, "");
-      aliases[`${name}/${subpath}`] = path.join(pkgDir, finalRel);
+      entries.push({
+        entrypoint: `${name}/${subpath}$`,
+        target: path.join(pkgDir, finalRel),
+        source: srcRel ? "src" : target.includes("locales") ? "generated" : "dist",
+      });
     }
   }
 
-  console.log(
-    `[local-sdk] Linked ${Object.keys(aliases).length} aliases from ${sdkRoot} (src-pointing)`,
-  );
-  return aliases;
+  return entries;
+}
+
+export function getLocalSdkAliases({ baseDir, fallback, logger = console.log } = {}) {
+  const entries = getLocalSdkAliasEntries({ baseDir, fallback });
+  if (entries.length === 0) return {};
+
+  for (const { entrypoint, source } of entries) {
+    logger(`[local-sdk] entrypoint=${entrypoint} source=${source}`);
+  }
+
+  return Object.fromEntries(entries.map(({ entrypoint, target }) => [entrypoint, target]));
 }
 
 /**

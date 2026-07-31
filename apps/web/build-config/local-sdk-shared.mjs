@@ -13,6 +13,31 @@
  */
 import fs from "fs";
 import path from "path";
+import { createRequire } from "module";
+
+export const LOCAL_SDK_FALLBACK = "../../../react-sdk";
+
+export const REQUIRED_SINGLETON_ENTRYPOINTS = [
+  "react$",
+  "react/jsx-runtime$",
+  "react/jsx-dev-runtime$",
+  "react-dom$",
+  "react-dom/client$",
+  "@tanstack/react-query$",
+  "jotai$",
+  "jotai/utils$",
+  "react-hook-form$",
+];
+
+export function getSingletonAliases({ baseDir }) {
+  const requireFromApp = createRequire(path.join(baseDir, "package.json"));
+  return Object.fromEntries(
+    REQUIRED_SINGLETON_ENTRYPOINTS.map((entrypoint) => {
+      const moduleId = entrypoint.slice(0, -1);
+      return [entrypoint, requireFromApp.resolve(moduleId)];
+    }),
+  );
+}
 
 /**
  * Returns `true` only when ALL gates are satisfied. Used by both the webpack
@@ -78,7 +103,10 @@ export function scanSdkPackages(sdkRoot) {
   if (!fs.existsSync(packagesDir)) return [];
 
   const out = [];
-  for (const entry of fs.readdirSync(packagesDir, { withFileTypes: true })) {
+  const directoryEntries = fs
+    .readdirSync(packagesDir, { withFileTypes: true })
+    .sort((left, right) => left.name.localeCompare(right.name));
+  for (const entry of directoryEntries) {
     if (!entry.isDirectory()) continue;
     const pkgJsonPath = path.join(packagesDir, entry.name, "package.json");
     if (!fs.existsSync(pkgJsonPath)) continue;

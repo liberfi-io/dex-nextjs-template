@@ -11,7 +11,7 @@
     "start": "next start",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint src",
-    "test": "jest --config ../../jest.config.cjs --selectProjects @liberfi/web --passWithNoTests",
+    "test": "jest --config ../../jest.config.cjs --selectProjects @liberfi/web --passWithNoTests && node --test build-config/local-sdk-aliases.test.mjs",
     "graphql-codegen": "graphql-codegen"
   },
   "dependencies": {
