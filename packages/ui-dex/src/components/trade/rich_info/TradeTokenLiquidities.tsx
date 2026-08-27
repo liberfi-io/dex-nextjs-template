@@ -8,13 +8,23 @@ import { Button, Divider, Skeleton } from "@heroui/react";
 import clsx from "clsx";
 import { useCallback, useState } from "react";
 
+type TokenLiquidityPool = {
+  poolAddress: string;
+  protocolFamily: string;
+  tvlInUsd?: string | number;
+};
+
+type TokenWithLiquidity = Token & {
+  liquidity?: TokenLiquidityPool[];
+};
+
 /**
  * @deprecated Use `TokenLiquiditiesWidget` from `@liberfi.io/ui-tokens`.
  */
 export function TradeTokenLiquidities({ token }: { token: Token }) {
   const { t } = useTranslation();
 
-  const liquidity = (token as any).liquidity as { poolAddress: string; protocolFamily: string; tvlInUsd?: string | number }[] | undefined;
+  const liquidity = (token as TokenWithLiquidity).liquidity;
   const [expanded, setExpanded] = useState(liquidity ? liquidity.length <= 3 : true);
   const toggleExpanded = useCallback(() => setExpanded((prev) => !prev), [setExpanded]);
 

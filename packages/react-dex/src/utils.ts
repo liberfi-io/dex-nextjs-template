@@ -265,7 +265,7 @@ export function convertStreamRankingTokenStat(stat: StreamTokenStat): RecursiveP
       ...convertStreamRankingTokenStats("1h", stat),
       ...convertStreamRankingTokenStats("4h", stat),
       ...convertStreamRankingTokenStats("24h", stat),
-    } as any,
+    } as unknown as RecursivePartial<Token>["stats"],
   };
 }
 
@@ -441,7 +441,7 @@ export function convertStreamRankingToken(
       ...convertStreamRankingTokenStats("1h", rankingToken.stat),
       ...convertStreamRankingTokenStats("4h", rankingToken.stat),
       ...convertStreamRankingTokenStats("24h", rankingToken.stat),
-    } as any,
+    } as unknown as RecursivePartial<Token>["stats"],
   };
 }
 

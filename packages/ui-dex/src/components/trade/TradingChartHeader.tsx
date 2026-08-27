@@ -1,11 +1,16 @@
 import { Divider } from "@heroui/react";
+import { useTranslation } from "@liberfi/ui-base";
 import clsx from "clsx";
+
+const CHART_TIMEFRAMES = ["1s", "1m", "5m", "15m", "1h", "4h", "1D", "1W"] as const;
 
 export type TradingChartHeaderProps = {
   className?: string;
 };
 
 export function TradingChartHeader({ className }: TradingChartHeaderProps) {
+  const { t } = useTranslation();
+
   return (
     <div
       className={clsx(
@@ -14,31 +19,18 @@ export function TradingChartHeader({ className }: TradingChartHeaderProps) {
       )}
     >
       <div className="flex items-center gap-0 text-[12px]">
-        <div className="mr-2 font-[500] sm:mr-4">Timeframe</div>
-        <div className="flex h-[22px] cursor-pointer items-center justify-center rounded-full px-[10px] hover:opacity-80 bg-content3 font-bold text-white">
-          1s
-        </div>
-        <div className="flex h-[22px] cursor-pointer items-center justify-center rounded-full px-[10px] hover:opacity-80">
-          1m
-        </div>
-        <div className="flex h-[22px] cursor-pointer items-center justify-center rounded-full px-[10px] hover:opacity-80">
-          5m
-        </div>
-        <div className="flex h-[22px] cursor-pointer items-center justify-center rounded-full px-[10px] hover:opacity-80">
-          15m
-        </div>
-        <div className="flex h-[22px] cursor-pointer items-center justify-center rounded-full px-[10px] hover:opacity-80">
-          1h
-        </div>
-        <div className="flex h-[22px] cursor-pointer items-center justify-center rounded-full px-[10px] hover:opacity-80">
-          4h
-        </div>
-        <div className="flex h-[22px] cursor-pointer items-center justify-center rounded-full px-[10px] hover:opacity-80">
-          1D
-        </div>
-        <div className="flex h-[22px] cursor-pointer items-center justify-center rounded-full px-[10px] hover:opacity-80">
-          1W
-        </div>
+        <div className="mr-2 font-[500] sm:mr-4">{t("extend.trade.tvchart.timeframe")}</div>
+        {CHART_TIMEFRAMES.map((timeframe, index) => (
+          <div
+            key={timeframe}
+            className={clsx(
+              "flex h-[22px] cursor-pointer items-center justify-center rounded-full px-[10px] hover:opacity-80",
+              index === 0 && "bg-content3 font-bold text-white",
+            )}
+          >
+            {timeframe}
+          </div>
+        ))}
       </div>
 
       <div className="flex items-center gap-3">

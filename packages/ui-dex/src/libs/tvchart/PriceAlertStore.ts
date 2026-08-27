@@ -7,10 +7,10 @@ export class PriceAlertStore {
   ) {}
 
   reset() {
-    console.log("reset");
+    console.debug("reset");
   }
 
   toggleDialog(on: boolean, e: any, type: string) {
-    console.log("toggleDialog", on, e, type);
+    console.debug("toggleDialog", on, e, type);
   }
 }

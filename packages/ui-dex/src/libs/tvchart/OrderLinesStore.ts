@@ -10,9 +10,9 @@ export class OrderLinesStore {
   ) {}
 
   reset() {
-    console.log("reset");
+    console.debug("reset");
   }
   destroy() {
-    console.log("destroy");
+    console.debug("destroy");
   }
 }

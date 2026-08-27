@@ -1,0 +1,44 @@
+{
+  "wave": "5.1",
+  "quota": 32,
+  "closed": 32,
+  "decision": "retain_pending_parity",
+  "notes": "T51-07 mechanical delete gates failed: migration-map status is still inventory:trade|chart (not parity=pass); template still imports TradingChart, TradeDataLoader, InstantBuy useSwap, Perpetuals TvChart, DexClientProvider; G2 five-method candles DTO/unit parity fixture does not exist. Perpetuals tvchart is Stage 5.3 write set. Paths retained; warnings closed in place so quota is not handed to Stage 6.",
+  "token_detail": {
+    "quota": 11,
+    "closed": 11,
+    "commit": "98c0333",
+    "command": "pnpm --filter @liberfi/web exec eslint src/components/page/token-detail --max-warnings 0"
+  },
+  "legacy_packages": {
+    "quota": 21,
+    "closed": 21,
+    "decision": "retain",
+    "paths": [
+      "packages/react-dex/src/**",
+      "packages/ui-dex/src/components/trade/**",
+      "packages/ui-dex/src/components/tvchart/**",
+      "packages/ui-dex/src/libs/tvchart/**"
+    ],
+    "baseline_keys": {
+      "packages/react-dex/src/utils.ts\t@typescript-eslint/no-explicit-any": 2,
+      "packages/ui-dex/src/components/trade/rich_info/TradeTokenLiquidities.tsx\t@typescript-eslint/no-explicit-any": 1,
+      "packages/ui-dex/src/components/trade/TradingChartHeader.tsx\ti18next/no-literal-string": 9,
+      "packages/ui-dex/src/components/tvchart/TvChartWrapper.tsx\timport-x/no-duplicates": 2,
+      "packages/ui-dex/src/libs/tvchart/ContextMenuStore.ts\tno-console": 1,
+      "packages/ui-dex/src/libs/tvchart/HistoryTradesStore.ts\tno-console": 2,
+      "packages/ui-dex/src/libs/tvchart/OrderLinesStore.ts\tno-console": 2,
+      "packages/ui-dex/src/libs/tvchart/PriceAlertStore.ts\tno-console": 2
+    },
+    "commands": [
+      "pnpm --filter @liberfi/react-dex exec eslint src --max-warnings 0",
+      "pnpm --filter @liberfi/ui-dex exec eslint src/components/trade src/components/tvchart src/libs/tvchart --max-warnings 0"
+    ]
+  },
+  "delete_gates": {
+    "migration_map_parity_pass": false,
+    "template_import_count_zero": false,
+    "g2_five_method_candles_parity_fixture": false
+  },
+  "remaining_template_baseline_after": 70
+}

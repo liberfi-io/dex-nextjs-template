@@ -5,9 +5,9 @@ export class HistoryTradesStore {
   constructor(_settings: TvChartSettings, _chartManager: TvChartManager) {}
 
   reset() {
-    console.log("reset");
+    console.debug("reset");
   }
   destroy() {
-    console.log("destroy");
+    console.debug("destroy");
   }
 }
