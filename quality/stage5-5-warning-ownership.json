@@ -1,0 +1,12 @@
+{
+  "wave": "5.5",
+  "quota": 5,
+  "closed": 5,
+  "command": "pnpm --filter @liberfi/web exec eslint src/components/NewAppLayout.tsx --max-warnings 0",
+  "split": {
+    "NewAppLayout.tsx i18next/no-literal-string": 1,
+    "NewAppLayout.tsx import-x/no-duplicates": 4
+  },
+  "unpublished_sdk": "template does not import @liberfi.io/react-launchpad|ui-launchpad|react-redpacket|ui-redpacket until published",
+  "retained_packages": "@liberfi/react-launchpad|ui-launchpad|react-redpacket|ui-redpacket stay until Stage 6"
+}

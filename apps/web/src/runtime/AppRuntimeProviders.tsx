@@ -30,6 +30,7 @@ import { readRuntimeConfig } from "./readRuntimeConfig";
 import { Stage51AdaptersProvider } from "./Stage51AdaptersProvider";
 import { Stage53AdaptersProvider } from "./Stage53AdaptersProvider";
 import { Stage54AdaptersProvider } from "./Stage54AdaptersProvider";
+import { Stage55AdaptersProvider } from "./Stage55AdaptersProvider";
 import { useAppClientBundle } from "./useAppClientBundle";
 
 export interface AppRuntimeProvidersProps extends PropsWithChildren {
@@ -130,29 +131,31 @@ export function AppRuntimeProviders({
                 wsClient={clients.predictWs}
                 wsEnabled={config.predictWsEnabled}
               >
-                <MediaTrackProvider client={clients.mediaTrack}>
-                  <ChannelsProvider client={clients.channels}>
-                    <PolymarketProvider>
-                      <PortfolioClientProvider client={clients.portfolio}>
-                        <PortfolioProvider chain={chain} address={wallet?.address ?? ""}>
-                          <PerpetualsProvider
-                            client={clients.perpetuals}
-                            depositClient={clients.perpetualDeposit}
-                          >
-                            <HyperliquidAccountStateSync />
-                            <DexDataRuntimeProvider
-                              queryClient={queryClient}
-                              adapter={dexDataAdapter}
-                              scheduler={browserDexDataScheduler}
+                <Stage55AdaptersProvider client={clients.chainStream} origin={config.origin}>
+                  <MediaTrackProvider client={clients.mediaTrack}>
+                    <ChannelsProvider client={clients.channels}>
+                      <PolymarketProvider>
+                        <PortfolioClientProvider client={clients.portfolio}>
+                          <PortfolioProvider chain={chain} address={wallet?.address ?? ""}>
+                            <PerpetualsProvider
+                              client={clients.perpetuals}
+                              depositClient={clients.perpetualDeposit}
                             >
-                              <DexDataProvider>{children}</DexDataProvider>
-                            </DexDataRuntimeProvider>
-                          </PerpetualsProvider>
-                        </PortfolioProvider>
-                      </PortfolioClientProvider>
-                    </PolymarketProvider>
-                  </ChannelsProvider>
-                </MediaTrackProvider>
+                              <HyperliquidAccountStateSync />
+                              <DexDataRuntimeProvider
+                                queryClient={queryClient}
+                                adapter={dexDataAdapter}
+                                scheduler={browserDexDataScheduler}
+                              >
+                                <DexDataProvider>{children}</DexDataProvider>
+                              </DexDataRuntimeProvider>
+                            </PerpetualsProvider>
+                          </PortfolioProvider>
+                        </PortfolioClientProvider>
+                      </PolymarketProvider>
+                    </ChannelsProvider>
+                  </MediaTrackProvider>
+                </Stage55AdaptersProvider>
               </Stage54AdaptersProvider>
             </Stage53AdaptersProvider>
           </Stage51AdaptersProvider>

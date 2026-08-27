@@ -76,20 +76,16 @@ import {
   ChevronDownIcon,
   Kbd,
   SearchIcon,
+  type LinkComponentType,
 } from "@liberfi.io/ui";
-import type { LinkComponentType } from "@liberfi.io/ui";
-import {
-  Scaffold,
-  ScaffoldHeader,
-  ScaffoldFooter,
-  Logo,
-  type NavItem,
-  DraggablePanelProvider,
-  DraggableStateProvider,
-} from "@liberfi.io/ui-scaffold";
+import * as UiScaffold from "@liberfi.io/ui-scaffold";
 import { SEARCH_MODAL_ID, SearchModal } from "@liberfi.io/ui-tokens";
-import { chainDisplayName, formatAmount, truncateAddress } from "@liberfi.io/utils";
-import type { PredefinedToken } from "@liberfi.io/utils";
+import {
+  chainDisplayName,
+  formatAmount,
+  truncateAddress,
+  type PredefinedToken,
+} from "@liberfi.io/utils";
 import { TranslationProvider, AppSdkProvider, RouterProvider } from "@liberfi/ui-base";
 import { useRouterAdapter } from "../hooks/useRouterAdapter";
 import { tokenDetailRoute } from "@liberfi/ui-dex/libs/routes";
@@ -108,7 +104,6 @@ import {
   type ApplicationLocaleRuntime,
 } from "../runtime/createApplicationLocaleRuntime";
 import { PresetFormModal } from "@liberfi.io/ui-trade";
-import * as UiScaffold from "@liberfi.io/ui-scaffold";
 import { useAccountInfo } from "@liberfi.io/ui-portfolio";
 import { LaunchPadModal, LAUNCHPAD_MODAL_ID } from "./modals/LaunchPadModal";
 import {
@@ -141,14 +136,24 @@ const LegacyModals = [
   lazy(() => import("@liberfi/ui-dex/components/modals/TransferModal")),
 ];
 
+const {
+  Scaffold,
+  ScaffoldHeader,
+  ScaffoldFooter,
+  Logo,
+  DraggablePanelProvider,
+} = UiScaffold;
+type NavItem = UiScaffold.NavItem;
+
 const RuntimeLocaleProvider = LocaleProvider as ComponentType<
   LocaleProviderProps & { runtime?: ApplicationLocaleRuntime }
 >;
-const ModalCoordinatorProvider = (
-  UiScaffold as typeof UiScaffold & {
-    ModalCoordinatorProvider: ComponentType<PropsWithChildren>;
-  }
-).ModalCoordinatorProvider;
+const UnpublishedScaffold = UiScaffold as typeof UiScaffold & {
+  ModalCoordinatorProvider: ComponentType<PropsWithChildren>;
+  DraggableStateProvider: ComponentType<PropsWithChildren>;
+};
+const ModalCoordinatorProvider = UnpublishedScaffold.ModalCoordinatorProvider;
+const DraggableStateProvider = UnpublishedScaffold.DraggableStateProvider;
 const useAsyncModal = UiScaffold.useAsyncModal;
 
 const navItemsConfig: Omit<NavItem, "label">[] = [
@@ -1414,7 +1419,9 @@ function DexAccountMenuContent({
             </div>
             <div className="flex items-center gap-1.5 text-xs mt-2">
               <span className="text-zinc-500">
-                {nativeToken?.symbol ?? chainNamespace.toUpperCase()} 总余额：
+                {t("extend.account.nativeTotalBalance", {
+                  symbol: nativeToken?.symbol ?? chainNamespace.toUpperCase(),
+                })}
               </span>
               {nativeToken && <TokenIcon symbol={nativeToken.symbol} size={16} />}
               <span className="text-zinc-300 tabular-nums font-medium">

@@ -42,6 +42,7 @@ extend.account.convert_transaction_submitted,true,true,sdk-domain-and-legacy-tem
 extend.account.convert_transaction_uncompleted,true,true,sdk-domain-and-legacy-template,legacy-compat,account.convert_transaction_uncompleted,stage-6
 extend.account.convert_view_on_explorer,true,true,sdk-domain-and-legacy-template,legacy-compat,account.convert_view_on_explorer,stage-6
 extend.account.hide_assets,true,true,sdk-domain-and-legacy-template,legacy-compat,account.hide_assets,stage-6
+extend.account.nativeTotalBalance,true,true,sdk-domain-and-legacy-template,legacy-compat,account.nativeTotalBalance,stage-6
 extend.account.other_tokens,true,true,sdk-domain-and-legacy-template,legacy-compat,account.other_tokens,stage-6
 extend.account.pnl,true,true,sdk-domain-and-legacy-template,legacy-compat,account.pnl,stage-6
 extend.account.portfolio,true,true,sdk-domain-and-legacy-template,legacy-compat,account.portfolio,stage-6
@@ -372,6 +373,8 @@ extend.predict.setup.verifying,true,true,sdk-domain-and-legacy-template,legacy-c
 extend.predict.subnav.markets,true,true,sdk-domain-and-legacy-template,legacy-compat,predict.subnav.markets,stage-6
 extend.predict.subnav.matches,true,true,sdk-domain-and-legacy-template,legacy-compat,predict.subnav.matches,stage-6
 extend.predict.subnav.portfolio,true,true,sdk-domain-and-legacy-template,legacy-compat,predict.subnav.portfolio,stage-6
+extend.predict.venue.kalshi,true,true,sdk-domain-and-legacy-template,legacy-compat,predict.venue.kalshi,stage-6
+extend.predict.venue.polymarket,true,true,sdk-domain-and-legacy-template,legacy-compat,predict.venue.polymarket,stage-6
 extend.pulse.bonding,true,true,sdk-domain-and-legacy-template,legacy-compat,pulse.bonding,stage-6
 extend.pulse.bundle_holding,true,true,sdk-domain-and-legacy-template,legacy-compat,pulse.bundle_holding,stage-6
 extend.pulse.buys_explained,true,true,sdk-domain-and-legacy-template,legacy-compat,pulse.buys_explained,stage-6
