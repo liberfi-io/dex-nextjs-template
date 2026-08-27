@@ -175,7 +175,11 @@ export function TokenTradeMobilePage({
           bottom-sheet modal containing the full TradingPanel pre-seeded
           to the tapped direction. This mirrors GMGN's mobile pattern
           and keeps the chart + lists the primary viewport content. */}
-      <MobileTradeBar tokenSymbol={token?.symbol} />
+      <MobileTradeBar
+        chain={chain}
+        tokenAddress={address}
+        tokenSymbol={token?.symbol}
+      />
     </div>
   );
 }

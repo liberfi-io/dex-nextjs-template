@@ -63,8 +63,10 @@ export interface InfiniteScrollConfig {
 
 export interface TableShellProps {
   columns: ReadonlyArray<BottomTableColumn>;
-  /** Min-width of the inner table; required to keep wide layouts intact when
-   *  the panel is narrow. Use a px value like `min-w-[820px]`. */
+  /**
+   * Min-width of the inner table; required to keep wide layouts intact when
+   * the panel is narrow. Use a px value like `min-w-[820px]`.
+   */
   minWidth: string;
   /** Optional toolbar row above the header (e.g. filter / sort chips). */
   toolbar?: ReactNode;

@@ -27,6 +27,7 @@ import {
   RuntimeConfig,
 } from "./app-runtime.types";
 import { readRuntimeConfig } from "./readRuntimeConfig";
+import { Stage51AdaptersProvider } from "./Stage51AdaptersProvider";
 import { useAppClientBundle } from "./useAppClientBundle";
 
 export interface AppRuntimeProvidersProps extends PropsWithChildren {
@@ -120,6 +121,7 @@ export function AppRuntimeProviders({
           subscribeClient={clients.api}
           capabilities={reactCapabilities}
         >
+          <Stage51AdaptersProvider api={clients.api}>
           <MediaTrackProvider client={clients.mediaTrack}>
             <ChannelsProvider client={clients.channels}>
               <PredictProvider client={clients.predict} wsClient={clients.predictWs}>
@@ -145,6 +147,7 @@ export function AppRuntimeProviders({
               </PredictProvider>
             </ChannelsProvider>
           </MediaTrackProvider>
+          </Stage51AdaptersProvider>
         </CapabilityClientProvider>
       </DexClientProvider>
     </PinataProvider>

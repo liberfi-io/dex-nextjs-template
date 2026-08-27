@@ -1,6 +1,10 @@
-import { InstantTrade } from "@liberfi/ui-dex/components/trade";
+import { useEffect } from "react";
+import type { Chain } from "@liberfi.io/types";
+import { InstantTradeWidget, useInstantTrade } from "@liberfi.io/ui-trade";
 
 export interface TradingPanelProps {
+  chain: Chain;
+  tokenAddress: string;
   /**
    * Optional initial trade direction. When this panel is rendered inside a
    * mobile bottom-sheet (see {@link MobileTradeBar}) the tapped CTA
@@ -10,20 +14,30 @@ export interface TradingPanelProps {
   defaultDirection?: "buy" | "sell";
 }
 
+function DirectionSeed({ direction }: { direction?: "buy" | "sell" }) {
+  const { setDirection } = useInstantTrade();
+  useEffect(() => {
+    if (direction) setDirection(direction);
+  }, [direction, setDirection]);
+  return null;
+}
+
 /**
- * Right-sidebar trading panel. Wraps `InstantTrade` from the dex package so
- * the Buy / Sell form remains a single source of truth. The previously-
- * appended position-stats row (Bought / Sold / Holding / PnL) was removed
- * because it was static placeholder data with no real wiring — once a
- * proper trader-stats source exists it can be re-introduced as its own
- * widget, but until then it just adds visual noise to the sidebar.
+ * Right-sidebar trading panel. Uses the SDK InstantTrade widget; DexClient
+ * and Stage 5.1 trade adapter come from application runtime providers.
  */
-export function TradingPanel({ defaultDirection }: TradingPanelProps = {}) {
+export function TradingPanel({
+  chain,
+  tokenAddress,
+  defaultDirection,
+}: TradingPanelProps) {
   return (
     <div className="relative axiom-trade-panel">
-      <InstantTrade
+      <InstantTradeWidget
+        chain={chain}
+        tokenAddress={tokenAddress}
         className="!rounded-none !bg-transparent !py-2 !px-3"
-        defaultDirection={defaultDirection}
+        headerExtra={<DirectionSeed direction={defaultDirection} />}
       />
     </div>
   );

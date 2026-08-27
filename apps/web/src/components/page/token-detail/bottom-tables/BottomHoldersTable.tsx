@@ -1,6 +1,5 @@
 "use client";
 
-import { formatAmount, formatAmountInUsd } from "@liberfi.io/utils";
 import { useTickAge } from "@liberfi.io/hooks";
 import { useTokenHoldersListScript } from "@liberfi.io/ui-tokens";
 import type { Chain, TokenHolder } from "@liberfi.io/types";
@@ -18,6 +17,8 @@ import {
 import {
   accountExplorerUrl,
   formatAge,
+  formatAmount,
+  formatAmountInUsd,
   formatPercent,
   SafeBigNumber,
   truncateAddress,

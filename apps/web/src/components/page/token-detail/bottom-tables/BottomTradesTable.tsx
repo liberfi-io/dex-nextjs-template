@@ -1,6 +1,5 @@
 "use client";
 
-import { formatAmount, formatAmountInUsd, formatPriceInUsd } from "@liberfi.io/utils";
 import { useTickAge } from "@liberfi.io/hooks";
 import { useTokenActivitiesListScript } from "@liberfi.io/ui-tokens";
 import type { Activity, ActivityType, Chain } from "@liberfi.io/types";
@@ -18,6 +17,9 @@ import { SortAscIcon, SortDescIcon } from "@liberfi/ui-dex/assets/icons";
 import {
   accountExplorerUrl,
   formatAge,
+  formatAmount,
+  formatAmountInUsd,
+  formatPriceInUsd,
   txExplorerUrl,
   truncateAddress,
 } from "@liberfi.io/utils";

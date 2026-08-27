@@ -1,9 +1,13 @@
 "use client";
 
-import { formatAmountInUsd, formatMCapInUsd } from "@liberfi.io/utils";
 import { useTokenQuery } from "@liberfi.io/react";
 import type { Chain } from "@liberfi.io/types";
-import { formatAmount, truncateAddress } from "@liberfi.io/utils";
+import {
+  formatAmount,
+  formatAmountInUsd,
+  formatMCapInUsd,
+  truncateAddress,
+} from "@liberfi.io/utils";
 import { useTranslation } from "@liberfi/ui-base";
 import { CollapsibleSection } from "@liberfi.io/ui-scaffold";
 import { ReactNode, useMemo } from "react";

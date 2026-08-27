@@ -8,9 +8,12 @@ import {
 import { cn } from "@liberfi.io/ui";
 import { useTranslation } from "@liberfi/ui-base";
 import { useCallback, useState } from "react";
+import type { Chain } from "@liberfi.io/types";
 import { TradingPanel } from "./TradingPanel";
 
 export interface MobileTradeBarProps {
+  chain: Chain;
+  tokenAddress: string;
   /** Token symbol — used for the modal's aria-label only. */
   tokenSymbol?: string;
 }
@@ -42,7 +45,11 @@ type Direction = "buy" | "sell";
  * padding). Consumers reserve the same amount of `padding-bottom` on the
  * page scroll container so the last list row isn't obscured.
  */
-export function MobileTradeBar({ tokenSymbol }: MobileTradeBarProps) {
+export function MobileTradeBar({
+  chain,
+  tokenAddress,
+  tokenSymbol,
+}: MobileTradeBarProps) {
   const { t } = useTranslation();
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   // Remember which CTA opened the sheet so the modal seeds InstantTrade
@@ -84,6 +91,8 @@ export function MobileTradeBar({ tokenSymbol }: MobileTradeBarProps) {
         onOpenChange={onOpenChange}
         onClose={onClose}
         direction={direction}
+        chain={chain}
+        tokenAddress={tokenAddress}
       />
     </>
   );
@@ -122,11 +131,15 @@ function TradeSheet({
   onOpenChange,
   onClose,
   direction,
+  chain,
+  tokenAddress,
 }: {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onClose: () => void;
   direction: Direction;
+  chain: Chain;
+  tokenAddress: string;
 }) {
   return (
     <Modal
@@ -155,7 +168,11 @@ function TradeSheet({
         <div className="flex justify-center pt-2.5 pb-1">
           <span className="block h-1 w-9 rounded-full bg-content3" />
         </div>
-        <TradingPanel defaultDirection={direction} />
+        <TradingPanel
+          chain={chain}
+          tokenAddress={tokenAddress}
+          defaultDirection={direction}
+        />
       </ModalContent>
     </Modal>
   );

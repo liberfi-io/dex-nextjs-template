@@ -353,7 +353,7 @@ function TokenTradeDesktopPage({ chain, address }: TokenTradePageProps) {
             className="custom-scrollbar absolute inset-x-0 top-0 flex h-fit flex-col border-l border-default-100"
           >
             <SidebarVolumeStats chain={chain} address={address} />
-            <TradingPanel />
+            <TradingPanel chain={chain} tokenAddress={address} />
             <SidebarTokenAudit chain={chain} address={address} />
             <SidebarBasicInfo chain={chain} address={address} />
             <SidebarSecurityCheck chain={chain} address={address} />
