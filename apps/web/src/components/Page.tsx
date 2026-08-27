@@ -6,7 +6,10 @@ import {
   showBottomNavigationBarOnLayoutAtom,
 } from "@liberfi/ui-base";
 import { cn } from "@liberfi.io/ui";
-import { DraggablePanelProvider } from "@liberfi.io/ui-scaffold";
+import {
+  DraggablePanelProvider,
+  DraggableStateProvider,
+} from "@liberfi.io/ui-scaffold";
 import { BottomTweets } from "./BottomTweets";
 import { BottomAICopilot } from "./BottomAICopilot";
 
@@ -66,6 +69,7 @@ export function Page({
         </nav>
       )}
 
+      <DraggableStateProvider>
       {/* content */}
       <div
         className={cn(
@@ -162,6 +166,7 @@ export function Page({
           {bottomNavigationBar}
         </div>
       )}
+      </DraggableStateProvider>
     </div>
   );
 }

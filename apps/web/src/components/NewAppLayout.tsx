@@ -85,6 +85,7 @@ import {
   Logo,
   type NavItem,
   DraggablePanelProvider,
+  DraggableStateProvider,
 } from "@liberfi.io/ui-scaffold";
 import { SEARCH_MODAL_ID, SearchModal } from "@liberfi.io/ui-tokens";
 import { chainDisplayName, formatAmount, truncateAddress } from "@liberfi.io/utils";
@@ -385,6 +386,7 @@ function PageShell({ children }: PropsWithChildren) {
           must be used within a PredictWalletProvider" the moment the user
           opens the deposit dialog. */}
       <FundWalletModal />
+      <DraggableStateProvider>
       <Scaffold
         pathname={pathname}
         onNavigate={onNavigate}
@@ -512,6 +514,7 @@ function PageShell({ children }: PropsWithChildren) {
           {children}
         </DraggablePanelProvider>
       </Scaffold>
+      </DraggableStateProvider>
     </PredictWalletProvider>
   );
 }
