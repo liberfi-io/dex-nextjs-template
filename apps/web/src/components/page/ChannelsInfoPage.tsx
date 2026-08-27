@@ -3,11 +3,11 @@
 import { useChainAwareRouter } from "../../hooks/useChainAwareRouter";
 import { cn } from "@liberfi.io/ui";
 import {
+  Channel,
   ChannelEditButton,
   ChannelsDetailPage,
   ChannelSubscribeButton,
 } from "@liberfi.io/ui-channels";
-import { Channel } from "@liberfi.io/ui-channels";
 
 export function ChannelsInfoPage({ id }: { id: string }) {
   return (

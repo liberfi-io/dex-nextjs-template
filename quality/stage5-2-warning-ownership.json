@@ -1,0 +1,16 @@
+{
+  "wave": "5.2",
+  "quota": 13,
+  "closed": 13,
+  "command": "pnpm --filter @liberfi/web exec eslint src/components/page/portfolio src/components/page/ChannelsListPage.tsx src/components/page/ChannelsInfoPage.tsx src/components/page/ChannelsCreatePage.tsx src/components/page/ChannelsUpdatePage.tsx --max-warnings 0",
+  "split": {
+    "portfolio_new_pages": 8,
+    "channels_new_pages": 5
+  },
+  "media_track_route": {
+    "from": "apps/web/src/app/(legacy)/media-track/page.tsx",
+    "to": "apps/web/src/app/(new)/media-track/page.tsx",
+    "legacy_files": "17 -> 16",
+    "legacy_route_pages": "12 -> 11"
+  }
+}

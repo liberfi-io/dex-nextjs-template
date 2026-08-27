@@ -6,9 +6,8 @@ import type { PieSectorDataItem } from "recharts/types/polar/Pie";
 import { useWalletPortfoliosQuery } from "@liberfi.io/react";
 import type { Chain, Portfolio } from "@liberfi.io/types";
 import { cn, EmptyIcon } from "@liberfi.io/ui";
-import { formatPercent } from "@liberfi.io/utils";
+import { formatAmountInUsd, formatPercent } from "@liberfi.io/utils";
 import { useTranslation } from "@liberfi/ui-base";
-import { formatAmountInUsd } from "@liberfi.io/utils";
 
 /**
  * Maximum number of named slices in the allocation pie. Anything beyond this

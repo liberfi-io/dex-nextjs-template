@@ -2,15 +2,17 @@
 
 import { useChainAwareRouter } from "../../hooks/useChainAwareRouter";
 import { cn } from "@liberfi.io/ui";
+import { useTranslation } from "@liberfi/ui-base";
 import {
+  Channel,
   ChannelEditButton,
   ChannelsHomePage,
   ChannelSubscribeButton,
 } from "@liberfi.io/ui-channels";
-import { Channel } from "@liberfi.io/ui-channels";
 
 export function ChannelsListPage() {
   const router = useChainAwareRouter();
+  const { t } = useTranslation();
 
   return (
     <div className={cn("relative w-full h-full")}>
@@ -22,7 +24,7 @@ export function ChannelsListPage() {
             className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-white"
             style={{ fontFamily: "var(--font-dm-sans, 'DM Sans', sans-serif)" }}
           >
-            Channels
+            {t("extend.nav.channels")}
           </h1>
         </div>
       </div>
