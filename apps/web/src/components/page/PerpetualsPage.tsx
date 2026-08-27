@@ -25,6 +25,7 @@ import {
 import {
   useHideBottomNavigationBar,
   useHideHeader,
+  useTranslation,
 } from "@liberfi/ui-base";
 import { DEPOSIT_HL_USDC_MODAL_ID } from "../modals/DepositHyperliquidUsdcModal";
 import { useHyperliquidUpdateLeverage } from "../../hooks/useHyperliquidUpdateLeverage";
@@ -43,7 +44,6 @@ import {
   TvChartType,
 } from "@liberfi/ui-dex/libs/tvchart";
 import { getTvChartLibraryLocale } from "@liberfi/ui-dex/libs/tvchart/utils";
-import { useTranslation } from "@liberfi/ui-base";
 import type { Timezone } from "../../../public/static/charting_library";
 import { PerpetualsTvChartDataFeedModule } from "./perpetuals/PerpetualsTvChartDataFeedModule";
 

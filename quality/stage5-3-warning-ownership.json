@@ -1,0 +1,18 @@
+{
+  "wave": "5.3",
+  "quota": 9,
+  "closed": 9,
+  "command": "pnpm --filter @liberfi/web exec eslint src/components/page/PerpetualsPage.tsx src/components/page/perpetuals src/hooks/useHyperliquidBalances.ts src/hooks/useHyperliquidCancelOrder.ts src/hooks/useHyperliquidPlaceOrder.ts src/hooks/useHyperliquidUpdateLeverage.ts src/lib/hyperliquid src/components/modals/DepositHyperliquidUsdcModal.tsx src/components/HyperliquidAccountStateSync.tsx --max-warnings 0",
+  "split": {
+    "PerpetualsPage.tsx import-x/no-duplicates": 2,
+    "useHyperliquidBalances.ts no-explicit-any": 1,
+    "useHyperliquidCancelOrder.ts jsdoc/tag-lines": 1,
+    "lib/hyperliquid/asset-index.ts jsdoc/tag-lines": 1,
+    "lib/hyperliquid/format.ts jsdoc/tag-lines": 4
+  },
+  "client_path": {
+    "retained": "apps/web/src/lib/hyperliquid/client.ts",
+    "owner": "apps/web/src/runtime/createStage53Adapters.ts",
+    "hooks_import_client": 0
+  }
+}

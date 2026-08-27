@@ -37,7 +37,7 @@ import {
   positionsQueryKey,
 } from "@liberfi.io/ui-perpetuals";
 
-import { getExchangeClient } from "../lib/hyperliquid/client";
+import { useStage53VenuePorts } from "../runtime/Stage53AdaptersProvider";
 import { getAssetIndex } from "../lib/hyperliquid/asset-index";
 
 /**
@@ -65,6 +65,7 @@ export function useHyperliquidUpdateLeverage(): (
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const wallets = useWallets();
+  const { getExchangeClient, getInfoClient } = useStage53VenuePorts();
   const evm = useMemo(
     () =>
       wallets.find(
@@ -87,7 +88,7 @@ export function useHyperliquidUpdateLeverage(): (
         throw new Error(message);
       }
       try {
-        const asset = await getAssetIndex(symbol);
+        const asset = await getAssetIndex(symbol, getInfoClient);
         const exchange = getExchangeClient(provider, evm.address as Hex);
         await exchange.updateLeverage({
           asset,
@@ -127,6 +128,6 @@ export function useHyperliquidUpdateLeverage(): (
         throw error;
       }
     },
-    [evm, queryClient, t],
+    [evm, getExchangeClient, getInfoClient, queryClient, t],
   );
 }

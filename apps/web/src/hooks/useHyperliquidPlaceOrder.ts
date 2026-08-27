@@ -62,7 +62,7 @@ import {
   type PlaceOrderResult,
 } from "@liberfi.io/ui-perpetuals";
 
-import { getExchangeClient } from "../lib/hyperliquid/client";
+import { useStage53VenuePorts } from "../runtime/Stage53AdaptersProvider";
 import { getAssetIndex } from "../lib/hyperliquid/asset-index";
 import { formatHlPx, formatHlSz } from "../lib/hyperliquid/format";
 
@@ -87,6 +87,7 @@ export function useHyperliquidPlaceOrder(): (
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const wallets = useWallets();
+  const { getExchangeClient, getInfoClient } = useStage53VenuePorts();
   const evm = useMemo(
     () =>
       wallets.find(
@@ -126,7 +127,7 @@ export function useHyperliquidPlaceOrder(): (
         } = request;
 
         const isBuy = side === "long";
-        const asset = await getAssetIndex(symbol);
+        const asset = await getAssetIndex(symbol, getInfoClient);
 
         // Slippage cap for market orders; for limit orders, use the
         // user-typed price as-is. Both still go through the formatter
@@ -330,6 +331,6 @@ export function useHyperliquidPlaceOrder(): (
         throw error;
       }
     },
-    [evm, queryClient, t],
+    [evm, getExchangeClient, getInfoClient, queryClient, t],
   );
 }

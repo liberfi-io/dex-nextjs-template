@@ -49,14 +49,13 @@ import {
   type CancelOrdersImpl,
 } from "@liberfi.io/ui-perpetuals";
 
-import { getExchangeClient } from "../lib/hyperliquid/client";
-import { getAssetIndex } from "../lib/hyperliquid/asset-index";
+import { useStage53VenuePorts } from "../runtime/Stage53AdaptersProvider";
+import { getAssetIndex, type GetInfoClient } from "../lib/hyperliquid/asset-index";
 
 /**
  * Resolve a Hyperliquid `cancel` leg from an SDK `CancelOrderParams`.
  * Pulled out as a small helper so the (sync after a single async
  * `getAssetIndex`) parsing logic lives in one place.
- *
  * @throws when the params lack an `orderId` — clientOrderId-only
  *   cancellation would require routing to `cancelByCloid` which
  *   we don't implement (the SDK's open-orders flow always carries
@@ -66,11 +65,12 @@ import { getAssetIndex } from "../lib/hyperliquid/asset-index";
 async function buildCancelLeg(
   params: CancelOrderParams,
   missingOrderIdMessage: string,
+  getInfoClient: GetInfoClient,
 ): Promise<{ a: number; o: number }> {
   if (!params.orderId) {
     throw new Error(missingOrderIdMessage);
   }
-  const a = await getAssetIndex(params.symbol);
+  const a = await getAssetIndex(params.symbol, getInfoClient);
   const o = Number(params.orderId);
   if (!Number.isFinite(o) || !Number.isSafeInteger(o)) {
     throw new Error(`Unsupported orderId: ${params.orderId}`);
@@ -122,6 +122,7 @@ export function useHyperliquidCancelOrder(): {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const wallets = useWallets();
+  const { getExchangeClient, getInfoClient } = useStage53VenuePorts();
   const evm = useMemo(
     () =>
       wallets.find(
@@ -163,7 +164,9 @@ export function useHyperliquidCancelOrder(): {
         // through the same `meta()` cache (see asset-index.ts) so
         // multiple legs collapse onto a single backend round-trip.
         const cancels = await Promise.all(
-          paramsList.map((p) => buildCancelLeg(p, missingOrderIdMessage)),
+          paramsList.map((p) =>
+            buildCancelLeg(p, missingOrderIdMessage, getInfoClient),
+          ),
         );
 
         const exchange = getExchangeClient(provider, evm.address as Hex);
@@ -239,7 +242,7 @@ export function useHyperliquidCancelOrder(): {
         throw error;
       }
     },
-    [evm, queryClient, t],
+    [evm, getExchangeClient, getInfoClient, queryClient, t],
   );
 
   /**

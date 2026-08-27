@@ -90,13 +90,11 @@ const RATIO_FP_TOLERANCE = 1e-9;
  * and ≤ (6 − szDecimals) decimals. The more restrictive of the two
  * defines the snap grid; ties are broken by the `mode` argument so
  * the caller can produce slippage-safe market prices.
- *
  * @param price       Unrounded numeric price (e.g. `markPx × 1.08`).
  * @param szDecimals  Per-asset size precision from `meta.universe[i]`.
  * @param mode        `"ceil"` for buys, `"floor"` for sells.
  * @returns A canonical decimal string (no scientific notation, no
  *          trailing zeros), ready to copy into the action payload.
- *
  * @throws when `price` is not a finite positive number.
  */
 export function formatHlPx(
@@ -167,11 +165,9 @@ export function formatHlPx(
  * where e.g. `0.00015 * 1e5 = 14.999999999999998` instead of `15`.
  * Without it the truncation would drop a full tick of precision on
  * common user inputs.
- *
  * @param size        Coin-unit position size (e.g. `0.00015`).
  * @param szDecimals  Per-asset size precision from `meta.universe[i]`.
  * @returns A fixed-decimal string with exactly `szDecimals` decimals.
- *
  * @throws when `size` is not a finite non-negative number.
  */
 export function formatHlSz(size: number, szDecimals: number): string {

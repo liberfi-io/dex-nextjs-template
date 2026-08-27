@@ -116,9 +116,15 @@ export function useHyperliquidBalances(
  */
 function pickAccountValue(account: {
   totalEquity: number;
-  raw?: any;
+  raw?: unknown;
 }): string {
-  const raw = account.raw?.clearinghouseState?.marginSummary?.accountValue;
+  const payload =
+    account.raw && typeof account.raw === "object"
+      ? (account.raw as {
+          clearinghouseState?: { marginSummary?: { accountValue?: unknown } };
+        })
+      : undefined;
+  const raw = payload?.clearinghouseState?.marginSummary?.accountValue;
   if (typeof raw === "string" && raw.length > 0) return raw;
   return account.totalEquity.toString();
 }

@@ -28,6 +28,7 @@ import {
 } from "./app-runtime.types";
 import { readRuntimeConfig } from "./readRuntimeConfig";
 import { Stage51AdaptersProvider } from "./Stage51AdaptersProvider";
+import { Stage53AdaptersProvider } from "./Stage53AdaptersProvider";
 import { useAppClientBundle } from "./useAppClientBundle";
 
 export interface AppRuntimeProvidersProps extends PropsWithChildren {
@@ -122,31 +123,33 @@ export function AppRuntimeProviders({
           capabilities={reactCapabilities}
         >
           <Stage51AdaptersProvider api={clients.api}>
-          <MediaTrackProvider client={clients.mediaTrack}>
-            <ChannelsProvider client={clients.channels}>
-              <PredictProvider client={clients.predict} wsClient={clients.predictWs}>
-                <PolymarketProvider>
-                  <PortfolioClientProvider client={clients.portfolio}>
-                    <PortfolioProvider chain={chain} address={wallet?.address ?? ""}>
-                      <PerpetualsProvider
-                        client={clients.perpetuals}
-                        depositClient={clients.perpetualDeposit}
-                      >
-                        <HyperliquidAccountStateSync />
-                        <DexDataRuntimeProvider
-                          queryClient={queryClient}
-                          adapter={dexDataAdapter}
-                          scheduler={browserDexDataScheduler}
-                        >
-                          <DexDataProvider>{children}</DexDataProvider>
-                        </DexDataRuntimeProvider>
-                      </PerpetualsProvider>
-                    </PortfolioProvider>
-                  </PortfolioClientProvider>
-                </PolymarketProvider>
-              </PredictProvider>
-            </ChannelsProvider>
-          </MediaTrackProvider>
+            <Stage53AdaptersProvider>
+              <MediaTrackProvider client={clients.mediaTrack}>
+                <ChannelsProvider client={clients.channels}>
+                  <PredictProvider client={clients.predict} wsClient={clients.predictWs}>
+                    <PolymarketProvider>
+                      <PortfolioClientProvider client={clients.portfolio}>
+                        <PortfolioProvider chain={chain} address={wallet?.address ?? ""}>
+                          <PerpetualsProvider
+                            client={clients.perpetuals}
+                            depositClient={clients.perpetualDeposit}
+                          >
+                            <HyperliquidAccountStateSync />
+                            <DexDataRuntimeProvider
+                              queryClient={queryClient}
+                              adapter={dexDataAdapter}
+                              scheduler={browserDexDataScheduler}
+                            >
+                              <DexDataProvider>{children}</DexDataProvider>
+                            </DexDataRuntimeProvider>
+                          </PerpetualsProvider>
+                        </PortfolioProvider>
+                      </PortfolioClientProvider>
+                    </PolymarketProvider>
+                  </PredictProvider>
+                </ChannelsProvider>
+              </MediaTrackProvider>
+            </Stage53AdaptersProvider>
           </Stage51AdaptersProvider>
         </CapabilityClientProvider>
       </DexClientProvider>
