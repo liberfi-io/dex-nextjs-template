@@ -537,7 +537,7 @@ function EventOrdersPanel({
                       <span className="mb-1 line-clamp-1 text-sm text-zinc-400">{order.outcome ?? "—"}</span>
                     )}
                     <div className="flex items-center gap-1.5 text-xs text-zinc-400">
-                      {source === "kalshi" ? <KalshiIcon width={36} height={12} /> : <><PolymarketIcon width={14} height={14} /><span>Polymarket</span></>}
+                      {source === "kalshi" ? <KalshiIcon width={36} height={12} /> : <><PolymarketIcon width={14} height={14} /><span>{t("extend.predict.venue.polymarket")}</span></>}
                     </div>
                   </div>
                   <div className="min-w-[100px] shrink-0 text-center">
@@ -647,15 +647,15 @@ function EventTradesPanel({
     overscan: 10,
     measureElement: (el) => el.getBoundingClientRect().height,
   });
+  const virtualItems = virtualizer.getVirtualItems();
 
   useEffect(() => {
-    const items = virtualizer.getVirtualItems();
-    const last = items[items.length - 1];
+    const last = virtualItems[virtualItems.length - 1];
     if (!last) return;
     if (last.index >= trades.length - 5 && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
-  }, [virtualizer.getVirtualItems(), trades.length, hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [virtualItems, trades.length, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleNavigate = useCallback(
     (trade: PredictTrade) => {
@@ -723,7 +723,7 @@ function EventTradesPanel({
                       )}
                       <div className="flex items-center gap-1.5 text-xs text-zinc-500">
                         <span className="inline-flex items-center gap-1">
-                          {source === "kalshi" ? <KalshiIcon width={36} height={12} /> : <><PolymarketIcon width={14} height={14} /><span className="text-zinc-500">Polymarket</span></>}
+                          {source === "kalshi" ? <KalshiIcon width={36} height={12} /> : <><PolymarketIcon width={14} height={14} /><span className="text-zinc-500">{t("extend.predict.venue.polymarket")}</span></>}
                         </span>
                       </div>
                     </div>

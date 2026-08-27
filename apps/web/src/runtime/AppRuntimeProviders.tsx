@@ -3,7 +3,7 @@
 import { type ComponentType, PropsWithChildren, useMemo } from "react";
 import Cookies from "js-cookie";
 import { DexClientProvider as ApiClientProvider } from "@liberfi.io/react";
-import { PolymarketProvider, PredictProvider } from "@liberfi.io/react-predict";
+import { PolymarketProvider } from "@liberfi.io/react-predict";
 import { ChannelsProvider } from "@liberfi.io/ui-channels";
 import { MediaTrackProvider } from "@liberfi.io/ui-media-track";
 import { PerpetualsProvider } from "@liberfi.io/ui-perpetuals";
@@ -29,6 +29,7 @@ import {
 import { readRuntimeConfig } from "./readRuntimeConfig";
 import { Stage51AdaptersProvider } from "./Stage51AdaptersProvider";
 import { Stage53AdaptersProvider } from "./Stage53AdaptersProvider";
+import { Stage54AdaptersProvider } from "./Stage54AdaptersProvider";
 import { useAppClientBundle } from "./useAppClientBundle";
 
 export interface AppRuntimeProvidersProps extends PropsWithChildren {
@@ -124,9 +125,13 @@ export function AppRuntimeProviders({
         >
           <Stage51AdaptersProvider api={clients.api}>
             <Stage53AdaptersProvider>
-              <MediaTrackProvider client={clients.mediaTrack}>
-                <ChannelsProvider client={clients.channels}>
-                  <PredictProvider client={clients.predict} wsClient={clients.predictWs}>
+              <Stage54AdaptersProvider
+                client={clients.predict}
+                wsClient={clients.predictWs}
+                wsEnabled={config.predictWsEnabled}
+              >
+                <MediaTrackProvider client={clients.mediaTrack}>
+                  <ChannelsProvider client={clients.channels}>
                     <PolymarketProvider>
                       <PortfolioClientProvider client={clients.portfolio}>
                         <PortfolioProvider chain={chain} address={wallet?.address ?? ""}>
@@ -146,9 +151,9 @@ export function AppRuntimeProviders({
                         </PortfolioProvider>
                       </PortfolioClientProvider>
                     </PolymarketProvider>
-                  </PredictProvider>
-                </ChannelsProvider>
-              </MediaTrackProvider>
+                  </ChannelsProvider>
+                </MediaTrackProvider>
+              </Stage54AdaptersProvider>
             </Stage53AdaptersProvider>
           </Stage51AdaptersProvider>
         </CapabilityClientProvider>

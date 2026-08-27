@@ -1,0 +1,12 @@
+{
+  "wave": "5.4",
+  "quota": 11,
+  "closed": 11,
+  "command": "pnpm --filter @liberfi/web exec eslint src/components/page/EventActivitySection.tsx src/components/page/PredictPortfolioPage.tsx --max-warnings 0",
+  "split": {
+    "EventActivitySection.tsx": 4,
+    "PredictPortfolioPage.tsx": 7
+  },
+  "ws_policy": "NEXT_PUBLIC_ENABLE_PREDICT_WS remains default false; Stage54 ports force wsClient=null when disabled",
+  "outcome_key_repo": "absent"
+}

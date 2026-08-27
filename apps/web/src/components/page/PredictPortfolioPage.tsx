@@ -220,7 +220,10 @@ function PortfolioContent() {
     polymarket_user: evmAddr || undefined,
   });
 
-  const allPositions = positionsData?.positions ?? [];
+  const allPositions = useMemo(
+    () => positionsData?.positions ?? [],
+    [positionsData?.positions],
+  );
   const positionsCount = allPositions.length;
 
   const { kalshiUsdcBalance, polymarketUsdcBalance, isLoading: balanceLoading } = usePredictWallet();
@@ -694,7 +697,7 @@ function PositionRow({ position }: { position: PredictPosition }) {
                 ) : (
                   <>
                     <PolymarketIcon width={16} height={16} />
-                    <span className="text-zinc-400">Polymarket</span>
+                    <span className="text-zinc-400">{t("extend.predict.venue.polymarket")}</span>
                   </>
                 )}
               </span>
@@ -1064,7 +1067,7 @@ function OrderRow({
             ) : (
               <>
                 <PolymarketIcon width={14} height={14} />
-                <span>Polymarket</span>
+                <span>{t("extend.predict.venue.polymarket")}</span>
               </>
             )}
           </div>
@@ -1220,15 +1223,15 @@ function TradesPanel({ solanaAddr, evmAddr }: { solanaAddr: string; evmAddr: str
     overscan: 10,
     measureElement: (el) => el.getBoundingClientRect().height,
   });
+  const virtualItems = virtualizer.getVirtualItems();
 
   useEffect(() => {
-    const items = virtualizer.getVirtualItems();
-    const last = items[items.length - 1];
+    const last = virtualItems[virtualItems.length - 1];
     if (!last) return;
     if (last.index >= trades.length - 5 && hasMore && !isFetchingMore) {
       fetchNextPage();
     }
-  }, [virtualizer.getVirtualItems(), trades.length, hasMore, isFetchingMore, fetchNextPage]);
+  }, [virtualItems, trades.length, hasMore, isFetchingMore, fetchNextPage]);
 
   const handleNavigate = useCallback(
     (trade: PredictTrade) => {
@@ -1354,7 +1357,7 @@ function TradeRow({
                 ) : (
                   <>
                     <PolymarketIcon width={14} height={14} />
-                    <span className="text-zinc-500">Polymarket</span>
+                    <span className="text-zinc-500">{t("extend.predict.venue.polymarket")}</span>
                   </>
                 )}
               </span>
