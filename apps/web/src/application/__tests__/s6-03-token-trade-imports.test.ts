@@ -2,7 +2,12 @@ import fs from "node:fs";
 import path from "node:path";
 import { Chain } from "@liberfi.io/types";
 import { formatShortAddress } from "../format";
-import { AppRoute, tokenDetailChainSegment, tokenDetailRoute } from "../routes";
+import {
+  AppRoute,
+  resolveTokenRouteSlug,
+  tokenDetailChainSegment,
+  tokenDetailRoute,
+} from "../routes";
 import { isValidWalletAddress } from "../wallet";
 
 const WEB_SRC = path.resolve(__dirname, "../..");
@@ -34,6 +39,17 @@ describe("S6-03 token/trade app adapters", () => {
     expect(tokenDetailRoute("ethereum", "0xabc")).toBe("/tokens/eth/0xabc");
     expect(tokenDetailChainSegment("bnb")).toBe("bsc");
     expect(AppRoute.trade).toBe("/tokens");
+  });
+
+  it("does not call chainIdBySlug on an empty /tokens slug", () => {
+    expect(resolveTokenRouteSlug(undefined)).toBeNull();
+    expect(resolveTokenRouteSlug([])).toBeNull();
+    expect(resolveTokenRouteSlug(["sol"])).toBeNull();
+    expect(resolveTokenRouteSlug(["not-a-chain", "mint"])).toBeNull();
+    expect(resolveTokenRouteSlug(["sol", "mint"])).toEqual({
+      chainId: Chain.SOLANA,
+      address: "mint",
+    });
   });
 
   it("validates Solana addresses and rejects invalid input", () => {

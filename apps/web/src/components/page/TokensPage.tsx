@@ -2,8 +2,7 @@
 
 import { useParams, redirect } from "next/navigation";
 import { useMemo } from "react";
-import { chainIdBySlug } from "@liberfi.io/utils";
-import { tokenDetailRoute } from "../../application/routes";
+import { resolveTokenRouteSlug, tokenDetailRoute } from "../../application/routes";
 import { TokenTradePage } from "./token-detail/TokenTradePage";
 
 /**
@@ -23,12 +22,9 @@ import { TokenTradePage } from "./token-detail/TokenTradePage";
  */
 export function TokensPage() {
   const { slug } = useParams();
+  const resolved = useMemo(() => resolveTokenRouteSlug(slug), [slug]);
 
-  const [chain, address] = (slug ?? []) as [string, string];
-
-  const chainId = useMemo(() => chainIdBySlug(chain), [chain]);
-
-  if (!chainId || !address) {
+  if (!resolved) {
     return redirect(
       tokenDetailRoute(
         process.env.NEXT_PUBLIC_DEFAULT_TOKEN_CHAIN,
@@ -37,5 +33,5 @@ export function TokensPage() {
     );
   }
 
-  return <TokenTradePage chain={chainId} address={address} />;
+  return <TokenTradePage chain={resolved.chainId} address={resolved.address} />;
 }

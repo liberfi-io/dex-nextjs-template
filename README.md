@@ -42,7 +42,5 @@ Ten leftover `@liberfi/*` packages were deleted in `c73ed3f` after
 
 ## Known Stage 7 residuals
 
-- Bare `/tokens` (no chain/address) currently 500s:
-  `chainIdBySlug(undefined)` before the default-token redirect.
 - `/launchpad` is not a route; LaunchPad is a modal.
 - Do not production-`next build` during this refactor.
