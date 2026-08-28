@@ -1,0 +1,29 @@
+{
+  "wave": "6",
+  "quota": 32,
+  "s6_07a_surviving_app": 18,
+  "s6_07b_delete_with_file": 4,
+  "s6_06_delete_with_package": 10,
+  "q5_01_sdk_final": "df596bbac",
+  "split": {
+    "CombinedTokenList.tsx react-hooks/exhaustive-deps": 1,
+    "FundWalletModal.tsx i18next/no-literal-string": 2,
+    "HyperliquidUsdcIcon.tsx import-x/no-duplicates": 2,
+    "ReceiveModal.tsx i18next/no-literal-string": 2,
+    "WithdrawModal.tsx": 11,
+    "ChannelsPage.tsx import-x/no-duplicates": 2,
+    "ChannelsInfoPage.tsx import-x/no-duplicates": 2,
+    "react-backend types no-explicit-any": 4,
+    "ui-dex AssetList import-x/no-duplicates": 2,
+    "ui-dex SwapContext no-explicit-any": 1,
+    "ui-launchpad LaunchPadHome import-x/no-duplicates": 2,
+    "ui-launchpad LaunchPadModal no-explicit-any": 1
+  },
+  "s6_07a_files": [
+    "apps/web/src/components/home/CombinedTokenList.tsx",
+    "apps/web/src/components/FundWalletModal.tsx",
+    "apps/web/src/components/icons/HyperliquidUsdcIcon.tsx",
+    "apps/web/src/components/modals/ReceiveModal.tsx",
+    "apps/web/src/components/modals/WithdrawModal.tsx"
+  ]
+}

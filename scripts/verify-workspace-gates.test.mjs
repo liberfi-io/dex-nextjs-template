@@ -3,7 +3,12 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
-import { findWarningRegressions } from "./verify-lint-baseline.mjs";
+import {
+  findFinalMismatches,
+  findWarningRegressions,
+  parseLintBaselineArgs,
+  readApprovedExceptions,
+} from "./verify-lint-baseline.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 
@@ -69,4 +74,16 @@ test("lint baseline permits reductions but rejects new warnings", () => {
   assert.deepEqual(findWarningRegressions({}, { "a\trule": 1 }), [
     "a\trule: 1 warning(s), baseline 0",
   ]);
+});
+
+test("final lint gate passes at 0 warnings and rejects leftovers", () => {
+  assert.deepEqual(findFinalMismatches({}, {}), []);
+  assert.deepEqual(findFinalMismatches({ "a\trule": 1 }, {}), [
+    "a\trule: current 1, exception 0",
+  ]);
+  assert.equal(
+    parseLintBaselineArgs(["--final", "--update"]).error,
+    "cannot combine --final with --update",
+  );
+  assert.deepEqual(readApprovedExceptions(), {});
 });

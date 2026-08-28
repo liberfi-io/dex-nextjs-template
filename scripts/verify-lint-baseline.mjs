@@ -6,6 +6,7 @@ import { promisify } from "node:util";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const baselinePath = join(root, "quality/lint-warning-baseline.json");
+const exceptionsPath = join(root, "quality/lint-warning-exceptions.json");
 const execFileAsync = promisify(execFile);
 
 function repositoryPath(filePath) {
@@ -28,6 +29,36 @@ export function findWarningRegressions(baseline, current) {
       ([key, count]) =>
         `${key}: ${count} warning(s), baseline ${baseline[key] ?? 0}`,
     );
+}
+
+export function findFinalMismatches(current, exceptions) {
+  const expected = exceptions ?? {};
+  const keys = new Set([...Object.keys(current), ...Object.keys(expected)]);
+  return [...keys]
+    .sort()
+    .filter((key) => (current[key] ?? 0) !== (expected[key] ?? 0))
+    .map(
+      (key) =>
+        `${key}: current ${current[key] ?? 0}, exception ${expected[key] ?? 0}`,
+    );
+}
+
+export function parseLintBaselineArgs(argv) {
+  const flags = argv.filter((value) => value.startsWith("--"));
+  if (flags.includes("--final") && flags.includes("--update")) {
+    return { error: "cannot combine --final with --update" };
+  }
+  return {
+    error: null,
+    final: flags.includes("--final"),
+    printCurrent: flags.includes("--print-current"),
+  };
+}
+
+export function readApprovedExceptions(filePath = exceptionsPath) {
+  if (!existsSync(filePath)) return {};
+  const parsed = JSON.parse(readFileSync(filePath, "utf8"));
+  return parsed.warnings ?? parsed;
 }
 
 export async function collectLintSummary() {
@@ -86,15 +117,39 @@ export async function collectLintSummary() {
 }
 
 async function main() {
+  const args = parseLintBaselineArgs(process.argv.slice(2));
+  if (args.error) {
+    console.error(args.error);
+    process.exitCode = 1;
+    return;
+  }
+
   const summary = await collectLintSummary();
 
-  if (process.argv.includes("--print-current")) {
+  if (args.printCurrent) {
     process.stdout.write(`${JSON.stringify(summary.warnings, null, 2)}\n`);
     return;
   }
   if (summary.errors.length > 0) {
     console.error(`Lint errors:\n${summary.errors.join("\n")}`);
     process.exitCode = 1;
+    return;
+  }
+  if (args.final) {
+    const mismatches = findFinalMismatches(
+      summary.warnings,
+      readApprovedExceptions(),
+    );
+    if (mismatches.length > 0) {
+      console.error(`Lint warning final gate failed:\n${mismatches.join("\n")}`);
+      process.exitCode = 1;
+      return;
+    }
+    const count = Object.values(summary.warnings).reduce(
+      (total, value) => total + value,
+      0,
+    );
+    console.log(`Lint warning final gate passed (${count} warning(s)).`);
     return;
   }
 
