@@ -1,6 +1,6 @@
 "use client";
 
-import { TradingChart } from "@liberfi/ui-dex/components/trade";
+import { TradingChart } from "../../TradingChart";
 import type { Chain } from "@liberfi.io/types";
 import { useTokenQuery } from "@liberfi.io/react";
 import {
@@ -132,7 +132,7 @@ export function TokenTradeMobilePage({
             style={{ height: MOBILE_CHART_HEIGHT_PX }}
             className="shrink-0 overflow-hidden border-b border-divider"
           >
-            <TradingChart />
+            <TradingChart chain={chain} address={address} />
           </div>
 
           <SidebarTokenAudit chain={chain} address={address} />

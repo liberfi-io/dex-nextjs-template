@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 import { useHideBottomNavigationBar, useHideHeader } from "@liberfi/ui-base";
-import { TradingChart } from "@liberfi/ui-dex/components/trade";
+import { TradingChart } from "../../TradingChart";
 import type { Chain } from "@liberfi.io/types";
 import { useScreen } from "@liberfi.io/ui";
 import { BottomDataPanel } from "./BottomDataPanel";
@@ -300,7 +300,7 @@ function TokenTradeDesktopPage({ chain, address }: TokenTradePageProps) {
 
           {/* Chart — fixed height, resizable via split handle */}
           <div style={{ height: chartH }} className="flex-shrink-0">
-            <TradingChart />
+            <TradingChart chain={chain} address={address} />
           </div>
 
           <TokenSplitHandle

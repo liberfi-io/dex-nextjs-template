@@ -23,6 +23,10 @@ const unpublishedSdkMapper = {
     localSdkRoot,
     "packages/ui-redpacket/src/index.ts",
   ),
+  "^@liberfi.io/ui-tradingview$": path.join(
+    localSdkRoot,
+    "packages/ui-tradingview/src/index.ts",
+  ),
 };
 const fs = require("fs");
 const localI18nSrc = path.join(localSdkRoot, "packages/i18n/src/index.ts");

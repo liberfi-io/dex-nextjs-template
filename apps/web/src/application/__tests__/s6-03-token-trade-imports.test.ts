@@ -97,4 +97,22 @@ describe("S6-03 token/trade app adapters", () => {
       ]),
     );
   });
+
+  it("renders token-detail charts through the SDK TradingView widget", () => {
+    expect(collectImports("@liberfi/ui-dex")).not.toEqual(
+      expect.arrayContaining([
+        "components/page/TokensPage.tsx",
+        "components/page/token-detail/TokenTradePage.tsx",
+        "components/page/token-detail/TokenTradeMobilePage.tsx",
+      ]),
+    );
+    expect(collectImports("@liberfi.io/ui-tradingview")).toEqual(
+      expect.arrayContaining([
+        "application/chart/client-data-feed.ts",
+        "application/chart/load-tradingview-widget.ts",
+        "components/TradingChart.tsx",
+      ]),
+    );
+  });
 });
+

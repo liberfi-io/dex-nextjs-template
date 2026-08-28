@@ -4,7 +4,6 @@ import { useParams, redirect } from "next/navigation";
 import { useMemo } from "react";
 import { chainIdBySlug } from "@liberfi.io/utils";
 import { tokenDetailRoute } from "../../application/routes";
-import { TradeDataLoader } from "@liberfi/ui-dex/components/trade";
 import { TokenTradePage } from "./token-detail/TokenTradePage";
 
 /**
@@ -38,9 +37,5 @@ export function TokensPage() {
     );
   }
 
-  return (
-    <TradeDataLoader chainId={chainId} address={address}>
-      <TokenTradePage chain={chainId} address={address} />
-    </TradeDataLoader>
-  );
+  return <TokenTradePage chain={chainId} address={address} />;
 }
