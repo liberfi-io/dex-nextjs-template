@@ -183,6 +183,7 @@ function WalletSelector({
   selected: WalletSource;
   onSelect: (w: WalletSource) => void;
 }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const {
     solanaAddress,
@@ -245,7 +246,10 @@ function WalletSelector({
             {current.address ? truncateAddress(current.address) : "—"}
           </div>
           <div className="text-xs text-zinc-500">
-            {formatUsdc(current.balance ?? 0)} USDC · {current.chainName}
+            {t("extend.account.usdcOnChain", {
+              amount: formatUsdc(current.balance ?? 0),
+              chain: current.chainName,
+            })}
           </div>
         </div>
         <ChevronDownIcon
@@ -295,7 +299,10 @@ function WalletSelector({
                       {w.address ? truncateAddress(w.address) : "—"}
                     </div>
                     <div className="text-xs text-zinc-500">
-                      {formatUsdc(w.balance ?? 0)} USDC · {w.chainName}
+                      {t("extend.account.usdcOnChain", {
+                        amount: formatUsdc(w.balance ?? 0),
+                        chain: w.chainName,
+                      })}
                     </div>
                   </div>
                 </button>

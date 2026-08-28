@@ -153,7 +153,7 @@ export function CombinedTokenList() {
           });
         });
     },
-    [client, t],
+    [chainRef, client, t],
   );
 
   const handleSelectToken = useCallback(

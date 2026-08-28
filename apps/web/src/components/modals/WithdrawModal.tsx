@@ -191,11 +191,11 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
 
   // Portfolio data for balance of the native token.
   const { data: portfolioData } = useWalletPortfolios();
-  const portfolios = portfolioData?.portfolios ?? [];
 
   const nativeBalance = useMemo(
-    () => portfolios.find((p) => p.address === nativeToken?.address),
-    [portfolios, nativeToken],
+    () =>
+      (portfolioData?.portfolios ?? []).find((p) => p.address === nativeToken?.address),
+    [portfolioData?.portfolios, nativeToken],
   );
 
   const balanceDisplay = useMemo(() => {
@@ -369,7 +369,6 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
       // but must not break the broadcast flow.
       void watchTransferConfirmation(chain, result.txSignature, toast).catch(
         (err: unknown) => {
-          // eslint-disable-next-line no-console
           console.error("[withdraw] confirmation watcher crashed", err);
         },
       );
@@ -459,7 +458,7 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
                   {t("extend.account.withdraw")}
                 </h3>
                 <p className="text-xs text-zinc-500 mt-0.5">
-                  发送 {chainName} 网络资产至钱包地址
+                  {t("extend.account.sendToWallet", { chain: chainName })}
                 </p>
               </div>
             </div>
@@ -476,19 +475,19 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
           <div className="px-5 pb-5 pt-2 flex flex-col gap-3">
             {!isSupportedChain ? (
               <div className="rounded-[10px] border border-amber-500/20 bg-amber-500/5 px-4 py-6 text-sm text-amber-300 text-center">
-                {chainName} 链转账即将支持，敬请期待
+                {t("extend.account.transferComingSoon", { chain: chainName })}
               </div>
             ) : (
               <>
                 {/* Amount card */}
                 <div className="rounded-[12px] bg-[#0a0a0b] border border-[#27272a] px-3.5 py-3">
                   <div className="flex items-center justify-between text-[11px]">
-                    <span className="text-zinc-500">发送数量</span>
+                    <span className="text-zinc-500">{t("extend.account.send_amount")}</span>
                     <span className="text-zinc-500">
-                      余额{" "}
-                      <span className="text-[#C7FF2E] tabular-nums">
-                        {balanceDisplay} {nativeToken.symbol}
-                      </span>
+                      {t("extend.account.balance_with_amount", {
+                        amount: balanceDisplay,
+                        symbol: nativeToken.symbol,
+                      })}
                     </span>
                   </div>
                   <div className="mt-1.5 flex items-center gap-2">
@@ -517,7 +516,7 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
                         disabled={!nativeBalance?.amount || nativeBalance.amount === "0" || isExecuting}
                         className="cursor-pointer px-2 py-0.5 rounded-md text-[10px] uppercase tracking-wider text-zinc-300 bg-zinc-800/60 hover:bg-zinc-700/80 hover:text-[#C7FF2E] transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-zinc-800/60 disabled:hover:text-zinc-300"
                       >
-                        半仓
+                        {t("extend.account.withdraw_half")}
                       </button>
                       <button
                         type="button"
@@ -525,7 +524,7 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
                         disabled={!nativeBalance?.amount || nativeBalance.amount === "0" || isExecuting}
                         className="cursor-pointer px-2 py-0.5 rounded-md text-[10px] uppercase tracking-wider text-zinc-300 bg-zinc-800/60 hover:bg-zinc-700/80 hover:text-[#C7FF2E] transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-zinc-800/60 disabled:hover:text-zinc-300"
                       >
-                        全部
+                        {t("extend.account.withdraw_all")}
                       </button>
                     </div>
                     <span className="text-[11px] text-zinc-500 tabular-nums">
@@ -541,14 +540,18 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
                 {/* Address card */}
                 <div className="rounded-[12px] bg-[#0a0a0b] border border-[#27272a] px-3.5 py-3">
                   <div className="flex items-center justify-between text-[11px] mb-1.5">
-                    <span className="text-zinc-500">{chainName} 钱包地址</span>
+                    <span className="text-zinc-500">
+                      {t("extend.account.wallet_address_chain", { chain: chainName })}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <input
                       type="text"
                       value={addressValue}
                       onChange={(e) => handleAddressChange(e.target.value)}
-                      placeholder={`请输入 ${chainName} 收款地址`}
+                      placeholder={t("extend.account.transfer_placeholder_chain", {
+                        chain: chainName,
+                      })}
                       disabled={isExecuting}
                       className={cn(
                         "flex-1 min-w-0 bg-transparent border-0 outline-none text-sm text-white placeholder:text-zinc-600",
@@ -566,7 +569,7 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
                           <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
                           <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
                         </svg>
-                        粘贴
+                        {t("extend.account.paste")}
                       </button>
                     )}
                     {addressValue && (

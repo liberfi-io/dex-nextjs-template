@@ -1,5 +1,4 @@
-import { UsdcIcon } from "@liberfi.io/ui";
-import { cn } from "@liberfi.io/ui";
+import { UsdcIcon, cn } from "@liberfi.io/ui";
 
 import { HyperliquidIcon } from "./HyperliquidIcon";
 

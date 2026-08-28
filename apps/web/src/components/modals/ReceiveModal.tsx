@@ -15,8 +15,7 @@ import {
 } from "@liberfi.io/ui-scaffold";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { useAccountInfo } from "@liberfi.io/ui-portfolio";
-import { chainDisplayName } from "@liberfi.io/utils";
-import type { PredefinedToken } from "@liberfi.io/utils";
+import { chainDisplayName, type PredefinedToken } from "@liberfi.io/utils";
 
 export const RECEIVE_MODAL_ID = "receive-wallet";
 
@@ -119,7 +118,7 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
               <button
                 type="button"
                 onClick={handleCopy}
-                aria-label={copied ? "Copied" : "Copy address"}
+                aria-label={copied ? t("extend.account.copied") : t("extend.account.copy_address")}
                 className="flex-shrink-0 flex items-center gap-1.5 h-7 px-2.5 rounded-[8px] text-xs font-medium transition-colors cursor-pointer bg-zinc-700/60 hover:bg-zinc-700 text-zinc-300 hover:text-white"
               >
                 {copied ? (
@@ -127,7 +126,7 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
-                    <span>已复制</span>
+                    <span>{t("extend.account.copied")}</span>
                   </>
                 ) : (
                   <>
@@ -135,7 +134,7 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
                       <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
                       <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
                     </svg>
-                    <span>复制地址</span>
+                    <span>{t("extend.account.copy_address")}</span>
                   </>
                 )}
               </button>
