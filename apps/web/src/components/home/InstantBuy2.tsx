@@ -12,7 +12,7 @@ import {
 } from "../../application/tokens";
 import { INSTANT_TRADE_AMOUNT_ID, swapFeesFromPreset } from "../../application/swapFees";
 import { useWalletPrimaryTokenNetWorth } from "../../application/useWalletPrimaryTokenNetWorth";
-import { useAppSdk } from "@liberfi/ui-base";
+import { browserAppSdk } from "../../application/app-sdk";
 import { useInstantTradeAmount, usePresetValues, useSwap, type SwapPhase } from "@liberfi.io/ui-trade";
 import { useAuthCallback, useConnectedWallet } from "@liberfi.io/wallet-connector";
 
@@ -23,7 +23,7 @@ export interface InstantBuy2Props {
 
 export function InstantBuy({ chain, tokenAddress }: InstantBuy2Props) {
   const { t } = useTranslation();
-  const appSdk = useAppSdk();
+
   const nativeToken = useMemo(() => getNativeToken(chain), [chain]);
   const { amount, preset } = useInstantTradeAmount({
     id: INSTANT_TRADE_AMOUNT_ID,
@@ -95,7 +95,7 @@ export function InstantBuy({ chain, tokenAddress }: InstantBuy2Props) {
 
     if (new SafeBigNumber(walletNetWorth.amount).lt(amount)) {
       toast.error(t("extend.trade.buy_insufficient_balance"));
-      appSdk.events.emit("deposit:open");
+      browserAppSdk.events.emit("deposit:open");
       return;
     }
 
@@ -114,7 +114,6 @@ export function InstantBuy({ chain, tokenAddress }: InstantBuy2Props) {
       ...fees,
     });
   }, [
-    appSdk,
     amount,
     chain,
     tokenAddress,

@@ -1,6 +1,6 @@
 import { RocketIcon, Button, StyledTooltip } from "@liberfi.io/ui";
-import { useAppSdk } from "@liberfi/ui-base";
 import { useTranslation } from "@liberfi.io/i18n";
+import { browserAppSdk } from "../application/app-sdk";
 import { useCallback } from "react";
 
 interface TweetMediaData {
@@ -17,14 +17,12 @@ export type TweetsLaunchButtonProps = {
 export function TweetsLaunchButton({ data }: TweetsLaunchButtonProps) {
   const { t } = useTranslation();
 
-  const appSdk = useAppSdk();
-
   const handleLaunch = useCallback(() => {
-    appSdk.events.emit("launchpad:open", {
+    browserAppSdk.events.emit("launchpad:open", {
       prompt: data.tweet.content.text,
       image: data.tweet.user.avatar,
     });
-  }, [appSdk, data]);
+  }, [data]);
 
   return (
     <StyledTooltip closeDelay={0} content={t("extend.toolbar.launch_token")}>

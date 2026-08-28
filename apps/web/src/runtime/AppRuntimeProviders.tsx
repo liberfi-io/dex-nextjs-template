@@ -11,7 +11,8 @@ import { PortfolioClientProvider, PortfolioProvider } from "@liberfi.io/ui-portf
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { useAuth, useConnectedWallet } from "@liberfi.io/wallet-connector";
 import { DexClientProvider } from "@liberfi/react-dex";
-import { PinataProvider, useDexTokenProvider } from "@liberfi/ui-base";
+import { PinataProvider } from "@liberfi/ui-base";
+import { useDexTokenProvider } from "../application/useDexTokenProvider";
 import {
   browserDexDataScheduler,
   createChainStreamDexDataAdapter,

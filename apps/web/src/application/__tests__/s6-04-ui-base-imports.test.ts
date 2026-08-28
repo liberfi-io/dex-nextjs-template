@@ -61,5 +61,7 @@ describe("S6-04 ui-base translation imports", () => {
     expect(filesImportingSymbolFrom("@liberfi/ui-base", "useTimerToast")).toEqual([]);
     expect(filesImportingSymbolFrom("@liberfi/ui-base", "useAuthenticatedCallback")).toEqual([]);
     expect(filesImportingSymbolFrom("@liberfi/ui-base", "useWalletPrimaryTokenNetWorth")).toEqual([]);
+    expect(filesImportingSymbolFrom("@liberfi/ui-base", "useAppSdk")).toEqual([]);
+    expect(filesImportingSymbolFrom("@liberfi/ui-base", "useDexTokenProvider")).toEqual([]);
   });
 });
