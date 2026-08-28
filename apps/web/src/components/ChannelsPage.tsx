@@ -2,12 +2,12 @@
 
 import { cn } from "@liberfi.io/ui";
 import {
+  Channel,
   ChannelEditButton,
   ChannelsHomePage,
   ChannelSubscribeButton,
 } from "@liberfi.io/ui-channels";
 import { hideHeaderOnLayoutAtom, useRouter, useSetBottomNavigationBarActiveKey, useShowBottomNavigationBar } from "@liberfi/ui-base";
-import { Channel } from "@liberfi.io/ui-channels";
 import { useSetAtom } from "jotai";
 import { useEffect } from "react";
 

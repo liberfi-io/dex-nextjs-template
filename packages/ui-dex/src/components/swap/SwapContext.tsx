@@ -78,7 +78,7 @@ export type SwapProviderProps = PropsWithChildren<{
   chainId?: Chain;
   fromTokenAddress?: string;
   toTokenAddress?: string;
-  onComplete?: (options: any) => void;
+  onComplete?: (options: { success: boolean; txHash?: string }) => void;
 }>;
 
 export function SwapProvider({

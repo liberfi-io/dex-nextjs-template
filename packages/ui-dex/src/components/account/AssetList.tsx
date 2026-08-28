@@ -21,8 +21,7 @@ import { useWalletPortfolioPnlsInfiniteQuery } from "@liberfi.io/react";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { keyBy } from "lodash-es";
 import BigNumber from "bignumber.js";
-import { useAuth, useRouter } from "@liberfi/ui-base";
-import { useCurrentWalletAddress } from "@liberfi/ui-base";
+import { useAuth, useCurrentWalletAddress, useRouter } from "@liberfi/ui-base";
 import { Virtuoso } from "react-virtuoso";
 
 export type AssetListProps = {

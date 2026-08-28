@@ -1,12 +1,4 @@
 {
   "description": "Stage 0 warning baseline. Keys are repository-relative file paths plus ESLint rule ids; values are maximum accepted counts.",
-  "warnings": {
-    "apps/web/src/components/ChannelsInfoPage.tsx\timport-x/no-duplicates": 2,
-    "apps/web/src/components/ChannelsPage.tsx\timport-x/no-duplicates": 2,
-    "packages/react-backend/src/types.ts\t@typescript-eslint/no-explicit-any": 4,
-    "packages/ui-dex/src/components/account/AssetList.tsx\timport-x/no-duplicates": 2,
-    "packages/ui-dex/src/components/swap/SwapContext.tsx\t@typescript-eslint/no-explicit-any": 1,
-    "packages/ui-launchpad/src/components/LaunchPadHome.tsx\timport-x/no-duplicates": 2,
-    "packages/ui-launchpad/src/components/LaunchPadModal.tsx\t@typescript-eslint/no-explicit-any": 1
-  }
+  "warnings": {}
 }

@@ -8,8 +8,7 @@ import { launchPadPlatform } from "../states";
 import { PumpLaunchPadForm } from "./pump";
 import { RaydiumLaunchPadForm } from "./raydium";
 import { LaunchPadCurveAreaChart } from "./LaunchPadCurveAreaChart";
-import { MagicLaunch } from "./MagicLaunch";
-import { GeneratedMemeInfo } from "./MagicLaunch";
+import { MagicLaunch, GeneratedMemeInfo } from "./MagicLaunch";
 
 const platforms = [
   {

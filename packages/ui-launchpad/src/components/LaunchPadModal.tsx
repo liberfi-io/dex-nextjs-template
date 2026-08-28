@@ -20,7 +20,7 @@ export function LaunchPadModal() {
       }}
       header={t("extend.launchpad.title")}
     >
-      {(_onClose: () => void, args: any) => (
+      {(_onClose: () => void, args: { prompt?: string; image?: string }) => (
         <LaunchPadHome prompt={args?.prompt} image={args?.image} />
       )}
     </Modal>
