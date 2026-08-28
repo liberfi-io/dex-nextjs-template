@@ -12,6 +12,12 @@ import zh from "../locales/zh.json";
 import { MemoryStorage } from "../storage";
 import { MockAppSdk } from "../app-sdk";
 import { buildCreateOnrampWidgetUrlBody } from "../server/useCreateOnrampWidgetUrlMutation";
+import {
+  getPrimaryTokenAddress,
+  getPrimaryTokenAvatar,
+  getPrimaryTokenDecimals,
+  getPrimaryTokenSymbol,
+} from "../tokens";
 
 const WEB_SRC = path.resolve(__dirname, "../..");
 const TEMPLATE_ROOT = path.resolve(WEB_SRC, "../../..");
@@ -114,16 +120,15 @@ describe("S6-02 application adapters", () => {
     ]);
   });
 
+  it("owns primary-token helpers without @liberfi/core", () => {
+    expect(getPrimaryTokenSymbol(Chain.SOLANA)).toBe("SOL");
+    expect(getPrimaryTokenAddress(Chain.SOLANA)).toBe("11111111111111111111111111111111");
+    expect(getPrimaryTokenDecimals(Chain.SOLANA)).toBe(9);
+    expect(getPrimaryTokenAvatar(Chain.SOLANA)).toBe("/images/tokens/sol.svg");
+  });
+
   it("stops apps/web from importing config/storage/auth/onramp from workspace packages", () => {
-    const core = collectImports("@liberfi/core");
-    expect(core).not.toEqual(
-      expect.arrayContaining([
-        "app/(new)/layout.tsx",
-        "app/(legacy)/layout.tsx",
-        "libs/browser/BrowserStorage.ts",
-        "libs/browser/BrowserAppSdk.ts",
-      ]),
-    );
+    expect(collectImports("@liberfi/core")).toEqual([]);
     expect(collectImports("@liberfi/react-backend")).toEqual([
       "application/server/graphql.ts",
       "components/modals/WithdrawModal.tsx",

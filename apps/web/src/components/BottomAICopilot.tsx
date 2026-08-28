@@ -1,7 +1,6 @@
 "use client";
 
 import { useResizeObserver } from "@liberfi.io/hooks";
-// import { Chain, SOL_TOKEN_DECIMALS } from "@liberfi/core";
 // import { fetchToken, useDexClient } from "@liberfi/react-dex";
 // import { useAuth, useTranslation } from "@liberfi/ui-base";
 import { ChatWidget, AgentProvider } from "@agent-widget/react";

@@ -1,5 +1,5 @@
 import { useTranslation } from "@liberfi.io/i18n";
-import { SOLANA_TOKEN_PROTOCOLS } from "@liberfi.io/types";
+import { Chain, SOLANA_TOKEN_PROTOCOLS } from "@liberfi.io/types";
 import { cn, SettingsIcon, StyledBadge, Button, StyledPlainTabs, Tab } from "@liberfi.io/ui";
 import {
   TokenListFilterModal,
@@ -8,7 +8,6 @@ import {
   TokenListResolution,
   TokenListResolutionSelectorWidget,
 } from "@liberfi.io/ui-tokens";
-import { Chain } from "@liberfi/core";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { ChevronUpIcon } from "@liberfi/ui-base";
 import { InstantBuyAmountInput, SwitchWallet } from "@liberfi/ui-dex";

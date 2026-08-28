@@ -1,6 +1,7 @@
 import { Avatar } from "@heroui/react";
 import { cn, StyledTooltip } from "@liberfi.io/ui";
-import { Chain, getPrimaryTokenAvatar } from "@liberfi/core";
+import { Chain } from "@liberfi.io/types";
+import { getPrimaryTokenAvatar } from "../application/tokens";
 import { useTranslation } from "@liberfi/ui-base";
 import { CHAIN_QUOTE_TOKEN_SYMBOLS, useQuotePrice } from "@liberfi/ui-dex";
 import { formatPriceInUsd } from "@liberfi.io/utils";

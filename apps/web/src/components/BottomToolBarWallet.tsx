@@ -1,8 +1,9 @@
 import { useMemo } from "react";
 
 import { Avatar } from "@heroui/react";
-import { formatAmount, getPrimaryTokenAvatar } from "@liberfi/core";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { formatAmount } from "@liberfi.io/utils";
+import { getPrimaryTokenAvatar } from "../application/tokens";
 import { useWalletPrimaryTokenNetWorth, WalletIcon } from "@liberfi/ui-base";
 
 export function BottomToolBarWallet() {

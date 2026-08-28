@@ -9,7 +9,7 @@ import {
   getPrimaryTokenAddress,
   getPrimaryTokenDecimals,
   getPrimaryTokenSymbol,
-} from "@liberfi/core";
+} from "../../application/tokens";
 import {
   useAppSdk,
   useAuthenticatedCallback,

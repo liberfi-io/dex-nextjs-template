@@ -15,7 +15,7 @@ import {
   getPrimaryTokenAddress,
   getPrimaryTokenDecimals,
   getPrimaryTokenSymbol,
-} from "@liberfi/core";
+} from "../../application/tokens";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
   useAppSdk,
