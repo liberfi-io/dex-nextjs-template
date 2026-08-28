@@ -3,7 +3,7 @@
 import { PropsWithChildren, useState } from "react";
 import { ServiceClientProviders } from "./ServiceClientProviders";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { GraphQLClientProvider } from "@liberfi/react-backend";
+import { GraphQLClientProvider } from "../application/server/graphql";
 import { UIProviders } from "./UIProviders";
 import { AuthProviders } from "./AuthProviders";
 import { LocaleCode, LocaleProvider } from "@liberfi.io/i18n";

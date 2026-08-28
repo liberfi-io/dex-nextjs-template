@@ -16,9 +16,11 @@ const unpublishedSdkMapper = {
     "packages/react-redpacket/src/index.ts",
   ),
 };
-const localI18nMapper = process.env.USE_LOCAL_SDK === "true"
+const fs = require("fs");
+const localI18nSrc = path.join(localSdkRoot, "packages/i18n/src/index.ts");
+const localI18nMapper = fs.existsSync(localI18nSrc)
   ? {
-      "^@liberfi.io/i18n$": path.join(localSdkRoot, "packages/i18n/src/index.ts"),
+      "^@liberfi.io/i18n$": localI18nSrc,
     }
   : {};
 

@@ -4,7 +4,7 @@ import { Inter, DM_Sans } from "next/font/google";
 import { initServerI18n } from "../../i18n/initServerI18n";
 import { detectLanguage } from "../../i18n/detectLanguage";
 import { defaultNS } from "@liberfi.io/i18n/server";
-import { CONFIG } from "@liberfi/core";
+import { CONFIG } from "../../application/config";
 import { GoogleAnalytics } from "../../components/GoogleAnalytics";
 import { NewAppLayout } from "../../components/NewAppLayout";
 

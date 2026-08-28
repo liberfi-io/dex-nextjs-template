@@ -1,10 +1,10 @@
 "use server";
 
 import { defaultLng, defaultNS, i18next, LocaleCode, LocaleEnum } from "@liberfi.io/i18n/server";
-import en from "@liberfi/locales/locales/en/translation.json";
-import zh from "@liberfi/locales/locales/zh/translation.json";
 import en2 from "@liberfi.io/i18n/locales/en.json";
 import zh2 from "@liberfi.io/i18n/locales/zh.json";
+import en from "../application/locales/en.json";
+import zh from "../application/locales/zh.json";
 
 let initialized = false;
 

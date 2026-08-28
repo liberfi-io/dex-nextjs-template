@@ -1,0 +1,105 @@
+{
+  "extend": {
+    "title": "{{name}} | 任何鏈上交易任何代幣",
+    "description": "在首個與鏈無關的交易平台上，於任何鏈上交易任何代幣。無需考慮鏈的選擇。100%去中心化且自托管。",
+    "languages": {
+      "en": "English",
+      "zh": "繁體中文"
+    },
+    "header": {
+      "home": "首頁",
+      "trade": "交易",
+      "predict": "預測",
+      "pulse": "Pulse",
+      "account": "帳戶",
+      "search_placeholder": "代幣名稱 / 地址",
+      "launchpad": "創建新代幣",
+      "language": "切換語言",
+      "settings": "設定",
+      "account_settings": "帳戶設定",
+      "account_wallet": "我的錢包",
+      "channels": "頻道"
+    },
+    "footer": {
+      "token_list": "首頁",
+      "trade": "交易",
+      "pulse": "Pulse",
+      "account": "帳戶",
+      "search": "搜尋",
+      "track": "推特"
+    },
+    "auth": {
+      "signin": "登入",
+      "signout": "登出"
+    },
+    "network": {
+      "stable": "網路連線穩定"
+    },
+    "nav": {
+      "discover": "發現",
+      "pulse": "Pulse",
+      "perpetuals": "永續合約",
+      "predict": "預測",
+      "channels": "頻道",
+      "portfolio": "資產",
+      "markets": "市場",
+      "matches": "跨平台匹配"
+    },
+    "toolbar": {
+      "discord": "加入我們的 Discord",
+      "twitter": "在 X 上關注我們",
+      "docs": "文件",
+      "sol_price_usd": "SOL 美元價格",
+      "media_track": "推特",
+      "ai_copilot": "AI 機器人",
+      "media_track_tooltip": "追蹤推特",
+      "ai_copilot_tooltip": "與 AI 機器人聊天以獲取交易見解",
+      "launch_token": "創建代幣"
+    },
+    "settings": {
+      "account_name": "{{application_name}} 帳戶",
+      "deposit": "充值",
+      "preferences": "偏好設定",
+      "social_medias": "社交媒體",
+      "others": "更多",
+      "language": "語言",
+      "twitter": "X (Twitter)",
+      "telegram": "Telegram",
+      "discord": "Discord",
+      "privacy_policy": "隱私政策",
+      "terms_of_service": "服務條款",
+      "support": "支援",
+      "faq": "常見問題",
+      "user_guide": "使用者指南"
+    },
+    "common": {
+      "save": "儲存",
+      "submit": "提交",
+      "signin": "登入",
+      "unauthenticated": "請登入以連接您的錢包",
+      "show_more": "更多",
+      "show_less": "更少",
+      "safe": "安全",
+      "unsafe": "風險",
+      "yes": "是",
+      "no": "否",
+      "none": "無",
+      "no_data": "暫無資料",
+      "or": "或",
+      "confirm": "確認",
+      "time": {
+        "24h": "24H",
+        "1d": "1D",
+        "1w": "1W",
+        "1M": "1M",
+        "3M": "3M",
+        "6M": "6M"
+      },
+      "copied": "複製成功",
+      "copied_token_address": "已複製 {{symbol}} 代幣地址"
+    },
+    "search": {
+      "history": "搜尋歷史"
+    }
+  }
+}

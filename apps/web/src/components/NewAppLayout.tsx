@@ -89,7 +89,7 @@ import {
 import { TranslationProvider, AppSdkProvider, RouterProvider } from "@liberfi/ui-base";
 import { useRouterAdapter } from "../hooks/useRouterAdapter";
 import { tokenDetailRoute } from "@liberfi/ui-dex/libs/routes";
-import { useCreateOnrampWidgetUrlMutation } from "@liberfi/react-backend";
+import { useCreateOnrampWidgetUrlMutation } from "../application/server/useCreateOnrampWidgetUrlMutation";
 import { queryClient } from "../libs/queryClient";
 import { AuthProviders } from "./AuthProviders";
 import { useChainAwareRouter } from "../hooks/useChainAwareRouter";
@@ -97,7 +97,7 @@ import { useChainUrlSync } from "../hooks/useChainUrlSync";
 import { useChainSwitchUrlHandler } from "../hooks/useChainSwitchUrlHandler";
 import { useTranslationAdapter } from "../hooks/useTranslationAdapter";
 import { ChainAwareLink } from "./ChainAwareLink";
-import { browserAppSdk } from "../libs/browser/BrowserAppSdk";
+import { browserAppSdk } from "../application/app-sdk";
 import {
   applicationLocaleProviderProps,
   createApplicationLocaleRuntime,

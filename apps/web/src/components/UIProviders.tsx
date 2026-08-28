@@ -4,7 +4,7 @@ import { PropsWithChildren } from "react";
 import { UIKitProvider } from "@liberfi/ui-base";
 import { useTranslationAdapter } from "../hooks/useTranslationAdapter";
 import { useRouterAdapter } from "../hooks/useRouterAdapter";
-import { browserAppSdk } from "../libs/browser/BrowserAppSdk";
+import { browserAppSdk } from "../application/app-sdk";
 import { Modals } from "./Modals";
 import { BottomNavigationBar, Header } from "@liberfi/ui-dex";
 import { BottomToolBar } from "./BottomToolBar";

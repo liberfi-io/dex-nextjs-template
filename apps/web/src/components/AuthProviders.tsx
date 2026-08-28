@@ -6,7 +6,7 @@ import {
   PrivyAuthProvider,
   PrivyWalletConnectorProvider,
 } from "@liberfi.io/wallet-connector-privy";
-import { authenticatePrivy } from "@liberfi/react-backend";
+import { authenticatePrivy } from "../application/auth/authenticatePrivy";
 
 export function AuthProviders({ children }: PropsWithChildren) {
   const exchangeAccessToken = useCallback(async (accessToken: string, identityToken: string) => {
