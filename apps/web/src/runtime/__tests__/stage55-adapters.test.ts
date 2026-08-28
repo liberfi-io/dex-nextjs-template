@@ -3,7 +3,8 @@ import path from "node:path";
 import { createElement, type PropsWithChildren } from "react";
 import { renderHook } from "@testing-library/react";
 import type { ChainStreamClient } from "@chainstream-io/sdk";
-import { Chain } from "@liberfi/core";
+import { LaunchPadPlatform } from "@liberfi.io/react-launchpad";
+import { Chain } from "@liberfi.io/types";
 import {
   createStage55Adapters,
   createStage55LaunchpadPorts,
@@ -66,10 +67,28 @@ describe("createStage55LaunchpadPorts", () => {
       chain: Chain.SOLANA,
       name: "Demo",
       symbol: "DEMO",
-    } as Parameters<typeof ports.createToken>[0]);
+      platform: LaunchPadPlatform.PUMPFUN,
+    });
 
     expect(createToken).toHaveBeenCalledTimes(1);
     expect(result).toEqual({ serializedTx: "signed-tx" });
+  });
+
+  it("builds an unpublished SDK create runtime against ChainStream execution", async () => {
+    const createToken = jest.fn().mockResolvedValue({ serializedTx: "signed-tx" });
+    const ports = createStage55LaunchpadPorts(fakeClient({ createToken }));
+    const snapshot = await ports.createRuntime({
+      signer: { sign: async () => "sig" },
+    }).submit({
+      chain: Chain.SOLANA,
+      name: "Demo",
+      symbol: "DEMO",
+      platform: LaunchPadPlatform.PUMPFUN,
+    });
+
+    expect(snapshot.status).toBe("succeeded");
+    expect(snapshot.txHash).toBe("signed-tx");
+    expect(createToken).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -79,7 +98,7 @@ describe("createStage55RedpacketPorts", () => {
     expect(ports.shareUrl("abc")).toBe("https://app.example.com/redpacket?share=abc");
   });
 
-  it("delegates create/claim/send to the retained template packages", async () => {
+  it("delegates create/claim/send to the application ChainStream client", async () => {
     const createRedpacket = jest.fn().mockResolvedValue({ shareId: "s1" });
     const claimRedpacket = jest.fn().mockResolvedValue({ alreadyClaimed: false });
     const redpacketSend = jest.fn().mockResolvedValue({ tx: "sent" });

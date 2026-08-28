@@ -11,13 +11,6 @@ const RETAINED = [
   "@liberfi/ui-redpacket",
 ] as const;
 
-const UNPUBLISHED = [
-  "@liberfi.io/react-launchpad",
-  "@liberfi.io/ui-launchpad",
-  "@liberfi.io/react-redpacket",
-  "@liberfi.io/ui-redpacket",
-] as const;
-
 const WORKSPACE_PACKAGES = [
   "packages/react-launchpad/package.json",
   "packages/ui-launchpad/package.json",
@@ -46,19 +39,25 @@ function collectImports(specifier: string): string[] {
 }
 
 describe("Stage 5.5 launchpad/redpacket parity", () => {
-  it("keeps unpublished SDK packages off production source", () => {
-    for (const specifier of UNPUBLISHED) {
-      expect(collectImports(specifier)).toEqual([]);
-    }
+  it("loads unpublished react packages only through Stage55 adapters", () => {
+    expect(collectImports("@liberfi.io/react-launchpad")).toEqual([
+      "runtime/__tests__/stage55-adapters.test.ts",
+      "runtime/createStage55Adapters.ts",
+    ]);
+    expect(collectImports("@liberfi.io/react-redpacket")).toEqual([
+      "runtime/createStage55Adapters.ts",
+    ]);
+    expect(collectImports("@liberfi.io/ui-launchpad")).toEqual([]);
+    expect(collectImports("@liberfi.io/ui-redpacket")).toEqual([]);
   });
 
-  it("keeps retained template packages imported (Stage 6 delete blocked)", () => {
+  it("keeps retained template UI packages imported (Stage 6 delete blocked)", () => {
     const counts = Object.fromEntries(
       RETAINED.map((specifier) => [specifier, collectImports(specifier).length]),
     );
-    expect(counts["@liberfi/react-launchpad"]).toBeGreaterThan(0);
+    expect(counts["@liberfi/react-launchpad"]).toBe(0);
     expect(counts["@liberfi/ui-launchpad"]).toBeGreaterThan(0);
-    expect(counts["@liberfi/react-redpacket"]).toBeGreaterThan(0);
+    expect(counts["@liberfi/react-redpacket"]).toBe(0);
     expect(counts["@liberfi/ui-redpacket"]).toBeGreaterThan(0);
   });
 

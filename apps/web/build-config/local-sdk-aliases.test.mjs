@@ -95,6 +95,18 @@ test("never resolves one entrypoint from both source and dist", () => {
   }
 });
 
+test("local SDK scan includes unpublished launchpad and redpacket packages", () => {
+  const sdkRoot = path.resolve("..", "react-sdk");
+  const entries = withLocalSdk(sdkRoot, () =>
+    getLocalSdkAliasEntries({ baseDir: path.resolve("apps/web") }),
+  );
+  const names = new Set(entries.map((entry) => entry.entrypoint));
+  assert.ok(names.has("@liberfi.io/react-launchpad$"));
+  assert.ok(names.has("@liberfi.io/react-redpacket$"));
+  assert.ok(names.has("@liberfi.io/ui-launchpad$"));
+  assert.ok(names.has("@liberfi.io/ui-redpacket$"));
+});
+
 test("logs entrypoint source kinds without exposing an absolute SDK path", () => {
   const fixture = createLocalSdkFixture();
   try {

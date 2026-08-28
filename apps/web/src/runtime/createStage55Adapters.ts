@@ -1,32 +1,55 @@
 import type { ChainStreamClient } from "@chainstream-io/sdk";
-import { createToken, type CreateTokenParams } from "@liberfi/react-launchpad";
+import { Chain } from "@liberfi.io/types";
 import {
-  claimRedPacket,
-  createFixedAmountRedPacket,
-  createRandomAmountRedPacket,
-  sendRedPacketTransaction,
-  type ClaimRedPacketParams,
-  type CreateFixedAmountRedPacketParams,
-  type CreateRandomAmountRedPacketParams,
-  type SendRedPacketTransactionParams,
-} from "@liberfi/react-redpacket";
+  createLaunchpadCreateRuntime,
+  type CreateTokenIntent,
+  type LaunchpadCreateRuntime,
+  type LaunchpadSignerPort,
+  type LaunchpadUploadPort,
+} from "@liberfi.io/react-launchpad";
+import {
+  createRedpacketRuntime,
+  type ClaimRedPacketIntent,
+  type CreateFixedAmountRedPacketIntent,
+  type CreateRandomAmountRedPacketIntent,
+  type RedpacketCommand,
+  type RedpacketSignerPort,
+} from "@liberfi.io/react-redpacket";
+
+function chainParam(chain: Chain): string {
+  switch (chain) {
+    case Chain.SOLANA:
+      return "sol";
+    case Chain.BINANCE:
+      return "bsc";
+    case Chain.ETHEREUM:
+      return "eth";
+    default:
+      throw new Error("unsupported chain");
+  }
+}
+
+export type Stage55SendTxParams = {
+  chain: Chain;
+} & Record<string, unknown>;
 
 export type Stage55LaunchpadPorts = {
-  createToken: (params: CreateTokenParams) => ReturnType<typeof createToken>;
+  createToken: (intent: CreateTokenIntent) => Promise<{ serializedTx?: string }>;
+  createRuntime: (options?: {
+    upload?: LaunchpadUploadPort;
+    signer?: LaunchpadSignerPort;
+  }) => LaunchpadCreateRuntime;
 };
 
 export type Stage55RedpacketPorts = {
-  createFixed: (
-    params: CreateFixedAmountRedPacketParams,
-  ) => ReturnType<typeof createFixedAmountRedPacket>;
-  createRandom: (
-    params: CreateRandomAmountRedPacketParams,
-  ) => ReturnType<typeof createRandomAmountRedPacket>;
-  claim: (params: ClaimRedPacketParams) => ReturnType<typeof claimRedPacket>;
-  sendTransaction: (
-    params: SendRedPacketTransactionParams,
-  ) => ReturnType<typeof sendRedPacketTransaction>;
+  createFixed: (intent: CreateFixedAmountRedPacketIntent) => Promise<{ shareId?: string }>;
+  createRandom: (intent: CreateRandomAmountRedPacketIntent) => Promise<{ shareId?: string }>;
+  claim: (intent: ClaimRedPacketIntent) => Promise<{ alreadyClaimed?: boolean }>;
+  sendTransaction: (params: Stage55SendTxParams) => Promise<unknown>;
   shareUrl: (shareId: string) => string;
+  createRuntime: (options?: { signer?: RedpacketSignerPort }) => ReturnType<
+    typeof createRedpacketRuntime
+  >;
 };
 
 export type Stage55Adapters = {
@@ -35,36 +58,109 @@ export type Stage55Adapters = {
 };
 
 /**
- * Template-owned launchpad ports. ChainStream DTO stays in this
- * adapter. Unpublished SDK `createLaunchpadCreateRuntime` is not
- * imported until the Stage 5.5 package is consumed.
+ * Template-owned launchpad ports. ChainStream DTO stays here.
+ * Unpublished `@liberfi.io/react-launchpad` is resolved via local-sdk
+ * aliases until the package is published.
  */
 export function createStage55LaunchpadPorts(
   client: ChainStreamClient,
 ): Stage55LaunchpadPorts {
+  const createToken = async (intent: CreateTokenIntent) =>
+    client.dex.createToken(chainParam(intent.chain), {
+      name: intent.name,
+      symbol: intent.symbol,
+      imageUri: intent.imageUri,
+    });
+
   return {
-    createToken: (params) => createToken(client, params),
+    createToken,
+    createRuntime: (options = {}) =>
+      createLaunchpadCreateRuntime({
+        upload: options.upload,
+        signer: options.signer,
+        execution: {
+          async submit(signed, intent) {
+            void signed;
+            const result = await createToken(intent);
+            return { txHash: result.serializedTx ?? "tx" };
+          },
+        },
+      }),
   };
 }
 
 /**
- * Template-owned redpacket ports. Share URLs are built against the
- * application origin; signer/upload stay in existing widgets.
+ * Template-owned redpacket ports. Share URLs use the application origin.
+ * Unpublished `@liberfi.io/react-redpacket` is resolved via local-sdk.
  */
 export function createStage55RedpacketPorts(
   client: ChainStreamClient,
   origin: string,
 ): Stage55RedpacketPorts {
+  const createFixed = async (intent: CreateFixedAmountRedPacketIntent) =>
+    client.redPacket.createRedpacket(chainParam(intent.chain), {
+      creator: intent.creator,
+      mint: intent.mint,
+      maxClaims: intent.maxClaims,
+      fixedAmount: intent.fixedAmount,
+      memo: intent.memo,
+      password: intent.password,
+    });
+
+  const createRandom = async (intent: CreateRandomAmountRedPacketIntent) =>
+    client.redPacket.createRedpacket(chainParam(intent.chain), {
+      creator: intent.creator,
+      mint: intent.mint,
+      maxClaims: intent.maxClaims,
+      totalAmount: intent.totalAmount,
+      memo: intent.memo,
+      password: intent.password,
+    });
+
+  const claim = async (intent: ClaimRedPacketIntent) =>
+    client.redPacket.claimRedpacket(chainParam(intent.chain), {
+      shareId: intent.shareId,
+      password: intent.password,
+      claimer: intent.claimer,
+    });
+
+  const submitCommand = async (command: RedpacketCommand) => {
+    if (command.kind === "create-fixed") {
+      const result = await createFixed(command.intent);
+      return { packetId: result.shareId ?? "packet" };
+    }
+    if (command.kind === "create-random") {
+      const result = await createRandom(command.intent);
+      return { packetId: result.shareId ?? "packet" };
+    }
+    const result = await claim(command.intent);
+    return {
+      packetId: command.intent.shareId,
+      alreadyClaimed: result.alreadyClaimed,
+    };
+  };
+
   return {
-    createFixed: (params) => createFixedAmountRedPacket(client, params),
-    createRandom: (params) => createRandomAmountRedPacket(client, params),
-    claim: (params) => claimRedPacket(client, params),
-    sendTransaction: (params) => sendRedPacketTransaction(client, params),
+    createFixed,
+    createRandom,
+    claim,
+    sendTransaction: async ({ chain, ...rest }) =>
+      client.redPacket.redpacketSend(chainParam(chain), rest),
     shareUrl: (shareId) => {
       const url = new URL("/redpacket", origin);
       url.searchParams.set("share", shareId);
       return url.toString();
     },
+    createRuntime: (options = {}) =>
+      createRedpacketRuntime({
+        signer: options.signer,
+        execution: {
+          async submit(signed, command) {
+            void signed;
+            return submitCommand(command);
+          },
+        },
+      }),
   };
 }
 
