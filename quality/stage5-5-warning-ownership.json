@@ -7,6 +7,6 @@
     "NewAppLayout.tsx i18next/no-literal-string": 1,
     "NewAppLayout.tsx import-x/no-duplicates": 4
   },
-  "unpublished_sdk": "template does not import @liberfi.io/react-launchpad|ui-launchpad|react-redpacket|ui-redpacket until published",
-  "retained_packages": "@liberfi/react-launchpad|ui-launchpad|react-redpacket|ui-redpacket stay until Stage 6"
+  "unpublished_sdk": "apps/web imports unpublished @liberfi.io/react-launchpad|ui-launchpad|react-redpacket|ui-redpacket via tsconfig paths and USE_LOCAL_SDK aliases; packages are not added to package.json",
+  "retained_packages": "@liberfi/react-launchpad|ui-launchpad|react-redpacket|ui-redpacket stay in workspace until S6-06"
 }

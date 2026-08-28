@@ -1,7 +1,12 @@
+"use client";
+
 import { RocketIcon, Button, StyledTooltip } from "@liberfi.io/ui";
 import { useTranslation } from "@liberfi.io/i18n";
-import { browserAppSdk } from "../application/app-sdk";
+import * as UiScaffold from "@liberfi.io/ui-scaffold";
 import { useCallback } from "react";
+import { LAUNCHPAD_MODAL_ID, type LaunchPadModalParams } from "./modals/LaunchPadModal";
+
+const useAsyncModal = UiScaffold.useAsyncModal;
 
 interface TweetMediaData {
   tweet: {
@@ -16,13 +21,16 @@ export type TweetsLaunchButtonProps = {
 
 export function TweetsLaunchButton({ data }: TweetsLaunchButtonProps) {
   const { t } = useTranslation();
+  const { onOpen } = useAsyncModal<LaunchPadModalParams>(LAUNCHPAD_MODAL_ID);
 
   const handleLaunch = useCallback(() => {
-    browserAppSdk.events.emit("launchpad:open", {
-      prompt: data.tweet.content.text,
-      image: data.tweet.user.avatar,
+    void onOpen({
+      params: {
+        prompt: data.tweet.content.text,
+        image: data.tweet.user.avatar,
+      },
     });
-  }, [data]);
+  }, [data, onOpen]);
 
   return (
     <StyledTooltip closeDelay={0} content={t("extend.toolbar.launch_token")}>

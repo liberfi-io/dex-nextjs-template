@@ -47,38 +47,37 @@ describe("Stage 5.5 launchpad/redpacket parity", () => {
     expect(collectImports("@liberfi.io/react-redpacket")).toEqual([
       "runtime/createStage55Adapters.ts",
     ]);
-    expect(collectImports("@liberfi.io/ui-launchpad")).toEqual([]);
-    expect(collectImports("@liberfi.io/ui-redpacket")).toEqual([]);
   });
 
-  it("keeps retained template UI packages imported (Stage 6 delete blocked)", () => {
+  it("switches production widgets onto unpublished SDK UI", () => {
+    expect(collectImports("@liberfi.io/ui-launchpad")).toEqual(
+      expect.arrayContaining([
+        "components/modals/LaunchPadModal.tsx",
+        "runtime/Stage55UiBridge.tsx",
+      ]),
+    );
+    expect(collectImports("@liberfi.io/ui-redpacket")).toEqual(
+      expect.arrayContaining([
+        "components/page/RedPacketHomePage.tsx",
+        "components/page/RedPacketLayout.tsx",
+        "runtime/Stage55UiBridge.tsx",
+      ]),
+    );
+  });
+
+  it("clears retained template UI imports from apps/web", () => {
     const counts = Object.fromEntries(
       RETAINED.map((specifier) => [specifier, collectImports(specifier).length]),
     );
     expect(counts["@liberfi/react-launchpad"]).toBe(0);
-    expect(counts["@liberfi/ui-launchpad"]).toBeGreaterThan(0);
+    expect(counts["@liberfi/ui-launchpad"]).toBe(0);
     expect(counts["@liberfi/react-redpacket"]).toBe(0);
-    expect(counts["@liberfi/ui-redpacket"]).toBeGreaterThan(0);
+    expect(counts["@liberfi/ui-redpacket"]).toBe(0);
   });
 
   it("does not remove the four workspace packages", () => {
     for (const relativePath of WORKSPACE_PACKAGES) {
       expect(fs.existsSync(path.join(TEMPLATE_ROOT, relativePath))).toBe(true);
     }
-  });
-
-  it("keeps new redpacket routes on retained widgets", () => {
-    expect(collectImports("@liberfi/ui-redpacket")).toEqual(
-      expect.arrayContaining([
-        "components/page/RedPacketHomePage.tsx",
-        "components/page/RedPacketLayout.tsx",
-      ]),
-    );
-    expect(collectImports("@liberfi/ui-launchpad")).toEqual(
-      expect.arrayContaining([
-        "components/Modals.tsx",
-        "components/modals/LaunchPadModal.tsx",
-      ]),
-    );
   });
 });

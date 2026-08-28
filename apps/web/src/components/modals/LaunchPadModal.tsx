@@ -9,7 +9,8 @@ import {
   XCloseIcon,
 } from "@liberfi.io/ui";
 import { AsyncModal, type RenderAsyncModalProps } from "@liberfi.io/ui-scaffold";
-import { LaunchPadHome } from "@liberfi/ui-launchpad";
+import { LaunchPadHome } from "@liberfi.io/ui-launchpad";
+import { LaunchpadUiBridge } from "../../runtime/Stage55UiBridge";
 
 export type LaunchPadModalParams = {
   prompt?: string;
@@ -66,7 +67,9 @@ function LaunchPadModalContent({
             </button>
           </div>
           <div className="px-5 pb-5">
-            <LaunchPadHome prompt={params?.prompt} image={params?.image} />
+            <LaunchpadUiBridge>
+              <LaunchPadHome prompt={params?.prompt} image={params?.image} />
+            </LaunchpadUiBridge>
           </div>
         </div>
       </ModalContent>

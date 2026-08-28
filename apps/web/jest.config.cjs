@@ -15,6 +15,14 @@ const unpublishedSdkMapper = {
     localSdkRoot,
     "packages/react-redpacket/src/index.ts",
   ),
+  "^@liberfi.io/ui-launchpad$": path.join(
+    localSdkRoot,
+    "packages/ui-launchpad/src/index.ts",
+  ),
+  "^@liberfi.io/ui-redpacket$": path.join(
+    localSdkRoot,
+    "packages/ui-redpacket/src/index.ts",
+  ),
 };
 const fs = require("fs");
 const localI18nSrc = path.join(localSdkRoot, "packages/i18n/src/index.ts");

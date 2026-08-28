@@ -21,8 +21,6 @@ function readWebSrc(relativePath: string) {
   return fs.readFileSync(path.join(WEB_SRC, relativePath), "utf8");
 }
 
-const UNPUBLISHED_SDK = /@liberfi\.io\/(?:react|ui)-(?:launchpad|redpacket)/;
-
 const PRODUCTION_ENTRIES = [
   "components/Modals.tsx",
   "components/modals/LaunchPadModal.tsx",
@@ -53,6 +51,15 @@ function fakeClient(overrides: {
         overrides.createRedpacket ?? jest.fn().mockResolvedValue({ shareId: "share-1" }),
       claimRedpacket: overrides.claimRedpacket ?? jest.fn().mockResolvedValue({ ok: true }),
       redpacketSend: overrides.redpacketSend ?? jest.fn().mockResolvedValue({ ok: true }),
+      getRedpacket: jest.fn().mockResolvedValue({
+        id: "p1",
+        shareId: "share-1",
+        totalAmount: "10",
+        maxClaims: 4,
+        expiredAt: Date.now() + 60_000,
+      }),
+      getClaimsByAddress: jest.fn().mockResolvedValue({ records: [] }),
+      getRedpacketsByAddress: jest.fn().mockResolvedValue({ records: [] }),
     },
   } as unknown as ChainStreamClient;
 }
@@ -176,19 +183,21 @@ describe("Stage 5.5 production wiring", () => {
     expect(stage55).toBeLessThan(stage54Close);
   });
 
-  it("keeps production launchpad/redpacket entries off unpublished SDK packages", () => {
-    for (const relativePath of PRODUCTION_ENTRIES) {
-      expect(readWebSrc(relativePath)).not.toMatch(UNPUBLISHED_SDK);
-    }
-  });
-
-  it("keeps new redpacket routes on the retained template widgets", () => {
-    expect(readWebSrc("components/page/RedPacketHomePage.tsx")).toMatch(
-      /@liberfi\/ui-redpacket/,
-    );
+  it("keeps production launchpad/redpacket entries on unpublished SDK UI", () => {
     expect(readWebSrc("components/modals/LaunchPadModal.tsx")).toMatch(
-      /@liberfi\/ui-launchpad/,
+      /@liberfi\.io\/ui-launchpad/,
     );
-    expect(readWebSrc("components/Modals.tsx")).toMatch(/@liberfi\/ui-launchpad/);
+    expect(readWebSrc("components/page/RedPacketHomePage.tsx")).toMatch(
+      /@liberfi\.io\/ui-redpacket/,
+    );
+    expect(readWebSrc("components/page/RedPacketLayout.tsx")).toMatch(
+      /@liberfi\.io\/ui-redpacket/,
+    );
+    expect(readWebSrc("components/Modals.tsx")).not.toMatch(/@liberfi\/ui-launchpad/);
+    for (const relativePath of PRODUCTION_ENTRIES) {
+      expect(readWebSrc(relativePath)).not.toMatch(
+        /@liberfi\/(?:ui-launchpad|ui-redpacket|react-launchpad|react-redpacket)/,
+      );
+    }
   });
 });

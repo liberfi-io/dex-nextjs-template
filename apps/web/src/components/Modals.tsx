@@ -1,5 +1,4 @@
 import { SettingsModal, TradeSettingsModal } from "@liberfi/ui-dex";
-import { LaunchPadModal } from "@liberfi/ui-launchpad";
 import { lazy, Suspense } from "react";
 
 const modals = [
@@ -23,7 +22,6 @@ export function Modals() {
       </Suspense>
       <SettingsModal />
       <TradeSettingsModal />
-      <LaunchPadModal />
     </>
   );
 }

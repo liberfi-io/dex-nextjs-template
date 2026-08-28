@@ -9,10 +9,12 @@ import {
 } from "@liberfi.io/react-launchpad";
 import {
   createRedpacketRuntime,
+  redpacketRecordStatus,
   type ClaimRedPacketIntent,
   type CreateFixedAmountRedPacketIntent,
   type CreateRandomAmountRedPacketIntent,
   type RedpacketCommand,
+  type RedpacketRecord,
   type RedpacketSignerPort,
 } from "@liberfi.io/react-redpacket";
 
@@ -38,6 +40,7 @@ export type Stage55LaunchpadPorts = {
   createRuntime: (options?: {
     upload?: LaunchpadUploadPort;
     signer?: LaunchpadSignerPort;
+    onChange?: (snapshot: import("@liberfi.io/react-launchpad").LaunchpadCreateSnapshot) => void;
   }) => LaunchpadCreateRuntime;
 };
 
@@ -47,10 +50,31 @@ export type Stage55RedpacketPorts = {
   claim: (intent: ClaimRedPacketIntent) => Promise<{ alreadyClaimed?: boolean }>;
   sendTransaction: (params: Stage55SendTxParams) => Promise<unknown>;
   shareUrl: (shareId: string) => string;
-  createRuntime: (options?: { signer?: RedpacketSignerPort }) => ReturnType<
-    typeof createRedpacketRuntime
-  >;
+  fetchPacket: (shareId: string) => Promise<RedpacketRecord>;
+  listReceived: (address: string) => Promise<RedpacketRecord[]>;
+  listSent: (address: string) => Promise<RedpacketRecord[]>;
+  createRuntime: (options?: {
+    signer?: RedpacketSignerPort;
+    onChange?: (snapshot: import("@liberfi.io/react-redpacket").RedpacketSnapshot) => void;
+  }) => ReturnType<typeof createRedpacketRuntime>;
 };
+
+function asRecord(raw: Record<string, unknown>): RedpacketRecord {
+  const mapped = {
+    id: String(raw.id ?? raw.shareId ?? ""),
+    shareId: String(raw.shareId ?? raw.id ?? ""),
+    totalAmount: String(raw.totalAmount ?? raw.amount ?? "0"),
+    claimedAmount: raw.claimedAmount != null ? String(raw.claimedAmount) : undefined,
+    claimedCount: raw.claimedCount != null ? Number(raw.claimedCount) : undefined,
+    maxClaims: Number(raw.maxClaims ?? 0),
+    memo: raw.memo != null ? String(raw.memo) : undefined,
+    mint: raw.mint != null ? String(raw.mint) : undefined,
+    creator: raw.creator != null ? String(raw.creator) : undefined,
+    expiredAt: typeof raw.expiredAt === "number" ? raw.expiredAt : undefined,
+    status: "ongoing" as const,
+  };
+  return { ...mapped, status: redpacketRecordStatus(mapped) };
+}
 
 export type Stage55Adapters = {
   launchpad: Stage55LaunchpadPorts;
@@ -78,6 +102,7 @@ export function createStage55LaunchpadPorts(
       createLaunchpadCreateRuntime({
         upload: options.upload,
         signer: options.signer,
+        onChange: options.onChange,
         execution: {
           async submit(signed, intent) {
             void signed;
@@ -151,9 +176,20 @@ export function createStage55RedpacketPorts(
       url.searchParams.set("share", shareId);
       return url.toString();
     },
+    fetchPacket: async (shareId) =>
+      asRecord((await client.redPacket.getRedpacket(shareId)) as Record<string, unknown>),
+    listReceived: async (address) => {
+      const page = await client.redPacket.getClaimsByAddress(address, { limit: 50 });
+      return ((page.records ?? []) as Array<Record<string, unknown>>).map(asRecord);
+    },
+    listSent: async (address) => {
+      const page = await client.redPacket.getRedpacketsByAddress(address, { limit: 50 });
+      return ((page.records ?? []) as Array<Record<string, unknown>>).map(asRecord);
+    },
     createRuntime: (options = {}) =>
       createRedpacketRuntime({
         signer: options.signer,
+        onChange: options.onChange,
         execution: {
           async submit(signed, command) {
             void signed;

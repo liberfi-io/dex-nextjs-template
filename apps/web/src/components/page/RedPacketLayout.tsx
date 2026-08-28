@@ -8,18 +8,21 @@ import {
   RedPacketModal,
   RedPacketProvider,
   ShareRedPacketModal,
-} from "@liberfi/ui-redpacket";
+} from "@liberfi.io/ui-redpacket";
+import { RedpacketUiBridge } from "../../runtime/Stage55UiBridge";
 
 export function RedPacketLayout({ children }: PropsWithChildren) {
   const searchParams = useSearchParams();
 
   return (
-    <RedPacketProvider shareId={searchParams.get("share") ?? undefined}>
-      {children}
-      <ClaimRedPacketModal />
-      <ShareRedPacketModal />
-      <RedPacketModal />
-      <RedPacketClaimsModal />
-    </RedPacketProvider>
+    <RedpacketUiBridge>
+      <RedPacketProvider shareId={searchParams.get("share") ?? undefined}>
+        {children}
+        <ClaimRedPacketModal />
+        <ShareRedPacketModal />
+        <RedPacketModal />
+        <RedPacketClaimsModal />
+      </RedPacketProvider>
+    </RedpacketUiBridge>
   );
 }
