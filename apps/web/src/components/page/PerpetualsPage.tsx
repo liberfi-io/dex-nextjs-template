@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import {
   CoinInfoWidget,
   SearchCoinsWidget,
@@ -28,21 +28,7 @@ import { DEPOSIT_HL_USDC_MODAL_ID } from "../modals/DepositHyperliquidUsdcModal"
 import { useHyperliquidUpdateLeverage } from "../../hooks/useHyperliquidUpdateLeverage";
 import { useHyperliquidPlaceOrder } from "../../hooks/useHyperliquidPlaceOrder";
 import { useHyperliquidCancelOrder } from "../../hooks/useHyperliquidCancelOrder";
-import {
-  TvChart,
-  type TvChartInstance,
-  type TvChartProps,
-} from "@liberfi/ui-dex/components/tvchart/TvChart";
-import {
-  TvChartFeature,
-  TvChartKlineStyle,
-  TvChartLayout,
-  TvChartTheme,
-  TvChartType,
-} from "@liberfi/ui-dex/libs/tvchart";
-import { getTvChartLibraryLocale } from "@liberfi/ui-dex/libs/tvchart/utils";
-import type { Timezone } from "../../../public/static/charting_library";
-import { PerpetualsTvChartDataFeedModule } from "./perpetuals/PerpetualsTvChartDataFeedModule";
+import { PerpetualsChart } from "./perpetuals/PerpetualsChart";
 
 type BottomTab = "positions" | "openOrders" | "tradeHistory";
 type MiddleTab = "orderBook" | "trades";
@@ -71,10 +57,6 @@ export function PerpetualsPage() {
   const [showMobileOrder, setShowMobileOrder] = useState(false);
 
   const { client } = usePerpetualsClient();
-
-  useEffect(() => {
-    PerpetualsTvChartDataFeedModule.setClient(client);
-  }, [client]);
 
   // EVM wallet address used by every account-scoped widget on this page
   // (PlaceOrderForm, Positions, OpenOrders, TradeHistory). Without this
@@ -215,7 +197,7 @@ export function PerpetualsPage() {
             <>
               {/* Chart takes ~60% of available height */}
               <div className="flex-[3] min-h-[200px] flex flex-col" style={{ borderBottom: '1px solid rgba(39,39,42,0.6)' }}>
-                <PerpetualsChart symbol={symbol} />
+                <PerpetualsChart symbol={symbol} client={client} />
               </div>
 
               {/* Positions / Orders / History tab bar */}
@@ -377,7 +359,7 @@ export function PerpetualsPage() {
                 handleSelectCoin={handleSelectCoin}
               />
               <div className="flex-1 min-h-0 flex flex-col">
-                <PerpetualsChart symbol={symbol} />
+                <PerpetualsChart symbol={symbol} client={client} />
               </div>
             </div>
 
@@ -891,71 +873,3 @@ function TickerItem({
     </button>
   );
 }
-
-const PerpetualsChart = memo(function PerpetualsChart({ symbol }: { symbol: string }) {
-  const { t, i18n } = useTranslation();
-  const chartRef = useRef<TvChartInstance>(null);
-  const [chartReady, setChartReady] = useState(false);
-
-  const config = useMemo<TvChartProps["config"]>(
-    () => ({
-      storageId: "perps-kline",
-      tickerSymbol: symbol,
-      resolution: "1m",
-      datafeedModule: PerpetualsTvChartDataFeedModule,
-      theme: TvChartTheme.Dark,
-      layout: TvChartLayout.Layout1A,
-      chartType: TvChartType.TradingView,
-      kLineStyle: TvChartKlineStyle.Candles,
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone as unknown as Timezone,
-      locale: getTvChartLibraryLocale(i18n.language),
-      chartNames: {
-        [TvChartType.TradingView]: t("perpetuals.page.chart.tradingview"),
-        [TvChartType.Original]: t("perpetuals.page.chart.original"),
-      },
-      // Match the perpetuals page background instead of the default chart bg.
-      backgroundColor: "#000000",
-      // Tint TradingView's loading spinner with the brand primary green
-      // so the loading state stays on-brand instead of TV's default blue.
-      // Hardcoded to the `defaultTheme.colors.primary.default` value in
-      // `@liberfi/ui-base` — keep in sync if the brand color changes.
-      loadingForegroundColor: "#C7FF2E",
-      // Show TradingView's native header (resolution / indicators / settings).
-      enabledFeatures: [TvChartFeature.HeaderWidget],
-      // Hide native header items the perpetuals page does not need.
-      // Left side keeps: resolution / chart type / indicators / undo-redo.
-      // Right side keeps: settings / fullscreen / screenshot.
-      // Everything else (symbol search, compare/+, saved-layout dropdown,
-      // multi-chart layout toggle, quick search magnifier) is removed.
-      disabledFeatures: [
-        TvChartFeature.HeaderSymbolSearch,
-        TvChartFeature.HeaderCompare,
-        TvChartFeature.HeaderSaveload,
-        TvChartFeature.HeaderLayoutToggle,
-        TvChartFeature.HeaderQuickSearch,
-      ],
-    }),
-    [symbol, i18n.language, t],
-  );
-
-  useEffect(() => {
-    if (chartReady) {
-      chartRef.current?.setSymbol(symbol);
-    }
-  }, [chartReady, symbol]);
-
-  const handleChartReady = useCallback(() => {
-    setChartReady(true);
-  }, []);
-
-  return (
-    <div className="flex-1 w-full min-h-0 flex flex-col">
-      <TvChart
-        ref={chartRef}
-        config={config}
-        onChartReady={handleChartReady}
-        showToolbar={false}
-      />
-    </div>
-  );
-});

@@ -129,6 +129,7 @@ describe("S6-02 application adapters", () => {
 
   it("stops apps/web from importing config/storage/auth/onramp from workspace packages", () => {
     expect(collectImports("@liberfi/core")).toEqual([]);
+    expect(collectImports("@liberfi/react-dex")).toEqual([]);
     expect(collectImports("@liberfi/react-backend")).toEqual([
       "application/server/graphql.ts",
       "components/modals/WithdrawModal.tsx",

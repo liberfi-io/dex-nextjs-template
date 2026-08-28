@@ -45,6 +45,7 @@ module.exports = createJestConfig({
     ...unpublishedSdkMapper,
     ...localI18nMapper,
     "^@/(.*)$": "<rootDir>/src/$1",
+    "^lodash-es$": "lodash",
     "\\.(css|less|sass|scss)$": "<rootDir>/test/style-mock.cjs",
     "\\.(gif|ico|jpe?g|png|svg|webp)$": "<rootDir>/test/file-mock.cjs",
   },

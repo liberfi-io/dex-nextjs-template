@@ -41,6 +41,8 @@ describe("application shell chrome mapping", () => {
         "components/page/PerpetualsPage.tsx",
         "components/page/RedPacketHomePage.tsx",
         "components/Modals.tsx",
+        "components/NewAppLayout.tsx",
+        "components/modals/WebviewModal.tsx",
       ]),
     ).toEqual([]);
   });

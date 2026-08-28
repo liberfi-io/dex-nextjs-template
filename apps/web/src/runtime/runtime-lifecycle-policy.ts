@@ -17,7 +17,6 @@ export const APP_RUNTIME_PROVIDER_ORDER: readonly RuntimeProviderKey[] = [
   "app-runtime",
   "pinata",
   "application-adapters",
-  "chainstream-client",
   "api-client",
   "media-track",
   "channels",

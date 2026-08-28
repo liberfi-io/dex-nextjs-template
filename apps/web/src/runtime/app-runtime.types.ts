@@ -140,7 +140,6 @@ export type RuntimeProviderKey =
   | "app-runtime"
   | "pinata"
   | "application-adapters"
-  | "chainstream-client"
   | "api-client"
   | "media-track"
   | "channels"

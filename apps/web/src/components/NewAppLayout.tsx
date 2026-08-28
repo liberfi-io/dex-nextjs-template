@@ -15,8 +15,6 @@
 
 import {
   PropsWithChildren,
-  Suspense,
-  lazy,
   useCallback,
   useEffect,
   useMemo,
@@ -86,9 +84,7 @@ import {
   truncateAddress,
   type PredefinedToken,
 } from "@liberfi.io/utils";
-import { TranslationProvider, AppSdkProvider, RouterProvider } from "@liberfi/ui-base";
 import { useShellChrome } from "../application/layout-chrome";
-import { useRouterAdapter } from "../hooks/useRouterAdapter";
 import { tokenDetailRoute } from "../application/routes";
 import { useCreateOnrampWidgetUrlMutation } from "../application/server/useCreateOnrampWidgetUrlMutation";
 import { queryClient } from "../libs/queryClient";
@@ -96,9 +92,7 @@ import { AuthProviders } from "./AuthProviders";
 import { useChainAwareRouter } from "../hooks/useChainAwareRouter";
 import { useChainUrlSync } from "../hooks/useChainUrlSync";
 import { useChainSwitchUrlHandler } from "../hooks/useChainSwitchUrlHandler";
-import { useTranslationAdapter } from "../hooks/useTranslationAdapter";
 import { ChainAwareLink } from "./ChainAwareLink";
-import { browserAppSdk } from "../application/app-sdk";
 import {
   applicationLocaleProviderProps,
   createApplicationLocaleRuntime,
@@ -112,6 +106,7 @@ import {
   DepositHyperliquidUsdcModal,
 } from "./modals/DepositHyperliquidUsdcModal";
 import { ReceiveModal, RECEIVE_MODAL_ID } from "./modals/ReceiveModal";
+import { WebviewModal } from "./modals/WebviewModal";
 import { WithdrawModal, WITHDRAW_MODAL_ID } from "./modals/WithdrawModal";
 import { useHyperliquidBalances } from "../hooks/useHyperliquidBalances";
 import { HyperliquidUsdcIcon } from "./icons/HyperliquidUsdcIcon";
@@ -127,15 +122,6 @@ import { PredictBalanceIndicator } from "./PredictBalanceIndicator";
 import { FundWalletModal } from "./FundWalletModal";
 import { isPulseSupportedChain } from "../lib/pulse";
 import { AppRuntimeProviders } from "../runtime/AppRuntimeProviders";
-
-const LegacyModals = [
-  lazy(() => import("@liberfi/ui-dex/components/modals/WebviewModal")),
-  lazy(() => import("@liberfi/ui-dex/components/modals/ReceiveModal")),
-  lazy(() => import("@liberfi/ui-dex/components/modals/AssetSelectModal")),
-  lazy(() => import("@liberfi/ui-dex/components/modals/TokenSelectModal")),
-  lazy(() => import("@liberfi/ui-dex/components/modals/SwapModal")),
-  lazy(() => import("@liberfi/ui-dex/components/modals/TransferModal")),
-];
 
 const {
   Scaffold,
@@ -182,51 +168,21 @@ export function NewAppLayout({ children, locale }: PropsWithChildren<{ locale: L
             supportedLanguages={["en", "zh"]}
           >
             <AppRuntimeProviders>
-              <ApplicationAdapters>
-                <PageShell>{children}</PageShell>
-                <LaunchPadModal />
-                <DepositHyperliquidUsdcModal />
-                <ReceiveModal />
-                <WithdrawModal />
-                <StyledToaster />
-                <SearchModal />
-                <PredictSearchModal />
-                <PresetFormModal />
-                <Suspense>
-                  {LegacyModals.map((Modal, i) => (
-                    <Modal key={i} />
-                  ))}
-                </Suspense>
-              </ApplicationAdapters>
+              <PageShell>{children}</PageShell>
+              <LaunchPadModal />
+              <DepositHyperliquidUsdcModal />
+              <ReceiveModal />
+              <WithdrawModal />
+              <WebviewModal />
+              <StyledToaster />
+              <SearchModal />
+              <PredictSearchModal />
+              <PresetFormModal />
             </AppRuntimeProviders>
           </RuntimeLocaleProvider>
         </AuthProviders>
       </QueryClientProvider>
     </ModalCoordinatorProvider>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Application adapters for legacy ui-dex components.
-//
-// The RouterProvider is required: @liberfi/ui-dex components such as
-// `TvChartWrapper` read `useRouter()` from `@liberfi/ui-base` to obtain the
-// navigation adapter. Without a `<RouterProvider>` ancestor, `useRouter()`
-// returns the empty default and downstream subscriptions (chart symbol
-// change → `navigate(url)`) crash with `TypeError: navigate is not a
-// function` once the chart's RxJS pipeline fires.
-// ---------------------------------------------------------------------------
-
-function ApplicationAdapters({ children }: PropsWithChildren) {
-  const translation = useTranslationAdapter();
-  const router = useRouterAdapter();
-
-  return (
-    <TranslationProvider translation={translation}>
-      <RouterProvider router={router}>
-        <AppSdkProvider appSdk={browserAppSdk}>{children}</AppSdkProvider>
-      </RouterProvider>
-    </TranslationProvider>
   );
 }
 

@@ -120,8 +120,26 @@ describe("S6-03 token/trade app adapters", () => {
       expect.arrayContaining([
         "application/chart/client-data-feed.ts",
         "application/chart/load-tradingview-widget.ts",
+        "application/chart/perpetuals-data-feed.ts",
         "components/TradingChart.tsx",
+        "components/page/perpetuals/PerpetualsChart.tsx",
       ]),
+    );
+  });
+
+  it("renders perpetuals charts through the SDK TradingView widget", () => {
+    expect(collectImports("@liberfi/ui-dex")).not.toEqual(
+      expect.arrayContaining([
+        "components/page/PerpetualsPage.tsx",
+        "components/page/perpetuals/PerpetualsChart.tsx",
+        "application/chart/perpetuals-data-feed.ts",
+      ]),
+    );
+  });
+
+  it("keeps the new shell off leftover ui-dex modals", () => {
+    expect(collectImports("@liberfi/ui-dex")).not.toEqual(
+      expect.arrayContaining(["components/NewAppLayout.tsx"]),
     );
   });
 });

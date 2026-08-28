@@ -10,7 +10,6 @@ import { PerpetualsProvider } from "@liberfi.io/ui-perpetuals";
 import { PortfolioClientProvider, PortfolioProvider } from "@liberfi.io/ui-portfolio";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { useAuth, useConnectedWallet } from "@liberfi.io/wallet-connector";
-import { DexClientProvider } from "@liberfi/react-dex";
 import { PinataProvider } from "../application/pinata";
 import { useDexTokenProvider } from "../application/useDexTokenProvider";
 import { HyperliquidAccountStateSync } from "../components/HyperliquidAccountStateSync";
@@ -108,43 +107,41 @@ export function AppRuntimeProviders({
 
   return (
     <PinataProvider client={pinata}>
-      <DexClientProvider client={clients.chainStream}>
-        <CapabilityClientProvider
-          client={clients.api}
-          subscribeClient={clients.api}
-          capabilities={reactCapabilities}
-        >
-          <Stage51AdaptersProvider api={clients.api}>
-            <Stage53AdaptersProvider>
-              <Stage54AdaptersProvider
-                client={clients.predict}
-                wsClient={clients.predictWs}
-                wsEnabled={config.predictWsEnabled}
-              >
-                <Stage55AdaptersProvider client={clients.chainStream} origin={config.origin}>
-                  <MediaTrackProvider client={clients.mediaTrack}>
-                    <ChannelsProvider client={clients.channels}>
-                      <PolymarketProvider>
-                        <PortfolioClientProvider client={clients.portfolio}>
-                          <PortfolioProvider chain={chain} address={wallet?.address ?? ""}>
-                            <PerpetualsProvider
-                              client={clients.perpetuals}
-                              depositClient={clients.perpetualDeposit}
-                            >
-                              <HyperliquidAccountStateSync />
-                              {children}
-                            </PerpetualsProvider>
-                          </PortfolioProvider>
-                        </PortfolioClientProvider>
-                      </PolymarketProvider>
-                    </ChannelsProvider>
-                  </MediaTrackProvider>
-                </Stage55AdaptersProvider>
-              </Stage54AdaptersProvider>
-            </Stage53AdaptersProvider>
-          </Stage51AdaptersProvider>
-        </CapabilityClientProvider>
-      </DexClientProvider>
+      <CapabilityClientProvider
+        client={clients.api}
+        subscribeClient={clients.api}
+        capabilities={reactCapabilities}
+      >
+        <Stage51AdaptersProvider api={clients.api}>
+          <Stage53AdaptersProvider>
+            <Stage54AdaptersProvider
+              client={clients.predict}
+              wsClient={clients.predictWs}
+              wsEnabled={config.predictWsEnabled}
+            >
+              <Stage55AdaptersProvider client={clients.chainStream} origin={config.origin}>
+                <MediaTrackProvider client={clients.mediaTrack}>
+                  <ChannelsProvider client={clients.channels}>
+                    <PolymarketProvider>
+                      <PortfolioClientProvider client={clients.portfolio}>
+                        <PortfolioProvider chain={chain} address={wallet?.address ?? ""}>
+                          <PerpetualsProvider
+                            client={clients.perpetuals}
+                            depositClient={clients.perpetualDeposit}
+                          >
+                            <HyperliquidAccountStateSync />
+                            {children}
+                          </PerpetualsProvider>
+                        </PortfolioProvider>
+                      </PortfolioClientProvider>
+                    </PolymarketProvider>
+                  </ChannelsProvider>
+                </MediaTrackProvider>
+              </Stage55AdaptersProvider>
+            </Stage54AdaptersProvider>
+          </Stage53AdaptersProvider>
+        </Stage51AdaptersProvider>
+      </CapabilityClientProvider>
     </PinataProvider>
   );
 }

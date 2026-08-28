@@ -65,5 +65,8 @@ describe("S6-04 ui-base translation imports", () => {
     expect(filesImportingSymbolFrom("@liberfi/ui-base", "useDexTokenProvider")).toEqual([]);
     expect(filesImportingSymbolFrom("@liberfi/ui-base", "useUpload")).toEqual([]);
     expect(filesImportingSymbolFrom("@liberfi/ui-base", "PinataProvider")).toEqual([]);
+    expect(filesImportingSymbolFrom("@liberfi/ui-base", "TranslationProvider")).toEqual([]);
+    expect(filesImportingSymbolFrom("@liberfi/ui-base", "AppSdkProvider")).toEqual([]);
+    expect(filesImportingSymbolFrom("@liberfi/ui-base", "RouterProvider")).toEqual([]);
   });
 });

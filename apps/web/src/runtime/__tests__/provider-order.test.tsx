@@ -15,7 +15,6 @@ describe("application provider order policy", () => {
       "app-runtime",
       "pinata",
       "application-adapters",
-      "chainstream-client",
       "api-client",
       "media-track",
       "channels",
@@ -50,7 +49,7 @@ describe("application provider order policy", () => {
     expect(source).not.toContain("DexDataProvider");
     expect(source).not.toContain("@liberfi/ui-dex");
     expect(source).toContain('from "../application/pinata"');
-    expect(source).toContain("@liberfi/react-dex");
+    expect(source).not.toContain("@liberfi/react-dex");
   });
 
   it("removes the leftover legacy AppLayout after option-A redirects", () => {
