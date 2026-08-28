@@ -10,9 +10,13 @@ import {
   TvChartTheme,
   TvChartType,
   getTvChartLibraryLocale,
+  type TradingViewProps,
   type TvChartConfig,
   type WidgetConstructor,
 } from "@liberfi.io/ui-tradingview";
+import { asJsxWithRef } from "../../../application/jsx";
+
+const TradingViewChart = asJsxWithRef<TradingViewProps, TvChartHandle>(TradingView);
 import {
   PERPETUALS_CHART_RESOLUTIONS,
   createPerpetualsTradingViewDatafeed,
@@ -83,7 +87,7 @@ export const PerpetualsChart = memo(function PerpetualsChart({
 
   return (
     <div className="flex-1 w-full min-h-0 flex flex-col">
-      <TradingView
+      <TradingViewChart
         ref={chartRef}
         className="flex-1 w-full h-full"
         initConfig={initConfig}

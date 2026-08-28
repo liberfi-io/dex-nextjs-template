@@ -3,6 +3,7 @@
 import { Skeleton } from "@heroui/react";
 import { cn } from "@liberfi.io/ui";
 import { useTranslation } from "@liberfi.io/i18n";
+import { tKey } from "../../../../application/t";
 import {
   alignClass,
   type BottomTableColumn,
@@ -44,7 +45,7 @@ export function PortfolioActivitiesTableSkeleton({
                   )}
                   style={{ letterSpacing: "-0.2px" }}
                 >
-                  {t(col.labelKey)}
+                  {tKey(t, col.labelKey)}
                 </th>
               ))}
             </tr>

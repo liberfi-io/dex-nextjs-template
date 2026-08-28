@@ -23,6 +23,7 @@ import {
   truncateAddress,
 } from "@liberfi.io/utils";
 import { useTranslation } from "@liberfi.io/i18n";
+import { tKey } from "../../../../application/t";
 import {
   MouseEvent,
   memo,
@@ -176,7 +177,7 @@ export function BottomTopTradersTable({
               >
                 {TOP_TRADER_SORT_BY_COLUMN[col.key] ? (
                   <TopTraderSortHeader
-                    label={t(col.labelKey)}
+                    label={tKey(t, col.labelKey)}
                     sortBeforeSlash={
                       col.key === "total_buy" || col.key === "total_sell"
                     }
@@ -186,7 +187,7 @@ export function BottomTopTradersTable({
                     onSortChange={setSort}
                   />
                 ) : (
-                  t(col.labelKey)
+                  tKey(t, col.labelKey)
                 )}
               </div>
             ))}

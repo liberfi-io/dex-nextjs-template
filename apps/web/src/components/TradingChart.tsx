@@ -12,9 +12,13 @@ import {
   TvChartType,
   getTvChartLibraryLocale,
   stringifySymbol,
+  type TradingViewProps,
   type TvChartConfig,
   type WidgetConstructor,
 } from "@liberfi.io/ui-tradingview";
+import { asJsx } from "../application/jsx";
+
+const TradingViewChart = asJsx<TradingViewProps>(TradingView);
 import {
   ClientDataFeedModule,
   createTradingViewDatafeedFromModule,
@@ -75,7 +79,7 @@ export function TradingChart({ chain, address, className }: TradingChartProps) {
   }
 
   return (
-    <TradingView
+    <TradingViewChart
       className={className ?? "flex-1 w-full h-full"}
       initConfig={initConfig}
       widgetConstructor={widgetConstructor}

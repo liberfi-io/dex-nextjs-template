@@ -14,8 +14,16 @@ import {
 } from "@liberfi.io/ui-redpacket";
 import { toast } from "@liberfi.io/ui";
 import { useAuthCallback, useConnectedWallet } from "@liberfi.io/wallet-connector";
+import { asJsx } from "../application/jsx";
 import { useUpload } from "../application/pinata";
 import { browserAppSdk } from "../application/app-sdk";
+
+const LaunchpadProvider = asJsx<PropsWithChildren<{ ports: LaunchpadUiPorts }>>(
+  LaunchpadUiProvider,
+);
+const RedpacketProvider = asJsx<PropsWithChildren<{ ports: RedpacketUiPorts }>>(
+  RedpacketUiProvider,
+);
 import { useChainAwareRouter } from "../hooks/useChainAwareRouter";
 import { useStage55Adapters } from "./Stage55AdaptersProvider";
 
@@ -66,7 +74,7 @@ export function LaunchpadUiBridge({ children }: PropsWithChildren) {
     [adapters.launchpad, chain, generateAsync, requireAuth, upload, wallet],
   );
 
-  return <LaunchpadUiProvider ports={ports}>{children}</LaunchpadUiProvider>;
+  return <LaunchpadProvider ports={ports}>{children}</LaunchpadProvider>;
 }
 
 export function RedpacketUiBridge({ children }: PropsWithChildren) {
@@ -112,5 +120,5 @@ export function RedpacketUiBridge({ children }: PropsWithChildren) {
     [adapters.redpacket, chain, requireAuth, router, t, wallet],
   );
 
-  return <RedpacketUiProvider ports={ports}>{children}</RedpacketUiProvider>;
+  return <RedpacketProvider ports={ports}>{children}</RedpacketProvider>;
 }

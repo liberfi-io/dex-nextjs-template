@@ -12,6 +12,7 @@ import {
   txExplorerUrl,
 } from "@liberfi.io/utils";
 import { useTranslation } from "@liberfi.io/i18n";
+import { tKey } from "../../../../application/t";
 import {
   alignClass,
   EmptyBody,
@@ -166,7 +167,7 @@ function ActivityRow({ activity, now, tokenByAddress }: ActivityRowProps) {
   const { t } = useTranslation();
   const sideMeta = resolveTypeMeta(activity.type);
   const sideLabel = sideMeta.labelKey
-    ? t(sideMeta.labelKey)
+    ? tKey(t, sideMeta.labelKey)
     : (sideMeta.fallbackLabel ?? "--");
   const primary = pickPrimaryToken(activity);
   const enrichedToken = tokenByAddress.get(primary.address);

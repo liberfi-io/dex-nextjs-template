@@ -24,6 +24,9 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
+      "react": [
+        "./node_modules/@types/react"
+      ],
       "@liberfi.io/react-launchpad": [
         "../../../react-sdk/packages/react-launchpad/src"
       ],

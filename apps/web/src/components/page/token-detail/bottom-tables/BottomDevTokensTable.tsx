@@ -25,6 +25,7 @@ import {
 import { useTick } from "@liberfi.io/hooks";
 import { tokenDetailRoute } from "../../../../application/routes";
 import { useTranslation } from "@liberfi.io/i18n";
+import { tKey } from "../../../../application/t";
 import {
   MouseEvent,
   memo,
@@ -197,7 +198,7 @@ function DevTokenHeader() {
           className={cn("flex h-full items-center px-3", justifyClass(col.align))}
           style={{ letterSpacing: "-0.2px" }}
         >
-          {t(col.labelKey)}
+          {tKey(t, col.labelKey)}
         </div>
       ))}
     </div>
@@ -462,7 +463,7 @@ function EmptyDevTokens({ messageKey }: { messageKey?: string }) {
       className="flex flex-1 items-center justify-center py-16 text-[12px] text-default-500"
       role="status"
     >
-      {t(messageKey ?? "extend.trade.bottom_panel.no_data")}
+      {tKey(t, messageKey ?? "extend.trade.bottom_panel.no_data")}
     </div>
   );
 }

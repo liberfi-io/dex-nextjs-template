@@ -1,9 +1,17 @@
 import assert from "node:assert/strict";
 import path from "node:path";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 import { getLocalSdkAliasEntries, getLocalSdkAliases } from "./local-sdk-aliases.mjs";
-import { REQUIRED_SINGLETON_ENTRYPOINTS, getSingletonAliases } from "./local-sdk-shared.mjs";
+import {
+  LOCAL_SDK_FALLBACK,
+  REQUIRED_SINGLETON_ENTRYPOINTS,
+  getSingletonAliases,
+} from "./local-sdk-shared.mjs";
 import { createLocalSdkFixture } from "./local-sdk-fixture.mjs";
+
+const webRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const realSdkRoot = path.resolve(webRoot, LOCAL_SDK_FALLBACK);
 
 function withLocalSdk(root, callback) {
   const previous = {
@@ -96,9 +104,8 @@ test("never resolves one entrypoint from both source and dist", () => {
 });
 
 test("local SDK scan includes unpublished launchpad and redpacket packages", () => {
-  const sdkRoot = path.resolve("..", "react-sdk");
-  const entries = withLocalSdk(sdkRoot, () =>
-    getLocalSdkAliasEntries({ baseDir: path.resolve("apps/web") }),
+  const entries = withLocalSdk(realSdkRoot, () =>
+    getLocalSdkAliasEntries({ baseDir: webRoot }),
   );
   const names = new Set(entries.map((entry) => entry.entrypoint));
   assert.ok(names.has("@liberfi.io/react-launchpad$"));

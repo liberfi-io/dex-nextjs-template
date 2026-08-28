@@ -50,7 +50,7 @@ export function useUpload() {
       uploadFileToIpfs({
         file,
         getPresignedUploadUrl: () => client.getPresignedUploadUrl(),
-        pinata,
+        pinata: pinata as unknown as PinataUploadClient,
       }),
     [client, pinata],
   );

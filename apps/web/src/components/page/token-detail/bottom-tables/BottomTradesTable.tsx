@@ -25,6 +25,7 @@ import {
   truncateAddress,
 } from "@liberfi.io/utils";
 import { useTranslation } from "@liberfi.io/i18n";
+import { tKey } from "../../../../application/t";
 import {
   MouseEvent,
   memo,
@@ -342,7 +343,7 @@ const ActivityRow = memo(function ActivityRow({
   const primary = pickPrimaryToken(activity);
   const sideMeta = resolveTypeMeta(activity.type);
   const sideLabel = sideMeta.labelKey
-    ? t(sideMeta.labelKey)
+    ? tKey(t, sideMeta.labelKey)
     : (sideMeta.fallbackLabel ?? "--");
 
   return (

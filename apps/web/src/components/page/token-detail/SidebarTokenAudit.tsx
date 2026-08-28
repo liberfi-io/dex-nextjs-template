@@ -13,6 +13,7 @@ import {
 } from "@liberfi.io/ui";
 import { formatAmount, formatPercent, SafeBigNumber } from "@liberfi.io/utils";
 import { useTranslation } from "@liberfi.io/i18n";
+import { tKey } from "../../../application/t";
 import { ReactNode, useMemo } from "react";
 import {
   getBurnRatio,
@@ -90,8 +91,8 @@ export function SidebarTokenAudit({ chain, address }: SidebarTokenAuditProps) {
         {metrics.map((m) => (
           <AuditCell
             key={m.key}
-            label={t(`extend.trade.audit.${m.key}`)}
-            tooltip={t(`extend.trade.audit.${m.key}_tip`)}
+            label={tKey(t, `extend.trade.audit.${m.key}`)}
+            tooltip={tKey(t, `extend.trade.audit.${m.key}_tip`)}
             value={m.value}
             status={m.status}
             showStatusIcon={m.showStatusIcon}

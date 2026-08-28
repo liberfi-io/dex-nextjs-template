@@ -18,7 +18,9 @@ import {
   type RedpacketSignerPort,
 } from "@liberfi.io/react-redpacket";
 
-function chainParam(chain: Chain): string {
+type DexChainParam = "sol" | "eth" | "bsc";
+
+function chainParam(chain: Chain): DexChainParam {
   switch (chain) {
     case Chain.SOLANA:
       return "sol";
@@ -93,8 +95,8 @@ export function createStage55LaunchpadPorts(
     client.dex.createToken(chainParam(intent.chain), {
       name: intent.name,
       symbol: intent.symbol,
-      imageUri: intent.imageUri,
-    });
+      ...(intent.imageUri ? { imageUri: intent.imageUri } : {}),
+    } as Parameters<ChainStreamClient["dex"]["createToken"]>[1]);
 
   return {
     createToken,
@@ -142,12 +144,16 @@ export function createStage55RedpacketPorts(
       password: intent.password,
     });
 
-  const claim = async (intent: ClaimRedPacketIntent) =>
-    client.redPacket.claimRedpacket(chainParam(intent.chain), {
+  const claim = async (intent: ClaimRedPacketIntent) => {
+    const result = await client.redPacket.claimRedpacket(chainParam(intent.chain), {
       shareId: intent.shareId,
       password: intent.password,
       claimer: intent.claimer,
     });
+    return {
+      alreadyClaimed: (result as { alreadyClaimed?: boolean }).alreadyClaimed,
+    };
+  };
 
   const submitCommand = async (command: RedpacketCommand) => {
     if (command.kind === "create-fixed") {
@@ -161,7 +167,7 @@ export function createStage55RedpacketPorts(
     const result = await claim(command.intent);
     return {
       packetId: command.intent.shareId,
-      alreadyClaimed: result.alreadyClaimed,
+      alreadyClaimed: (result as { alreadyClaimed?: boolean }).alreadyClaimed,
     };
   };
 
@@ -170,21 +176,24 @@ export function createStage55RedpacketPorts(
     createRandom,
     claim,
     sendTransaction: async ({ chain, ...rest }) =>
-      client.redPacket.redpacketSend(chainParam(chain), rest),
+      client.redPacket.redpacketSend(
+        chainParam(chain),
+        rest as unknown as Parameters<ChainStreamClient["redPacket"]["redpacketSend"]>[1],
+      ),
     shareUrl: (shareId) => {
       const url = new URL("/redpacket", origin);
       url.searchParams.set("share", shareId);
       return url.toString();
     },
     fetchPacket: async (shareId) =>
-      asRecord((await client.redPacket.getRedpacket(shareId)) as Record<string, unknown>),
+      asRecord((await client.redPacket.getRedpacket(shareId)) as unknown as Record<string, unknown>),
     listReceived: async (address) => {
       const page = await client.redPacket.getClaimsByAddress(address, { limit: 50 });
-      return ((page.records ?? []) as Array<Record<string, unknown>>).map(asRecord);
+      return ((page.records ?? []) as unknown as Array<Record<string, unknown>>).map(asRecord);
     },
     listSent: async (address) => {
       const page = await client.redPacket.getRedpacketsByAddress(address, { limit: 50 });
-      return ((page.records ?? []) as Array<Record<string, unknown>>).map(asRecord);
+      return ((page.records ?? []) as unknown as Array<Record<string, unknown>>).map(asRecord);
     },
     createRuntime: (options = {}) =>
       createRedpacketRuntime({

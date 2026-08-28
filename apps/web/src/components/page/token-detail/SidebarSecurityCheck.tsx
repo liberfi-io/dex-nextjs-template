@@ -15,6 +15,7 @@ import {
 import { CollapsibleSection } from "@liberfi.io/ui-scaffold";
 import { formatPercent, SafeBigNumber } from "@liberfi.io/utils";
 import { useTranslation } from "@liberfi.io/i18n";
+import { tKey } from "../../../application/t";
 import Image from "next/image";
 import { type ReactNode, useMemo } from "react";
 import { buildSecurityProviderLinks } from "./securityLinks";
@@ -79,7 +80,7 @@ export function SidebarSecurityCheck({
   const security = securityData as TokenSecurityDetails | undefined;
 
   const checks = useMemo<CheckSpec[]>(
-    () => buildChecks(chain, token?.marketData, security, t),
+    () => buildChecks(chain, token?.marketData, security, (key) => tKey(t, key)),
     [chain, token?.marketData, security, t],
   );
 
@@ -125,8 +126,8 @@ export function SidebarSecurityCheck({
         {checks.map((c) => (
           <CheckRow
             key={c.key}
-            label={t(`extend.trade.security_check.items.${c.key}`)}
-            tooltip={t(`extend.trade.security_check.items.${c.key}_tip`)}
+            label={tKey(t, `extend.trade.security_check.items.${c.key}`)}
+            tooltip={tKey(t, `extend.trade.security_check.items.${c.key}_tip`)}
             status={c.status}
             value={c.value}
             showIcon={c.showIcon}

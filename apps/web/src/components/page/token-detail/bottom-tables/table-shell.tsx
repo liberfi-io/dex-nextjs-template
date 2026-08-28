@@ -2,6 +2,7 @@
 
 import { cn, Spinner } from "@liberfi.io/ui";
 import { useTranslation } from "@liberfi.io/i18n";
+import { tKey } from "../../../../application/t";
 import {
   createContext,
   ReactNode,
@@ -137,7 +138,7 @@ export function TableShell({
                 )}
                 style={{ letterSpacing: "-0.2px" }}
               >
-                {t(col.labelKey)}
+                {tKey(t, col.labelKey)}
               </th>
             ))}
           </tr>
@@ -212,7 +213,7 @@ export function EmptyBody({
           colSpan={colSpan}
           className="py-16 text-center text-[12px] text-default-500"
         >
-          {t(messageKey ?? "extend.trade.bottom_panel.no_data")}
+          {tKey(t, messageKey ?? "extend.trade.bottom_panel.no_data")}
         </td>
       </tr>
     </tbody>
