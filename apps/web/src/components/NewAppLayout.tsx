@@ -88,7 +88,7 @@ import {
 } from "@liberfi.io/utils";
 import { TranslationProvider, AppSdkProvider, RouterProvider } from "@liberfi/ui-base";
 import { useRouterAdapter } from "../hooks/useRouterAdapter";
-import { tokenDetailRoute } from "@liberfi/ui-dex/libs/routes";
+import { tokenDetailRoute } from "../application/routes";
 import { useCreateOnrampWidgetUrlMutation } from "../application/server/useCreateOnrampWidgetUrlMutation";
 import { queryClient } from "../libs/queryClient";
 import { AuthProviders } from "./AuthProviders";

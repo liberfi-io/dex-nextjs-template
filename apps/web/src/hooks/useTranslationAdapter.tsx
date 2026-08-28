@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { ITranslation, TranslateFunction } from "@liberfi/ui-dex";
+import { type ITranslation, type TranslateFunction } from "../application/adapters";
 import { LocaleEnum, useChangeLocale, useLocale, useTranslation } from "@liberfi.io/i18n";
 
 export function useTranslationAdapter() {

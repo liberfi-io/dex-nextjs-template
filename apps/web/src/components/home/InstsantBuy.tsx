@@ -13,7 +13,9 @@ import {
   useAuthenticatedCallback,
   useWalletPrimaryTokenNetWorth,
 } from "@liberfi/ui-base";
-import { defaultTradePresetValues, useSwap, useTradeBuySettings } from "@liberfi/ui-dex";
+import { defaultTradePresetValues, useTradeBuySettings } from "@liberfi/ui-dex";
+import { useSwap, type SwapPhase } from "@liberfi.io/ui-trade";
+import { useConnectedWallet } from "@liberfi.io/wallet-connector";
 import { useMemo } from "react";
 import { useInstantBuy } from "./InstantBuyContext";
 
@@ -41,11 +43,38 @@ export function InstantBuy({ token }: TokenListActionsProps) {
     () => buySettings?.presets?.[preset ?? 0] ?? defaultTradePresetValues,
     [buySettings, preset],
   );
+  const wallet = useConnectedWallet(chainId);
 
-  const { swap, isSwapping } = useSwap();
+  const handleSwapError = (error: Error, phase: SwapPhase) => {
+    const phaseLabel = t(`trade.swap.phase.${phase}`);
+    const message = error.message
+      ? t("trade.swap.error", { phase: phaseLabel, reason: error.message })
+      : t("trade.swap.errorUnknown", { phase: phaseLabel });
+    toast.error(message);
+  };
+
+  const { swap, isSwapping } = useSwap({
+    onSubmitted: ({ txHash }) => {
+      toast.progress({
+        id: txHash,
+        type: "success",
+        message: t("trade.swap.transactionSubmitted"),
+        progress: true,
+        duration: 65_000,
+      });
+    },
+    onError: handleSwapError,
+  });
 
   const handleInstantBuy = useAuthenticatedCallback(async () => {
-    if (!walletNetWorth?.amount || !primaryTokenAddress || !primaryTokenDecimals || !token.address) return;
+    if (
+      !walletNetWorth?.amount ||
+      !wallet ||
+      !primaryTokenAddress ||
+      !primaryTokenDecimals ||
+      !token.address
+    )
+      return;
 
     if (!amount || new SafeBigNumber(amount).lte(0.0001)) {
       toast.error(
@@ -81,21 +110,29 @@ export function InstantBuy({ token }: TokenListActionsProps) {
       .toString();
 
     await swap({
-      from: primaryTokenAddress,
-      to: token.address,
+      chain: chainId,
+      wallet,
+      input: primaryTokenAddress,
+      output: token.address,
       amount: amountInDecimals,
       slippage: presetSettings.slippage ?? defaultTradePresetValues.slippage!,
       priorityFee: priorityFeeInDecimals,
       tipFee: tipFeeInDecimals,
-      isAntiMev: presetSettings.antiMev,
+      isAntiMev:
+        typeof presetSettings.antiMev === "boolean"
+          ? presetSettings.antiMev
+          : presetSettings.antiMev !== "off",
     });
   }, [
     appSdk,
     amount,
+    chainId,
     token.address,
     primaryTokenDecimals,
     primaryTokenAddress,
     swap,
+    t,
+    wallet,
     walletNetWorth?.amount,
     presetSettings,
   ]);

@@ -28,7 +28,7 @@ import {
   type SwapResult,
   type SwapPhase,
 } from "@liberfi.io/ui-trade";
-import { tokenDetailRoute } from "@liberfi/ui-dex/libs/routes";
+import { tokenDetailRoute } from "../../application/routes";
 import { QuickAmountPresetInputWidget } from "../QuickAmountPresetInput";
 import { InstantTradeListButton } from "./InstantTradeListButton";
 

@@ -3,7 +3,7 @@
 import { useParams, redirect } from "next/navigation";
 import { useMemo } from "react";
 import { chainIdBySlug } from "@liberfi.io/utils";
-import { tokenDetailRoute } from "@liberfi/ui-dex/libs/routes";
+import { tokenDetailRoute } from "../../application/routes";
 import { TradeDataLoader } from "@liberfi/ui-dex/components/trade";
 import { TokenTradePage } from "./token-detail/TokenTradePage";
 

@@ -13,7 +13,7 @@ import {
   formatPriceInUsd,
 } from "@liberfi.io/utils";
 import { useTranslation } from "@liberfi/ui-base";
-import { tokenDetailRoute } from "@liberfi/ui-dex/libs/routes";
+import { tokenDetailRoute } from "../../../../application/routes";
 import {
   alignClass,
   EmptyBody,

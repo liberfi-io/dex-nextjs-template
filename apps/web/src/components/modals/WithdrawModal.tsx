@@ -12,7 +12,7 @@ import { Chain } from "@liberfi.io/types";
 import { chainDisplayName, formatAmount, formatAmountInUsd } from "@liberfi.io/utils";
 import { useTimerToast, useWalletPortfolios } from "@liberfi/ui-base";
 import { useConnectedWallet } from "@liberfi.io/wallet-connector";
-import { isValidWalletAddress } from "@liberfi/ui-dex";
+import { isValidWalletAddress } from "../../application/wallet";
 import {
   getPrimaryTokenAddress,
   getPrimaryTokenDecimals,

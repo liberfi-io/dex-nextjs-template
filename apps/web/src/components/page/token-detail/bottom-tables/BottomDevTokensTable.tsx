@@ -23,7 +23,7 @@ import {
   truncateAddress,
 } from "@liberfi.io/utils";
 import { useTick } from "@liberfi.io/hooks";
-import { tokenDetailRoute } from "@liberfi/ui-dex/libs/routes";
+import { tokenDetailRoute } from "../../../../application/routes";
 import { useTranslation } from "@liberfi/ui-base";
 import {
   MouseEvent,

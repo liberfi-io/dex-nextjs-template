@@ -19,7 +19,7 @@ import {
   TrendingTokenListWidget,
 } from "@liberfi.io/ui-tokens";
 import { Token } from "@liberfi.io/types";
-import { tokenDetailRoute } from "@liberfi/ui-dex/libs/routes";
+import { tokenDetailRoute } from "../../application/routes";
 import { InstantBuyProvider } from "./InstantBuyContext";
 import { InstantBuy } from "./InstsantBuy";
 

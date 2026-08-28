@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { IRouter, NavigateOptions } from "@liberfi/ui-dex";
+import { type IRouter, type NavigateOptions } from "../application/adapters";
 import { useChainAwareRouter } from "./useChainAwareRouter";
 
 export function useRouterAdapter() {

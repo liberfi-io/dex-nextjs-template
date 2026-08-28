@@ -29,7 +29,7 @@ import {
 } from "@liberfi.io/ui";
 import { TokenAvatar } from "@liberfi.io/ui-tokens";
 import { useTranslation } from "@liberfi/ui-base";
-import { formatShortAddress } from "@liberfi/ui-dex/libs";
+import { formatShortAddress } from "../../../application/format";
 import { MouseEvent, useCallback, useMemo } from "react";
 
 export interface TokenDetailHeaderMobileProps {

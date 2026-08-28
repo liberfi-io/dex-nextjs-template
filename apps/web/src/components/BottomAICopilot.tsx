@@ -1,13 +1,8 @@
 "use client";
 
 import { useResizeObserver } from "@liberfi.io/hooks";
-// import { fetchToken, useDexClient } from "@liberfi/react-dex";
-// import { useAuth, useTranslation } from "@liberfi/ui-base";
 import { ChatWidget, AgentProvider } from "@agent-widget/react";
 import { useRef } from "react";
-// import { toast } from "@liberfi.io/ui";
-// import { useSwap } from "@liberfi/ui-dex";
-// import { SafeBigNumber } from "@liberfi.io/utils";
 
 export function BottomAICopilot() {
   // const { t } = useTranslation();

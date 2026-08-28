@@ -29,7 +29,7 @@ import {
   searchTwitterUrl,
 } from "@liberfi.io/utils";
 import { useTranslation } from "@liberfi/ui-base";
-import { formatShortAddress } from "@liberfi/ui-dex/libs";
+import { formatShortAddress } from "../../../application/format";
 import { MouseEvent, useCallback, useMemo } from "react";
 
 export interface TokenDetailHeaderProps {

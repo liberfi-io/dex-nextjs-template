@@ -41,7 +41,7 @@ import {
   useShowHeader,
   useRouter,
 } from "@liberfi/ui-base";
-import { tokenDetailRoute } from "@liberfi/ui-dex/libs/routes";
+import { tokenDetailRoute } from "../../application/routes";
 import { useSwitchEvmWalletsToChain } from "@liberfi.io/wallet-connector";
 import { chainDisplayName } from "@liberfi.io/utils";
 import { useChainSwitchUrlHandler } from "../../hooks/useChainSwitchUrlHandler";
