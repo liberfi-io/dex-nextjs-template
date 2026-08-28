@@ -3,22 +3,16 @@
 import { cn } from "@liberfi.io/ui";
 import { UpdateChannelFormType, UpdateChannelWidget } from "@liberfi.io/ui-channels";
 import {
-  hideHeaderOnLayoutAtom,
+  useHideHeader,
   useSetBottomNavigationBarActiveKey,
   useShowBottomNavigationBar,
-} from "@liberfi/ui-base";
+} from "../application/layout-chrome";
 import { useTranslation } from "@liberfi.io/i18n";
-import { useSetAtom } from "jotai";
-import { useEffect } from "react";
 
 export function ChannelsUpdatePage({ id, type }: { id: string; type: string }) {
   const { t } = useTranslation();
 
-  // hide header on mobile
-  const setHideHeaderOnLayout = useSetAtom(hideHeaderOnLayoutAtom);
-  useEffect(() => {
-    setHideHeaderOnLayout("mobile");
-  }, [setHideHeaderOnLayout]);
+  useHideHeader("mobile");
 
   // display bottom navigation bar on tablet & mobile
   useShowBottomNavigationBar("tablet");

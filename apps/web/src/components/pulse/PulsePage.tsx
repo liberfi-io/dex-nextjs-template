@@ -39,7 +39,7 @@ import {
   useSetBottomNavigationBarActiveKey,
   useShowBottomNavigationBar,
   useShowHeader,
-} from "@liberfi/ui-base";
+} from "../../application/layout-chrome";
 import { tokenDetailRoute } from "../../application/routes";
 import { useChainAwareRouter } from "../../hooks/useChainAwareRouter";
 import { useSwitchEvmWalletsToChain } from "@liberfi.io/wallet-connector";

@@ -6,7 +6,7 @@ import {
   useSetBottomNavigationBarActiveKey,
   useShowBottomNavigationBar,
   useShowHeader,
-} from "@liberfi/ui-base";
+} from "../application/layout-chrome";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { getNativeToken } from "@liberfi.io/utils";
 import { useMemo, useState } from "react";

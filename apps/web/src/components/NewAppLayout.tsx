@@ -87,6 +87,7 @@ import {
   type PredefinedToken,
 } from "@liberfi.io/utils";
 import { TranslationProvider, AppSdkProvider, RouterProvider } from "@liberfi/ui-base";
+import { useShellChrome } from "../application/layout-chrome";
 import { useRouterAdapter } from "../hooks/useRouterAdapter";
 import { tokenDetailRoute } from "../application/routes";
 import { useCreateOnrampWidgetUrlMutation } from "../application/server/useCreateOnrampWidgetUrlMutation";
@@ -239,6 +240,7 @@ function PageShell({ children }: PropsWithChildren) {
   const pathname = usePathname();
   const router = useChainAwareRouter();
   const { chain } = useCurrentChain();
+  const { headerVisible, footerVisible } = useShellChrome();
 
   const navItems: NavItem[] = useMemo(
     () =>
@@ -395,8 +397,8 @@ function PageShell({ children }: PropsWithChildren) {
       <Scaffold
         pathname={pathname}
         onNavigate={onNavigate}
-        headerVisible={["desktop", "tablet", "mobile"]}
-        footerVisible={["mobile"]}
+        headerVisible={headerVisible}
+        footerVisible={footerVisible}
         toolbar={<AppBottomToolbar />}
         toolbarVisible={["desktop"]}
         header={

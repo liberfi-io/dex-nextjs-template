@@ -1,27 +1,7 @@
-import { SettingsModal, TradeSettingsModal } from "@liberfi/ui-dex";
-import { lazy, Suspense } from "react";
-
-const modals = [
-  lazy(() => import("@liberfi/ui-dex/components/modals/SearchModal")),
-  lazy(() => import("@liberfi/ui-dex/components/modals/WebviewModal")),
-  lazy(() => import("@liberfi/ui-dex/components/modals/ReceiveModal")),
-  lazy(() => import("@liberfi/ui-dex/components/modals/AssetSelectModal")),
-  lazy(() => import("@liberfi/ui-dex/components/modals/TokenSelectModal")),
-  lazy(() => import("@liberfi/ui-dex/components/modals/SwapModal")),
-  lazy(() => import("@liberfi/ui-dex/components/modals/LanguageModal")),
-  lazy(() => import("@liberfi/ui-dex/components/modals/TransferModal")),
-];
-
+/**
+ * Legacy modal bag. The (new) shell mounts its own modals in NewAppLayout.
+ * Kept as an empty export so old tests can still see the file.
+ */
 export function Modals() {
-  return (
-    <>
-      <Suspense>
-        {modals.map((Modal, index) => (
-          <Modal key={index} />
-        ))}
-      </Suspense>
-      <SettingsModal />
-      <TradeSettingsModal />
-    </>
-  );
+  return null;
 }

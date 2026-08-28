@@ -5,9 +5,9 @@ import { Avatar, Button } from "@heroui/react";
 import { cn, SettingsIcon, WalletIcon } from "@liberfi.io/ui";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { formatAmount } from "@liberfi.io/utils";
-import { browserAppSdk } from "./app-sdk";
 import { useWalletPrimaryTokenNetWorth } from "./useWalletPrimaryTokenNetWorth";
 import { getPrimaryTokenAvatar } from "./tokens";
+import { useOpenPresetForm } from "./useOpenPresetForm";
 
 export type SwitchWalletProps = {
   enableSettings?: boolean;
@@ -17,7 +17,8 @@ export function SwitchWallet({ enableSettings = false }: SwitchWalletProps) {
   const { chain } = useCurrentChain();
   const primaryTokenAvatar = useMemo(() => getPrimaryTokenAvatar(chain), [chain]);
   const balance = useWalletPrimaryTokenNetWorth();
-  const handleSettings = useCallback(() => browserAppSdk.events.emit("trade_settings:open"), []);
+  const openPresetForm = useOpenPresetForm();
+  const handleSettings = useCallback(() => openPresetForm(0), [openPresetForm]);
 
   return (
     <div className="flex items-center gap-2">

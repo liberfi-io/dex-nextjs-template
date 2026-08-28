@@ -7,7 +7,7 @@ import {
   useHideHeader,
   useSetBottomNavigationBarActiveKey,
   useShowBottomNavigationBar,
-} from "@liberfi/ui-base";
+} from "../../../application/layout-chrome";
 import { PortfolioHeader } from "./PortfolioHeader";
 import { PortfolioAllocationChart } from "./PortfolioAllocationChart";
 import { PortfolioBottomPanel } from "./PortfolioBottomPanel";

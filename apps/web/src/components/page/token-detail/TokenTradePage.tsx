@@ -7,7 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { useHideBottomNavigationBar, useHideHeader } from "@liberfi/ui-base";
+import { useHideBottomNavigationBar, useHideHeader } from "../../../application/layout-chrome";
 import { TradingChart } from "../../TradingChart";
 import type { Chain } from "@liberfi.io/types";
 import { useScreen } from "@liberfi.io/ui";
