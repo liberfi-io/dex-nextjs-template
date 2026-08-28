@@ -22,11 +22,8 @@ import {
   useWallets,
   type EvmWalletAdapter,
 } from "@liberfi.io/wallet-connector";
-import {
-  useHideBottomNavigationBar,
-  useHideHeader,
-  useTranslation,
-} from "@liberfi/ui-base";
+import { useHideBottomNavigationBar, useHideHeader } from "@liberfi/ui-base";
+import { useTranslation } from "@liberfi.io/i18n";
 import { DEPOSIT_HL_USDC_MODAL_ID } from "../modals/DepositHyperliquidUsdcModal";
 import { useHyperliquidUpdateLeverage } from "../../hooks/useHyperliquidUpdateLeverage";
 import { useHyperliquidPlaceOrder } from "../../hooks/useHyperliquidPlaceOrder";

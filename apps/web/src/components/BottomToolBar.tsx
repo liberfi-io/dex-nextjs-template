@@ -1,19 +1,21 @@
 "use client";
 
-import { UserGuideIcon, useTranslation, RobotIcon } from "@liberfi/ui-base";
+import { useTranslation } from "@liberfi.io/i18n";
+import {
+  Button,
+  DiscordIcon,
+  Divider,
+  RobotIcon,
+  SettingsIcon,
+  StyledTooltip,
+  TwitterIcon,
+  UserGuideIcon,
+} from "@liberfi.io/ui";
 import { useInstantTradeAmount } from "@liberfi.io/ui-trade";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { getNativeToken } from "@liberfi.io/utils";
 import { INSTANT_TRADE_AMOUNT_ID } from "../application/swapFees";
 import { useOpenPresetForm } from "../application/useOpenPresetForm";
-import {
-  DiscordIcon,
-  Divider,
-  SettingsIcon,
-  Button,
-  StyledTooltip,
-  TwitterIcon,
-} from "@liberfi.io/ui";
 import { useDraggableDisclosure } from "@liberfi.io/ui-scaffold";
 import { useCallback, useMemo } from "react";
 import { BottomToolBarWallet } from "./BottomToolBarWallet";

@@ -28,7 +28,7 @@ import {
   useCopyToClipboard,
 } from "@liberfi.io/ui";
 import { TokenAvatar } from "@liberfi.io/ui-tokens";
-import { useTranslation } from "@liberfi/ui-base";
+import { useTranslation } from "@liberfi.io/i18n";
 import { formatShortAddress } from "../../../application/format";
 import { MouseEvent, useCallback, useMemo } from "react";
 

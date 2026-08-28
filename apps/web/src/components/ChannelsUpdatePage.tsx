@@ -2,7 +2,12 @@
 
 import { cn } from "@liberfi.io/ui";
 import { UpdateChannelFormType, UpdateChannelWidget } from "@liberfi.io/ui-channels";
-import { hideHeaderOnLayoutAtom, useSetBottomNavigationBarActiveKey, useShowBottomNavigationBar, useTranslation } from "@liberfi/ui-base";
+import {
+  hideHeaderOnLayoutAtom,
+  useSetBottomNavigationBarActiveKey,
+  useShowBottomNavigationBar,
+} from "@liberfi/ui-base";
+import { useTranslation } from "@liberfi.io/i18n";
 import { useSetAtom } from "jotai";
 import { useEffect } from "react";
 

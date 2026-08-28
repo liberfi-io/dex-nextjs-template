@@ -1,4 +1,4 @@
-import { useTranslation } from "@liberfi/ui-base";
+import { useTranslation } from "@liberfi.io/i18n";
 
 export function BottomNetworkStatus() {
   const { t } = useTranslation();

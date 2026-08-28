@@ -24,7 +24,7 @@ import {
   txExplorerUrl,
   truncateAddress,
 } from "@liberfi.io/utils";
-import { useTranslation } from "@liberfi/ui-base";
+import { useTranslation } from "@liberfi.io/i18n";
 import {
   MouseEvent,
   memo,

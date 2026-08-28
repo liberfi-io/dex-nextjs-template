@@ -4,7 +4,7 @@ import { useTokenStatsQuery } from "@liberfi.io/react";
 import type { Chain, TokenStatsByResolution } from "@liberfi.io/types";
 import { cn } from "@liberfi.io/ui";
 import { formatPercent, SafeBigNumber } from "@liberfi.io/utils";
-import { useTranslation } from "@liberfi/ui-base";
+import { useTranslation } from "@liberfi.io/i18n";
 import BigNumber from "bignumber.js";
 import { useMemo, useState } from "react";
 

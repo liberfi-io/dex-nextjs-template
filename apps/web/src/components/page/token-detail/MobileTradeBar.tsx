@@ -6,7 +6,7 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { cn } from "@liberfi.io/ui";
-import { useTranslation } from "@liberfi/ui-base";
+import { useTranslation } from "@liberfi.io/i18n";
 import { useCallback, useState } from "react";
 import type { Chain } from "@liberfi.io/types";
 import { TradingPanel } from "./TradingPanel";

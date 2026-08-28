@@ -28,7 +28,7 @@ import {
   SafeBigNumber,
   searchTwitterUrl,
 } from "@liberfi.io/utils";
-import { useTranslation } from "@liberfi/ui-base";
+import { useTranslation } from "@liberfi.io/i18n";
 import { formatShortAddress } from "../../../application/format";
 import { MouseEvent, useCallback, useMemo } from "react";
 

@@ -1,13 +1,15 @@
 "use client";
 
-import { UserGuideIcon, useTranslation, RobotIcon } from "@liberfi/ui-base";
+import { useTranslation } from "@liberfi.io/i18n";
 import {
+  Button,
   DiscordIcon,
   Divider,
+  RobotIcon,
   SettingsIcon,
-  Button,
   StyledTooltip,
   TwitterIcon,
+  UserGuideIcon,
 } from "@liberfi.io/ui";
 import { ScaffoldToolbar, useAsyncModal, useDraggableDisclosure } from "@liberfi.io/ui-scaffold";
 import { useCallback, useMemo } from "react";

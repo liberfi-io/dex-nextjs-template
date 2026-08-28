@@ -2,7 +2,7 @@
 
 import { Skeleton } from "@heroui/react";
 import { cn } from "@liberfi.io/ui";
-import { useTranslation } from "@liberfi/ui-base";
+import { useTranslation } from "@liberfi.io/i18n";
 import {
   alignClass,
   type BottomTableColumn,

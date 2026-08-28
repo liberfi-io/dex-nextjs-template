@@ -7,7 +7,7 @@ import {
   TabBarUnderline,
   type TabBarUnderlineItem,
 } from "@liberfi.io/ui-scaffold";
-import { useTranslation } from "@liberfi/ui-base";
+import { useTranslation } from "@liberfi.io/i18n";
 import { BottomDevTokensTable } from "./bottom-tables/BottomDevTokensTable";
 import { BottomHoldersTable } from "./bottom-tables/BottomHoldersTable";
 import { BottomTopTradersTable } from "./bottom-tables/BottomTopTradersTable";

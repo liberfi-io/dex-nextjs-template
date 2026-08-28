@@ -11,7 +11,7 @@ import {
   truncateAddress,
   txExplorerUrl,
 } from "@liberfi.io/utils";
-import { useTranslation } from "@liberfi/ui-base";
+import { useTranslation } from "@liberfi.io/i18n";
 import {
   alignClass,
   EmptyBody,

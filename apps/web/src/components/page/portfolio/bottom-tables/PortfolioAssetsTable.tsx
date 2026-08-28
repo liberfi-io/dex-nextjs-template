@@ -12,7 +12,7 @@ import {
   formatPercent,
   formatPriceInUsd,
 } from "@liberfi.io/utils";
-import { useTranslation } from "@liberfi/ui-base";
+import { useTranslation } from "@liberfi.io/i18n";
 import { tokenDetailRoute } from "../../../../application/routes";
 import {
   alignClass,

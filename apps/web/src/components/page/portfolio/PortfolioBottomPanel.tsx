@@ -3,7 +3,7 @@
 import { useMemo, useState, type Key, type ReactNode } from "react";
 import type { Chain } from "@liberfi.io/types";
 import { cn } from "@liberfi.io/ui";
-import { useTranslation } from "@liberfi/ui-base";
+import { useTranslation } from "@liberfi.io/i18n";
 import { PortfolioAssetsTable } from "./bottom-tables/PortfolioAssetsTable";
 import { PortfolioActivitiesTable } from "./bottom-tables/PortfolioActivitiesTable";
 

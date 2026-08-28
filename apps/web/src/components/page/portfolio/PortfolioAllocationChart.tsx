@@ -7,7 +7,7 @@ import { useWalletPortfoliosQuery } from "@liberfi.io/react";
 import type { Chain, Portfolio } from "@liberfi.io/types";
 import { cn, EmptyIcon } from "@liberfi.io/ui";
 import { formatAmountInUsd, formatPercent } from "@liberfi.io/utils";
-import { useTranslation } from "@liberfi/ui-base";
+import { useTranslation } from "@liberfi.io/i18n";
 
 /**
  * Maximum number of named slices in the allocation pie. Anything beyond this

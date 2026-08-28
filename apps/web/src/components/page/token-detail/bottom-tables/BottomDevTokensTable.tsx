@@ -24,7 +24,7 @@ import {
 } from "@liberfi.io/utils";
 import { useTick } from "@liberfi.io/hooks";
 import { tokenDetailRoute } from "../../../../application/routes";
-import { useTranslation } from "@liberfi/ui-base";
+import { useTranslation } from "@liberfi.io/i18n";
 import {
   MouseEvent,
   memo,

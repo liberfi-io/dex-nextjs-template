@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { Tooltip } from "@heroui/react";
-import { useTranslation } from "@liberfi/ui-base";
+import { useTranslation } from "@liberfi.io/i18n";
 import {
   cn,
   RefreshIcon,

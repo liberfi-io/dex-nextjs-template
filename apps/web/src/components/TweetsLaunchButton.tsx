@@ -1,5 +1,6 @@
 import { RocketIcon, Button, StyledTooltip } from "@liberfi.io/ui";
-import { useAppSdk, useTranslation } from "@liberfi/ui-base";
+import { useAppSdk } from "@liberfi/ui-base";
+import { useTranslation } from "@liberfi.io/i18n";
 import { useCallback } from "react";
 
 interface TweetMediaData {

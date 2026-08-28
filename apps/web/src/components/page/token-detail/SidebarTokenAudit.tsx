@@ -12,7 +12,7 @@ import {
   cn,
 } from "@liberfi.io/ui";
 import { formatAmount, formatPercent, SafeBigNumber } from "@liberfi.io/utils";
-import { useTranslation } from "@liberfi/ui-base";
+import { useTranslation } from "@liberfi.io/i18n";
 import { ReactNode, useMemo } from "react";
 import {
   getBurnRatio,

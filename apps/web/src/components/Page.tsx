@@ -1,10 +1,7 @@
 import { PropsWithChildren, ReactNode } from "react";
 import { useAtomValue } from "jotai";
-import {
-  useTranslation,
-  hideHeaderOnLayoutAtom,
-  showBottomNavigationBarOnLayoutAtom,
-} from "@liberfi/ui-base";
+import { hideHeaderOnLayoutAtom, showBottomNavigationBarOnLayoutAtom } from "@liberfi/ui-base";
+import { useTranslation } from "@liberfi.io/i18n";
 import { cn } from "@liberfi.io/ui";
 import {
   DraggablePanelProvider,
