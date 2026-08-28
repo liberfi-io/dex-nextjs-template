@@ -13,7 +13,8 @@ import {
   VirtualList,
   type VirtualRowComponentProps,
 } from "@liberfi.io/ui";
-import { SortAscIcon, SortDescIcon } from "@liberfi/ui-dex/assets/icons";
+import { SortAscIcon } from "../../../../application/icons/SortAscIcon";
+import { SortDescIcon } from "../../../../application/icons/SortDescIcon";
 import {
   accountExplorerUrl,
   formatAge,

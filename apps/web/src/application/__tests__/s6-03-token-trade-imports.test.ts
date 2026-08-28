@@ -82,4 +82,19 @@ describe("S6-03 token/trade app adapters", () => {
     expect(legacyBuy).toContain('from "@liberfi.io/ui-trade"');
     expect(legacyBuy).not.toContain("useSwap } from \"@liberfi/ui-dex\"");
   });
+
+  it("keeps production instant-buy widgets off @liberfi/ui-dex", () => {
+    expect(collectImports("@liberfi/ui-dex")).not.toEqual(
+      expect.arrayContaining([
+        "components/BottomTweets.tsx",
+        "components/MediaTrackPage.tsx",
+        "components/home/TokenListHeader.tsx",
+        "components/home/InstantBuy2.tsx",
+        "components/home/InstsantBuy.tsx",
+        "components/pulse/PulseInstantBuyContext.tsx",
+        "components/BottomToolBar.tsx",
+        "components/page/token-detail/bottom-tables/BottomTradesTable.tsx",
+      ]),
+    );
+  });
 });

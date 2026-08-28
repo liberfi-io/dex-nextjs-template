@@ -1,8 +1,11 @@
 "use client";
 
-import { useAppSdk, UserGuideIcon, useTranslation, RobotIcon } from "@liberfi/ui-base";
-import { tradeBuyPresetAtom } from "@liberfi/ui-dex";
-import { useAtomValue } from "jotai";
+import { UserGuideIcon, useTranslation, RobotIcon } from "@liberfi/ui-base";
+import { useInstantTradeAmount } from "@liberfi.io/ui-trade";
+import { useCurrentChain } from "@liberfi.io/ui-chain-select";
+import { getNativeToken } from "@liberfi.io/utils";
+import { INSTANT_TRADE_AMOUNT_ID } from "../application/swapFees";
+import { useOpenPresetForm } from "../application/useOpenPresetForm";
 import {
   DiscordIcon,
   Divider,
@@ -12,21 +15,25 @@ import {
   TwitterIcon,
 } from "@liberfi.io/ui";
 import { useDraggableDisclosure } from "@liberfi.io/ui-scaffold";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { BottomToolBarWallet } from "./BottomToolBarWallet";
 import { BottomNetworkStatus } from "./BottomNetworkStatus";
 import { BottomSolPrice } from "./BottomSolPrice";
 
 export function BottomToolBar() {
   const { t } = useTranslation();
-
-  const appSdk = useAppSdk();
-
-  const preset = useAtomValue(tradeBuyPresetAtom);
+  const { chain } = useCurrentChain();
+  const nativeToken = useMemo(() => getNativeToken(chain), [chain]);
+  const { preset } = useInstantTradeAmount({
+    id: INSTANT_TRADE_AMOUNT_ID,
+    chain,
+    tokenAddress: nativeToken?.address ?? "",
+  });
+  const handlePresetClick = useOpenPresetForm();
 
   const handlePresetSettings = useCallback(() => {
-    appSdk.events.emit("trade_settings:open", { preset });
-  }, [appSdk, preset]);
+    handlePresetClick(preset);
+  }, [handlePresetClick, preset]);
 
   const { onOpen: onOpenMediaTrack } = useDraggableDisclosure("mediaTrack");
 

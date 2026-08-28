@@ -4,6 +4,7 @@ import { PropsWithChildren, useState } from "react";
 import { ServiceClientProviders } from "./ServiceClientProviders";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { GraphQLClientProvider } from "../application/server/graphql";
+import { PresetFormModal } from "@liberfi.io/ui-trade";
 import { UIProviders } from "./UIProviders";
 import { AuthProviders } from "./AuthProviders";
 import { LocaleCode, LocaleProvider } from "@liberfi.io/i18n";
@@ -41,6 +42,7 @@ export function AppLayout({ children, locale }: PropsWithChildren<{ locale: Loca
             >
               <ServiceClientProviders>
                 <UIProviders>{children}</UIProviders>
+                <PresetFormModal />
               </ServiceClientProviders>
             </RuntimeLocaleProvider>
           </AuthProviders>

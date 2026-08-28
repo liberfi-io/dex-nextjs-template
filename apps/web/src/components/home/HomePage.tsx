@@ -20,7 +20,6 @@ import {
 } from "@liberfi.io/ui-tokens";
 import { Token } from "@liberfi.io/types";
 import { tokenDetailRoute } from "../../application/routes";
-import { InstantBuyProvider } from "./InstantBuyContext";
 import { InstantBuy } from "./InstsantBuy";
 
 export function HomePage() {
@@ -51,10 +50,6 @@ export function HomePage() {
 
   const [filters, setFilters] = useState<TokenListFiltersType | undefined>();
 
-  const [instantBuyAmount, setInstantBuyAmount] = useState<number | undefined>(0.01);
-
-  const [instantBuyPreset, setInstantBuyPreset] = useState<number | undefined>(0);
-
   // container ref
   const ref = useRef<HTMLDivElement>(null);
   // get container's height
@@ -68,7 +63,7 @@ export function HomePage() {
   );
 
   return (
-    <InstantBuyProvider amount={instantBuyAmount} preset={instantBuyPreset}>
+    <>
       <div
         className={cn(
           "px-4 max-sm:px-0 flex flex-col gap-2.5",
@@ -87,10 +82,6 @@ export function HomePage() {
           onTypeChange={setTokenListType}
           onResolutionChange={setResolution}
           onFiltersChange={setFilters}
-          instantBuyAmount={instantBuyAmount}
-          instantBuyPreset={instantBuyPreset}
-          onInstantBuyAmountChange={setInstantBuyAmount}
-          onInstantBuyPresetChange={setInstantBuyPreset}
         />
 
         <div className="w-full min-h-0 flex-auto max-sm:px-1" ref={ref}>
@@ -116,6 +107,6 @@ export function HomePage() {
           )}
         </div>
       </div>
-    </InstantBuyProvider>
+    </>
   );
 }

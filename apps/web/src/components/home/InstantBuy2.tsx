@@ -4,21 +4,20 @@ import { useMemo } from "react";
 import { useTranslation } from "@liberfi.io/i18n";
 import { Chain } from "@liberfi.io/types";
 import { LightningIcon, Button, toast } from "@liberfi.io/ui";
-import { formatPrice, SafeBigNumber } from "@liberfi.io/utils";
+import { formatPrice, getNativeToken, SafeBigNumber } from "@liberfi.io/utils";
 import {
   getPrimaryTokenAddress,
   getPrimaryTokenDecimals,
   getPrimaryTokenSymbol,
 } from "../../application/tokens";
+import { INSTANT_TRADE_AMOUNT_ID, swapFeesFromPreset } from "../../application/swapFees";
 import {
   useAppSdk,
   useAuthenticatedCallback,
   useWalletPrimaryTokenNetWorth,
 } from "@liberfi/ui-base";
-import { defaultTradePresetValues, useTradeBuySettings } from "@liberfi/ui-dex";
-import { useSwap, type SwapPhase } from "@liberfi.io/ui-trade";
+import { useInstantTradeAmount, usePresetValues, useSwap, type SwapPhase } from "@liberfi.io/ui-trade";
 import { useConnectedWallet } from "@liberfi.io/wallet-connector";
-import { useInstantBuy } from "./InstantBuyContext";
 
 export interface InstantBuy2Props {
   chain: Chain;
@@ -28,7 +27,12 @@ export interface InstantBuy2Props {
 export function InstantBuy({ chain, tokenAddress }: InstantBuy2Props) {
   const { t } = useTranslation();
   const appSdk = useAppSdk();
-  const { amount, preset } = useInstantBuy();
+  const nativeToken = useMemo(() => getNativeToken(chain), [chain]);
+  const { amount, preset } = useInstantTradeAmount({
+    id: INSTANT_TRADE_AMOUNT_ID,
+    chain,
+    tokenAddress: nativeToken?.address ?? "",
+  });
   const walletNetWorth = useWalletPrimaryTokenNetWorth();
 
   const primaryTokenSymbol = useMemo(
@@ -44,11 +48,11 @@ export function InstantBuy({ chain, tokenAddress }: InstantBuy2Props) {
     [chain],
   );
 
-  const buySettings = useTradeBuySettings(chain);
-  const presetSettings = useMemo(
-    () => buySettings?.presets?.[preset ?? 0] ?? defaultTradePresetValues,
-    [buySettings, preset],
-  );
+  const presetSettings = usePresetValues({
+    chain,
+    direction: "buy",
+    presetIndex: preset ?? 0,
+  });
   const wallet = useConnectedWallet(chain);
 
   const handleSwapError = (error: Error, phase: SwapPhase) => {
@@ -102,20 +106,7 @@ export function InstantBuy({ chain, tokenAddress }: InstantBuy2Props) {
       .shiftedBy(primaryTokenDecimals)
       .decimalPlaces(0)
       .toString();
-
-    const priorityFeeInDecimals = new SafeBigNumber(
-      presetSettings.priorityFee ?? defaultTradePresetValues.priorityFee!,
-    )
-      .shiftedBy(primaryTokenDecimals)
-      .decimalPlaces(0)
-      .toString();
-
-    const tipFeeInDecimals = new SafeBigNumber(
-      presetSettings.tipFee ?? defaultTradePresetValues.tipFee!,
-    )
-      .shiftedBy(primaryTokenDecimals)
-      .decimalPlaces(0)
-      .toString();
+    const fees = swapFeesFromPreset(presetSettings, primaryTokenDecimals);
 
     await swap({
       chain,
@@ -123,14 +114,7 @@ export function InstantBuy({ chain, tokenAddress }: InstantBuy2Props) {
       input: primaryTokenAddress,
       output: tokenAddress,
       amount: amountInDecimals,
-      slippage:
-        presetSettings.slippage ?? defaultTradePresetValues.slippage!,
-      priorityFee: priorityFeeInDecimals,
-      tipFee: tipFeeInDecimals,
-      isAntiMev:
-        typeof presetSettings.antiMev === "boolean"
-          ? presetSettings.antiMev
-          : presetSettings.antiMev !== "off",
+      ...fees,
     });
   }, [
     appSdk,

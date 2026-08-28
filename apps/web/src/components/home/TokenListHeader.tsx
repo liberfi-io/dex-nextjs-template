@@ -1,6 +1,6 @@
 import { useTranslation } from "@liberfi.io/i18n";
 import { Chain, SOLANA_TOKEN_PROTOCOLS } from "@liberfi.io/types";
-import { cn, SettingsIcon, StyledBadge, Button, StyledPlainTabs, Tab } from "@liberfi.io/ui";
+import { cn, ChevronUpIcon, SettingsIcon, StyledBadge, Button, StyledPlainTabs, Tab } from "@liberfi.io/ui";
 import {
   TokenListFilterModal,
   TokenListFilterPopover,
@@ -9,8 +9,11 @@ import {
   TokenListResolutionSelectorWidget,
 } from "@liberfi.io/ui-tokens";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
-import { ChevronUpIcon } from "@liberfi/ui-base";
-import { InstantBuyAmountInput, SwitchWallet } from "@liberfi/ui-dex";
+import { getNativeToken } from "@liberfi.io/utils";
+import { SwitchWallet } from "../../application/SwitchWallet";
+import { INSTANT_TRADE_AMOUNT_ID } from "../../application/swapFees";
+import { useOpenPresetForm } from "../../application/useOpenPresetForm";
+import { QuickAmountPresetInputWidget } from "../QuickAmountPresetInput";
 import { Key, useCallback, useMemo, useState } from "react";
 
 
@@ -27,31 +30,21 @@ export type TokenListHeaderProps = {
   filters?: TokenListFiltersType;
   /** callback function when token list filters changes */
   onFiltersChange: (filters?: TokenListFiltersType) => void;
-  /** instant buy amount */
-  instantBuyAmount?: number;
-  /** callback function when instant buy amount changes */
-  onInstantBuyAmountChange: (amount?: number) => void;
-  /** instant buy preset */
-  instantBuyPreset?: number;
-  /** callback function when instant buy preset changes */
-  onInstantBuyPresetChange: (preset: number) => void;
 };
 
 export function TokenListHeader({
   type,
   resolution,
   filters,
-  instantBuyAmount,
-  instantBuyPreset,
   onTypeChange,
   onResolutionChange,
   onFiltersChange,
-  onInstantBuyAmountChange,
-  onInstantBuyPresetChange,
 }: TokenListHeaderProps) {
   const { t } = useTranslation();
 
   const { chain: chainId } = useCurrentChain();
+  const nativeToken = useMemo(() => getNativeToken(chainId), [chainId]);
+  const handlePresetClick = useOpenPresetForm();
 
   const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useState(false);
 
@@ -94,17 +87,17 @@ export function TokenListHeader({
             filters={filters}
             onFiltersChange={onFiltersChange}
           />
-          {/* desktop wallet */}
           <SwitchWallet />
-          {/* desktop instant buy amount input */}
-          <InstantBuyAmountInput
-            radius="full"
-            size="lg"
-            amount={instantBuyAmount}
-            preset={instantBuyPreset}
-            onAmountChange={onInstantBuyAmountChange}
-            onPresetChange={onInstantBuyPresetChange}
-          />
+          {nativeToken && (
+            <QuickAmountPresetInputWidget
+              id={INSTANT_TRADE_AMOUNT_ID}
+              chain={chainId}
+              token={nativeToken}
+              size="sm"
+              className="w-48 flex-none"
+              onPresetClick={handlePresetClick}
+            />
+          )}
         </div>
 
         {/* toggle settings menu on mobile */}
@@ -137,9 +130,7 @@ export function TokenListHeader({
           {isSettingsMenuOpen ? (
             <ChevronUpIcon width={18} height={18} />
           ) : (
-            <span className="text-neutral">
-              {t(`extend.trade.settings.p${(instantBuyPreset ?? 0) + 1}`)}
-            </span>
+            <span className="text-neutral">{t("trade.preset.short", { n: 1 })}</span>
           )}
         </Button>
       </div>
@@ -167,15 +158,16 @@ export function TokenListHeader({
         </div>
         <div className="w-full flex justify-end items-center gap-4 max-sm:px-3">
           <SwitchWallet />
-          <InstantBuyAmountInput
-            radius="full"
-            size="lg"
-            amount={instantBuyAmount}
-            preset={instantBuyPreset}
-            onAmountChange={onInstantBuyAmountChange}
-            onPresetChange={onInstantBuyPresetChange}
-            className="lg:hidden"
-          />
+          {nativeToken && (
+            <QuickAmountPresetInputWidget
+              id={INSTANT_TRADE_AMOUNT_ID}
+              chain={chainId}
+              token={nativeToken}
+              size="sm"
+              className="w-40 flex-none lg:hidden"
+              onPresetClick={handlePresetClick}
+            />
+          )}
         </div>
       </div>
     </div>

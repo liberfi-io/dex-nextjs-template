@@ -11,6 +11,7 @@ import { useTranslation } from "@liberfi.io/i18n";
 import { toast } from "@liberfi.io/ui";
 import { PulseListType } from "@liberfi.io/ui-tokens";
 import { SafeBigNumber } from "@liberfi.io/utils";
+import { swapFeesFromPreset } from "../../application/swapFees";
 import {
   getPrimaryTokenAddress,
   getPrimaryTokenDecimals,
@@ -21,11 +22,7 @@ import {
   useAppSdk,
   useWalletPrimaryTokenNetWorth,
 } from "@liberfi/ui-base";
-import {
-  defaultTradePresetValues,
-  useTradeBuySettings,
-} from "@liberfi/ui-dex";
-import { useSwap, type SwapPhase } from "@liberfi.io/ui-trade";
+import { usePresetValues, useSwap, type SwapPhase } from "@liberfi.io/ui-trade";
 import {
   useAuthCallback,
   useConnectedWallet,
@@ -66,7 +63,6 @@ export function PulseInstantBuyProvider({
   const preset = pulseSettings[type]?.instant_buy?.preset;
 
   const walletNetWorth = useWalletPrimaryTokenNetWorth();
-  const buySettings = useTradeBuySettings(chainId);
   const handleSwapError = useCallback(
     (error: Error, phase: SwapPhase) => {
       const phaseLabel = t(`trade.swap.phase.${phase}`);
@@ -104,11 +100,11 @@ export function PulseInstantBuyProvider({
     [chainId],
   );
 
-  const presetSettings = useMemo(
-    () =>
-      buySettings?.presets?.[preset ?? 0] ?? defaultTradePresetValues,
-    [buySettings, preset],
-  );
+  const presetSettings = usePresetValues({
+    chain: chainId,
+    direction: "buy",
+    presetIndex: preset ?? 0,
+  });
 
   // keep a stable ref so the buy callback never changes identity
   const depsRef = useRef({
@@ -182,20 +178,7 @@ export function PulseInstantBuyProvider({
       .shiftedBy(primaryTokenDecimals)
       .decimalPlaces(0)
       .toString();
-
-    const priorityFeeInDecimals = new SafeBigNumber(
-      presetSettings.priorityFee ?? defaultTradePresetValues.priorityFee!,
-    )
-      .shiftedBy(primaryTokenDecimals)
-      .decimalPlaces(0)
-      .toString();
-
-    const tipFeeInDecimals = new SafeBigNumber(
-      presetSettings.tipFee ?? defaultTradePresetValues.tipFee!,
-    )
-      .shiftedBy(primaryTokenDecimals)
-      .decimalPlaces(0)
-      .toString();
+    const fees = swapFeesFromPreset(presetSettings, primaryTokenDecimals);
 
     await swap({
       chain: chainId,
@@ -203,14 +186,7 @@ export function PulseInstantBuyProvider({
       input: primaryTokenAddress,
       output: tokenAddress,
       amount: amountInDecimals,
-      slippage:
-        presetSettings.slippage ?? defaultTradePresetValues.slippage!,
-      priorityFee: priorityFeeInDecimals,
-      tipFee: tipFeeInDecimals,
-      isAntiMev:
-        typeof presetSettings.antiMev === "boolean"
-          ? presetSettings.antiMev
-          : presetSettings.antiMev !== "off",
+      ...fees,
     });
   }, []);
 
