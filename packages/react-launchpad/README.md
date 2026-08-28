@@ -1,1 +1,0 @@
-# React LaunchPad - Hooks For LaunchPad API

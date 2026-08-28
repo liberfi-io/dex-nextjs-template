@@ -75,9 +75,9 @@ describe("Stage 5.5 launchpad/redpacket parity", () => {
     expect(counts["@liberfi/ui-redpacket"]).toBe(0);
   });
 
-  it("does not remove the four workspace packages", () => {
+  it("removes the four leftover launchpad/redpacket workspace packages", () => {
     for (const relativePath of WORKSPACE_PACKAGES) {
-      expect(fs.existsSync(path.join(TEMPLATE_ROOT, relativePath))).toBe(true);
+      expect(fs.existsSync(path.join(TEMPLATE_ROOT, relativePath))).toBe(false);
     }
   });
 });

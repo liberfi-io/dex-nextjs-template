@@ -138,13 +138,20 @@ describe("S6-02 application adapters", () => {
     expect(collectImports("@liberfi/locales")).toEqual([]);
   });
 
-  it("does not delete the workspace packages", () => {
+  it("removes leftover workspace packages after apps/web import=0", () => {
     for (const relativePath of [
       "packages/core/package.json",
       "packages/locales/package.json",
       "packages/react-backend/package.json",
+      "packages/react-dex/package.json",
+      "packages/react-launchpad/package.json",
+      "packages/react-redpacket/package.json",
+      "packages/ui-base/package.json",
+      "packages/ui-dex/package.json",
+      "packages/ui-launchpad/package.json",
+      "packages/ui-redpacket/package.json",
     ]) {
-      expect(fs.existsSync(path.join(TEMPLATE_ROOT, relativePath))).toBe(true);
+      expect(fs.existsSync(path.join(TEMPLATE_ROOT, relativePath))).toBe(false);
     }
   });
 });

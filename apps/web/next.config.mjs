@@ -75,42 +75,6 @@ const nextConfig = {
           }),
     };
 
-    // Workspace package aliases — force every `@liberfi/*` import to
-    // resolve to the package's `src/` directory (matching the tsconfig
-    // path aliases used by apps/web). Without this, imports from sibling
-    // workspace packages (e.g. `packages/ui-dex` importing
-    // `@liberfi/ui-base`) fall through to the `node_modules` symlink and
-    // pick up `dist/index.js`, while imports from `apps/web` go through
-    // the tsconfig path alias to `src/index.tsx`. The two physical files
-    // each run their own `createContext()` calls, so React sees them as
-    // separate contexts: a `<RouterProvider>` set up via the src copy
-    // never matches a `useRouter()` reading from the dist copy, and the
-    // hook silently returns the empty `{} as IRouter` default —
-    // surfacing later as `TypeError: navigate is not a function` inside
-    // TvChartWrapper's chart-ready subscription.
-    //
-    // Webpack treats these as directory aliases, so subpath imports
-    // (`@liberfi/ui-base/providers`, JSON paths under `@liberfi/locales`,
-    // etc.) keep working — they resolve to the same relative path under
-    // `src/` rather than under `dist/`.
-    const WORKSPACE_PKGS = [
-      "core",
-      "react-backend",
-      "react-dex",
-      "react-launchpad",
-      "react-redpacket",
-      "ui-base",
-      "ui-dex",
-      "ui-launchpad",
-      "ui-redpacket",
-    ];
-    const workspaceAliases = Object.fromEntries(
-      WORKSPACE_PKGS.map((name) => [
-        `@liberfi/${name}`,
-        path.resolve(__dirname, `../../packages/${name}/src`),
-      ]),
-    );
-
     // @liberfi.io/* aliases: use local react-sdk dist when available,
     // otherwise pin to apps/web/node_modules for singleton safety.
     const libAliases = useLocalSdk
@@ -135,7 +99,6 @@ const nextConfig = {
       ...libAliases,
       ...singletonAliases,
       ...applicationSingletonAliases,
-      ...workspaceAliases,
     };
 
     if (useLocalSdk) {
