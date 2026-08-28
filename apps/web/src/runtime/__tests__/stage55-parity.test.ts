@@ -70,7 +70,6 @@ describe("Stage 5.5 launchpad/redpacket parity", () => {
   it("keeps new redpacket routes on retained widgets", () => {
     expect(collectImports("@liberfi/ui-redpacket")).toEqual(
       expect.arrayContaining([
-        "app/(legacy)/legacy/redpacket/page.tsx",
         "components/page/RedPacketHomePage.tsx",
         "components/page/RedPacketLayout.tsx",
       ]),

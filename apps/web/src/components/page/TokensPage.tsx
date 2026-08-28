@@ -19,9 +19,8 @@ import { TokenTradePage } from "./token-detail/TokenTradePage";
  * Those calls also crashed in production because `NewAppLayout` does not
  * mount `<GraphQLClientProvider>` — the default empty client made
  * `client.request` undefined and threw `t.request is not a function`.
- * Legacy `(legacy)/legacy/tokens/providers.tsx` still mounts the provider
- * for the legacy `TradePage` consumers; that path keeps working because
- * the legacy `AppLayout` mounts `GraphQLClientProvider`.
+ * The leftover `(legacy)` tokens providers and `AppLayout` were removed
+ * after option-A redirects; do not reintroduce `TradeDataProvider` here.
  */
 export function TokensPage() {
   const { slug } = useParams();

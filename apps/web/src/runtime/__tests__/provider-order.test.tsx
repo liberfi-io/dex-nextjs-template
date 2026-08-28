@@ -76,20 +76,10 @@ describe("application provider order policy", () => {
     expect(validateRuntimeProviderOrder(invalidOrder)).toBe(false);
   });
 
-  it("keeps the legacy layout source tree in the frozen root provider order", () => {
-    expect(
-      providerChain(
-        path.resolve(process.cwd(), "src/components/AppLayout.tsx"),
-        "ModalCoordinatorProvider",
-      ),
-    ).toEqual([
-      "ModalCoordinatorProvider",
-      "QueryClientProvider",
-      "GraphQLClientProvider",
-      "AuthProviders",
-      "RuntimeLocaleProvider",
-      "ServiceClientProviders",
-      "UIProviders",
-    ]);
+  it("removes the leftover legacy AppLayout after option-A redirects", () => {
+    expect(fs.existsSync(path.resolve(process.cwd(), "src/components/AppLayout.tsx"))).toBe(
+      false,
+    );
+    expect(fs.existsSync(path.resolve(process.cwd(), "src/app/(legacy)"))).toBe(false);
   });
 });
