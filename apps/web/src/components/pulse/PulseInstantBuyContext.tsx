@@ -18,10 +18,8 @@ import {
   getPrimaryTokenSymbol,
 } from "../../application/tokens";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
-import {
-  useAppSdk,
-  useWalletPrimaryTokenNetWorth,
-} from "@liberfi/ui-base";
+import { useWalletPrimaryTokenNetWorth } from "../../application/useWalletPrimaryTokenNetWorth";
+import { useAppSdk } from "@liberfi/ui-base";
 import { usePresetValues, useSwap, type SwapPhase } from "@liberfi.io/ui-trade";
 import {
   useAuthCallback,

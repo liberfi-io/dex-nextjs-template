@@ -4,10 +4,10 @@ import { cn } from "@liberfi.io/ui";
 import { CreateChannelWidget } from "@liberfi.io/ui-channels";
 import {
   hideHeaderOnLayoutAtom,
-  useRouter,
   useSetBottomNavigationBarActiveKey,
   useShowBottomNavigationBar,
 } from "@liberfi/ui-base";
+import { useChainAwareRouter } from "../hooks/useChainAwareRouter";
 import { useTranslation } from "@liberfi.io/i18n";
 import { useSetAtom } from "jotai";
 import { useEffect } from "react";
@@ -15,7 +15,7 @@ import { useEffect } from "react";
 export function ChannelsCreatePage() {
   const { t } = useTranslation();
 
-  const { navigate } = useRouter();
+  const router = useChainAwareRouter();
 
   // hide header on mobile
   const setHideHeaderOnLayout = useSetAtom(hideHeaderOnLayoutAtom);
@@ -45,7 +45,7 @@ export function ChannelsCreatePage() {
         <h1 className="text-base sm:text-lg font-semibold mb-4">{t("channels.create.title")}</h1>
         <CreateChannelWidget
           onSuccess={(channel) => {
-            navigate(`/channels/${channel.id}/update?type=wallets`);
+            router.push(`/channels/${channel.id}/update?type=wallets`);
           }}
         />
       </div>

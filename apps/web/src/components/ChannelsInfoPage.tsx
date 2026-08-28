@@ -7,7 +7,8 @@ import {
   ChannelsDetailPage,
   ChannelSubscribeButton,
 } from "@liberfi.io/ui-channels";
-import { hideHeaderOnLayoutAtom, useRouter, useSetBottomNavigationBarActiveKey, useShowBottomNavigationBar } from "@liberfi/ui-base";
+import { hideHeaderOnLayoutAtom, useSetBottomNavigationBarActiveKey, useShowBottomNavigationBar } from "@liberfi/ui-base";
+import { useChainAwareRouter } from "../hooks/useChainAwareRouter";
 import { useSetAtom } from "jotai";
 import { useEffect } from "react";
 
@@ -48,13 +49,13 @@ export function ChannelInfoPage({ id }: { id: string }) {
 }
 
 function HeaderActions({ channel }: { channel: Channel }) {
-  const { navigate } = useRouter();
+  const router = useChainAwareRouter();
   return (
     <div className="flex items-center gap-2">
       <ChannelEditButton
         channel={channel}
         onEdit={() => {
-          navigate(`/channels/${channel.id}/update`);
+          router.push(`/channels/${channel.id}/update`);
         }}
       />
     </div>

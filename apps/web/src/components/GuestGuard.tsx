@@ -2,7 +2,7 @@
 
 import { PropsWithChildren } from "react";
 import { redirect } from "next/navigation";
-import { useAuth } from "@liberfi/ui-base";
+import { useAuth } from "@liberfi.io/wallet-connector";
 
 export function GuestGuard({ children }: PropsWithChildren) {
   const { status } = useAuth();

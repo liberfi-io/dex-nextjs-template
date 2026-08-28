@@ -5,7 +5,8 @@ import { Avatar, Button } from "@heroui/react";
 import { cn, SettingsIcon, WalletIcon } from "@liberfi.io/ui";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { formatAmount } from "@liberfi.io/utils";
-import { useAppSdk, useWalletPrimaryTokenNetWorth } from "@liberfi/ui-base";
+import { useAppSdk } from "@liberfi/ui-base";
+import { useWalletPrimaryTokenNetWorth } from "./useWalletPrimaryTokenNetWorth";
 import { getPrimaryTokenAvatar } from "./tokens";
 
 export type SwitchWalletProps = {

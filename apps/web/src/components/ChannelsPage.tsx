@@ -7,12 +7,13 @@ import {
   ChannelsHomePage,
   ChannelSubscribeButton,
 } from "@liberfi.io/ui-channels";
-import { hideHeaderOnLayoutAtom, useRouter, useSetBottomNavigationBarActiveKey, useShowBottomNavigationBar } from "@liberfi/ui-base";
+import { hideHeaderOnLayoutAtom, useSetBottomNavigationBarActiveKey, useShowBottomNavigationBar } from "@liberfi/ui-base";
+import { useChainAwareRouter } from "../hooks/useChainAwareRouter";
 import { useSetAtom } from "jotai";
 import { useEffect } from "react";
 
 export function ChannelsPage() {
-  const { navigate } = useRouter();
+  const router = useChainAwareRouter();
 
   // hide header on mobile
   const setHideHeaderOnLayout = useSetAtom(hideHeaderOnLayoutAtom);
@@ -40,10 +41,10 @@ export function ChannelsPage() {
     >
       <ChannelsHomePage
         onCreateChannel={() => {
-          navigate("/channels/create");
+          router.push("/channels/create");
         }}
         onSelectChannel={(channel) => {
-          navigate(`/channels/${channel.id}`);
+          router.push(`/channels/${channel.id}`);
         }}
         customHeaderActions={(channel) => <HeaderActions channel={channel} />}
         customFooterActions={(channel) => <FooterActions channel={channel} />}
@@ -53,13 +54,13 @@ export function ChannelsPage() {
 }
 
 function HeaderActions({ channel }: { channel: Channel }) {
-  const { navigate } = useRouter();
+  const router = useChainAwareRouter();
   return (
     <div className="flex items-center gap-2">
       <ChannelEditButton
         channel={channel}
         onEdit={() => {
-          navigate(`/channels/${channel.id}/update`);
+          router.push(`/channels/${channel.id}/update`);
         }}
       />
     </div>

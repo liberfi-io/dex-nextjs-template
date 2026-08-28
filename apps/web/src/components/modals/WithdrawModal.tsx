@@ -4,13 +4,13 @@ import BigNumber from "bignumber.js";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { debounce } from "lodash-es";
 import { useTranslation } from "@liberfi.io/i18n";
-import { ModalContent, StyledModal, TokenIcon, XCloseIcon, cn } from "@liberfi.io/ui";
+import { ModalContent, StyledModal, TokenIcon, XCloseIcon, cn, toast } from "@liberfi.io/ui";
 import { AsyncModal, type RenderAsyncModalProps } from "@liberfi.io/ui-scaffold";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { useAccountInfo } from "@liberfi.io/ui-portfolio";
 import { Chain } from "@liberfi.io/types";
 import { chainDisplayName, formatAmount, formatAmountInUsd } from "@liberfi.io/utils";
-import { useTimerToast, useWalletPortfolios } from "@liberfi/ui-base";
+import { useWalletPortfolios } from "../../application/useWalletPortfolios";
 import { useConnectedWallet } from "@liberfi.io/wallet-connector";
 import { isValidWalletAddress } from "../../application/wallet";
 import {
@@ -50,7 +50,7 @@ export const WITHDRAW_MODAL_ID = "withdraw-wallet";
 //   - Transient network errors don't immediately fail the toast. We
 //     tolerate up to MAX_CONSECUTIVE_ERRORS in a row before surfacing.
 //
-type ToastFn = ReturnType<typeof useTimerToast>;
+type ToastFn = typeof toast.progress;
 
 const POLL_INTERVAL_MS = 3_000;
 const MAX_CONSECUTIVE_ERRORS = 3;
@@ -184,7 +184,6 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
   const chainName = chainDisplayName(chain);
   const { walletAddress } = useAccountInfo();
   const walletInstance = useConnectedWallet(chain);
-  const toast = useTimerToast();
 
   // Fixed to the chain's native token — no selection needed.
   const nativeToken = useMemo(() => getNativeToken(chain), [chain]);
@@ -352,7 +351,7 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
       // confirmation. The same toast id is reused below so success /
       // failure / timeout updates replace this toast in place instead of
       // stacking new ones.
-      toast({
+      toast.progress({
         id: result.txSignature,
         message: `转账已提交，等待上链确认 · ${shortSig(result.txSignature)}`,
         progress: true,
@@ -367,7 +366,7 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
 
       // Fire-and-forget. Any unexpected throw in the watcher is logged
       // but must not break the broadcast flow.
-      void watchTransferConfirmation(chain, result.txSignature, toast).catch(
+      void watchTransferConfirmation(chain, result.txSignature, toast.progress).catch(
         (err: unknown) => {
           console.error("[withdraw] confirmation watcher crashed", err);
         },
@@ -383,7 +382,7 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
         msg = "转账失败，请重试";
       }
       setTxError(msg);
-      toast({
+      toast.progress({
         type: "error",
         message: msg,
         duration: 5000,
@@ -398,7 +397,6 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
     chain,
     createTx,
     sendTx,
-    toast,
     handleClose,
   ]);
 

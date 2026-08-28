@@ -39,9 +39,9 @@ import {
   useSetBottomNavigationBarActiveKey,
   useShowBottomNavigationBar,
   useShowHeader,
-  useRouter,
 } from "@liberfi/ui-base";
 import { tokenDetailRoute } from "../../application/routes";
+import { useChainAwareRouter } from "../../hooks/useChainAwareRouter";
 import { useSwitchEvmWalletsToChain } from "@liberfi.io/wallet-connector";
 import { chainDisplayName } from "@liberfi.io/utils";
 import { useChainSwitchUrlHandler } from "../../hooks/useChainSwitchUrlHandler";
@@ -155,7 +155,7 @@ export function PulsePage() {
 
   const { t } = useTranslation();
   const { chain: chainId } = useCurrentChain();
-  const { navigate } = useRouter();
+  const router = useChainAwareRouter();
   const switchChain = useSwitchEvmWalletsToChain();
   const onChainSwitchedUrl = useChainSwitchUrlHandler();
   const isPulseSupported = isPulseSupportedChain(chainId);
@@ -164,9 +164,9 @@ export function PulsePage() {
   useEffect(() => {
     if (!isPulseSupported) {
       const chainQuery = chainQueryValue(chainId);
-      navigate(chainQuery ? `/?chain=${chainQuery}` : "/", { replace: true });
+      router.replace(chainQuery ? `/?chain=${chainQuery}` : "/");
     }
-  }, [chainId, isPulseSupported, navigate]);
+  }, [chainId, isPulseSupported, router]);
 
   const [type, setType] = useState<PulseListType>("new");
   const [isMobileListPaused, setIsMobileListPaused] = useState(false);
@@ -179,9 +179,9 @@ export function PulsePage() {
 
   const handleSelectToken = useCallback(
     (token: Token) => {
-      navigate(tokenDetailRoute(chainId, token.address));
+      router.push(tokenDetailRoute(chainId, token.address));
     },
-    [navigate, chainId],
+    [router, chainId],
   );
 
   const filterProtocols = useMemo(

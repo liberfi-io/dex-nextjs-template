@@ -3,10 +3,10 @@
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
   hideHeaderOnLayoutAtom,
-  useRouter,
   useSetBottomNavigationBarActiveKey,
   useShowBottomNavigationBar,
 } from "@liberfi/ui-base";
+import { useChainAwareRouter } from "../../hooks/useChainAwareRouter";
 import { cn } from "@liberfi.io/ui";
 import { useSetAtom } from "jotai";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -37,7 +37,7 @@ export function HomePage() {
   // set bottom navigation bar active tab
   useSetBottomNavigationBarActiveKey("token_list");
 
-  const { navigate } = useRouter();
+  const router = useChainAwareRouter();
 
   const [tokenListType, setTokenListType] = useState<"trending" | "stocks">("trending");
 
@@ -57,9 +57,9 @@ export function HomePage() {
 
   const handleSelectToken = useCallback(
     (token: Token) => {
-      navigate(tokenDetailRoute(chainId, token.address));
+      router.push(tokenDetailRoute(chainId, token.address));
     },
-    [navigate, chainId],
+    [router, chainId],
   );
 
   return (

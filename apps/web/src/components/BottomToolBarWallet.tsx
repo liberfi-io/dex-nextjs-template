@@ -4,7 +4,7 @@ import { Avatar } from "@heroui/react";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { formatAmount } from "@liberfi.io/utils";
 import { getPrimaryTokenAvatar } from "../application/tokens";
-import { useWalletPrimaryTokenNetWorth } from "@liberfi/ui-base";
+import { useWalletPrimaryTokenNetWorth } from "../application/useWalletPrimaryTokenNetWorth";
 import { WalletIcon } from "@liberfi.io/ui";
 
 export function BottomToolBarWallet() {

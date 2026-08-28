@@ -11,13 +11,10 @@ import {
   getPrimaryTokenSymbol,
 } from "../../application/tokens";
 import { INSTANT_TRADE_AMOUNT_ID, swapFeesFromPreset } from "../../application/swapFees";
-import {
-  useAppSdk,
-  useAuthenticatedCallback,
-  useWalletPrimaryTokenNetWorth,
-} from "@liberfi/ui-base";
+import { useWalletPrimaryTokenNetWorth } from "../../application/useWalletPrimaryTokenNetWorth";
+import { useAppSdk } from "@liberfi/ui-base";
 import { useInstantTradeAmount, usePresetValues, useSwap, type SwapPhase } from "@liberfi.io/ui-trade";
-import { useConnectedWallet } from "@liberfi.io/wallet-connector";
+import { useAuthCallback, useConnectedWallet } from "@liberfi.io/wallet-connector";
 
 export interface InstantBuy2Props {
   chain: Chain;
@@ -76,7 +73,7 @@ export function InstantBuy({ chain, tokenAddress }: InstantBuy2Props) {
     onError: handleSwapError,
   });
 
-  const handleInstantBuy = useAuthenticatedCallback(async () => {
+  const handleInstantBuy = useAuthCallback(async () => {
     if (
       !walletNetWorth?.amount ||
       !wallet ||

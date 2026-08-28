@@ -1,7 +1,7 @@
 "use client";
 
 import { PropsWithChildren, useEffect, useRef } from "react";
-import { useAuth } from "@liberfi/ui-base";
+import { useAuth } from "@liberfi.io/wallet-connector";
 
 export function AuthGuard({ children }: PropsWithChildren) {
   const { status, signIn } = useAuth();
