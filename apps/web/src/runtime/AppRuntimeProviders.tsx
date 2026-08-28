@@ -11,17 +11,10 @@ import { PortfolioClientProvider, PortfolioProvider } from "@liberfi.io/ui-portf
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { useAuth, useConnectedWallet } from "@liberfi.io/wallet-connector";
 import { DexClientProvider } from "@liberfi/react-dex";
-import { PinataProvider } from "@liberfi/ui-base";
+import { PinataProvider } from "../application/pinata";
 import { useDexTokenProvider } from "../application/useDexTokenProvider";
-import {
-  browserDexDataScheduler,
-  createChainStreamDexDataAdapter,
-  DexDataProvider,
-  DexDataRuntimeProvider,
-} from "@liberfi/ui-dex";
 import { HyperliquidAccountStateSync } from "../components/HyperliquidAccountStateSync";
 import { pinata } from "../libs/pinata";
-import { queryClient } from "../libs/queryClient";
 import {
   type AppClientBundle,
   type CapabilityBundleV1,
@@ -106,10 +99,6 @@ export function AppRuntimeProviders({
     dexTokenProvider,
     channelsTokenProvider,
   });
-  const dexDataAdapter = useMemo(
-    () => createChainStreamDexDataAdapter(clients.chainStream),
-    [clients.chainStream],
-  );
   const reactCapabilities = useMemo(
     () => projectReactCapabilities(clients.capabilities),
     [clients.capabilities],
@@ -143,13 +132,7 @@ export function AppRuntimeProviders({
                               depositClient={clients.perpetualDeposit}
                             >
                               <HyperliquidAccountStateSync />
-                              <DexDataRuntimeProvider
-                                queryClient={queryClient}
-                                adapter={dexDataAdapter}
-                                scheduler={browserDexDataScheduler}
-                              >
-                                <DexDataProvider>{children}</DexDataProvider>
-                              </DexDataRuntimeProvider>
+                              {children}
                             </PerpetualsProvider>
                           </PortfolioProvider>
                         </PortfolioClientProvider>

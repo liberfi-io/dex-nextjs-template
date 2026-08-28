@@ -173,6 +173,13 @@ describe("Stage55AdaptersProvider", () => {
 });
 
 describe("Stage 5.5 production wiring", () => {
+  it("uploads launchpad images through the application Pinata adapter", () => {
+    expect(readWebSrc("runtime/Stage55UiBridge.tsx")).toContain(
+      'from "../application/pinata"',
+    );
+    expect(readWebSrc("runtime/Stage55UiBridge.tsx")).not.toContain("@liberfi/ui-base");
+  });
+
   it("nests Stage55AdaptersProvider inside Stage54AdaptersProvider", () => {
     const source = readWebSrc("runtime/AppRuntimeProviders.tsx");
     const stage54 = source.indexOf("<Stage54AdaptersProvider");

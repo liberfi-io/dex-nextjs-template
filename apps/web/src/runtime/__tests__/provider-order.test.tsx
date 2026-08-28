@@ -1,45 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
-import ts from "typescript";
 import {
   APP_RUNTIME_PROVIDER_ORDER,
   validateRuntimeProviderOrder,
 } from "../runtime-lifecycle-policy";
 
-function providerChain(sourceFile: string, rootName: string) {
-  const sourceText = fs.readFileSync(sourceFile, "utf8");
-  const source = ts.createSourceFile(
-    sourceFile,
-    sourceText,
-    ts.ScriptTarget.Latest,
-    true,
-    ts.ScriptKind.TSX,
-  );
-  let root: ts.JsxElement | undefined;
-  const visit = (node: ts.Node) => {
-    if (
-      ts.isJsxElement(node) &&
-      node.openingElement.tagName.getText(source) === rootName
-    ) {
-      root = node;
-      return;
-    }
-    node.forEachChild(visit);
-  };
-  source.forEachChild(visit);
-  if (!root) throw new Error(`Missing provider root: ${rootName}`);
-
-  const chain: string[] = [];
-  let current: ts.JsxElement | undefined = root;
-  while (current) {
-    chain.push(current.openingElement.tagName.getText(source));
-    current = current.children.find(ts.isJsxElement);
-  }
-  return chain;
-}
-
 describe("application provider order policy", () => {
-  it("places data runtime outside data consumers", () => {
+  it("keeps the frozen application provider order", () => {
     expect(APP_RUNTIME_PROVIDER_ORDER).toEqual([
       "modal-coordinator",
       "query-client",
@@ -57,23 +24,33 @@ describe("application provider order policy", () => {
       "portfolio-client",
       "portfolio-account",
       "perpetuals",
-      "dex-data-runtime",
-      "dex-data",
       "application-shell",
     ]);
     expect(validateRuntimeProviderOrder(APP_RUNTIME_PROVIDER_ORDER)).toBe(true);
   });
 
-  it("rejects data consumers outside their runtime provider", () => {
+  it("rejects a permuted provider order", () => {
     const invalidOrder = [...APP_RUNTIME_PROVIDER_ORDER];
-    const runtimeIndex = invalidOrder.indexOf("dex-data-runtime");
-    const dataIndex = invalidOrder.indexOf("dex-data");
-    [invalidOrder[runtimeIndex], invalidOrder[dataIndex]] = [
-      invalidOrder[dataIndex],
-      invalidOrder[runtimeIndex],
+    const pinataIndex = invalidOrder.indexOf("pinata");
+    const apiIndex = invalidOrder.indexOf("api-client");
+    [invalidOrder[pinataIndex], invalidOrder[apiIndex]] = [
+      invalidOrder[apiIndex],
+      invalidOrder[pinataIndex],
     ];
 
     expect(validateRuntimeProviderOrder(invalidOrder)).toBe(false);
+  });
+
+  it("drops DexData after SOL quote moves onto the SDK token query", () => {
+    const source = fs.readFileSync(
+      path.resolve(process.cwd(), "src/runtime/AppRuntimeProviders.tsx"),
+      "utf8",
+    );
+    expect(source).not.toContain("DexDataRuntimeProvider");
+    expect(source).not.toContain("DexDataProvider");
+    expect(source).not.toContain("@liberfi/ui-dex");
+    expect(source).toContain('from "../application/pinata"');
+    expect(source).toContain("@liberfi/react-dex");
   });
 
   it("removes the leftover legacy AppLayout after option-A redirects", () => {

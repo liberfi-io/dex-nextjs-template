@@ -26,8 +26,6 @@ export const APP_RUNTIME_PROVIDER_ORDER: readonly RuntimeProviderKey[] = [
   "portfolio-client",
   "portfolio-account",
   "perpetuals",
-  "dex-data-runtime",
-  "dex-data",
   "application-shell",
 ];
 

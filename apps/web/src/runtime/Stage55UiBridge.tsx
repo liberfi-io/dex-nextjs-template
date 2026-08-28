@@ -14,7 +14,7 @@ import {
 } from "@liberfi.io/ui-redpacket";
 import { toast } from "@liberfi.io/ui";
 import { useAuthCallback, useConnectedWallet } from "@liberfi.io/wallet-connector";
-import { useUpload } from "@liberfi/ui-base";
+import { useUpload } from "../application/pinata";
 import { browserAppSdk } from "../application/app-sdk";
 import { useChainAwareRouter } from "../hooks/useChainAwareRouter";
 import { useStage55Adapters } from "./Stage55AdaptersProvider";

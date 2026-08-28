@@ -2,16 +2,15 @@ import { Avatar } from "@heroui/react";
 import { cn, StyledTooltip } from "@liberfi.io/ui";
 import { Chain } from "@liberfi.io/types";
 import { getPrimaryTokenAvatar } from "../application/tokens";
+import { useSolQuotePrice } from "../application/useSolQuotePrice";
 import { useTranslation } from "@liberfi.io/i18n";
-import { CHAIN_QUOTE_TOKEN_SYMBOLS, useQuotePrice } from "@liberfi/ui-dex";
 import { formatPriceInUsd } from "@liberfi.io/utils";
 
 const avatar = getPrimaryTokenAvatar(Chain.SOLANA);
 
 export function BottomSolPrice() {
   const { t } = useTranslation();
-
-  const quotePrice = useQuotePrice(CHAIN_QUOTE_TOKEN_SYMBOLS[Chain.SOLANA] ?? "");
+  const quotePrice = useSolQuotePrice();
 
   return (
     <StyledTooltip content={t("extend.toolbar.sol_price_usd")} closeDelay={0}>

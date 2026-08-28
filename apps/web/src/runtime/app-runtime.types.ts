@@ -149,8 +149,6 @@ export type RuntimeProviderKey =
   | "portfolio-client"
   | "portfolio-account"
   | "perpetuals"
-  | "dex-data-runtime"
-  | "dex-data"
   | "application-shell";
 
 export interface PredictWsLifecycleClient {
