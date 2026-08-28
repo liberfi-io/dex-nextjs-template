@@ -23,10 +23,10 @@ import {
   chainToTransferSymbol,
   getTransferStatus,
   isTerminalTransferStatus,
-  useCreateTransferTransactionMutation,
-  useSendTransferTransactionMutation,
   type TransferStatusResponse,
-} from "@liberfi/react-backend";
+} from "../../application/server/transferRestClient";
+import { useCreateTransferTransactionMutation } from "../../application/server/useCreateTransferTransactionMutation";
+import { useSendTransferTransactionMutation } from "../../application/server/useSendTransferTransactionMutation";
 
 export const WITHDRAW_MODAL_ID = "withdraw-wallet";
 
@@ -133,8 +133,8 @@ async function watchTransferConfirmation(
 }
 
 // ---------------------------------------------------------------------------
-// Native token resolved from @liberfi/core (single source of truth shared
-// with the header balance display so the token address always matches the
+// Native token resolved from application/tokens (same helpers as the
+// header balance display so the token address always matches the
 // portfolio data returned by the backend).
 // ---------------------------------------------------------------------------
 

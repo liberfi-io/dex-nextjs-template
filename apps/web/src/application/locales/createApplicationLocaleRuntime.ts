@@ -1,7 +1,6 @@
 import * as I18nSdk from "@liberfi.io/i18n";
 import type { LocaleCode, LocaleProviderProps } from "@liberfi.io/i18n";
 import { installLegacyLocaleAliases } from "./legacy-aliases";
-import { legacySdkShapedDomainResources } from "./legacy-domain-resources";
 import en from "./en.json";
 import zh from "./zh.json";
 
@@ -44,8 +43,8 @@ export function applicationLocaleProviderProps(runtime: ApplicationLocaleRuntime
     ? { runtime }
     : {
         resources: {
-          en: { ...legacySdkShapedDomainResources.en, extend: resources.en.extend },
-          zh: { ...legacySdkShapedDomainResources.zh, extend: resources.zh.extend },
+          en: { extend: resources.en.extend },
+          zh: { extend: resources.zh.extend },
         } as LocaleProviderProps["resources"],
       };
 }
@@ -73,14 +72,12 @@ function createLegacyApplicationLocaleRuntime(locale: LocaleCode): ApplicationLo
       en: {
         translation: {
           ...sdkEn,
-          ...legacySdkShapedDomainResources.en,
           extend: cloneResource(en.extend),
         },
       },
       zh: {
         translation: {
           ...sdkZh,
-          ...legacySdkShapedDomainResources.zh,
           extend: cloneResource(zh.extend),
         },
       },

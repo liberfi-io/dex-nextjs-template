@@ -12,6 +12,7 @@ import zh from "../locales/zh.json";
 import { MemoryStorage } from "../storage";
 import { MockAppSdk } from "../app-sdk";
 import { buildCreateOnrampWidgetUrlBody } from "../server/useCreateOnrampWidgetUrlMutation";
+import { chainToTransferSymbol } from "../server/transferRestClient";
 import {
   getPrimaryTokenAddress,
   getPrimaryTokenAvatar,
@@ -115,9 +116,12 @@ describe("S6-02 application adapters", () => {
   });
 
   it("keeps @liberfi/locales out of application locale files and UI", () => {
-    expect(collectImports("@liberfi/locales")).toEqual([
-      "application/locales/legacy-domain-resources.ts",
-    ]);
+    expect(collectImports("@liberfi/locales")).toEqual([]);
+  });
+
+  it("maps transfer chains without @liberfi/react-backend", () => {
+    expect(chainToTransferSymbol(Chain.SOLANA)).toBe("sol");
+    expect(chainToTransferSymbol(Chain.ETHEREUM)).toBe("eth");
   });
 
   it("owns primary-token helpers without @liberfi/core", () => {
@@ -130,10 +134,8 @@ describe("S6-02 application adapters", () => {
   it("stops apps/web from importing config/storage/auth/onramp from workspace packages", () => {
     expect(collectImports("@liberfi/core")).toEqual([]);
     expect(collectImports("@liberfi/react-dex")).toEqual([]);
-    expect(collectImports("@liberfi/react-backend")).toEqual([
-      "application/server/graphql.ts",
-      "components/modals/WithdrawModal.tsx",
-    ]);
+    expect(collectImports("@liberfi/react-backend")).toEqual([]);
+    expect(collectImports("@liberfi/locales")).toEqual([]);
   });
 
   it("does not delete the workspace packages", () => {

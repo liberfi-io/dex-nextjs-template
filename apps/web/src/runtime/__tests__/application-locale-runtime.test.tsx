@@ -21,6 +21,7 @@ describe("application locale runtime", () => {
 
     expect(runtime.i18n.t("trade.buy")).toBe("Buy");
     expect(runtime.i18n.t("extend.header.home")).toBe("Home");
+    expect(runtime.i18n.t("account.withdraw")).toBe("Withdraw");
   });
 
   it("creates isolated layout instances", async () => {
