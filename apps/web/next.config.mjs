@@ -3,6 +3,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { getLocalSdkAliases, getLocalSdkWatchOptions } from "./build-config/local-sdk-aliases.mjs";
 import { getSingletonAliases, LOCAL_SDK_FALLBACK } from "./build-config/local-sdk-shared.mjs";
+import { LEGACY_REDIRECTS } from "./build-config/legacy-redirects.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -17,6 +18,9 @@ const nextConfig = {
   // TODO tv chart need to disable reactStrictMode
   reactStrictMode: false,
   output: "standalone",
+  async redirects() {
+    return LEGACY_REDIRECTS;
+  },
   async rewrites() {
     return [
       {

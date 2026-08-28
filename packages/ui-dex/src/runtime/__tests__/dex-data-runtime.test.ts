@@ -101,6 +101,24 @@ describe("ChainStreamDexDataAdapter", () => {
     expect(subscription).toBeDefined();
   });
 
+  it("keeps G2 live candles as a single WsCandle with numeric time", () => {
+    const source = createSourceFake();
+    const adapter = createChainStreamDexDataAdapter(source.client);
+    const callback = jest.fn<void, [WsCandle]>();
+    adapter.subscribeTokenCandles({
+      chain: Chain.SOLANA,
+      tokenAddress: "token-a",
+      resolution: "1m" as never,
+      callback,
+    });
+    const passed = source.stream.subscribeTokenCandles.mock.calls[0][0].callback as (
+      candle: WsCandle,
+    ) => void;
+    passed({ time: 1_700_000_000_000, open: "1", close: "1", high: "1", low: "1", volume: "1" } as WsCandle);
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback.mock.calls[0][0].time).toBe(1_700_000_000_000);
+  });
+
   it("preserves producer errors", async () => {
     const source = createSourceFake();
     const failure = new Error("upstream failed");
