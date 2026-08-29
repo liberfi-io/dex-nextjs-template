@@ -103,7 +103,7 @@ test("never resolves one entrypoint from both source and dist", () => {
   }
 });
 
-test("local SDK scan includes unpublished launchpad and redpacket packages", () => {
+test("local SDK scan includes published launchpad and redpacket packages", () => {
   const entries = withLocalSdk(realSdkRoot, () =>
     getLocalSdkAliasEntries({ baseDir: webRoot }),
   );

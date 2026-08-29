@@ -81,7 +81,7 @@ describe("createStage55LaunchpadPorts", () => {
     expect(result).toEqual({ serializedTx: "signed-tx" });
   });
 
-  it("builds an unpublished SDK create runtime against ChainStream execution", async () => {
+  it("builds the SDK create runtime against ChainStream execution", async () => {
     const createToken = jest.fn().mockResolvedValue({ serializedTx: "signed-tx" });
     const ports = createStage55LaunchpadPorts(fakeClient({ createToken }));
     const snapshot = await ports.createRuntime({
@@ -190,7 +190,7 @@ describe("Stage 5.5 production wiring", () => {
     expect(stage55).toBeLessThan(stage54Close);
   });
 
-  it("keeps production launchpad/redpacket entries on unpublished SDK UI", () => {
+  it("keeps production launchpad/redpacket entries on published SDK UI", () => {
     expect(readWebSrc("components/modals/LaunchPadModal.tsx")).toMatch(
       /@liberfi\.io\/ui-launchpad/,
     );

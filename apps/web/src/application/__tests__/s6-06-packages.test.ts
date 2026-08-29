@@ -35,12 +35,18 @@ describe("S6-06 leftover package deletion", () => {
     }
   });
 
-  it("keeps unpublished SDK aliases out of package.json", () => {
+  it("declares the published Stage 5.5 and chart SDK packages", () => {
     const manifest = JSON.parse(
       fs.readFileSync(path.join(TEMPLATE_ROOT, "apps/web/package.json"), "utf8"),
     ) as { dependencies: Record<string, string> };
-    expect(manifest.dependencies["@liberfi.io/ui-launchpad"]).toBeUndefined();
-    expect(manifest.dependencies["@liberfi.io/ui-redpacket"]).toBeUndefined();
-    expect(manifest.dependencies["@liberfi.io/ui-tradingview"]).toBeUndefined();
+    for (const name of [
+      "@liberfi.io/react-launchpad",
+      "@liberfi.io/react-redpacket",
+      "@liberfi.io/ui-launchpad",
+      "@liberfi.io/ui-redpacket",
+      "@liberfi.io/ui-tradingview",
+    ]) {
+      expect(manifest.dependencies[name]).toBeDefined();
+    }
   });
 });

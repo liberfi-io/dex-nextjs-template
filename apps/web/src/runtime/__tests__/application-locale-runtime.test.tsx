@@ -30,4 +30,11 @@ describe("application locale runtime", () => {
     await first.change("zh");
     expect(first.i18n.language).not.toBe(second.i18n.language);
   });
+
+  it("exposes the SDK locale runtime contract", async () => {
+    const runtime = createApplicationLocaleRuntime("en");
+    expect(runtime.normalize("en-US")).toBe("en");
+    expect(runtime.resolve("extend.header.home")).toBe("Home");
+    await expect(runtime.load("en")).resolves.toBeUndefined();
+  });
 });

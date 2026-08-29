@@ -32,7 +32,6 @@ import {
   useLocale,
   useChangeLocale,
   useLocaleContext,
-  type LocaleProviderProps,
 } from "@liberfi.io/i18n";
 import {
   useAuth,
@@ -96,7 +95,6 @@ import { ChainAwareLink } from "./ChainAwareLink";
 import {
   applicationLocaleProviderProps,
   createApplicationLocaleRuntime,
-  type ApplicationLocaleRuntime,
 } from "../runtime/createApplicationLocaleRuntime";
 import { PresetFormModal } from "@liberfi.io/ui-trade";
 import { useAccountInfo } from "@liberfi.io/ui-portfolio";
@@ -132,15 +130,12 @@ const {
 } = UiScaffold;
 type NavItem = UiScaffold.NavItem;
 
-const RuntimeLocaleProvider = LocaleProvider as ComponentType<
-  LocaleProviderProps & { runtime?: ApplicationLocaleRuntime }
->;
-const UnpublishedScaffold = UiScaffold as typeof UiScaffold & {
+const ScaffoldWithProviders = UiScaffold as typeof UiScaffold & {
   ModalCoordinatorProvider: ComponentType<PropsWithChildren>;
   DraggableStateProvider: ComponentType<PropsWithChildren>;
 };
-const ModalCoordinatorProvider = UnpublishedScaffold.ModalCoordinatorProvider;
-const DraggableStateProvider = UnpublishedScaffold.DraggableStateProvider;
+const ModalCoordinatorProvider = ScaffoldWithProviders.ModalCoordinatorProvider;
+const DraggableStateProvider = ScaffoldWithProviders.DraggableStateProvider;
 const useAsyncModal = UiScaffold.useAsyncModal;
 
 const navItemsConfig: Omit<NavItem, "label">[] = [
@@ -162,7 +157,7 @@ export function NewAppLayout({ children, locale }: PropsWithChildren<{ locale: L
     <ModalCoordinatorProvider>
       <QueryClientProvider client={queryClient}>
         <AuthProviders>
-          <RuntimeLocaleProvider
+          <LocaleProvider
             {...applicationLocaleProviderProps(localeRuntime)}
             locale={locale}
             supportedLanguages={["en", "zh"]}
@@ -179,7 +174,7 @@ export function NewAppLayout({ children, locale }: PropsWithChildren<{ locale: L
               <PredictSearchModal />
               <PresetFormModal />
             </AppRuntimeProviders>
-          </RuntimeLocaleProvider>
+          </LocaleProvider>
         </AuthProviders>
       </QueryClientProvider>
     </ModalCoordinatorProvider>

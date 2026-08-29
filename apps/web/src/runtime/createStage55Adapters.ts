@@ -85,8 +85,7 @@ export type Stage55Adapters = {
 
 /**
  * Template-owned launchpad ports. ChainStream DTO stays here.
- * Unpublished `@liberfi.io/react-launchpad` is resolved via local-sdk
- * aliases until the package is published.
+ * Explicit local SDK mode may resolve the package to source during development.
  */
 export function createStage55LaunchpadPorts(
   client: ChainStreamClient,
@@ -118,7 +117,7 @@ export function createStage55LaunchpadPorts(
 
 /**
  * Template-owned redpacket ports. Share URLs use the application origin.
- * Unpublished `@liberfi.io/react-redpacket` is resolved via local-sdk.
+ * Explicit local SDK mode may resolve the package to source during development.
  */
 export function createStage55RedpacketPorts(
   client: ChainStreamClient,
