@@ -19,7 +19,7 @@ describe("runtime configuration policy", () => {
     const path = await import("node:path");
     const source = await fs.readFile(path.resolve(__dirname, "../readRuntimeConfig.ts"), "utf8");
     expect(source).toContain("process.env.NEXT_PUBLIC_DEX_AGGREGATOR_URL");
-    expect(source).not.toMatch(/=\s*process\.env[^\.]/);
+    expect(source).not.toMatch(/=\s*process\.env[^.]/);
   });
 
   it("resolves relative HTTP endpoints against the browser origin", () => {
