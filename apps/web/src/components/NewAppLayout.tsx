@@ -96,7 +96,6 @@ import { ChainAwareLink } from "./ChainAwareLink";
 import {
   applicationLocaleProviderProps,
   createApplicationLocaleRuntime,
-  type ApplicationLocaleRuntime,
 } from "../runtime/createApplicationLocaleRuntime";
 import { PresetFormModal } from "@liberfi.io/ui-trade";
 import { useAccountInfo } from "@liberfi.io/ui-portfolio";
@@ -132,9 +131,7 @@ const {
 } = UiScaffold;
 type NavItem = UiScaffold.NavItem;
 
-const RuntimeLocaleProvider = LocaleProvider as ComponentType<
-  LocaleProviderProps & { runtime?: ApplicationLocaleRuntime }
->;
+const RuntimeLocaleProvider = LocaleProvider as ComponentType<LocaleProviderProps>;
 const UnpublishedScaffold = UiScaffold as typeof UiScaffold & {
   ModalCoordinatorProvider: ComponentType<PropsWithChildren>;
   DraggableStateProvider: ComponentType<PropsWithChildren>;
