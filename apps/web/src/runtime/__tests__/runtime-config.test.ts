@@ -14,6 +14,14 @@ describe("runtime configuration policy", () => {
     expect(readRuntimeConfig(REQUIRED_ENV, "").origin).toBe("");
   });
 
+  it("reads public runtime env via static Next.js member access, not process.env as an object", async () => {
+    const fs = await import("node:fs/promises");
+    const path = await import("node:path");
+    const source = await fs.readFile(path.resolve(__dirname, "../readRuntimeConfig.ts"), "utf8");
+    expect(source).toContain("process.env.NEXT_PUBLIC_DEX_AGGREGATOR_URL");
+    expect(source).not.toMatch(/=\s*process\.env[^\.]/);
+  });
+
   it("resolves relative HTTP endpoints against the browser origin", () => {
     expect(
       resolveRuntimeConfigPolicy({
