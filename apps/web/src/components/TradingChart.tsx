@@ -83,7 +83,7 @@ export function TradingChart({ chain, address, className }: TradingChartProps) {
       className={className ?? "flex-1 w-full h-full"}
       initConfig={initConfig}
       widgetConstructor={widgetConstructor}
-      libraryPath="static/charting_library/"
+      libraryPath="/static/charting_library/"
       customCssUrl="custom-styles.css"
     />
   );
