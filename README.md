@@ -18,10 +18,9 @@ pnpm install
 pnpm --filter @liberfi/web dev   # :3000 — do not restart a healthy server
 ```
 
-Unpublished packages (`@liberfi.io/ui-launchpad`, `ui-redpacket`,
-`react-launchpad`, `react-redpacket`) are wired through webpack aliases
-and `tsconfig` paths. Do not add them to `package.json` until they are
-on npm (Vercel would fail the install).
+Launchpad / redpacket / TradingView are on npm. Default local debug
+still uses `USE_LOCAL_SDK=true`. npm-mode debug: install workspace
+deps, start with `USE_LOCAL_SDK=false`, then restart the dev server.
 
 Predict WebSocket stays disabled unless
 `NEXT_PUBLIC_ENABLE_PREDICT_WS=true`.

@@ -35,12 +35,14 @@ describe("S6-06 leftover package deletion", () => {
     }
   });
 
-  it("keeps unpublished SDK aliases out of package.json", () => {
+  it("declares published launchpad, redpacket, and tradingview SDK packages", () => {
     const manifest = JSON.parse(
       fs.readFileSync(path.join(TEMPLATE_ROOT, "apps/web/package.json"), "utf8"),
     ) as { dependencies: Record<string, string> };
-    expect(manifest.dependencies["@liberfi.io/ui-launchpad"]).toBeUndefined();
-    expect(manifest.dependencies["@liberfi.io/ui-redpacket"]).toBeUndefined();
-    expect(manifest.dependencies["@liberfi.io/ui-tradingview"]).toBeUndefined();
+    expect(manifest.dependencies["@liberfi.io/react-launchpad"]).toMatch(/^\^0\.1\./);
+    expect(manifest.dependencies["@liberfi.io/react-redpacket"]).toMatch(/^\^0\.1\./);
+    expect(manifest.dependencies["@liberfi.io/ui-launchpad"]).toMatch(/^\^1\.0\./);
+    expect(manifest.dependencies["@liberfi.io/ui-redpacket"]).toMatch(/^\^1\.0\./);
+    expect(manifest.dependencies["@liberfi.io/ui-tradingview"]).toMatch(/^\^0\.1\./);
   });
 });
