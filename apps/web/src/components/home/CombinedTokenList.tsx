@@ -32,6 +32,7 @@ import { tokenDetailRoute } from "../../application/routes";
 import { QuickAmountPresetInputWidget } from "../QuickAmountPresetInput";
 import { InstantTradeListButton } from "./InstantTradeListButton";
 import { getTradeErrorToastMessage } from "../../application/trade-error-toast";
+import { DiscoverTokenListMeasurementGate } from "./DiscoverTokenListSkeleton";
 
 type ListTab = "trending" | "stocks" | "new";
 
@@ -349,7 +350,9 @@ export function CombinedTokenList() {
           </div>
 
           <div className="w-full flex-auto flex flex-col min-h-0" ref={ref}>
-            {tokenListContent}
+            <DiscoverTokenListMeasurementGate height={height}>
+              {tokenListContent}
+            </DiscoverTokenListMeasurementGate>
           </div>
         </div>
       </div>
