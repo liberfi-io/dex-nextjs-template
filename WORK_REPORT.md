@@ -261,3 +261,14 @@
 - 验证结果：聚焦测试 2 项、TypeScript 类型检查、目标 ESLint、12 项配置契约测试、`git diff --check` 及真实首屏 HTML/浏览器验证通过；全量测试仅保留既有 locale 资源断言 4 项失败。规格与规范最终复审均无发现。
 - 推送状态：功能提交与本记录提交仅存在于本地 `main`，尚未推送；未使用 force push。
 - Workflow 状态：功能提交标题包含 `[skip ci]`；本轮未推送，因此未触发 GitHub Actions workflow 或 Vercel 部署。
+
+## 2026-09-01：校准发现页列表骨架行高与分割线（提交后）
+
+- 仓库与分支：`react-sdk/main`；通过 `dex-nextjs-template/main` 的本地 SDK 链接和现有 3000 端口开发服务验证。
+- React SDK 提交：`27fbc1836` — `fix(ui-tokens): align token list skeleton rows [skip ci]`。
+- 问题背景：发现页 SDK 骨架一次渲染 10 行，每行虽然接收与真实列表相同的桌面行高 `88px`，但作为 loading wrapper 内的 flex 子项仍允许收缩；页面剩余高度不足时，浏览器会将骨架行压缩到约 64px。骨架分割线同时使用全强度 `border-subtle`，在深色背景中对比过强。
+- 完成事项：为骨架行设置 `flex-shrink: 0`，确保桌面 `88px` 与移动端传入行高稳定，由列表容器承载溢出；将非末行分割线调整为 `border-border-subtle/30`。消费者提交 `5e16e63` 提供首屏尺寸测量前的 SDK 骨架，本次 SDK 提交进一步统一该骨架与真实列表的行高和主题分隔，两项改动互补。
+- 回归防线：新增 `TokenListSkeleton` 组件测试，覆盖 10 行数量、桌面 88px 行高、禁止 flex 收缩、非末行弱分割线以及末行不显示分割线；测试在修复前稳定复现缺少防收缩约束，修复后通过。
+- 验证结果：`@liberfi.io/ui-tokens` 全量 11 个测试套件、62 项测试通过，TypeScript 类型检查、目标 ESLint 和 `git diff --check` 通过；现有本地发现页确认真实列表行与骨架行均为 88px，弱分割线与页面背景协调；未重启开发服务、未执行 production build。
+- 推送状态：SDK 功能提交、消费者首屏骨架提交及对应工作记录已快进推送至各自 `origin/main`，未使用 force push。
+- Workflow 状态：所有提交标题均包含 `[skip ci]`；按提交 SHA 查询 GitHub Actions 未生成 run，未触发远端部署。
