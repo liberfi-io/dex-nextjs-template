@@ -433,3 +433,14 @@
 - 国际化处理：预测模板本地维护的六模块及其共享 World Cup 组件翻译将收敛到 `react-sdk/packages/i18n/locales`，主站不新增第二套本地文案源。
 - 依赖与约束：模板仅新增新版页面实际需要的 `@number-flow/react` 与 `centrifuge`；`@chainstream-io/sdk` 保持 `2.1.14`，不升级版本；本轮不发布 npm、不推送远端、不触发 GitHub workflow 或 Vercel 部署。
 - 验证计划：运行 React SDK i18n 类型检查与测试、模板预测聚焦测试、TypeScript、ESLint、全量测试、`git diff --check`，并通过现有本地开发服务逐页检查六个模块、二级导航、详情跳转、登录态和浏览器控制台。
+
+## 2026-09-01：迁移新版预测六个可见模块（提交后）
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`。
+- 提交：React SDK `7c2aa5c55` — `feat(i18n): centralize prediction module translations`；模板 `efc2393` — `feat(predict): migrate updated prediction modules`。
+- 最终完成事项：将新版体育、电竞、市场、排行榜、预测持仓、返佣六个模块迁入主站 `/predict` 二级导航；补齐统一详情页、排行榜钱包详情、体育/电竞实时数据、预测持仓交易活动和返佣流程，并将旧 `/predict` 与 `/predict/matches` 收敛到 `/predict/sports`，不暴露 Matches、World Cup、Profile、Recovery 或 Mini App 独立入口。
+- 架构与主题：接入 prediction-server 新版 HTTP、WebSocket 与可选 Centrifugo 行情能力，复用主站认证、钱包及运行时 Provider；新增页面已从源模板固定灰阶与涨跌色转换为主站语义化 theme token，六模块内部跳转保持在 `/predict/*` 命名空间。
+- 国际化：六模块及其共享详情组件文案已集中到 `react-sdk/packages/i18n/locales` 的 13 份 locale；模板仅保留语言解析与后端语言透传逻辑，不维护第二套业务翻译。
+- 验证结果：React SDK i18n 类型检查及 12/12 个套件共 61/61 项测试通过；模板 TypeScript、ESLint、34/34 个 Jest 套件共 175/175 项、13 项构建配置契约、主题扫描与两仓库 `git diff --check` 通过。现有 3000 端口开发服务确认本地 SDK alias 生效，浏览器逐页验证六个入口、六项二级菜单、激活态与 `/predict` 重定向正常，未发现失效主题类名。
+- 审查结果：提交前按规范与需求两轴复审，修正旧 Matches 路由边界及一处无关 QueryClient 配置覆盖后，两轴均无剩余发现。
+- 版本与发布状态：`@chainstream-io/sdk` manifest 继续保持 `^2.1.14`，lockfile 仅解析 `2.1.14`；本轮仅本地提交，未推送远端、未发布 npm、未触发 GitHub workflow 或 Vercel 部署。本地联调继续通过同级 `react-sdk` source alias 运行。
