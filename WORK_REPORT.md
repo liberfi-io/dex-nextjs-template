@@ -323,3 +323,12 @@
 - 完成事项：在 `.vercelignore` 中为根目录及任意子目录的 `.env.example` 增加精确反忽略规则；真实环境文件仍继续被 `.env` / `.env.*` 排除，只允许无密钥的示例配置进入 Vercel 上传上下文。
 - 验证结果：确认 `apps/web/.env.example` 为仓库已跟踪文件，反忽略规则位于通配排除规则之后；消费者 production build、全量测试和 `git diff --check` 通过。最终部署结果将在 GitHub Actions 完成后追加记录。
 - 推送计划：与前两个已验证提交一起快进推送到 `origin/main`，由 push 触发 Vercel production workflow；不使用 force push。
+
+## 2026-09-01：完成 SDK 升级与 Vercel 生产部署（提交后）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 代码提交：`e994daa` — `fix(navigation): preserve token detail source`；`cd30062` — `chore(deps): upgrade liberfi sdk packages`；`4f28ca8` — `fix(deploy): include env example in vercel upload`。三个提交已一次性快进推送到 `origin/main`，未使用 force push。
+- 发布链路：React SDK Release run `33415039510` 先成功发布 25 个 `@liberfi.io/*` npm 包；消费者随后升级正式版本并由提交 `4f28ca8d0967042a81889b3bd4dafe04941a1bcb` 触发 Vercel production workflow。
+- 部署结果：GitHub Actions Deploy run `33416471983`、job `99568200470` 成功，总用时 6 分 19 秒；Vercel `Build`、此前失败的 `Deploy` 以及成功通知步骤全部通过，生产地址为 `https://liberfi-kig2hwoaz-sgt-lab.vercel.app`。
+- 验证汇总：React SDK build 24/24 个任务及相关 322 项测试通过；消费者全量 Jest 169/169 项、12 项配置契约、TypeScript、目标 ESLint、依赖版本扫描、`git diff --check` 和 production build 均通过；`@chainstream-io/sdk` 全链路保持 `2.1.14`。
+- Workflow 说明：部署仅有 GitHub Actions 对 Node.js 20 action runtime 的弃用提示，不影响结果；本条最终记录提交使用 `[skip ci]`，避免仅文档更新再次重复部署。
