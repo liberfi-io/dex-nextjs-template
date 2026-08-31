@@ -126,6 +126,7 @@ import {
   HEADER_CONTROL_SURFACE_CLASS,
   HEADER_ICON_CONTROL_CLASS,
 } from "./header-control-theme";
+import { resolveHeaderLanguageOption } from "./header-language-selection";
 
 const { Scaffold, ScaffoldHeader, ScaffoldFooter, Logo, DraggablePanelProvider } = UiScaffold;
 type NavItem = UiScaffold.NavItem;
@@ -600,6 +601,7 @@ function LanguageButton() {
   const { languages } = useLocaleContext();
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const selectedLocale = resolveHeaderLanguageOption(locale, languages);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -635,7 +637,7 @@ function LanguageButton() {
         <div className="absolute right-0 mt-2 w-36 z-50 overflow-hidden" style={DROPDOWN_STYLE}>
           <div className="p-1">
             {languages.map((lang) => {
-              const selected = lang.localCode === locale;
+              const selected = lang.localCode === selectedLocale;
               return (
                 <button
                   key={lang.localCode}
