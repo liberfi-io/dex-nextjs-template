@@ -121,6 +121,11 @@ import { PredictBalanceIndicator } from "./PredictBalanceIndicator";
 import { FundWalletModal } from "./FundWalletModal";
 import { isPulseSupportedChain } from "../lib/pulse";
 import { AppRuntimeProviders } from "../runtime/AppRuntimeProviders";
+import {
+  HEADER_CONTROL_CLASS,
+  HEADER_CONTROL_SURFACE_CLASS,
+  HEADER_ICON_CONTROL_CLASS,
+} from "./header-control-theme";
 
 const { Scaffold, ScaffoldHeader, ScaffoldFooter, Logo, DraggablePanelProvider } = UiScaffold;
 type NavItem = UiScaffold.NavItem;
@@ -529,14 +534,15 @@ function HeaderSearchButton({
         radius="full"
         onPress={onPress}
         variant="bordered"
-        startContent={<SearchIcon width={16} height={16} className="text-foreground" />}
+        startContent={<SearchIcon width={16} height={16} />}
         endContent={
-          <Kbd className="min-w-6 justify-center text-xs text-foreground bg-content3 rounded-lg">
+          <Kbd className="min-w-6 justify-center rounded-lg bg-surface-strong text-xs text-text-secondary">
             /
           </Kbd>
         }
         className={cn(
-          "w-56 min-w-0 h-8 min-h-0 border-transparent hover:border-border bg-content2 pl-3 pr-1.5 text-text-muted",
+          HEADER_CONTROL_CLASS,
+          "w-56 min-w-0 pl-3 pr-1.5",
           className,
         )}
       >
@@ -553,15 +559,12 @@ function HeaderSearchButton({
       onPress={onPress}
       variant="bordered"
       aria-label={label}
-      className={cn("w-8 min-w-0 h-8 min-h-0 border-1 border-border bg-content2", className)}
+      className={cn(HEADER_CONTROL_CLASS, HEADER_ICON_CONTROL_CLASS, className)}
     >
-      <SearchIcon width={16} height={16} className="text-foreground" />
+      <SearchIcon width={16} height={16} />
     </Button>
   );
 }
-
-const TRIGGER_CLASS =
-  "flex items-center justify-center h-8 rounded-full text-sm font-medium transition-colors border bg-surface-interactive/60 border-border-control/50 hover:bg-surface-interactive cursor-pointer focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus";
 
 const DROPDOWN_STYLE: React.CSSProperties = {
   borderRadius: 14,
@@ -579,7 +582,11 @@ function LaunchPadButton() {
       type="button"
       onClick={() => onOpen()}
       aria-label={t("extend.header.launchpad")}
-      className={cn(TRIGGER_CLASS, "w-8 text-positive")}
+      className={cn(
+        HEADER_CONTROL_CLASS,
+        HEADER_ICON_CONTROL_CLASS,
+        "text-brand-primary hover:text-brand-primary",
+      )}
     >
       <RocketIcon width={14} height={14} />
     </button>
@@ -619,7 +626,7 @@ function LanguageButton() {
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         aria-label={t("extend.header.language")}
-        className={cn(TRIGGER_CLASS, "w-8 text-text-secondary hover:text-text-primary")}
+        className={cn(HEADER_CONTROL_CLASS, HEADER_ICON_CONTROL_CLASS)}
       >
         <TranslateIcon width={14} height={14} />
       </button>
@@ -734,7 +741,7 @@ function ChainSelectDropdown({
           radius="full"
           variant="bordered"
           onPress={() => setIsOpen(!isOpen)}
-          className="bg-content2 border-transparent hover:border-border"
+          className={cn(HEADER_CONTROL_CLASS, "px-3")}
           startContent={<ChainIcon chain={chain} size={18} />}
           endContent={
             <ChevronDownIcon
@@ -758,7 +765,7 @@ function ChainSelectDropdown({
           variant="bordered"
           onPress={() => setIsOpen(!isOpen)}
           isIconOnly
-          className="max-lg:hidden bg-content2 border-1 border-border"
+          className={cn(HEADER_CONTROL_CLASS, HEADER_ICON_CONTROL_CLASS, "max-lg:hidden")}
           disableRipple
           disabled={isSwitching}
         >
@@ -814,7 +821,7 @@ function ChainIcon({ chain, size }: { chain: Chain; size: number }) {
   if (chain === Chain.SOLANA) return <SolanaIcon width={size} height={size} />;
   if (chain === Chain.ETHEREUM) return <EthereumIcon width={size} height={size} />;
   if (chain === Chain.BINANCE) return <BinanceIcon width={size} height={size} />;
-  return <div style={{ width: size, height: size }} className="rounded-full bg-content2" />;
+  return <div style={{ width: size, height: size }} className="rounded-full bg-surface-interactive" />;
 }
 
 // ---------------------------------------------------------------------------
@@ -900,7 +907,10 @@ function DexAccountButton() {
       <button
         type="button"
         onClick={() => signIn()}
-        className="flex items-center gap-1.5 h-8 px-3 bg-action-primary/10 hover:bg-action-primary/20 border border-brand-primary/25 hover:border-brand-primary/40 text-brand-primary rounded-full text-xs font-semibold transition-colors duration-200 cursor-pointer focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        className={cn(
+          HEADER_CONTROL_CLASS,
+          "gap-1.5 px-3 text-xs font-semibold text-brand-primary hover:text-brand-primary",
+        )}
       >
         <SignInIcon width={14} height={14} />
         {t("common.signIn")}
@@ -910,8 +920,8 @@ function DexAccountButton() {
 
   if (status === "authenticating" || status === "deauthenticating") {
     return (
-      <div className="flex items-center justify-center w-8 h-8">
-        <span className="inline-block w-4 h-4 border-[2px] border-border-control border-t-transparent rounded-full animate-spin" />
+      <div className={cn(HEADER_CONTROL_SURFACE_CLASS, HEADER_ICON_CONTROL_CLASS)}>
+        <span className="inline-block w-4 h-4 border-[2px] border-border-control border-t-brand-primary rounded-full animate-spin" />
       </div>
     );
   }
@@ -926,7 +936,7 @@ function DexAccountButton() {
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className={cn(TRIGGER_CLASS, "gap-1.5 px-2.5 text-text-secondary")}
+        className={cn(HEADER_CONTROL_CLASS, "gap-1.5 px-2.5")}
       >
         {nativeToken && <TokenIcon symbol={nativeToken.symbol} size={16} />}
         <span className="text-xs font-medium text-text-primary tabular-nums">
@@ -1072,7 +1082,7 @@ function HyperliquidBalanceButton() {
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className={cn(TRIGGER_CLASS, "gap-1.5 px-2.5 text-text-secondary")}
+        className={cn(HEADER_CONTROL_CLASS, "gap-1.5 px-2.5")}
       >
         <HyperliquidUsdcIcon size={16} />
         <span className="text-xs font-medium text-text-primary tabular-nums">
