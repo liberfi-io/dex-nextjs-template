@@ -31,6 +31,7 @@ import {
 import { tokenDetailRoute } from "../../application/routes";
 import { QuickAmountPresetInputWidget } from "../QuickAmountPresetInput";
 import { InstantTradeListButton } from "./InstantTradeListButton";
+import { getTradeErrorToastMessage } from "../../application/trade-error-toast";
 
 type ListTab = "trending" | "stocks" | "new";
 
@@ -93,11 +94,7 @@ export function CombinedTokenList() {
 
   const handleSwapError = useCallback(
     (error: Error, phase: SwapPhase) => {
-      const phaseLabel = t(`trade.swap.phase.${phase}`);
-      const message = error.message
-        ? t("trade.swap.error", { phase: phaseLabel, reason: error.message })
-        : t("trade.swap.errorUnknown", { phase: phaseLabel });
-      toast.error(message);
+      toast.error(getTradeErrorToastMessage(error, phase, t));
     },
     [t],
   );

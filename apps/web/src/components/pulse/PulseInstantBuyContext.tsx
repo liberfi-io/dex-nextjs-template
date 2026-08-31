@@ -16,6 +16,7 @@ import { useWalletPrimaryTokenNetWorth } from "../../application/useWalletPrimar
 import { usePresetValues, useSwap, type SwapPhase } from "@liberfi.io/ui-trade";
 import { useAuthCallback, useConnectedWallet } from "@liberfi.io/wallet-connector";
 import { pulseSettingsAtom } from "../../states/pulse";
+import { getTradeErrorToastMessage } from "../../application/trade-error-toast";
 
 type PulseInstantBuyContextType = {
   amount?: number;
@@ -49,11 +50,7 @@ export function PulseInstantBuyProvider({ type, children }: PulseInstantBuyProvi
   const walletNetWorth = useWalletPrimaryTokenNetWorth();
   const handleSwapError = useCallback(
     (error: Error, phase: SwapPhase) => {
-      const phaseLabel = t(`trade.swap.phase.${phase}`);
-      const message = error.message
-        ? t("trade.swap.error", { phase: phaseLabel, reason: error.message })
-        : t("trade.swap.errorUnknown", { phase: phaseLabel });
-      toast.error(message);
+      toast.error(getTradeErrorToastMessage(error, phase, t));
     },
     [t],
   );

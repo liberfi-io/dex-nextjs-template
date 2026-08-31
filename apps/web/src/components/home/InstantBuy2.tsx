@@ -20,6 +20,7 @@ import {
   type SwapPhase,
 } from "@liberfi.io/ui-trade";
 import { useAuthCallback, useConnectedWallet } from "@liberfi.io/wallet-connector";
+import { getTradeErrorToastMessage } from "../../application/trade-error-toast";
 
 export interface InstantBuy2Props {
   chain: Chain;
@@ -49,11 +50,7 @@ export function InstantBuy({ chain, tokenAddress }: InstantBuy2Props) {
   const wallet = useConnectedWallet(chain);
 
   const handleSwapError = (error: Error, phase: SwapPhase) => {
-    const phaseLabel = t(`trade.swap.phase.${phase}`);
-    const message = error.message
-      ? t("trade.swap.error", { phase: phaseLabel, reason: error.message })
-      : t("trade.swap.errorUnknown", { phase: phaseLabel });
-    toast.error(message);
+    toast.error(getTradeErrorToastMessage(error, phase, t));
   };
 
   const { swap, isSwapping } = useSwap({
