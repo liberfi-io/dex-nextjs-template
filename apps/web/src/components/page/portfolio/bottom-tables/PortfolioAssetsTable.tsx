@@ -21,6 +21,7 @@ import {
   type BottomTableColumn,
 } from "../../token-detail/bottom-tables/table-shell";
 import { PortfolioAssetsTableSkeleton } from "../skeletons/PortfolioAssetsTableSkeleton";
+import { resolvePortfolioTokenSymbol } from "./portfolio-token-symbol";
 
 const COLUMNS: ReadonlyArray<BottomTableColumn> = [
   {
@@ -141,7 +142,18 @@ export function PortfolioAssetsTable({ chain, address }: PortfolioAssetsTablePro
     return map;
   }, [tokens]);
 
-  const rows = portfolios?.portfolios ?? [];
+  // Temporary demo safeguard: while token metadata is whitelist-backed and
+  // incomplete, hide holdings that cannot resolve a display symbol.
+  const rows = useMemo(
+    () =>
+      (portfolios?.portfolios ?? []).filter((portfolio) =>
+        resolvePortfolioTokenSymbol(
+          tokenByAddress.get(portfolio.address)?.symbol,
+          portfolio.symbol,
+        ),
+      ),
+    [portfolios, tokenByAddress],
+  );
   // Skeleton window: until BOTH the holdings list and the token
   // enrichment have resolved. Without the second condition rows would
   // flash on screen with placeholder symbols / missing 24h-change /
@@ -149,7 +161,8 @@ export function PortfolioAssetsTable({ chain, address }: PortfolioAssetsTablePro
   // enriched values once the tokens query lands — the user sees the
   // page "shake".
   const isInitialLoading =
-    (portfoliosLoading && rows.length === 0) || (tokenAddresses.length > 0 && tokensLoading);
+    (portfoliosLoading && (portfolios?.portfolios.length ?? 0) === 0) ||
+    (tokenAddresses.length > 0 && tokensLoading);
   const isEmpty = !portfoliosLoading && rows.length === 0;
 
   if (!enabled) {
@@ -200,7 +213,7 @@ interface AssetRowProps {
 }
 
 function AssetRow({ portfolio, pnl, token, onClick }: AssetRowProps) {
-  const symbol = token?.symbol ?? portfolio.symbol;
+  const symbol = resolvePortfolioTokenSymbol(token?.symbol, portfolio.symbol);
   const name = token?.name ?? portfolio.name;
   const imageUrl = token?.image ?? portfolio.image;
   const priceInUsd = token?.marketData?.priceInUsd ?? portfolio.priceInUsd;
@@ -220,7 +233,7 @@ function AssetRow({ portfolio, pnl, token, onClick }: AssetRowProps) {
   return (
     <tr
       onClick={onClick}
-      className="h-12 cursor-pointer border-b border-default-50 transition-colors hover:bg-content2"
+      className="h-12 cursor-pointer border-b border-border-subtle/30 transition-colors hover:bg-content2"
     >
       <td className={cn("px-3 align-middle", alignClass("left"))}>
         <div className="flex items-center gap-2">

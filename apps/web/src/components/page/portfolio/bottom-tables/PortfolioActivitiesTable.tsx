@@ -15,6 +15,7 @@ import {
   type BottomTableColumn,
 } from "../../token-detail/bottom-tables/table-shell";
 import { PortfolioActivitiesTableSkeleton } from "../skeletons/PortfolioActivitiesTableSkeleton";
+import { resolvePortfolioTokenSymbol } from "./portfolio-token-symbol";
 
 const COLUMNS: ReadonlyArray<BottomTableColumn> = [
   {
@@ -104,6 +105,20 @@ export function PortfolioActivitiesTable({ chain, address }: PortfolioActivities
     return map;
   }, [tokens]);
 
+  // Temporary demo safeguard: while token metadata is whitelist-backed and
+  // incomplete, hide activities whose displayed token has no symbol.
+  const visibleActivities = useMemo(
+    () =>
+      activities.filter((activity) => {
+        const primary = pickPrimaryToken(activity);
+        return resolvePortfolioTokenSymbol(
+          tokenByAddress.get(primary.address)?.symbol,
+          primary.symbol,
+        );
+      }),
+    [activities, tokenByAddress],
+  );
+
   const now = Date.now();
   // Skeleton window: until BOTH the activity list AND the token
   // enrichment have resolved. Without the second clause the rows
@@ -111,7 +126,7 @@ export function PortfolioActivitiesTable({ chain, address }: PortfolioActivities
   // missing logos, then jump once the tokens query lands.
   const isInitialLoading =
     (isLoading && activities.length === 0) || (tokenAddresses.length > 0 && tokensLoading);
-  const isEmpty = !isLoading && activities.length === 0;
+  const isEmpty = !isLoading && visibleActivities.length === 0;
 
   if (!enabled) {
     return (
@@ -132,7 +147,7 @@ export function PortfolioActivitiesTable({ chain, address }: PortfolioActivities
       infiniteScroll={{ hasMore, isLoading, onLoadMore: loadMore }}
     >
       <tbody>
-        {activities.map((activity) => (
+        {visibleActivities.map((activity) => (
           <ActivityRow
             key={activityKey(activity)}
             activity={activity}
@@ -160,14 +175,14 @@ function ActivityRow({ activity, now, tokenByAddress }: ActivityRowProps) {
     : (sideMeta.fallbackLabel ?? "--");
   const primary = pickPrimaryToken(activity);
   const enrichedToken = tokenByAddress.get(primary.address);
-  const symbol = enrichedToken?.symbol ?? primary.symbol;
+  const symbol = resolvePortfolioTokenSymbol(enrichedToken?.symbol, primary.symbol);
   const name = enrichedToken?.name ?? primary.name ?? "";
   const imageUrl = enrichedToken?.image ?? primary.image;
 
   const explorer = txExplorerUrl(activity.chain, activity.txHash);
 
   return (
-    <tr className="h-12 border-b border-default-50 transition-colors hover:bg-content2">
+    <tr className="h-12 border-b border-border-subtle/30 transition-colors hover:bg-content2">
       <td className={cn("px-3 align-middle text-text-muted", alignClass("left"))}>
         {formatAgeShort(activity.time, now)}
       </td>
@@ -190,7 +205,7 @@ function ActivityRow({ activity, now, tokenByAddress }: ActivityRowProps) {
         style={{ letterSpacing: "-0.2px" }}
       >
         <span>{formatAmount(primary.amount)}</span>
-        <span className="ml-1 text-text-muted">{primary.symbol}</span>
+        <span className="ml-1 text-text-muted">{symbol}</span>
       </td>
       <td
         className={cn(
