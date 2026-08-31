@@ -366,3 +366,15 @@
 - 验证计划：刷新依赖后检查所有 workspace manifest 的 dependencies、devDependencies、peerDependencies 与锁文件残留；运行消费者类型检查、TradingView 聚焦测试、配置契约测试、全量测试、目标 ESLint、`git diff --check` 和发布所需的 `pnpm build:web`。
 - 预期推送状态：验证通过后 fast-forward 推送到 `dex-nextjs-template/origin/main`，禁止 force push。
 - Workflow 策略：提交标题不包含 `[skip ci]`，按用户确认触发 Vercel production Deploy workflow；部署完成后使用 `[skip ci]` 的报告提交补记最终结果，避免重复部署。
+
+## 2026-09-01：升级模板使用的 React SDK TradingView 修复版本（提交后）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 提交：`9a5d681` — `chore(deps): upgrade liberfi sdk packages`。
+- 最终完成事项：将模板实际依赖的 24 个 `@liberfi.io/*` npm 包统一升级到 React SDK Release `f2f78c708` 生成的新 patch 版本并刷新锁文件；关键包 `@liberfi.io/ui-tradingview` 从 `0.1.229` 升级至 `0.1.230`，生产构建已包含图表高度自适应修复。
+- 版本与约束：直接依赖解析结果逐项符合目标版本；`@chainstream-io/sdk` 的 manifest 继续保持 `^2.1.14`，lockfile 仍仅解析 `2.1.14`，未引入其他 ChainStream 版本。
+- 验证结果：消费者 TypeScript 类型检查、全量 ESLint、32/32 个 Jest 套件共 169/169 项、12 项构建配置契约和 `git diff --check` 全部通过；`pnpm build:web` 成功完成 20/20 个静态页面生成，仅保留既有 PostCSS、Sentry/OpenTelemetry、Browserslist 及依赖 peer warning。
+- 推送状态：依赖提交已 fast-forward 推送至 `dex-nextjs-template/origin/main`，未使用 force push。
+- 部署结果：GitHub Actions Deploy to Vercel run `33421324893`、job `99584138386` 成功，用时 6 分 6 秒；Build、Deploy 与成功通知步骤全部通过，生产地址为 `https://liberfi-coy7vq94a-sgt-lab.vercel.app`。
+- 线上检查：生产地址可达并返回 Vercel SSO 的 `302` 跳转，说明部署入口已生效但受项目访问保护，未在未授权会话中继续页面级验证。
+- Workflow 说明：仅有 GitHub Actions Node.js 20 action runtime 弃用提示，不影响部署；本条最终记录提交使用 `[skip ci]`，避免仅文档更新再次触发生产部署。
