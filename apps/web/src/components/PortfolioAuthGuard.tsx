@@ -1,33 +1,42 @@
 "use client";
 
-import { PropsWithChildren, useEffect, useRef } from "react";
+import { PropsWithChildren, useEffect, useRef, useState } from "react";
+import { useTranslation } from "@liberfi.io/i18n";
+import { Button } from "@liberfi.io/ui";
 import { useAuth } from "@liberfi.io/wallet-connector";
-import { Skeleton } from "@heroui/react";
+import { PortfolioPageSkeleton } from "./page/portfolio/skeletons/PortfolioPageSkeleton";
 
-function PortfolioSkeleton() {
+interface PortfolioSignInPromptProps {
+  onSignIn: () => void | Promise<void>;
+}
+
+function PortfolioSignInPrompt({ onSignIn }: PortfolioSignInPromptProps) {
+  const { t } = useTranslation();
+
   return (
-    <div className="relative w-full max-w-[860px] mx-auto lg:px-6 py-4 animate-pulse">
+    <div className="relative flex h-full w-full items-center justify-center p-4 lg:p-6">
       <div
-        className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] opacity-[0.07]"
+        className="pointer-events-none absolute top-0 left-1/2 h-[300px] w-[600px] -translate-x-1/2 opacity-[0.07]"
         style={{
           background:
             "radial-gradient(ellipse at center, var(--color-brand-primary) 0%, transparent 70%)",
           filter: "blur(80px)",
         }}
       />
-      <div className="relative z-[1]">
-        <div className="flex items-center gap-4 px-4 lg:px-0">
-          <Skeleton className="w-16 h-16 rounded-full flex-none" />
-          <div className="flex flex-col gap-2">
-            <Skeleton className="w-24 h-8 rounded-lg" />
-            <Skeleton className="w-36 h-5 rounded-lg" />
-          </div>
+
+      <div
+        className="relative z-[1] flex w-full max-w-md flex-col items-center gap-4 rounded-2xl border border-default-100 bg-content1 p-6 text-center lg:p-8"
+        aria-live="polite"
+      >
+        <div className="flex flex-col gap-1.5">
+          <h1 className="text-lg font-semibold text-foreground">
+            {t("common.unauthenticated")}
+          </h1>
+          <p className="text-sm text-text-muted">{t("portfolio.connectWallet.hint")}</p>
         </div>
-        <div className="mt-6 px-4 lg:px-0 flex flex-col gap-3">
-          {[...Array(5)].map((_, i) => (
-            <Skeleton key={i} className="w-full h-16 rounded-[14px]" />
-          ))}
-        </div>
+        <Button color="primary" radius="lg" size="sm" onPress={onSignIn}>
+          {t("common.signIn")}
+        </Button>
       </div>
     </div>
   );
@@ -36,17 +45,23 @@ function PortfolioSkeleton() {
 export function PortfolioAuthGuard({ children }: PropsWithChildren) {
   const { status, signIn } = useAuth();
   const signInTriggered = useRef(false);
+  const [hasAttemptedAutoSignIn, setHasAttemptedAutoSignIn] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated" && !signInTriggered.current) {
       signInTriggered.current = true;
-      signIn();
+      setHasAttemptedAutoSignIn(true);
+      void signIn();
     }
   }, [status, signIn]);
 
-  if (status !== "authenticated") {
-    return <PortfolioSkeleton />;
+  if (status === "authenticated") {
+    return <>{children}</>;
   }
 
-  return <>{children}</>;
+  if (status === "unauthenticated" && hasAttemptedAutoSignIn) {
+    return <PortfolioSignInPrompt onSignIn={signIn} />;
+  }
+
+  return <PortfolioPageSkeleton />;
 }
