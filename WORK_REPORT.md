@@ -314,3 +314,12 @@
 - 验证结果：`pnpm list --depth 0` 确认全部直接依赖解析到目标 npm 版本；消费者全量 Jest 32/32 个套件、169/169 项测试通过，12 项构建配置契约测试、TypeScript 类型检查、目标 ESLint、旧 SDK 版本残留扫描、`git diff --check` 和 `pnpm build:web` 均通过。production build 完成 20/20 个静态页面生成，仅保留既有 PostCSS 与 Sentry/OpenTelemetry 警告。
 - 推送计划：与导航修复及部署修复提交一起快进推送到 `origin/main`，不使用 force push。
 - Workflow 策略：提交标题不包含 `[skip ci]`；本轮明确允许消费者的 push workflow 继续执行 Vercel 生产部署。
+
+## 2026-09-01：修复 Vercel 预构建产物上传缺少环境示例文件
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 提交标题：`fix(deploy): include env example in vercel upload`。
+- 问题背景：此前 Deploy workflow run `33266855138` 已完成 Vercel production build，但在 `vercel deploy --prebuilt --prod` 阶段因 `.vercelignore` 的 `.env.*` 规则排除了构建追踪引用的 `apps/web/.env.example`，最终以 `ENOENT` 失败。
+- 完成事项：在 `.vercelignore` 中为根目录及任意子目录的 `.env.example` 增加精确反忽略规则；真实环境文件仍继续被 `.env` / `.env.*` 排除，只允许无密钥的示例配置进入 Vercel 上传上下文。
+- 验证结果：确认 `apps/web/.env.example` 为仓库已跟踪文件，反忽略规则位于通配排除规则之后；消费者 production build、全量测试和 `git diff --check` 通过。最终部署结果将在 GitHub Actions 完成后追加记录。
+- 推送计划：与前两个已验证提交一起快进推送到 `origin/main`，由 push 触发 Vercel production workflow；不使用 force push。
