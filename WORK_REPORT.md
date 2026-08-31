@@ -412,3 +412,14 @@
 - 验证计划：检查全部 workspace manifest 的 dependencies、devDependencies、peerDependencies 和锁文件旧版本残留；运行 TypeScript、全量 Jest、配置契约测试、ESLint、`git diff --check` 与发布所需的 `pnpm build:web`。
 - 预期推送状态：验证通过后 fast-forward 推送到 `dex-nextjs-template/origin/main`，禁止 force push。
 - Workflow 策略：依赖提交不包含 `[skip ci]`，按用户确认触发 Vercel production Deploy workflow；部署完成后使用 `[skip ci]` 的报告提交补记最终结果，避免重复部署。
+
+## 2026-09-01：升级模板使用的 React SDK 曲线预览修复版本（提交后）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 提交：`f92cf4f` — `chore(deps): upgrade liberfi sdk packages`。
+- 最终完成事项：将模板实际依赖的 24 个 `@liberfi.io/*` npm 包统一升级到 React SDK Release `9a8a99e8b` 生成的新 patch 版本并刷新锁文件；关键包 `@liberfi.io/ui-launchpad` 从 `1.0.4` 升级至 `1.0.5`，生产构建已包含完整曲线预览及稀疏点样式修复。
+- 版本与约束：全部 workspace manifest 的 dependencies、devDependencies、peerDependencies 已扫描，24 个直接依赖逐项匹配 SDK 正式 manifest；`@chainstream-io/sdk` 继续保持 manifest `^2.1.14`，lockfile 仅解析 `2.1.14`。
+- 验证结果：现有 3000 端口开发服务在依赖安装后继续正常热更新且首页 HTTP 200；消费者 TypeScript、lint 0 warning、32/32 个 Jest 套件共 169/169 项、12 项配置契约、workspace gates、依赖与旧版本扫描、`git diff --check` 和 `pnpm build:web` 全部通过。production build 成功生成 20/20 个页面，仅保留既有 PostCSS、Sentry/OpenTelemetry、Browserslist 与 peer dependency 警告。
+- 推送状态：依赖提交已 fast-forward 推送至 `dex-nextjs-template/origin/main`，未使用 force push；为避免与 production build 同时写入 `.next`，本轮由 agent 启动的本地 3000 端口开发服务已正常停止。
+- 部署结果：GitHub Actions Deploy to Vercel run `33430928162`、job `99615810340` 成功，用时 6 分 47 秒；Build、Deploy 与成功通知步骤全部通过，生产地址为 `https://liberfi-i3z091del-sgt-lab.vercel.app`。
+- Workflow 说明：仅有 GitHub Actions Node.js 20 action runtime 弃用提示，不影响部署；本条最终记录提交使用 `[skip ci]`，避免纯文档更新再次触发生产部署。
