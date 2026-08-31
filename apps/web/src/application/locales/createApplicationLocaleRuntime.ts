@@ -2,6 +2,7 @@ import {
   createLocaleRuntime,
   type LocaleCode,
   type LocaleRuntime,
+  type Resources,
 } from "@liberfi.io/i18n";
 import { installLegacyLocaleAliases } from "./legacy-aliases";
 import en from "./en.json";
@@ -26,7 +27,7 @@ export function applicationLocaleProviderProps(runtime: ApplicationLocaleRuntime
 
 /** Create one application-owned locale runtime for a layout root. */
 export function createApplicationLocaleRuntime(locale: LocaleCode) {
-  const resources = applicationLocaleResources();
+  const resources = applicationLocaleResources() as Resources;
   const runtime = createLocaleRuntime({ locale, resources });
   installLegacyLocaleAliases(runtime, "en");
   installLegacyLocaleAliases(runtime, "zh");

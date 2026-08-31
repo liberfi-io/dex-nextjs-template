@@ -32,6 +32,7 @@ import {
   useLocale,
   useChangeLocale,
   useLocaleContext,
+  type LocaleProviderProps,
 } from "@liberfi.io/i18n";
 import {
   useAuth,
@@ -130,12 +131,13 @@ const {
 } = UiScaffold;
 type NavItem = UiScaffold.NavItem;
 
-const ScaffoldWithProviders = UiScaffold as typeof UiScaffold & {
+const RuntimeLocaleProvider = LocaleProvider as ComponentType<LocaleProviderProps>;
+const UnpublishedScaffold = UiScaffold as typeof UiScaffold & {
   ModalCoordinatorProvider: ComponentType<PropsWithChildren>;
   DraggableStateProvider: ComponentType<PropsWithChildren>;
 };
-const ModalCoordinatorProvider = ScaffoldWithProviders.ModalCoordinatorProvider;
-const DraggableStateProvider = ScaffoldWithProviders.DraggableStateProvider;
+const ModalCoordinatorProvider = UnpublishedScaffold.ModalCoordinatorProvider;
+const DraggableStateProvider = UnpublishedScaffold.DraggableStateProvider;
 const useAsyncModal = UiScaffold.useAsyncModal;
 
 const navItemsConfig: Omit<NavItem, "label">[] = [
@@ -157,7 +159,7 @@ export function NewAppLayout({ children, locale }: PropsWithChildren<{ locale: L
     <ModalCoordinatorProvider>
       <QueryClientProvider client={queryClient}>
         <AuthProviders>
-          <LocaleProvider
+          <RuntimeLocaleProvider
             {...applicationLocaleProviderProps(localeRuntime)}
             locale={locale}
             supportedLanguages={["en", "zh"]}
@@ -174,7 +176,7 @@ export function NewAppLayout({ children, locale }: PropsWithChildren<{ locale: L
               <PredictSearchModal />
               <PresetFormModal />
             </AppRuntimeProviders>
-          </LocaleProvider>
+          </RuntimeLocaleProvider>
         </AuthProviders>
       </QueryClientProvider>
     </ModalCoordinatorProvider>

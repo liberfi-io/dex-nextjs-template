@@ -92,7 +92,7 @@ export const PerpetualsChart = memo(function PerpetualsChart({
         className="flex-1 w-full h-full"
         initConfig={initConfig}
         widgetConstructor={widgetConstructor}
-        libraryPath="static/charting_library/"
+        libraryPath="/static/charting_library/"
         customCssUrl="custom-styles.css"
         onReady={handleChartReady}
       />

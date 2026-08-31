@@ -1,5 +1,4 @@
 const nextJest = require("next/jest");
-const fs = require("fs");
 const path = require("path");
 
 const createJestConfig = nextJest({ dir: __dirname });
@@ -7,11 +6,11 @@ const localSdkRoot = path.resolve(
   __dirname,
   process.env.LOCAL_SDK_ROOT || "../../../react-sdk",
 );
+const fs = require("fs");
 const useLocalSdk =
   process.env.USE_LOCAL_SDK === "true" &&
   process.env.NODE_ENV !== "production" &&
   fs.existsSync(path.join(localSdkRoot, "packages"));
-const localI18nSrc = path.join(localSdkRoot, "packages/i18n/src/index.ts");
 const localSdkMapper = useLocalSdk
   ? {
       "^@liberfi.io/react-launchpad$": path.join(
@@ -34,11 +33,15 @@ const localSdkMapper = useLocalSdk
         localSdkRoot,
         "packages/ui-tradingview/src/index.ts",
       ),
-      ...(fs.existsSync(localI18nSrc)
-        ? { "^@liberfi.io/i18n$": localI18nSrc }
-        : {}),
     }
   : {};
+const localI18nSrc = path.join(localSdkRoot, "packages/i18n/src/index.ts");
+const localI18nMapper =
+  useLocalSdk && fs.existsSync(localI18nSrc)
+    ? {
+        "^@liberfi.io/i18n$": localI18nSrc,
+      }
+    : {};
 
 module.exports = createJestConfig({
   displayName: "@liberfi/web",
@@ -47,6 +50,7 @@ module.exports = createJestConfig({
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
   moduleNameMapper: {
     ...localSdkMapper,
+    ...localI18nMapper,
     "^@/(.*)$": "<rootDir>/src/$1",
     "^lodash-es$": "lodash",
     "\\.(css|less|sass|scss)$": "<rootDir>/test/style-mock.cjs",

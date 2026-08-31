@@ -1,10 +1,9 @@
-import "@testing-library/jest-dom";
 import { TextDecoder, TextEncoder } from "node:util";
+import "@testing-library/jest-dom";
 
 if (typeof globalThis.TextEncoder === "undefined") {
-  Object.assign(globalThis, { TextEncoder });
+  globalThis.TextEncoder = TextEncoder as typeof globalThis.TextEncoder;
 }
-
 if (typeof globalThis.TextDecoder === "undefined") {
-  Object.assign(globalThis, { TextDecoder });
+  globalThis.TextDecoder = TextDecoder as typeof globalThis.TextDecoder;
 }

@@ -35,18 +35,14 @@ describe("S6-06 leftover package deletion", () => {
     }
   });
 
-  it("declares the published Stage 5.5 and chart SDK packages", () => {
+  it("declares published launchpad, redpacket, and tradingview SDK packages", () => {
     const manifest = JSON.parse(
       fs.readFileSync(path.join(TEMPLATE_ROOT, "apps/web/package.json"), "utf8"),
     ) as { dependencies: Record<string, string> };
-    for (const name of [
-      "@liberfi.io/react-launchpad",
-      "@liberfi.io/react-redpacket",
-      "@liberfi.io/ui-launchpad",
-      "@liberfi.io/ui-redpacket",
-      "@liberfi.io/ui-tradingview",
-    ]) {
-      expect(manifest.dependencies[name]).toBeDefined();
-    }
+    expect(manifest.dependencies["@liberfi.io/react-launchpad"]).toMatch(/^\^0\.1\./);
+    expect(manifest.dependencies["@liberfi.io/react-redpacket"]).toMatch(/^\^0\.1\./);
+    expect(manifest.dependencies["@liberfi.io/ui-launchpad"]).toMatch(/^\^1\.0\./);
+    expect(manifest.dependencies["@liberfi.io/ui-redpacket"]).toMatch(/^\^1\.0\./);
+    expect(manifest.dependencies["@liberfi.io/ui-tradingview"]).toMatch(/^\^0\.1\./);
   });
 });
