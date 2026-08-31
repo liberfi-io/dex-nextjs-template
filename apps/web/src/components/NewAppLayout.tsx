@@ -94,6 +94,7 @@ import {
 } from "../application/routes";
 import { useCreateOnrampWidgetUrlMutation } from "../application/server/useCreateOnrampWidgetUrlMutation";
 import { queryClient } from "../libs/queryClient";
+import { ResolvedLocaleProvider } from "../i18n/ResolvedLocaleProvider";
 import { AuthProviders } from "./AuthProviders";
 import { useChainAwareRouter } from "../hooks/useChainAwareRouter";
 import { useChainUrlSync } from "../hooks/useChainUrlSync";
@@ -170,18 +171,20 @@ export function NewAppLayout({ children, locale }: PropsWithChildren<{ locale: L
             locale={locale}
             supportedLanguages={["en", "zh"]}
           >
-            <AppRuntimeProviders>
-              <PageShell>{children}</PageShell>
-              <LaunchPadModal />
-              <DepositHyperliquidUsdcModal />
-              <ReceiveModal />
-              <WithdrawModal />
-              <WebviewModal />
-              <StyledToaster />
-              <SearchModal />
-              <PredictSearchModal />
-              <PresetFormModal />
-            </AppRuntimeProviders>
+            <ResolvedLocaleProvider locale={locale}>
+              <AppRuntimeProviders>
+                <PageShell>{children}</PageShell>
+                <LaunchPadModal />
+                <DepositHyperliquidUsdcModal />
+                <ReceiveModal />
+                <WithdrawModal />
+                <WebviewModal />
+                <StyledToaster />
+                <SearchModal />
+                <PredictSearchModal />
+                <PresetFormModal />
+              </AppRuntimeProviders>
+            </ResolvedLocaleProvider>
           </RuntimeLocaleProvider>
         </AuthProviders>
       </QueryClientProvider>

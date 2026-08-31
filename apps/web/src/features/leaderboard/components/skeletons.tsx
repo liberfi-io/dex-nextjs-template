@@ -1,0 +1,337 @@
+/**
+ * Loading skeletons for the Smart Money leaderboard.
+ *
+ * Pure (no client hooks) so they can be used both as a server-side Suspense
+ * fallback in the route `page.tsx` and inline while a React Query fetch is
+ * pending. Mirrors the real master-detail layout so the first paint does not
+ * shift.
+ */
+
+const cx = (...classes: string[]) => classes.join(" ");
+const PULSE = "animate-pulse bg-surface-interactive/50";
+
+/** Right- (or center-) aligned placeholder bar used inside grid cells. */
+function Bar({
+  w,
+  h = "h-3.5",
+  center,
+}: {
+  w: string;
+  h?: string;
+  center?: boolean;
+}) {
+  return (
+    <div className={center ? "flex justify-center" : "flex justify-end"}>
+      <div className={cx(h, w, "rounded", PULSE)} />
+    </div>
+  );
+}
+
+/** Mirror of {@link SmartMoneyBoard}'s `ROW_GRID` so header + rows align. */
+const BOARD_ROW_GRID =
+  "grid grid-cols-[minmax(44px,0.35fr)_minmax(108px,1.2fr)_minmax(140px,1.15fr)_minmax(128px,1fr)_minmax(132px,1fr)_minmax(148px,1.2fr)_minmax(104px,0.85fr)] items-center gap-3";
+/** Mirror of {@link SmartMoneyBoard}'s `TABLE_MIN_W`. */
+const BOARD_TABLE_MIN_W = "w-full min-w-[908px]";
+
+/** A single board row placeholder (mirrors the 7-column table row). */
+function BoardRowSkeleton({ last }: { last?: boolean }) {
+  return (
+    <div className={cx(BOARD_ROW_GRID, "px-3 py-3", last ? "" : "border-b border-border-subtle/40")}>
+      {/* rank */}
+      <div className="flex justify-center">
+        <div className={cx("size-6 rounded-full", PULSE)} />
+      </div>
+      {/* trader: avatar + two-line address/meta */}
+      <div className="flex min-w-0 items-center gap-2.5">
+        <div className={cx("size-8 shrink-0 rounded-full", PULSE)} />
+        <div className="min-w-0">
+          <div className={cx("mb-1.5 h-3.5 w-24 rounded", PULSE)} />
+          <div className={cx("h-3 w-14 rounded", PULSE)} />
+        </div>
+      </div>
+      {/* net pnl + ratio */}
+      <div className="flex flex-col items-end gap-1.5">
+        <div className={cx("h-3.5 w-16 rounded", PULSE)} />
+        <div className={cx("h-3 w-10 rounded", PULSE)} />
+      </div>
+      {/* win rate + avg bet */}
+      <div className="flex flex-col items-end gap-1.5">
+        <div className={cx("h-3.5 w-12 rounded", PULSE)} />
+        <div className={cx("h-3 w-14 rounded", PULSE)} />
+      </div>
+      {/* balance */}
+      <div className="flex justify-end">
+        <div className={cx("h-3.5 w-14 rounded", PULSE)} />
+      </div>
+      {/* vol / txs */}
+      <div className="flex flex-col items-end gap-1.5">
+        <div className={cx("h-3.5 w-14 rounded", PULSE)} />
+        <div className={cx("h-3 w-10 rounded", PULSE)} />
+      </div>
+      {/* last trade */}
+      <div className="flex justify-end">
+        <div className={cx("h-3 w-10 rounded", PULSE)} />
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Board table skeleton. Mirrors the real {@link BoardTable}: a screen-filling
+ * bounded box with a 7-column header fixed on top and column-aligned rows
+ * below; horizontally scrollable on narrow screens.
+ */
+export function BoardRowsSkeleton({ rows = 10 }: { rows?: number }) {
+  return (
+    <div className="flex h-full min-h-0 w-full flex-col overflow-hidden rounded-xl border border-border-subtle/40 bg-surface-raised/20">
+      <div className="flex min-h-0 flex-1 flex-col overflow-x-auto">
+        <div className={cx(BOARD_TABLE_MIN_W, "flex min-h-0 flex-1 flex-col")}>
+          {/* Column header */}
+          <div className={cx(BOARD_ROW_GRID, "shrink-0 border-b border-border-subtle/50 px-3 py-2.5")}>
+            <div className={cx("mx-auto h-3 w-4 rounded", PULSE)} />
+            <div className={cx("h-3 w-16 rounded", PULSE)} />
+            <div className={cx("ml-auto h-3 w-14 rounded", PULSE)} />
+            <div className={cx("ml-auto h-3 w-12 rounded", PULSE)} />
+            <div className={cx("ml-auto h-3 w-14 rounded", PULSE)} />
+            <div className={cx("ml-auto h-3 w-16 rounded", PULSE)} />
+            <div className={cx("ml-auto h-3 w-12 rounded", PULSE)} />
+          </div>
+          {/* Rows */}
+          <div className="min-h-0 flex-1 overflow-hidden pb-4">
+            {Array.from({ length: rows }).map((_, i) => (
+              <BoardRowSkeleton key={i} last={i === rows - 1} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Rows-only skeleton for the board body when the column header is already visible. */
+export function BoardBodySkeleton({ rows = 10 }: { rows?: number }) {
+  return (
+    <div className="min-h-0 flex-1 overflow-hidden pb-4">
+      {Array.from({ length: rows }).map((_, i) => (
+        <BoardRowSkeleton key={i} last={i === rows - 1} />
+      ))}
+    </div>
+  );
+}
+
+/** Summary card shell: bordered surface + small uppercase title placeholder. */
+function CardShellSkeleton({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="rounded-xl border border-border-subtle/50 bg-surface-raised/40 p-4">
+      <div className={cx("mb-3 h-3 w-24 rounded", PULSE)} />
+      {children}
+    </div>
+  );
+}
+
+/** `label · value` rows used by the TOTAL VALUE / PERFORMANCE & BIAS cards. */
+function StatRowsSkeleton({ rows }: { rows: number }) {
+  return (
+    <div className="space-y-2">
+      {Array.from({ length: rows }).map((_, i) => (
+        <div key={i} className="flex items-center justify-between gap-2">
+          <div className={cx("h-3 w-20 rounded", PULSE)} />
+          <div className={cx("h-3.5 w-16 rounded", PULSE)} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** Best/worst trade block placeholder (label + market title + signed pnl). */
+function TradeBlockSkeleton() {
+  return (
+    <div className="mt-3 border-t border-border-subtle/60 pt-3">
+      <div className={cx("mb-1.5 h-2.5 w-20 rounded", PULSE)} />
+      <div className={cx("mb-1.5 h-3 w-3/4 rounded", PULSE)} />
+      <div className={cx("h-3.5 w-16 rounded", PULSE)} />
+    </div>
+  );
+}
+
+/** Card 1 — TOTAL VALUE: 4 label/value rows + 7-day PNL sparkline block. */
+export function TotalValueCardSkeleton() {
+  return (
+    <CardShellSkeleton>
+      <StatRowsSkeleton rows={4} />
+      {/* 7-day PNL chart placeholder (mirrors SevenDayPnlChart's loading box). */}
+      <div className="mt-4 border-t border-border-subtle/60 pt-3">
+        <div className={cx("mb-2 h-2.5 w-20 rounded", PULSE)} />
+        <div className={cx("h-24 rounded-lg", PULSE)} />
+      </div>
+    </CardShellSkeleton>
+  );
+}
+
+/** Card 2 — PERFORMANCE & BIAS: 9 label/value rows. */
+export function PerformanceBiasCardSkeleton() {
+  return (
+    <CardShellSkeleton>
+      <StatRowsSkeleton rows={9} />
+    </CardShellSkeleton>
+  );
+}
+
+/**
+ * Card 3 — YIELD & RISK: 2-column metric grid + best/worst trade blocks +
+ * exposure bar + legend.
+ */
+export function YieldRiskCardSkeleton() {
+  return (
+    <CardShellSkeleton>
+      <div className="grid grid-cols-2 gap-3">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i}>
+            <div className={cx("mb-1.5 h-2.5 w-16 rounded", PULSE)} />
+            <div className={cx("h-3.5 w-14 rounded", PULSE)} />
+          </div>
+        ))}
+      </div>
+      <TradeBlockSkeleton />
+      <TradeBlockSkeleton />
+      <div className="mt-4">
+        <div className={cx("mb-1.5 h-2.5 w-20 rounded", PULSE)} />
+        <div className={cx("h-2 w-full rounded-full", PULSE)} />
+        <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className={cx("h-3 w-16 rounded", PULSE)} />
+          ))}
+        </div>
+      </div>
+    </CardShellSkeleton>
+  );
+}
+
+/** Mirror of {@link WalletDetailPanel}'s positions `TABLE_GRID`. */
+const POSITIONS_GRID =
+  "grid-cols-[minmax(160px,1.7fr)_44px_64px_96px_80px_96px_88px_88px_78px_62px]";
+/** Mirror of the positions table's mobile fixed min width. */
+const POSITIONS_MIN_W = "min-w-[920px] lg:min-w-0";
+
+/**
+ * Positions table placeholder — mirrors the real 10-column grid table: a
+ * left-aligned market column header plus 9 center/right numeric columns, with
+ * the same horizontal-scroll behaviour (fixed min width below `lg`, fit to
+ * width at `lg`+). Used both as the default-tab body of
+ * {@link WalletDetailSkeleton} and as the positions tab's loading / sort
+ * placeholder inside the live panel.
+ */
+export function PositionsTableSkeleton({ rows = 6 }: { rows?: number }) {
+  return (
+    <div className="rounded-xl border border-border-subtle/40 bg-surface-raised/20">
+      <div className="overflow-x-auto lg:overflow-x-visible">
+        <div className={POSITIONS_MIN_W}>
+          {/* Column header (Market · Side · Shares · Avg→Now · Value · Total ·
+              Realized · Unrealized · Last active · Status) */}
+          <div className={cx("grid", POSITIONS_GRID, "items-center gap-1.5 border-b border-border-subtle/50 px-3 py-2.5")}>
+            <div className={cx("h-3 w-16 rounded", PULSE)} />
+            <Bar w="w-8" h="h-3" center />
+            <Bar w="w-10" h="h-3" />
+            <Bar w="w-12" h="h-3" />
+            <Bar w="w-10" h="h-3" />
+            <Bar w="w-12" h="h-3" />
+            <Bar w="w-14" h="h-3" />
+            <Bar w="w-14" h="h-3" />
+            <Bar w="w-12" h="h-3" />
+            <Bar w="w-10" h="h-3" />
+          </div>
+          {/* Rows */}
+          <div className="divide-y divide-border-subtle/40">
+            {Array.from({ length: rows }).map((_, i) => (
+              <div key={i} className={cx("grid", POSITIONS_GRID, "items-center gap-1.5 px-3 py-3")}>
+                <div className="flex min-w-0 items-center gap-2.5">
+                  <div className={cx("size-[34px] shrink-0 rounded-md", PULSE)} />
+                  <div className="min-w-0 flex-1">
+                    <div className={cx("mb-1.5 h-3.5 w-2/3 rounded", PULSE)} />
+                    <div className={cx("h-3 w-1/3 rounded", PULSE)} />
+                  </div>
+                </div>
+                <Bar w="w-9" h="h-4" center />
+                <Bar w="w-10" />
+                <Bar w="w-14" h="h-3" />
+                <Bar w="w-12" />
+                <Bar w="w-12" />
+                <Bar w="w-12" />
+                <Bar w="w-12" />
+                <Bar w="w-12" h="h-3" />
+                <Bar w="w-10" h="h-4" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Right detail panel skeleton — mirrors the header + 3-card + tabs + table layout. */
+export function WalletDetailSkeleton({ onBack }: { onBack?: () => void }) {
+  return (
+    <div className="flex h-full flex-col gap-4 overflow-hidden">
+      {/* Header: back button + avatar + address/meta */}
+      <div className="flex items-center gap-3">
+        {onBack && <div className={cx("size-9 shrink-0 rounded-lg", PULSE)} />}
+        <div className={cx("size-11 shrink-0 rounded-xl", PULSE)} />
+        <div>
+          <div className={cx("mb-2 h-4 w-36 rounded", PULSE)} />
+          <div className={cx("h-3 w-28 rounded", PULSE)} />
+        </div>
+      </div>
+      {/* Three summary cards — each mirrors its real card's structure */}
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
+        <TotalValueCardSkeleton />
+        <PerformanceBiasCardSkeleton />
+        <YieldRiskCardSkeleton />
+      </div>
+      {/* Tabs bar (3 tab pills: holding / settled / activity + search input) */}
+      <div className="flex items-center justify-between gap-2 border-b border-border-subtle/50 pb-2">
+        <div className="flex gap-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className={cx("h-5 w-16 rounded", PULSE)} />
+          ))}
+        </div>
+        <div className={cx("h-7 w-[140px] rounded-lg sm:w-[200px]", PULSE)} />
+      </div>
+      {/* Default tab is the positions (holding) table */}
+      <PositionsTableSkeleton />
+    </div>
+  );
+}
+
+/** Full page skeleton used as the route Suspense fallback. */
+export function LeaderboardSkeleton() {
+  return (
+    <div className="flex h-full min-h-0 w-full flex-col overflow-hidden">
+      {/* Secondary nav is full-width; its content aligns with the table wrapper. */}
+      <div className="shrink-0 border-b border-border-subtle/60 bg-surface-base/95">
+        <div className="mx-auto flex max-w-[1280px] items-center gap-1 px-4 py-2 sm:px-6 lg:px-10 xl:px-12">
+          <div className={cx("h-8 w-28 rounded-lg", PULSE)} />
+        </div>
+      </div>
+
+      <div className="mx-auto flex min-h-0 w-full max-w-[1280px] flex-1 flex-col px-4 sm:px-6 lg:px-10 xl:px-12">
+        {/* Scope chips + interval switch mirror the live two-line mobile layout. */}
+        <div className="flex shrink-0 flex-col gap-2 py-2 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex gap-x-1.5 pl-1 lg:gap-x-2">
+            <div className={cx("h-8 w-14 rounded-2xl", PULSE)} />
+            <div className={cx("h-8 w-20 rounded-2xl", PULSE)} />
+          </div>
+          <div className="flex w-fit items-center gap-1 rounded-xl border border-border-subtle/60 bg-surface-base/40 p-1 lg:shrink-0">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className={cx("h-6 w-12 rounded-lg", PULSE)} />
+            ))}
+          </div>
+        </div>
+
+        <div className="flex min-h-0 w-full flex-1 pb-4">
+          <BoardRowsSkeleton />
+        </div>
+      </div>
+    </div>
+  );
+}

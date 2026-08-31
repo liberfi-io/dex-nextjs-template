@@ -1,8 +1,16 @@
 "use client";
 
 import { createContext, type PropsWithChildren, useContext, useMemo } from "react";
-import type { PredictClient, PredictWsClient } from "@liberfi.io/react-predict";
-import { PredictProvider } from "@liberfi.io/react-predict";
+import type {
+  MarketDataCapability,
+  MarketDataTransportFactory,
+  PredictClient,
+  PredictWsClient,
+} from "@liberfi.io/react-predict";
+import {
+  MarketDataProvider,
+  PredictProvider,
+} from "@liberfi.io/react-predict";
 import {
   createStage54PredictPorts,
   type Stage54PredictPorts,
@@ -14,12 +22,16 @@ export interface Stage54AdaptersProviderProps extends PropsWithChildren {
   client: PredictClient;
   wsClient: PredictWsClient | null;
   wsEnabled: boolean;
+  marketDataCapability: MarketDataCapability;
+  marketDataTransportFactory?: MarketDataTransportFactory;
 }
 
 export function Stage54AdaptersProvider({
   client,
   wsClient,
   wsEnabled,
+  marketDataCapability,
+  marketDataTransportFactory,
   children,
 }: Stage54AdaptersProviderProps) {
   const ports = useMemo(
@@ -29,7 +41,13 @@ export function Stage54AdaptersProvider({
   return (
     <Stage54PredictContext.Provider value={ports}>
       <PredictProvider client={ports.client} wsClient={ports.wsClient}>
-        {children}
+        <MarketDataProvider
+          capability={marketDataCapability}
+          client={ports.client}
+          transportFactory={marketDataTransportFactory}
+        >
+          {children}
+        </MarketDataProvider>
       </PredictProvider>
     </Stage54PredictContext.Provider>
   );

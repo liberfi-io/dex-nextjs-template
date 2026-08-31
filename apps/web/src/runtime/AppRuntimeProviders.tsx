@@ -13,6 +13,8 @@ import { useAuth, useConnectedWallet } from "@liberfi.io/wallet-connector";
 import { PinataProvider } from "../application/pinata";
 import { useDexTokenProvider } from "../application/useDexTokenProvider";
 import { HyperliquidAccountStateSync } from "../components/HyperliquidAccountStateSync";
+import { MARKET_DATA_FEATURE_CAPABILITY } from "../libs/featureFlags";
+import { createMarketDataCentrifugoTransportFactory } from "../libs/marketDataCentrifugoClient";
 import { pinata } from "../libs/pinata";
 import {
   type AppClientBundle,
@@ -104,6 +106,13 @@ export function AppRuntimeProviders({
   );
   const { chain } = useCurrentChain();
   const wallet = useConnectedWallet(chain);
+  const marketDataTransportFactory = useMemo(() => {
+    const endpoint = process.env.NEXT_PUBLIC_CENTRIFUGO_WS_URL;
+    if (!MARKET_DATA_FEATURE_CAPABILITY.enabled || !endpoint) {
+      return undefined;
+    }
+    return createMarketDataCentrifugoTransportFactory({ endpoint });
+  }, []);
 
   return (
     <PinataProvider client={pinata}>
@@ -118,6 +127,8 @@ export function AppRuntimeProviders({
               client={clients.predict}
               wsClient={clients.predictWs}
               wsEnabled={config.predictWsEnabled}
+              marketDataCapability={MARKET_DATA_FEATURE_CAPABILITY}
+              marketDataTransportFactory={marketDataTransportFactory}
             >
               <Stage55AdaptersProvider client={clients.chainStream} origin={config.origin}>
                 <MediaTrackProvider client={clients.mediaTrack}>

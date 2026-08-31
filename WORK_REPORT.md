@@ -423,3 +423,13 @@
 - 推送状态：依赖提交已 fast-forward 推送至 `dex-nextjs-template/origin/main`，未使用 force push；为避免与 production build 同时写入 `.next`，本轮由 agent 启动的本地 3000 端口开发服务已正常停止。
 - 部署结果：GitHub Actions Deploy to Vercel run `33430928162`、job `99615810340` 成功，用时 6 分 47 秒；Build、Deploy 与成功通知步骤全部通过，生产地址为 `https://liberfi-i3z091del-sgt-lab.vercel.app`。
 - Workflow 说明：仅有 GitHub Actions Node.js 20 action runtime 弃用提示，不影响部署；本条最终记录提交使用 `[skip ci]`，避免纯文档更新再次触发生产部署。
+
+## 2026-09-01：迁移新版预测六个可见模块（提交前）
+
+- 仓库与分支：`dex-nextjs-template/main` 与同级 `react-sdk/main`；复用现有 3000 端口开发服务和本地 SDK source alias 联调。
+- 拟用提交标题：React SDK 使用 `feat(i18n): centralize prediction module translations`；模板使用 `feat(predict): migrate updated prediction modules`。
+- 迁移范围：将 `prediction-nextjs-template` 当前可见的体育、电竞、市场、排行榜、预测持仓和返佣六个模块迁入主站 `/predict` 二级导航；不暴露 Matches、World Cup、Profile、Recovery 或 Mini App 独立菜单与路由。
+- 架构处理：六个入口统一使用 `/predict/*` 路由，旧预测详情入口保留重定向兼容；接入新版 sports、leaderboard、referral、portfolio、market-data 组件和更新后的 prediction-server API 客户端，同时复用主站认证、钱包、主题与运行时 Provider。
+- 国际化处理：预测模板本地维护的六模块及其共享 World Cup 组件翻译将收敛到 `react-sdk/packages/i18n/locales`，主站不新增第二套本地文案源。
+- 依赖与约束：模板仅新增新版页面实际需要的 `@number-flow/react` 与 `centrifuge`；`@chainstream-io/sdk` 保持 `2.1.14`，不升级版本；本轮不发布 npm、不推送远端、不触发 GitHub workflow 或 Vercel 部署。
+- 验证计划：运行 React SDK i18n 类型检查与测试、模板预测聚焦测试、TypeScript、ESLint、全量测试、`git diff --check`，并通过现有本地开发服务逐页检查六个模块、二级导航、详情跳转、登录态和浏览器控制台。

@@ -4,6 +4,7 @@ import { fileURLToPath } from "url";
 import { getLocalSdkAliases, getLocalSdkWatchOptions } from "./build-config/local-sdk-aliases.mjs";
 import { getSingletonAliases, LOCAL_SDK_FALLBACK } from "./build-config/local-sdk-shared.mjs";
 import { LEGACY_REDIRECTS } from "./build-config/legacy-redirects.mjs";
+import { PREDICTION_REDIRECTS } from "./build-config/prediction-redirects.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -19,7 +20,7 @@ const nextConfig = {
   reactStrictMode: false,
   output: "standalone",
   async redirects() {
-    return LEGACY_REDIRECTS;
+    return [...PREDICTION_REDIRECTS, ...LEGACY_REDIRECTS];
   },
   async rewrites() {
     return [

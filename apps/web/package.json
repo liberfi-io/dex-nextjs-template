@@ -11,7 +11,7 @@
     "start": "next start",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint src",
-    "test": "jest --config ../../jest.config.cjs --selectProjects @liberfi/web --passWithNoTests && node --test build-config/local-sdk-aliases.test.mjs build-config/legacy-redirects.test.mjs build-config/theme-contract.test.mjs",
+    "test": "jest --config ../../jest.config.cjs --selectProjects @liberfi/web --passWithNoTests && node --test build-config/local-sdk-aliases.test.mjs build-config/legacy-redirects.test.mjs build-config/prediction-redirects.test.mjs build-config/theme-contract.test.mjs",
     "graphql-codegen": "graphql-codegen"
   },
   "dependencies": {
@@ -44,6 +44,7 @@
     "@liberfi.io/wallet-connector": "^0.2.77",
     "@liberfi.io/wallet-connector-privy": "^1.1.75",
     "@nktkas/hyperliquid": "^0.32.2",
+    "@number-flow/react": "^0.6.0",
     "@paulmillr/qr": "^0.2.1",
     "@privy-io/react-auth": "^3.16.0",
     "@privy-io/server-auth": "^1.18.12",
@@ -57,6 +58,7 @@
     "@types/js-cookie": "^3.0.6",
     "auth0": "^5.3.0",
     "bignumber.js": "^9.1.2",
+    "centrifuge": "5.7.0",
     "copy-to-clipboard": "^3.3.3",
     "eruda": "^3.4.1",
     "ethers": "^6.15.0",
