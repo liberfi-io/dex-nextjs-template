@@ -332,3 +332,37 @@
 - 部署结果：GitHub Actions Deploy run `33416471983`、job `99568200470` 成功，总用时 6 分 19 秒；Vercel `Build`、此前失败的 `Deploy` 以及成功通知步骤全部通过，生产地址为 `https://liberfi-kig2hwoaz-sgt-lab.vercel.app`。
 - 验证汇总：React SDK build 24/24 个任务及相关 322 项测试通过；消费者全量 Jest 169/169 项、12 项配置契约、TypeScript、目标 ESLint、依赖版本扫描、`git diff --check` 和 production build 均通过；`@chainstream-io/sdk` 全链路保持 `2.1.14`。
 - Workflow 说明：部署仅有 GitHub Actions 对 Node.js 20 action runtime 的弃用提示，不影响结果；本条最终记录提交使用 `[skip ci]`，避免仅文档更新再次重复部署。
+
+## 2026-09-01：修复 Token 详情页 TradingView 未填满图表分区（提交前）
+
+- 仓库与分支：`react-sdk/main`；通过同级 `dex-nextjs-template/main` 的本地 SDK alias 和重启后的 3000 端口开发服务验证。
+- 拟用提交标题：`fix(ui-tradingview): fill resizable chart area`。
+- 问题背景：Token 详情页桌面端图表分区高度为 `418px`，但 `TradingViewWidgetProvider` 的中间 wrapper 仅声明 `flex-1`；其直接父元素不是 flex 容器，该规则不参与高度分配，TradingView iframe 因此回退到固有 `150px` 高度，在分割区域下方留下 `268px` 空白。
+- 完成事项：为 SDK `ui-tradingview` 的 widget wrapper 增加 `h-full min-h-0`，恢复从详情页图表分区到 widget container、iframe 的完整高度链；不修改详情页默认高度、最小高度、分割拖动范围、TradingView 初始化配置或数据源。
+- 影响范围：影响所有复用 `@liberfi.io/ui-tradingview` widget 的已定高容器，使 iframe 跟随可用区域；不修改公开 Props、类型、exports、HTTP/WebSocket adapter、Domain DTO、K 线数据语义或 ChainStream 版本。
+- 回归防线：新增 `TradingViewWidgetProvider` 组件测试，要求 wrapper 明确填满可用高度并允许 flex 子项正确收缩；测试在修复前稳定失败，修复后通过。
+- 验证计划与结果：计划运行 `ui-tradingview` 全量测试、类型检查、全包 ESLint、`git diff --check`、React SDK `pnpm build`、消费者类型检查与 TradingView 入口测试，并在真实页面测量初始及拖动后的高度。实际结果为 SDK 5 个测试套件、23 项测试、类型检查、ESLint、24/24 个 build 任务和 `git diff --check` 全部通过；消费者类型检查及 Token/TradingView 入口 11 项测试通过。2048×1126 页面从“分区 418px / iframe 150px / 空白 268px”修复为“分区 418px / iframe 418px / 空白 0px”，拖动后分区与 iframe 同步为 416px。
+- 预期推送状态：功能提交将 fast-forward 推送到 `react-sdk/origin/main`，禁止 force push；Release workflow 完成后拉取自动生成的 release commit。
+- Workflow 策略：提交标题不包含 `[skip ci]`，由 push 触发 React SDK `Release` workflow；发布成功后使用官方 npm registry 核验全部公共包，并在消费者升级正式版本后触发 Vercel production 部署。
+
+## 2026-09-01：修复 Token 详情页 TradingView 未填满图表分区（提交后）
+
+- 仓库与分支：`react-sdk/main`。
+- 提交：`b2295642b` — `fix(ui-tradingview): fill resizable chart area`。
+- 最终完成事项：修复 `TradingViewWidgetProvider` 的中间高度链，使 widget container 与 iframe 填满调用方分配的可拖动图表区域；新增组件回归测试锁定 `h-full min-h-0` 契约。
+- 验证结果：SDK 全量 build 24/24 个任务通过；`ui-tradingview` 全量 5 个套件、23 项测试、类型检查和 ESLint 通过；消费者类型检查、TradingView 入口 11 项测试和真实页面初始/拖动高度测量通过；两轴代码复审均无发现。
+- 推送状态：功能提交已 fast-forward 推送到 `react-sdk/origin/main`，未使用 force push；随后已拉取 workflow 自动生成的 release commit `f2f78c708` — `chore: release packages`，本地与远端一致。
+- Workflow 状态：GitHub Actions Release run `33420289335`、job `99580715431` 成功，用时 5 分 35 秒；25 个公共包均已通过官方 npm registry 验证，关键修复包为 `@liberfi.io/ui-tradingview@0.1.230`。workflow 仅有 Node.js 20 action runtime 弃用提示，不影响发布。
+- ChainStream 约束：`@liberfi.io/client@0.3.91` 的官方 npm 元数据确认仍精确依赖 `@chainstream-io/sdk@2.1.14`，本轮未升级 ChainStream。
+
+## 2026-09-01：升级模板使用的 React SDK TradingView 修复版本（提交前）
+
+- 仓库与分支：`dex-nextjs-template/main`；React SDK Release 已完成，计划通过现有 3000 端口开发服务、测试与 production build 验证正式 npm 依赖。
+- 拟用提交标题：`chore(deps): upgrade liberfi sdk packages`。
+- 问题背景：TradingView 高度修复已随 React SDK Release 发布，但模板仍引用上一轮 npm 版本，生产构建无法获得 `ui-tradingview` 的完整高度链修复。
+- 计划完成事项：将 `apps/web/package.json` 中实际使用的 24 个 `@liberfi.io/*` 包统一升级到 Release 生成的新 patch 版本，刷新 `pnpm-lock.yaml`；重点将 `@liberfi.io/ui-tradingview` 从 `0.1.229` 升级到 `0.1.230`。
+- 影响范围：仅变更模板的 React SDK npm 依赖与锁文件；不修改业务调用接口、路由、图表数据源或 ChainStream SDK。
+- ChainStream 约束：按用户明确要求，`@chainstream-io/sdk` 保持 `^2.1.14`，锁文件必须继续仅解析 `2.1.14`。
+- 验证计划：刷新依赖后检查所有 workspace manifest 的 dependencies、devDependencies、peerDependencies 与锁文件残留；运行消费者类型检查、TradingView 聚焦测试、配置契约测试、全量测试、目标 ESLint、`git diff --check` 和发布所需的 `pnpm build:web`。
+- 预期推送状态：验证通过后 fast-forward 推送到 `dex-nextjs-template/origin/main`，禁止 force push。
+- Workflow 策略：提交标题不包含 `[skip ci]`，按用户确认触发 Vercel production Deploy workflow；部署完成后使用 `[skip ci]` 的报告提交补记最终结果，避免重复部署。
