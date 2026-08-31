@@ -40,6 +40,10 @@ const localI18nMapper =
   useLocalSdk && fs.existsSync(localI18nSrc)
     ? {
         "^@liberfi.io/i18n$": localI18nSrc,
+        "^@liberfi.io/i18n/server$": path.join(
+          localSdkRoot,
+          "packages/i18n/src/server.ts",
+        ),
       }
     : {};
 

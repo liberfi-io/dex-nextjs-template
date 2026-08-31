@@ -42,7 +42,7 @@ export function CombinedPulseList({ chain, onSelectToken }: CombinedPulseListPro
             onClick={() => setType(tab)}
             className={cn(
               "text-sm sm:text-base font-medium transition-colors cursor-pointer whitespace-nowrap",
-              type === tab ? "text-foreground" : "text-neutral hover:text-foreground/80",
+              type === tab ? "text-foreground" : "text-text-muted hover:text-foreground/80",
             )}
           >
             {t(PULSE_TAB_I18N_KEYS[tab])}

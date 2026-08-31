@@ -2,12 +2,7 @@
 
 import { useCallback } from "react";
 import { useTranslation } from "@liberfi.io/i18n";
-import {
-  ModalContent,
-  StyledModal,
-  useScreen,
-  XCloseIcon,
-} from "@liberfi.io/ui";
+import { ModalContent, StyledModal, useScreen, XCloseIcon } from "@liberfi.io/ui";
 import { AsyncModal, type RenderAsyncModalProps } from "@liberfi.io/ui-scaffold";
 import { LaunchPadHome } from "@liberfi.io/ui-launchpad";
 import { LaunchpadUiBridge } from "../../runtime/Stage55UiBridge";
@@ -48,20 +43,18 @@ function LaunchPadModalContent({
       hideCloseButton
       backdrop="blur"
       classNames={{
-        base: "!bg-[#18181b] !rounded-[14px] !border !border-[rgba(39,39,42,1)] !shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)]",
+        base: "!bg-surface-interactive !rounded-[14px] !border !border-border-control !shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)]",
         body: "!p-0",
       }}
     >
       <ModalContent>
         <div>
           <div className="flex items-center justify-between px-5 pt-5 pb-3">
-            <h3 className="text-lg font-semibold text-white">
-              {t("extend.launchpad.title")}
-            </h3>
+            <h3 className="text-lg font-semibold text-text-primary">{t("launchpad.title")}</h3>
             <button
               type="button"
               onClick={handleClose}
-              className="p-1 rounded-[10px] hover:bg-[rgba(39,39,42,0.5)] text-zinc-400 hover:text-white transition-colors cursor-pointer focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+              className="p-1 rounded-[10px] hover:bg-surface-strong/50 text-text-secondary hover:text-text-primary transition-colors cursor-pointer focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
             >
               <XCloseIcon width={18} height={18} />
             </button>

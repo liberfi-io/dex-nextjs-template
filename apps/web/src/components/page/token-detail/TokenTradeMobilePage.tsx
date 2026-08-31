@@ -3,10 +3,7 @@
 import { TradingChart } from "../../TradingChart";
 import type { Chain } from "@liberfi.io/types";
 import { useTokenQuery } from "@liberfi.io/react";
-import {
-  TabBarUnderline,
-  type TabBarUnderlineItem,
-} from "@liberfi.io/ui-scaffold";
+import { TabBarUnderline, type TabBarUnderlineItem } from "@liberfi.io/ui-scaffold";
 import { useTranslation } from "@liberfi.io/i18n";
 import { useMemo, useRef, useState } from "react";
 import { BottomDevTokensTable } from "./bottom-tables/BottomDevTokensTable";
@@ -82,10 +79,7 @@ const MOBILE_CHART_HEIGHT_PX = 400;
  * `SidebarSecurityCheck`, the four `Bottom*Table`s) so we only need to
  * maintain one set of styles + i18n keys per section.
  */
-export function TokenTradeMobilePage({
-  chain,
-  address,
-}: TokenTradeMobilePageProps) {
+export function TokenTradeMobilePage({ chain, address }: TokenTradeMobilePageProps) {
   const { t } = useTranslation();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [tab, setTab] = useState<BottomTab>("trades");
@@ -95,14 +89,14 @@ export function TokenTradeMobilePage({
 
   const tabItems = useMemo<ReadonlyArray<TabBarUnderlineItem<BottomTab>>>(
     () => [
-      { key: "trades", label: t("extend.trade.titles.activities") },
+      { key: "trades", label: t("trade.titles.activities") },
       {
         key: "holders",
-        label: t("extend.trade.titles.holders"),
+        label: t("trade.titles.holders"),
         count: holdersCount ?? undefined,
       },
-      { key: "top-traders", label: t("extend.trade.titles.top_traders") },
-      { key: "dev-tokens", label: t("extend.trade.titles.dev_tokens") },
+      { key: "top-traders", label: t("trade.titles.top_traders") },
+      { key: "dev-tokens", label: t("trade.titles.dev_tokens") },
     ],
     [t, holdersCount],
   );
@@ -144,28 +138,16 @@ export function TokenTradeMobilePage({
               user can switch tabs without scrolling back up. The sticky
               context is the scroll container itself (`top: 0`). */}
           <div className="sticky top-0 z-20 border-b border-divider bg-content1">
-            <TabBarUnderline<BottomTab>
-              items={tabItems}
-              value={tab}
-              onChange={setTab}
-            />
+            <TabBarUnderline<BottomTab> items={tabItems} value={tab} onChange={setTab} />
           </div>
 
           {/* Active table — embedded mode (no internal scroll). The
               IntersectionObserver sentinel observes the page scroll via
               the provider above. */}
-          {tab === "trades" && (
-            <BottomTradesTable chain={chain} address={address} />
-          )}
-          {tab === "holders" && (
-            <BottomHoldersTable chain={chain} address={address} />
-          )}
-          {tab === "top-traders" && (
-            <BottomTopTradersTable chain={chain} address={address} />
-          )}
-          {tab === "dev-tokens" && (
-            <BottomDevTokensTable chain={chain} address={address} />
-          )}
+          {tab === "trades" && <BottomTradesTable chain={chain} address={address} />}
+          {tab === "holders" && <BottomHoldersTable chain={chain} address={address} />}
+          {tab === "top-traders" && <BottomTopTradersTable chain={chain} address={address} />}
+          {tab === "dev-tokens" && <BottomDevTokensTable chain={chain} address={address} />}
         </div>
       </TableShellScrollRootProvider>
 
@@ -175,11 +157,7 @@ export function TokenTradeMobilePage({
           bottom-sheet modal containing the full TradingPanel pre-seeded
           to the tapped direction. This mirrors GMGN's mobile pattern
           and keeps the chart + lists the primary viewport content. */}
-      <MobileTradeBar
-        chain={chain}
-        tokenAddress={address}
-        tokenSymbol={token?.symbol}
-      />
+      <MobileTradeBar chain={chain} tokenAddress={address} tokenSymbol={token?.symbol} />
     </div>
   );
 }

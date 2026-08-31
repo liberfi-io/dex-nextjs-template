@@ -17,11 +17,7 @@ import {
 } from "@liberfi.io/ui-perpetuals";
 import { cn, useScreen } from "@liberfi.io/ui";
 import { useAsyncModal } from "@liberfi.io/ui-scaffold";
-import {
-  useAuthCallback,
-  useWallets,
-  type EvmWalletAdapter,
-} from "@liberfi.io/wallet-connector";
+import { useAuthCallback, useWallets, type EvmWalletAdapter } from "@liberfi.io/wallet-connector";
 import { useHideBottomNavigationBar, useHideHeader } from "../../application/layout-chrome";
 import { useTranslation } from "@liberfi.io/i18n";
 import { DEPOSIT_HL_USDC_MODAL_ID } from "../modals/DepositHyperliquidUsdcModal";
@@ -66,9 +62,9 @@ export function PerpetualsPage() {
   // adapter and surface its address.
   const wallets = useWallets();
   const userAddress = useMemo(() => {
-    const evm = wallets.find(
-      (w) => w.chainNamespace === "EVM" && w.isConnected,
-    ) as EvmWalletAdapter | undefined;
+    const evm = wallets.find((w) => w.chainNamespace === "EVM" && w.isConnected) as
+      | EvmWalletAdapter
+      | undefined;
     return evm?.address;
   }, [wallets]);
 
@@ -91,9 +87,7 @@ export function PerpetualsPage() {
   // after signing in" even on a successful Privy login. The SDK's
   // `useAuthCallback` doesn't try to chain post-auth work, so it
   // sidesteps the race entirely.
-  const { onOpen: openHlUsdcDeposit } = useAsyncModal(
-    DEPOSIT_HL_USDC_MODAL_ID,
-  );
+  const { onOpen: openHlUsdcDeposit } = useAsyncModal(DEPOSIT_HL_USDC_MODAL_ID);
   const handleAddFunds = useAuthCallback(
     useCallback(() => {
       void openHlUsdcDeposit();
@@ -157,10 +151,7 @@ export function PerpetualsPage() {
   //      updates them in lockstep.
   // The widgets below are similarly mounted without `symbol` for the
   // same reason.
-  const { data: openOrdersData } = useOrdersQuery(
-    { userAddress },
-    { enabled: !!userAddress },
-  );
+  const { data: openOrdersData } = useOrdersQuery({ userAddress }, { enabled: !!userAddress });
   const openOrdersCount = openOrdersData?.orders.length ?? 0;
   const openOrdersTabLabel =
     openOrdersCount > 0
@@ -171,7 +162,10 @@ export function PerpetualsPage() {
 
   if (isMobile) {
     return (
-      <div className="flex flex-col w-full h-full min-h-0 text-white overflow-hidden" style={{ backgroundColor: '#000000' }}>
+      <div
+        className="flex flex-col w-full h-full min-h-0 text-text-primary overflow-hidden"
+        style={{ backgroundColor: "var(--color-surface-base)" }}
+      >
         {/* Ticker strip */}
         <TickerStrip
           activeSymbol={tokenSymbol}
@@ -196,12 +190,22 @@ export function PerpetualsPage() {
           {mobileMainTab === "chart" && (
             <>
               {/* Chart takes ~60% of available height */}
-              <div className="flex-[3] min-h-[200px] flex flex-col" style={{ borderBottom: '1px solid rgba(39,39,42,0.6)' }}>
+              <div
+                className="flex-[3] min-h-[200px] flex flex-col"
+                style={{ borderBottom: "1px solid var(--color-border-subtle)" }}
+              >
                 <PerpetualsChart symbol={symbol} client={client} />
               </div>
 
               {/* Positions / Orders / History tab bar */}
-              <div className="flex-none flex items-center" style={{ height: 36, padding: '0 8px', borderBottom: '1px solid rgba(39,39,42,0.6)' }}>
+              <div
+                className="flex-none flex items-center"
+                style={{
+                  height: 36,
+                  padding: "0 8px",
+                  borderBottom: "1px solid var(--color-border-subtle)",
+                }}
+              >
                 {(
                   [
                     { key: "positions", label: t("perpetuals.page.tab.positions") },
@@ -215,14 +219,20 @@ export function PerpetualsPage() {
                     onClick={() => setActiveTab(tab.key)}
                     className="cursor-pointer transition-colors"
                     style={{
-                      padding: '0 8px',
+                      padding: "0 8px",
                       height: 36,
                       fontSize: 13,
                       fontWeight: 500,
-                      color: activeTab === tab.key ? '#ffffff' : '#6b6b6b',
-                      background: 'none',
-                      border: 'none',
-                      borderBottom: activeTab === tab.key ? '2px solid #ffffff' : '2px solid transparent',
+                      color:
+                        activeTab === tab.key
+                          ? "var(--color-text-primary)"
+                          : "var(--color-text-muted)",
+                      background: "none",
+                      border: "none",
+                      borderBottom:
+                        activeTab === tab.key
+                          ? "2px solid var(--color-text-primary)"
+                          : "2px solid transparent",
                     }}
                   >
                     {tab.label}
@@ -241,8 +251,13 @@ export function PerpetualsPage() {
                   `webData2` push, so the table populates the instant the
                   WS frame arrives — no extra REST round-trip on tab
                   switch. */}
-              <div className="flex-[2] min-h-0 overflow-auto" style={{ backgroundColor: '#000000' }}>
-                {activeTab === "positions" && <PositionsWidget userAddress={userAddress} onPlaceOrder={placeOrder} />}
+              <div
+                className="flex-[2] min-h-0 overflow-auto"
+                style={{ backgroundColor: "var(--color-surface-base)" }}
+              >
+                {activeTab === "positions" && (
+                  <PositionsWidget userAddress={userAddress} onPlaceOrder={placeOrder} />
+                )}
                 {activeTab === "openOrders" && (
                   <OpenOrdersWidget
                     userAddress={userAddress}
@@ -250,9 +265,7 @@ export function PerpetualsPage() {
                     cancelOrders={cancelOrders}
                   />
                 )}
-                {activeTab === "tradeHistory" && (
-                  <TradeHistoryWidget userAddress={userAddress} />
-                )}
+                {activeTab === "tradeHistory" && <TradeHistoryWidget userAddress={userAddress} />}
               </div>
             </>
           )}
@@ -262,11 +275,7 @@ export function PerpetualsPage() {
             // scrolls). The wrapper just clips overflow so the widget's
             // internal min-h-0 flex math works.
             <div className="flex-1 min-h-0 overflow-hidden">
-              <OrderBookWidget
-                symbol={symbol}
-                maxLevel={50}
-                className="h-full"
-              />
+              <OrderBookWidget symbol={symbol} maxLevel={50} className="h-full" />
             </div>
           )}
 
@@ -278,7 +287,15 @@ export function PerpetualsPage() {
         </div>
 
         {/* Sticky bottom: Long / Short buttons */}
-        <div className="flex-none flex" style={{ padding: '8px 12px', gap: 8, borderTop: '1px solid rgba(39,39,42,0.6)', backgroundColor: '#000000' }}>
+        <div
+          className="flex-none flex"
+          style={{
+            padding: "8px 12px",
+            gap: 8,
+            borderTop: "1px solid var(--color-border-subtle)",
+            backgroundColor: "var(--color-surface-base)",
+          }}
+        >
           <button
             type="button"
             className="flex-1 cursor-pointer transition-colors"
@@ -287,9 +304,9 @@ export function PerpetualsPage() {
               fontSize: 16,
               fontWeight: 700,
               borderRadius: 9999,
-              backgroundColor: '#C7FF2E',
-              color: '#000000',
-              border: 'none',
+              backgroundColor: "var(--color-positive)",
+              color: "var(--color-text-inverse)",
+              border: "none",
             }}
             onClick={() => setShowMobileOrder(true)}
           >
@@ -303,9 +320,9 @@ export function PerpetualsPage() {
               fontSize: 16,
               fontWeight: 700,
               borderRadius: 9999,
-              backgroundColor: '#F76816',
-              color: '#000000',
-              border: 'none',
+              backgroundColor: "var(--color-negative)",
+              color: "var(--color-text-inverse)",
+              border: "none",
             }}
             onClick={() => setShowMobileOrder(true)}
           >
@@ -329,12 +346,12 @@ export function PerpetualsPage() {
   }
 
   return (
-    <div className="flex flex-col w-full h-full min-h-0 text-white overflow-hidden" style={{ backgroundColor: '#000000' }}>
+    <div
+      className="flex flex-col w-full h-full min-h-0 text-text-primary overflow-hidden"
+      style={{ backgroundColor: "var(--color-surface-base)" }}
+    >
       {/* Ticker strip */}
-      <TickerStrip
-        activeSymbol={tokenSymbol}
-        onSelectCoin={(coin) => setSymbol(`${coin}-USDC`)}
-      />
+      <TickerStrip activeSymbol={tokenSymbol} onSelectCoin={(coin) => setSymbol(`${coin}-USDC`)} />
 
       {/* Main content layout:
             ┌─────────────────────── left section ─────────────────────┐  ┌── PlaceOrder ──┐
@@ -350,7 +367,10 @@ export function PerpetualsPage() {
           {/* Top half: Chart sub-col + OB sub-col side by side */}
           <div className="flex-1 min-h-0 flex">
             {/* Chart sub-col: CoinSelectorBar header + Chart */}
-            <div className="flex-1 min-w-0 flex flex-col" style={{ borderRight: '1px solid rgba(39,39,42,0.6)' }}>
+            <div
+              className="flex-1 min-w-0 flex flex-col"
+              style={{ borderRight: "1px solid var(--color-border-subtle)" }}
+            >
               <CoinSelectorBar
                 tokenSymbol={tokenSymbol}
                 symbol={symbol}
@@ -366,7 +386,14 @@ export function PerpetualsPage() {
             {/* OB sub-col: OrderBook / Trades, top-aligned to TickerStrip,
                 bottom-aligned to chart (i.e. ends at SplitHandle) */}
             <div className="flex flex-col overflow-hidden" style={{ width: 290, minWidth: 290 }}>
-              <div className="flex-none flex items-center" style={{ height: 36, padding: '0 16px 0 8px', borderBottom: '1px solid rgba(39,39,42,0.6)' }}>
+              <div
+                className="flex-none flex items-center"
+                style={{
+                  height: 36,
+                  padding: "0 16px 0 8px",
+                  borderBottom: "1px solid var(--color-border-subtle)",
+                }}
+              >
                 {(
                   [
                     { key: "orderBook", label: t("perpetuals.page.tab.orderBook") },
@@ -377,11 +404,14 @@ export function PerpetualsPage() {
                     key={tab.key}
                     style={{
                       height: 36,
-                      display: 'flex',
-                      alignItems: 'center',
-                      borderBottom: middleTab === tab.key ? '2px solid #ffffff' : '2px solid transparent',
-                      padding: '2px 0 0',
-                      cursor: 'pointer',
+                      display: "flex",
+                      alignItems: "center",
+                      borderBottom:
+                        middleTab === tab.key
+                          ? "2px solid var(--color-text-primary)"
+                          : "2px solid transparent",
+                      padding: "2px 0 0",
+                      cursor: "pointer",
                     }}
                   >
                     <button
@@ -389,12 +419,15 @@ export function PerpetualsPage() {
                       onClick={() => setMiddleTab(tab.key)}
                       className="cursor-pointer transition-colors"
                       style={{
-                        padding: '0 8px',
+                        padding: "0 8px",
                         fontSize: 14,
                         fontWeight: 500,
-                        color: middleTab === tab.key ? '#ffffff' : '#b5b5b5',
-                        background: 'none',
-                        border: 'none',
+                        color:
+                          middleTab === tab.key
+                            ? "var(--color-text-primary)"
+                            : "var(--color-text-secondary)",
+                        background: "none",
+                        border: "none",
                       }}
                     >
                       {tab.label}
@@ -408,11 +441,7 @@ export function PerpetualsPage() {
                   // aggregation step (1000 USD) there are several visible
                   // buckets, and so that asks/bids each have enough rows to
                   // overflow their independent scroll containers.
-                  <OrderBookWidget
-                    symbol={symbol}
-                    maxLevel={50}
-                    className="h-full"
-                  />
+                  <OrderBookWidget symbol={symbol} maxLevel={50} className="h-full" />
                 ) : (
                   <TradesWidget symbol={symbol} limit={100} className="h-full" />
                 )}
@@ -426,23 +455,33 @@ export function PerpetualsPage() {
           {/* Bottom panel: Positions / Open Orders / Trades — spans the
               entire left section (chart + OB widths) */}
           <div className="flex-none flex flex-col" style={{ height: bottomHeight }}>
-            <div className="flex-none flex items-center" style={{ height: 36, padding: '0 16px 0 8px', borderBottom: '1px solid rgba(39,39,42,0.6)' }}>
+            <div
+              className="flex-none flex items-center"
+              style={{
+                height: 36,
+                padding: "0 16px 0 8px",
+                borderBottom: "1px solid var(--color-border-subtle)",
+              }}
+            >
               {(
-                  [
-                    { key: "positions", label: t("perpetuals.page.tab.positions") },
-                    { key: "openOrders", label: openOrdersTabLabel },
-                    { key: "tradeHistory", label: t("perpetuals.page.tab.trades") },
-                  ] as const
-                ).map((tab) => (
+                [
+                  { key: "positions", label: t("perpetuals.page.tab.positions") },
+                  { key: "openOrders", label: openOrdersTabLabel },
+                  { key: "tradeHistory", label: t("perpetuals.page.tab.trades") },
+                ] as const
+              ).map((tab) => (
                 <div
                   key={tab.key}
                   style={{
                     height: 36,
-                    display: 'flex',
-                    alignItems: 'center',
-                    borderBottom: activeTab === tab.key ? '2px solid #ffffff' : '2px solid transparent',
-                    padding: '2px 0 0',
-                    cursor: 'pointer',
+                    display: "flex",
+                    alignItems: "center",
+                    borderBottom:
+                      activeTab === tab.key
+                        ? "2px solid var(--color-text-primary)"
+                        : "2px solid transparent",
+                    padding: "2px 0 0",
+                    cursor: "pointer",
                   }}
                 >
                   <button
@@ -450,12 +489,15 @@ export function PerpetualsPage() {
                     onClick={() => setActiveTab(tab.key)}
                     className="cursor-pointer transition-colors"
                     style={{
-                      padding: '0 8px',
+                      padding: "0 8px",
                       fontSize: 14,
                       fontWeight: 500,
-                      color: activeTab === tab.key ? '#ffffff' : '#b5b5b5',
-                      background: 'none',
-                      border: 'none',
+                      color:
+                        activeTab === tab.key
+                          ? "var(--color-text-primary)"
+                          : "var(--color-text-secondary)",
+                      background: "none",
+                      border: "none",
                     }}
                   >
                     {tab.label}
@@ -467,8 +509,13 @@ export function PerpetualsPage() {
                 to keep the cache key aligned with the
                 webData2 WS write — see the mobile branch above for the
                 full rationale. */}
-            <div className="flex-1 min-h-0 overflow-auto" style={{ backgroundColor: '#000000' }}>
-              {activeTab === "positions" && <PositionsWidget userAddress={userAddress} onPlaceOrder={placeOrder} />}
+            <div
+              className="flex-1 min-h-0 overflow-auto"
+              style={{ backgroundColor: "var(--color-surface-base)" }}
+            >
+              {activeTab === "positions" && (
+                <PositionsWidget userAddress={userAddress} onPlaceOrder={placeOrder} />
+              )}
               {activeTab === "openOrders" && (
                 <OpenOrdersWidget
                   userAddress={userAddress}
@@ -476,16 +523,22 @@ export function PerpetualsPage() {
                   cancelOrders={cancelOrders}
                 />
               )}
-              {activeTab === "tradeHistory" && (
-                <TradeHistoryWidget userAddress={userAddress} />
-              )}
+              {activeTab === "tradeHistory" && <TradeHistoryWidget userAddress={userAddress} />}
             </div>
           </div>
         </div>
 
         {/* PlaceOrder (full main height, fixed 320px). Bottom aligns with
             the Positions row — both stop at the main content's bottom edge. */}
-        <div className="flex flex-col overflow-hidden" style={{ width: 320, minWidth: 320, maxWidth: 320, borderLeft: '1px solid rgba(39,39,42,0.6)' }}>
+        <div
+          className="flex flex-col overflow-hidden"
+          style={{
+            width: 320,
+            minWidth: 320,
+            maxWidth: 320,
+            borderLeft: "1px solid var(--color-border-subtle)",
+          }}
+        >
           <PlaceOrderFormWidget
             symbol={symbol}
             userAddress={userAddress}
@@ -496,7 +549,6 @@ export function PerpetualsPage() {
           />
         </div>
       </div>
-
     </div>
   );
 }
@@ -518,12 +570,15 @@ function CoinSelectorBar({
   isMobile?: boolean;
 }) {
   return (
-    <div className="flex-none relative" style={{ height: isMobile ? 48 : 64, borderBottom: '1px solid rgba(39,39,42,0.6)' }}>
+    <div
+      className="flex-none relative"
+      style={{ height: isMobile ? 48 : 64, borderBottom: "1px solid var(--color-border-subtle)" }}
+    >
       <div className="flex items-center h-full">
         <button
           type="button"
           className="flex items-center cursor-pointer shrink-0"
-          style={{ gap: 6, padding: isMobile ? '0 10px' : '0 16px', height: 32 }}
+          style={{ gap: 6, padding: isMobile ? "0 10px" : "0 16px", height: 32 }}
           onClick={() => setShowSearch((v: boolean) => !v)}
         >
           <img
@@ -535,10 +590,18 @@ function CoinSelectorBar({
               (e.target as HTMLImageElement).style.display = "none";
             }}
           />
-          <span style={{ fontSize: isMobile ? 16 : 18, fontWeight: 500, color: '#ffffff' }}>{tokenSymbol}</span>
+          <span
+            style={{
+              fontSize: isMobile ? 16 : 18,
+              fontWeight: 500,
+              color: "var(--color-text-primary)",
+            }}
+          >
+            {tokenSymbol}
+          </span>
           <svg
             className={cn("transition-transform", showSearch && "rotate-180")}
-            style={{ color: '#b5b5b5', width: 12, height: 12 }}
+            style={{ color: "var(--color-text-secondary)", width: 12, height: 12 }}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -565,12 +628,12 @@ function CoinSelectorBar({
           <div
             className="absolute top-full left-0 z-50 flex flex-col overflow-hidden"
             style={{
-              width: isMobile ? '100vw' : 800,
-              height: isMobile ? '60vh' : 400,
-              background: 'rgba(24,24,27,1)',
-              border: '1px solid rgba(39,39,42,1)',
+              width: isMobile ? "100vw" : 800,
+              height: isMobile ? "60vh" : 400,
+              background: "var(--color-surface-interactive)",
+              border: "1px solid var(--color-border-control)",
               borderRadius: isMobile ? 0 : 14,
-              boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
+              boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)",
               paddingBottom: 8,
               marginTop: isMobile ? 0 : -8,
               marginLeft: isMobile ? 0 : 12,
@@ -600,10 +663,13 @@ function MobileTabBar({
   ];
 
   return (
-    <div className="flex-none flex items-center" style={{ padding: '4px 8px', borderBottom: '1px solid rgba(39,39,42,0.6)' }}>
+    <div
+      className="flex-none flex items-center"
+      style={{ padding: "4px 8px", borderBottom: "1px solid var(--color-border-subtle)" }}
+    >
       <div
         className="relative flex w-full items-center rounded-full"
-        style={{ height: 32, backgroundColor: 'rgba(26,26,26,0.5)', padding: 2 }}
+        style={{ height: 32, backgroundColor: "var(--color-surface-raised)", padding: 2 }}
       >
         {tabs.map((tab) => (
           <button
@@ -614,9 +680,11 @@ function MobileTabBar({
               height: 28,
               fontSize: 13,
               fontWeight: activeTab === tab.key ? 600 : 400,
-              color: activeTab === tab.key ? '#ffffff' : '#6b6b6b',
-              backgroundColor: activeTab === tab.key ? '#2a2a2a' : 'transparent',
-              border: 'none',
+              color:
+                activeTab === tab.key ? "var(--color-text-primary)" : "var(--color-text-muted)",
+              backgroundColor:
+                activeTab === tab.key ? "var(--color-surface-strong)" : "transparent",
+              border: "none",
             }}
             onClick={() => onTabChange(tab.key)}
           >
@@ -642,14 +710,12 @@ function MobilePlaceOrderSheet({
   onClose: () => void;
   onAddFunds?: () => void;
   onUpdateLeverage?: (leverage: number) => Promise<void>;
-  onPlaceOrder?: React.ComponentProps<
-    typeof PlaceOrderFormWidget
-  >["onPlaceOrder"];
+  onPlaceOrder?: React.ComponentProps<typeof PlaceOrderFormWidget>["onPlaceOrder"];
 }) {
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end">
       <div
-        className="absolute inset-0 bg-black/60"
+        className="absolute inset-0 bg-surface-scrim"
         onClick={onClose}
         onKeyDown={(e) => e.key === "Escape" && onClose()}
         role="button"
@@ -659,27 +725,45 @@ function MobilePlaceOrderSheet({
       <div
         className="relative z-10 flex flex-col overflow-hidden"
         style={{
-          maxHeight: '85vh',
-          backgroundColor: '#000000',
+          maxHeight: "85vh",
+          backgroundColor: "var(--color-surface-base)",
           borderTopLeftRadius: 16,
           borderTopRightRadius: 16,
-          borderTop: '1px solid rgba(39,39,42,0.6)',
+          borderTop: "1px solid var(--color-border-subtle)",
         }}
       >
         {/* Drag indicator */}
-        <div className="flex justify-center" style={{ padding: '8px 0 4px' }}>
-          <div style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: '#2a2a2a' }} />
+        <div className="flex justify-center" style={{ padding: "8px 0 4px" }}>
+          <div
+            style={{
+              width: 36,
+              height: 4,
+              borderRadius: 2,
+              backgroundColor: "var(--color-surface-strong)",
+            }}
+          />
         </div>
 
         {/* Close button */}
-        <div className="flex justify-end" style={{ padding: '0 12px' }}>
+        <div className="flex justify-end" style={{ padding: "0 12px" }}>
           <button
             type="button"
             className="cursor-pointer"
-            style={{ color: '#6b6b6b', background: 'none', border: 'none', padding: 4 }}
+            style={{
+              color: "var(--color-text-muted)",
+              background: "none",
+              border: "none",
+              padding: 4,
+            }}
             onClick={onClose}
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -746,12 +830,35 @@ function SplitHandle({
         style={{
           height: 4,
           gap: 4,
-          backgroundColor: isResizing ? '#464646' : 'rgba(26,26,26,0.8)',
+          backgroundColor: isResizing
+            ? "var(--color-border-control)"
+            : "hsl(var(--heroui-content1) / 0.8)",
         }}
       >
-        <i style={{ width: 2, height: 2, borderRadius: '50%', backgroundColor: '#6b6b6b' }} />
-        <i style={{ width: 2, height: 2, borderRadius: '50%', backgroundColor: '#6b6b6b' }} />
-        <i style={{ width: 2, height: 2, borderRadius: '50%', backgroundColor: '#6b6b6b' }} />
+        <i
+          style={{
+            width: 2,
+            height: 2,
+            borderRadius: "50%",
+            backgroundColor: "var(--color-text-muted)",
+          }}
+        />
+        <i
+          style={{
+            width: 2,
+            height: 2,
+            borderRadius: "50%",
+            backgroundColor: "var(--color-text-muted)",
+          }}
+        />
+        <i
+          style={{
+            width: 2,
+            height: 2,
+            borderRadius: "50%",
+            backgroundColor: "var(--color-text-muted)",
+          }}
+        />
 
         {/* Expanded hit area */}
         <div
@@ -762,12 +869,10 @@ function SplitHandle({
       </div>
 
       <style>{`
-        .perp-split-handle:hover .perp-split-bar { background-color: #464646 !important; }
+        .perp-split-handle:hover .perp-split-bar { background-color: var(--color-border-control) !important; }
       `}</style>
 
-      {isResizing && (
-        <div className="fixed inset-0 z-50 cursor-ns-resize" />
-      )}
+      {isResizing && <div className="fixed inset-0 z-50 cursor-ns-resize" />}
     </div>
   );
 }
@@ -801,7 +906,16 @@ function TickerStrip({
   const { data: universe } = useUniverseQuery();
 
   return (
-    <div className="flex-none flex items-center overflow-x-auto" style={{ height: 28, gap: 16, padding: '0 12px', borderBottom: '1px solid rgba(39,39,42,0.6)', backgroundColor: '#0a0a0b' }}>
+    <div
+      className="flex-none flex items-center overflow-x-auto"
+      style={{
+        height: 28,
+        gap: 16,
+        padding: "0 12px",
+        borderBottom: "1px solid var(--color-border-subtle)",
+        backgroundColor: "var(--color-surface-base)",
+      }}
+    >
       {TICKER_COINS.map((coin) => (
         <TickerItem
           key={coin}
@@ -838,9 +952,7 @@ function TickerItem({
   const change = entry?.market.change24h;
   const isPositive = (change ?? 0) >= 0;
   const changeStr =
-    typeof change === "number"
-      ? `${isPositive ? "+" : ""}${change.toFixed(2)}%`
-      : "—";
+    typeof change === "number" ? `${isPositive ? "+" : ""}${change.toFixed(2)}%` : "—";
 
   return (
     <button
@@ -849,13 +961,13 @@ function TickerItem({
       className="flex items-center cursor-pointer transition-colors"
       style={{
         gap: 4,
-        padding: '2px 4px',
+        padding: "2px 4px",
         borderRadius: 4,
         fontSize: 12,
         fontWeight: 500,
-        color: '#b5b5b5',
-        backgroundColor: isActive ? 'rgba(255,255,255,0.05)' : 'transparent',
-        border: 'none',
+        color: "var(--color-text-secondary)",
+        backgroundColor: isActive ? "hsl(var(--heroui-foreground) / 0.05)" : "transparent",
+        border: "none",
       }}
     >
       <img
@@ -867,7 +979,7 @@ function TickerItem({
         }}
       />
       <span>{coin}</span>
-      <span style={{ color: isPositive ? '#C7FF2E' : '#F76816' }}>
+      <span style={{ color: isPositive ? "var(--color-positive)" : "var(--color-negative)" }}>
         {changeStr}
       </span>
     </button>

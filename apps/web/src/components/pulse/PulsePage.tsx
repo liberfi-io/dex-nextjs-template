@@ -13,13 +13,7 @@ import {
 } from "react";
 import { useAtom } from "jotai";
 import { cloneDeep } from "lodash-es";
-import {
-  cn,
-  HorizontalScrollContainer,
-  PauseIcon,
-  SearchIcon,
-  toast,
-} from "@liberfi.io/ui";
+import { cn, HorizontalScrollContainer, PauseIcon, SearchIcon, toast } from "@liberfi.io/ui";
 import { useTranslation } from "@liberfi.io/i18n";
 import { Chain, SOLANA_TOKEN_PROTOCOLS, Token } from "@liberfi.io/types";
 import { ChainSelectWidget, useCurrentChain } from "@liberfi.io/ui-chain-select";
@@ -53,9 +47,9 @@ import { isPulseSupportedChain } from "../../lib/pulse";
 import { pulseSettingsAtom } from "../../states/pulse";
 
 const PULSE_TAB_I18N_KEYS = {
-  new: "extend.pulse.new",
-  final_stretch: "extend.pulse.final_stretch",
-  migrated: "extend.pulse.migrated",
+  new: "pulse.new",
+  final_stretch: "pulse.final_stretch",
+  migrated: "pulse.migrated",
 } as const;
 
 const PULSE_FILTER_RESOLUTION = "24h";
@@ -100,11 +94,7 @@ type PulseKeywordInputProps = {
   className?: string;
 };
 
-function PulseKeywordInput({
-  value,
-  onValueChange,
-  className,
-}: PulseKeywordInputProps) {
+function PulseKeywordInput({ value, onValueChange, className }: PulseKeywordInputProps) {
   const { t } = useTranslation();
   const [text, setText] = useState(value);
 
@@ -133,16 +123,16 @@ function PulseKeywordInput({
         className,
       )}
       style={{
-        border: "1px solid rgba(63,63,70,0.5)",
-        background: "rgba(39,39,42,0.6)",
+        border: "1px solid var(--color-border-control)",
+        background: "hsl(var(--heroui-content3) / 0.6)",
       }}
     >
-      <SearchIcon width={14} height={14} className="flex-none text-zinc-400" />
+      <SearchIcon width={14} height={14} className="flex-none text-text-secondary" />
       <input
         value={text}
         onChange={handleChange}
         placeholder={t("tokens.filters.keywords.placeholder")}
-        className="min-w-0 flex-1 bg-transparent pl-1.5 text-xs text-foreground outline-none placeholder:text-zinc-500"
+        className="min-w-0 flex-1 bg-transparent pl-1.5 text-xs text-foreground outline-none placeholder:text-text-muted"
       />
     </div>
   );
@@ -235,10 +225,7 @@ export function PulsePage() {
     [filterProtocols, handleFiltersChange, handleKeywordsChange, pulseSettings],
   );
 
-  const renderNewHeaderExtra = useMemo(
-    () => renderHeaderExtra("new"),
-    [renderHeaderExtra],
-  );
+  const renderNewHeaderExtra = useMemo(() => renderHeaderExtra("new"), [renderHeaderExtra]);
   const renderFinalStretchHeaderExtra = useMemo(
     () => renderHeaderExtra("final_stretch"),
     [renderHeaderExtra],
@@ -278,9 +265,7 @@ export function PulsePage() {
     <div className="w-full h-full max-w-[1920px] mx-auto">
       <div className="w-full h-full flex flex-col gap-3 sm:gap-4 py-4 lg:px-4 min-h-0">
         <div className="hidden lg:flex flex-none h-8 items-center">
-          <h1 className="text-sm sm:text-base font-medium text-foreground">
-            {t("extend.pulse.title")}
-          </h1>
+          <h1 className="text-sm sm:text-base font-medium text-foreground">{t("pulse.title")}</h1>
         </div>
 
         <div
@@ -307,7 +292,7 @@ export function PulsePage() {
                     "text-sm sm:text-base font-medium transition-all cursor-pointer",
                     type === tab
                       ? "text-foreground hover:opacity-70"
-                      : "text-zinc-500 hover:text-zinc-300",
+                      : "text-text-muted hover:text-text-secondary",
                   )}
                 >
                   {t(key)}
@@ -382,7 +367,7 @@ export function PulsePage() {
                 <PulseNewListWidget
                   chain={chainId}
                   filters={pulseSettings.new?.filters}
-                  title={t("extend.pulse.new")}
+                  title={t("pulse.new")}
                   renderHeaderExtra={renderNewHeaderExtra}
                   renderItemAction={renderItemAction}
                   onSelectToken={handleSelectToken}
@@ -395,7 +380,7 @@ export function PulsePage() {
                 <PulseFinalStretchListWidget
                   chain={chainId}
                   filters={pulseSettings.final_stretch?.filters}
-                  title={t("extend.pulse.final_stretch")}
+                  title={t("pulse.final_stretch")}
                   renderHeaderExtra={renderFinalStretchHeaderExtra}
                   renderItemAction={renderItemAction}
                   onSelectToken={handleSelectToken}
@@ -408,7 +393,7 @@ export function PulsePage() {
                 <PulseMigratedListWidget
                   chain={chainId}
                   filters={pulseSettings.migrated?.filters}
-                  title={t("extend.pulse.migrated")}
+                  title={t("pulse.migrated")}
                   renderHeaderExtra={renderMigratedHeaderExtra}
                   renderItemAction={renderItemAction}
                   onSelectToken={handleSelectToken}

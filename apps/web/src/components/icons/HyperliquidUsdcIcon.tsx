@@ -22,13 +22,10 @@ export function HyperliquidUsdcIcon({
   const ringSize = badgeSize + 2;
 
   return (
-    <div
-      className={cn("relative inline-block", className)}
-      style={{ width: size, height: size }}
-    >
+    <div className={cn("relative inline-block", className)} style={{ width: size, height: size }}>
       <UsdcIcon width={size} height={size} />
       <div
-        className="absolute -bottom-0.5 -right-0.5 flex items-center justify-center rounded-full bg-[#18181b]"
+        className="absolute -bottom-0.5 -right-0.5 flex items-center justify-center rounded-full bg-surface-interactive"
         style={{ width: ringSize, height: ringSize }}
       >
         <HyperliquidIcon width={badgeSize} height={badgeSize} />

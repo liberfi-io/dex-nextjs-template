@@ -16,7 +16,9 @@ export function BottomSolPrice() {
     <StyledTooltip content={t("extend.toolbar.sol_price_usd")} closeDelay={0}>
       <div className="flex items-center gap-1">
         <Avatar className="w-4.5 h-4.5 bg-transparent" src={avatar} />
-        <span className={cn("text-xs font-medium", quotePrice ? "text-bullish" : "text-neutral")}>
+        <span
+          className={cn("text-xs font-medium", quotePrice ? "text-positive" : "text-text-muted")}
+        >
           {quotePrice ? formatPriceInUsd(quotePrice) : "--"}
         </span>
       </div>

@@ -31,23 +31,9 @@ import { debounce } from "lodash-es";
 import { formatUnits, parseUnits } from "viem";
 import { formatAmount } from "@liberfi.io/utils";
 import { useTranslation } from "@liberfi.io/i18n";
-import {
-  ModalContent,
-  SolanaIcon,
-  Spinner,
-  StyledModal,
-  XCloseIcon,
-  cn,
-} from "@liberfi.io/ui";
-import {
-  AsyncModal,
-  type RenderAsyncModalProps,
-} from "@liberfi.io/ui-scaffold";
-import {
-  useAuth,
-  useConnectedWallet,
-  useWallets,
-} from "@liberfi.io/wallet-connector";
+import { ModalContent, SolanaIcon, Spinner, StyledModal, XCloseIcon, cn } from "@liberfi.io/ui";
+import { AsyncModal, type RenderAsyncModalProps } from "@liberfi.io/ui-scaffold";
+import { useAuth, useConnectedWallet, useWallets } from "@liberfi.io/wallet-connector";
 import { Chain } from "@liberfi.io/types";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
@@ -66,10 +52,7 @@ import type { PrivyEvmWalletAdapter } from "@liberfi.io/wallet-connector-privy";
 
 import { HyperliquidUsdcIcon } from "../icons/HyperliquidUsdcIcon";
 import { useSolBalance } from "../../hooks/useSolBalance";
-import {
-  useEvmNativeBalance,
-  type EvmNativeChain,
-} from "../../hooks/useEvmNativeBalance";
+import { useEvmNativeBalance, type EvmNativeChain } from "../../hooks/useEvmNativeBalance";
 import { useHyperliquidBalances } from "../../hooks/useHyperliquidBalances";
 
 export const DEPOSIT_HL_USDC_MODAL_ID = "deposit-hyperliquid-usdc";
@@ -135,19 +118,15 @@ const ORIGIN_BNB: OriginOption = {
   evmBalanceChain: "bnb",
 };
 
-const ORIGIN_OPTIONS: readonly OriginOption[] = [
-  ORIGIN_SOL,
-  ORIGIN_ETH,
-  ORIGIN_BNB,
-] as const;
+const ORIGIN_OPTIONS: readonly OriginOption[] = [ORIGIN_SOL, ORIGIN_ETH, ORIGIN_BNB] as const;
 
 // Inline style mirrored from `ChainSelectDropdown` in NewAppLayout so the
 // origin selector and the header's chain selector share the exact same
 // surface — radius, background, border, and shadow.
 const DROPDOWN_STYLE: React.CSSProperties = {
   borderRadius: 14,
-  border: "1px solid rgba(39,39,42,1)",
-  background: "rgba(24,24,27,1)",
+  border: "1px solid var(--color-border-control)",
+  background: "var(--color-surface-interactive)",
   boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)",
 };
 
@@ -164,11 +143,7 @@ function pickDefaultOrigin(chain: Chain | undefined): OriginOption {
 }
 
 export function DepositHyperliquidUsdcModal() {
-  return (
-    <AsyncModal id={DEPOSIT_HL_USDC_MODAL_ID}>
-      {(props) => <Body {...props} />}
-    </AsyncModal>
-  );
+  return <AsyncModal id={DEPOSIT_HL_USDC_MODAL_ID}>{(props) => <Body {...props} />}</AsyncModal>;
 }
 
 function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
@@ -194,9 +169,7 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
   // The default is re-applied every time the modal transitions from
   // closed to open so opening from a different page picks the latest
   // active chain rather than the last selection.
-  const [origin, setOrigin] = useState<OriginOption>(() =>
-    pickDefaultOrigin(activeChain),
-  );
+  const [origin, setOrigin] = useState<OriginOption>(() => pickDefaultOrigin(activeChain));
   const wasOpen = useRef(false);
   useEffect(() => {
     if (isOpen && !wasOpen.current) {
@@ -208,9 +181,7 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
   // Balances — only the hook matching the current origin is "enabled";
   // the other returns immediately from its disabled default and avoids
   // wasted RPC calls.
-  const solBalance = useSolBalance(
-    origin.namespace === "solana" ? sol?.address : undefined,
-  );
+  const solBalance = useSolBalance(origin.namespace === "solana" ? sol?.address : undefined);
   const evmBalance = useEvmNativeBalance({
     chain: origin.evmBalanceChain ?? "eth",
     address: origin.namespace === "evm" ? evm?.address : undefined,
@@ -223,10 +194,8 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
     return evm?.address;
   }, [origin.namespace, sol?.address, evm?.address]);
 
-  const balanceSmallestUnit =
-    origin.namespace === "solana" ? solBalance.lamports : evmBalance.wei;
-  const balanceDisplay =
-    origin.namespace === "solana" ? solBalance.sol : evmBalance.native;
+  const balanceSmallestUnit = origin.namespace === "solana" ? solBalance.lamports : evmBalance.wei;
+  const balanceDisplay = origin.namespace === "solana" ? solBalance.sol : evmBalance.native;
 
   // Two-tier amount state: `inputValue` keeps the raw text the user typed
   // (so the field is responsive); `committedAmount` is the debounced
@@ -245,10 +214,7 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
     () => debounce((v: string) => setCommittedAmount(v), 350),
     [],
   );
-  useEffect(
-    () => () => debouncedSetCommitted.cancel(),
-    [debouncedSetCommitted],
-  );
+  useEffect(() => () => debouncedSetCommitted.cancel(), [debouncedSetCommitted]);
 
   const handleAmountChange = useCallback(
     (raw: string) => {
@@ -286,7 +252,7 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
     if (!/^\d+(\.\d+)?$/.test(amt) || Number(amt) <= 0) {
       return {
         grossAmount: "",
-        amountError: t("extend.hlDeposit.errorInvalid"),
+        amountError: t("hlDeposit.errorInvalid"),
       };
     }
     let smallest: bigint;
@@ -295,13 +261,13 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
     } catch {
       return {
         grossAmount: "",
-        amountError: t("extend.hlDeposit.errorInvalid"),
+        amountError: t("hlDeposit.errorInvalid"),
       };
     }
     if (smallest <= 0n) {
       return {
         grossAmount: "",
-        amountError: t("extend.hlDeposit.errorInvalid"),
+        amountError: t("hlDeposit.errorInvalid"),
       };
     }
     if (
@@ -311,7 +277,7 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
     ) {
       return {
         grossAmount: "",
-        amountError: t("extend.hlDeposit.errorInsufficient", {
+        amountError: t("hlDeposit.errorInsufficient", {
           symbol: origin.symbol,
         }),
       };
@@ -421,12 +387,8 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
   // are converted to human-readable units of their own decimals.
   const rateText = useMemo(() => {
     if (!quote?.breakdown.expectedOutputUSDC) return null;
-    const grossDecimal = Number(
-      formatUnits(BigInt(quote.breakdown.grossAmount), origin.decimals),
-    );
-    const expectedUsdcNum = Number(
-      hlUsdcRawToUsdc(quote.breakdown.expectedOutputUSDC, 8),
-    );
+    const grossDecimal = Number(formatUnits(BigInt(quote.breakdown.grossAmount), origin.decimals));
+    const expectedUsdcNum = Number(hlUsdcRawToUsdc(quote.breakdown.expectedOutputUSDC, 8));
     if (!grossDecimal || !expectedUsdcNum) return null;
     return formatUsdcDisplay(expectedUsdcNum / grossDecimal);
   }, [quote, origin.decimals]);
@@ -489,15 +451,14 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
   // Visual gating
   // ---------------------------------------------------------------------
   const blocked = !depositClient
-    ? t("extend.hlDeposit.needsConfig")
+    ? t("hlDeposit.needsConfig")
     : !evm
-      ? t("extend.hlDeposit.needsEvmWallet")
+      ? t("hlDeposit.needsEvmWallet")
       : origin.namespace === "solana" && !sol
-        ? t("extend.hlDeposit.needsSolWallet")
+        ? t("hlDeposit.needsSolWallet")
         : null;
 
-  const isExecuting =
-    state.phase === "signing" || state.phase === "broadcasting";
+  const isExecuting = state.phase === "signing" || state.phase === "broadcasting";
   const showStatus =
     state.phase === "submitted" ||
     state.phase === "tracking" ||
@@ -514,13 +475,13 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
     isExecuting;
 
   const confirmLabelText = (() => {
-    if (isExecuting) return t("extend.hlDeposit.signing");
+    if (isExecuting) return t("hlDeposit.signing");
     if (quoteQ.isFetching && committedAmount) {
-      return t("extend.hlDeposit.fetchingQuote");
+      return t("hlDeposit.fetchingQuote");
     }
-    if (!committedAmount) return t("extend.hlDeposit.enterAmount");
-    if (!quoteQ.data) return t("extend.hlDeposit.waitingQuote");
-    return t("extend.hlDeposit.confirm");
+    if (!committedAmount) return t("hlDeposit.enterAmount");
+    if (!quoteQ.data) return t("hlDeposit.waitingQuote");
+    return t("hlDeposit.confirm");
   })();
 
   // Origin-tx hash (chain-agnostic) extracted from the FSM, preferring
@@ -564,7 +525,7 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
         hideCloseButton
         backdrop="blur"
         classNames={{
-          base: "!bg-[#18181b] !rounded-[14px] !border !border-[rgba(39,39,42,1)] !shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] max-w-[420px]",
+          base: "!bg-surface-interactive !rounded-[14px] !border !border-border-control !shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] max-w-[420px]",
           body: "!p-0",
         }}
       >
@@ -577,18 +538,18 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
                   <HyperliquidUsdcIcon size={22} />
                 </div>
                 <div>
-                  <h3 className="text-base font-semibold text-white">
-                    {t("extend.hlDeposit.title")}
+                  <h3 className="text-base font-semibold text-text-primary">
+                    {t("hlDeposit.title")}
                   </h3>
-                  <p className="text-xs text-zinc-500 mt-0.5">
-                    {t("extend.hlDeposit.exchangeSubtitle")}
+                  <p className="text-xs text-text-muted mt-0.5">
+                    {t("hlDeposit.exchangeSubtitle")}
                   </p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={handleClose}
-                className="p-1 rounded-[10px] hover:bg-[rgba(39,39,42,0.5)] text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                className="p-1 rounded-[10px] hover:bg-surface-strong/50 text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
                 aria-label="Close"
               >
                 <XCloseIcon width={16} height={16} />
@@ -605,8 +566,8 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
               <div className="px-5 pb-5 pt-2">
                 {/* Converting card */}
                 <ExchangeCard
-                  label={t("extend.hlDeposit.converting")}
-                  balanceLabel={t("extend.hlDeposit.balance")}
+                  label={t("hlDeposit.converting")}
+                  balanceLabel={t("hlDeposit.balance")}
                   balanceValue={balanceDisplay || "0"}
                   amountInput={
                     <input
@@ -617,30 +578,24 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
                       placeholder="0.0"
                       disabled={isExecuting}
                       className={cn(
-                        "w-full bg-transparent border-0 outline-none text-3xl font-medium text-white placeholder:text-zinc-600 tabular-nums",
+                        "w-full bg-transparent border-0 outline-none text-3xl font-medium text-text-primary placeholder:text-text-disabled tabular-nums",
                         "disabled:opacity-60",
                       )}
                     />
                   }
                   tokenChip={
-                    <OriginSelector
-                      value={origin}
-                      onChange={setOrigin}
-                      disabled={isExecuting}
-                    />
+                    <OriginSelector value={origin} onChange={setOrigin} disabled={isExecuting} />
                   }
                   belowSlot={
                     <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-1 text-[11px] text-zinc-500">
+                      <div className="flex items-center gap-1 text-[11px] text-text-muted">
                         <button
                           type="button"
                           onClick={handleHalf}
                           disabled={
-                            !balanceSmallestUnit ||
-                            balanceSmallestUnit === "0" ||
-                            isExecuting
+                            !balanceSmallestUnit || balanceSmallestUnit === "0" || isExecuting
                           }
-                          className="cursor-pointer px-2 py-0.5 rounded-md text-[10px] uppercase tracking-wider text-zinc-300 bg-zinc-800/60 hover:bg-zinc-700/80 hover:text-[#C7FF2E] transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-zinc-800/60 disabled:hover:text-zinc-300"
+                          className="cursor-pointer px-2 py-0.5 rounded-md text-[10px] uppercase tracking-wider text-text-secondary bg-surface-interactive/60 hover:bg-surface-strong/80 hover:text-brand-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-surface-interactive/60 disabled:hover:text-text-secondary"
                         >
                           {t("perpetuals.page.halfBtn")}
                         </button>
@@ -648,16 +603,14 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
                           type="button"
                           onClick={handleMax}
                           disabled={
-                            !balanceSmallestUnit ||
-                            balanceSmallestUnit === "0" ||
-                            isExecuting
+                            !balanceSmallestUnit || balanceSmallestUnit === "0" || isExecuting
                           }
-                          className="cursor-pointer px-2 py-0.5 rounded-md text-[10px] uppercase tracking-wider text-zinc-300 bg-zinc-800/60 hover:bg-zinc-700/80 hover:text-[#C7FF2E] transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-zinc-800/60 disabled:hover:text-zinc-300"
+                          className="cursor-pointer px-2 py-0.5 rounded-md text-[10px] uppercase tracking-wider text-text-secondary bg-surface-interactive/60 hover:bg-surface-strong/80 hover:text-brand-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-surface-interactive/60 disabled:hover:text-text-secondary"
                         >
-                          {t("extend.hlDeposit.max")}
+                          {t("hlDeposit.max")}
                         </button>
                       </div>
-                      <span className="text-[11px] text-zinc-500 tabular-nums">
+                      <span className="text-[11px] text-text-muted tabular-nums">
                         {usdValue ? `(${`$${usdValue}`})` : "\u00A0"}
                       </span>
                     </div>
@@ -666,15 +619,15 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
 
                 {/* Direction divider */}
                 <div className="relative -my-2 flex items-center justify-center pointer-events-none">
-                  <div className="absolute inset-x-0 top-1/2 h-px bg-zinc-800/0" />
-                  <div className="relative z-10 flex items-center justify-center w-8 h-8 rounded-full bg-[#27272a] border-2 border-[#18181b] text-zinc-300">
+                  <div className="absolute inset-x-0 top-1/2 h-px bg-surface-interactive/0" />
+                  <div className="relative z-10 flex items-center justify-center w-8 h-8 rounded-full bg-surface-strong border-2 border-border-subtle text-text-secondary">
                     <SwapArrowIcon />
                   </div>
                 </div>
 
                 {/* Gaining card */}
                 <ExchangeCard
-                  label={t("extend.hlDeposit.gaining")}
+                  label={t("hlDeposit.gaining")}
                   // The deposit-margin flow lands funds in the Hyperliquid
                   // perp account, so the figure to surface here is what's
                   // immediately usable for opening positions (withdrawable
@@ -682,30 +635,21 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
                   // which can be inflated by open PnL and isn't free
                   // margin.
                   balanceLabel={t("perpetuals.placeOrder.availableMargin")}
-                  balanceValue={
-                    evm ? formatHlUsdc(hlBalances.availableMargin) : "—"
-                  }
+                  balanceValue={evm ? formatHlUsdc(hlBalances.availableMargin) : "—"}
                   amountInput={
                     <div className="flex items-center gap-2">
-                      <span className="text-3xl font-medium text-white tabular-nums">
+                      <span className="text-3xl font-medium text-text-primary tabular-nums">
                         {gainingAmount}
                       </span>
-                      {quoteQ.isFetching && Boolean(quoteReq) && (
-                        <Spinner size="sm" />
-                      )}
+                      {quoteQ.isFetching && Boolean(quoteReq) && <Spinner size="sm" />}
                     </div>
                   }
-                  tokenChip={
-                    <TokenChip
-                      icon={<HyperliquidUsdcIcon size={20} />}
-                      symbol="USDC"
-                    />
-                  }
+                  tokenChip={<TokenChip icon={<HyperliquidUsdcIcon size={20} />} symbol="USDC" />}
                   belowSlot={
                     <div className="flex justify-end">
-                      <span className="text-[11px] text-zinc-500 tabular-nums">
+                      <span className="text-[11px] text-text-muted tabular-nums">
                         {rateText
-                          ? t("extend.hlDeposit.rate", {
+                          ? t("hlDeposit.rate", {
                               rate: rateText,
                               symbol: origin.symbol,
                             })
@@ -717,20 +661,16 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
 
                 {/* Quote breakdown — currently only platform fee, when > 0 */}
                 {platformFeeText && (
-                  <div className="mt-3 rounded-[10px] bg-[#0a0a0b] border border-[#27272a] px-3.5 py-2.5 flex items-center justify-between text-[11px]">
-                    <span className="text-zinc-500">
-                      {t("extend.hlDeposit.platformFee")}
-                    </span>
-                    <span className="text-zinc-200 tabular-nums">
-                      {platformFeeText}
-                    </span>
+                  <div className="mt-3 rounded-[10px] bg-surface-base border border-border-subtle px-3.5 py-2.5 flex items-center justify-between text-[11px]">
+                    <span className="text-text-muted">{t("hlDeposit.platformFee")}</span>
+                    <span className="text-text-primary tabular-nums">{platformFeeText}</span>
                   </div>
                 )}
 
                 {/* Inline errors */}
                 {(amountError || quoteQ.error) && (
                   <p className="mt-3 text-xs text-rose-400">
-                    {amountError ?? t("extend.hlDeposit.errorQuote")}
+                    {amountError ?? t("hlDeposit.errorQuote")}
                   </p>
                 )}
 
@@ -740,10 +680,10 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
                   onClick={handleSubmit}
                   disabled={confirmDisabled}
                   className={cn(
-                    "cursor-pointer mt-4 w-full h-12 rounded-[12px] font-semibold text-black",
-                    "bg-[#C7FF2E] hover:bg-[#b6ed1c] active:bg-[#a6d913]",
+                    "cursor-pointer mt-4 w-full h-12 rounded-[12px] font-semibold text-text-inverse",
+                    "bg-action-primary hover:bg-action-primary-hover active:bg-action-primary-pressed",
                     "transition-colors flex items-center justify-center gap-2",
-                    "disabled:bg-[#3f3f46] disabled:text-zinc-500 disabled:cursor-not-allowed",
+                    "disabled:bg-surface-emphasis disabled:text-text-muted disabled:cursor-not-allowed",
                   )}
                 >
                   {isExecuting && <Spinner size="sm" color="current" />}
@@ -760,9 +700,7 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
         isOpen={showStatus}
         phase={state.phase}
         status={
-          state.phase === "tracking" ||
-          state.phase === "succeeded" ||
-          state.phase === "refunded"
+          state.phase === "tracking" || state.phase === "succeeded" || state.phase === "refunded"
             ? state.status
             : state.phase === "failed"
               ? state.status
@@ -779,9 +717,7 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
             : undefined
         }
         onClose={handleStatusClose}
-        errorMessage={
-          state.phase === "failed" ? state.error.message : undefined
-        }
+        errorMessage={state.phase === "failed" ? state.error.message : undefined}
       />
     </>
   );
@@ -821,13 +757,13 @@ function OriginSelector({
         onClick={() => !disabled && setIsOpen((v) => !v)}
         disabled={disabled}
         className={cn(
-          "flex items-center gap-1.5 h-8 pl-1.5 pr-1.5 rounded-full bg-[#27272a] border border-[#3f3f46]",
-          "transition-colors hover:bg-[#2c2c2f] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer",
+          "flex items-center gap-1.5 h-8 pl-1.5 pr-1.5 rounded-full bg-surface-strong border border-border-control",
+          "transition-colors hover:bg-surface-strong disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer",
           "focus:outline-none focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
         )}
       >
         <OriginIcon origin={value} />
-        <span className="text-sm font-medium text-white">{value.symbol}</span>
+        <span className="text-sm font-medium text-text-primary">{value.symbol}</span>
         <svg
           width="10"
           height="10"
@@ -837,20 +773,14 @@ function OriginSelector({
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className={cn(
-            "text-zinc-400 transition-transform",
-            isOpen && "rotate-180",
-          )}
+          className={cn("text-text-secondary transition-transform", isOpen && "rotate-180")}
           aria-hidden="true"
         >
           <path d="m6 9 6 6 6-6" />
         </svg>
       </button>
       {isOpen && (
-        <div
-          className="absolute right-0 mt-2 w-44 z-50 overflow-hidden"
-          style={DROPDOWN_STYLE}
-        >
+        <div className="absolute right-0 mt-2 w-44 z-50 overflow-hidden" style={DROPDOWN_STYLE}>
           <div className="p-1">
             {ORIGIN_OPTIONS.map((opt) => {
               const isActive = opt.id === value.id;
@@ -865,14 +795,12 @@ function OriginSelector({
                   className={cn(
                     "w-full flex items-center gap-2.5 px-3 py-2 rounded-[10px] text-sm transition-all cursor-pointer",
                     isActive
-                      ? "bg-[#c7ff2e]/[0.08] text-[#c7ff2e]"
-                      : "text-zinc-400 hover:text-white hover:bg-[rgba(39,39,42,0.5)]",
+                      ? "bg-action-primary/[0.08] text-brand-primary"
+                      : "text-text-secondary hover:text-text-primary hover:bg-surface-strong/50",
                   )}
                 >
                   <OriginIcon origin={opt} />
-                  <span className="flex-1 text-left font-medium">
-                    {opt.symbol}
-                  </span>
+                  <span className="flex-1 text-left font-medium">{opt.symbol}</span>
                   {isActive && (
                     <svg
                       viewBox="0 0 24 24"
@@ -925,12 +853,11 @@ function ExchangeCard({
   belowSlot: React.ReactNode;
 }) {
   return (
-    <div className="rounded-[12px] bg-[#0a0a0b] border border-[#27272a] px-3.5 py-3">
+    <div className="rounded-[12px] bg-surface-base border border-border-subtle px-3.5 py-3">
       <div className="flex items-center justify-between text-[11px]">
-        <span className="text-zinc-500">{label}</span>
-        <span className="text-zinc-500">
-          {balanceLabel}{" "}
-          <span className="text-[#C7FF2E] tabular-nums">{balanceValue}</span>
+        <span className="text-text-muted">{label}</span>
+        <span className="text-text-muted">
+          {balanceLabel} <span className="text-brand-primary tabular-nums">{balanceValue}</span>
         </span>
       </div>
       <div className="mt-1.5 flex items-center gap-2">
@@ -942,17 +869,11 @@ function ExchangeCard({
   );
 }
 
-function TokenChip({
-  icon,
-  symbol,
-}: {
-  icon: React.ReactNode;
-  symbol: string;
-}) {
+function TokenChip({ icon, symbol }: { icon: React.ReactNode; symbol: string }) {
   return (
-    <div className="flex items-center gap-1.5 h-8 pl-1.5 pr-2.5 rounded-full bg-[#27272a] border border-[#3f3f46]">
+    <div className="flex items-center gap-1.5 h-8 pl-1.5 pr-2.5 rounded-full bg-surface-strong border border-border-control">
       {icon}
-      <span className="text-sm font-medium text-white">{symbol}</span>
+      <span className="text-sm font-medium text-text-primary">{symbol}</span>
     </div>
   );
 }
@@ -975,12 +896,34 @@ function EthCoinBadge() {
       aria-hidden="true"
     >
       <svg width="11" height="14" viewBox="0 0 256 417" fill="none">
-        <path d="M127.961 0L125.165 9.502v275.668l2.796 2.79 127.962-75.638z" fill="#fff" />
-        <path d="M127.962 0L0 212.32l127.962 75.639V154.158z" fill="#fff" fillOpacity="0.8" />
-        <path d="M127.961 312.187l-1.575 1.92v98.199l1.575 4.6L256 236.587z" fill="#fff" />
-        <path d="M127.962 416.905v-104.72L0 236.585z" fill="#fff" fillOpacity="0.8" />
-        <path d="M127.961 287.958l127.96-75.637-127.96-58.162z" fill="#fff" fillOpacity="0.5" />
-        <path d="M0 212.32l127.96 75.638V154.159z" fill="#fff" fillOpacity="0.6" />
+        <path
+          d="M127.961 0L125.165 9.502v275.668l2.796 2.79 127.962-75.638z"
+          fill="var(--color-text-primary)"
+        />
+        <path
+          d="M127.962 0L0 212.32l127.962 75.639V154.158z"
+          fill="var(--color-text-primary)"
+          fillOpacity="0.8"
+        />
+        <path
+          d="M127.961 312.187l-1.575 1.92v98.199l1.575 4.6L256 236.587z"
+          fill="var(--color-text-primary)"
+        />
+        <path
+          d="M127.962 416.905v-104.72L0 236.585z"
+          fill="var(--color-text-primary)"
+          fillOpacity="0.8"
+        />
+        <path
+          d="M127.961 287.958l127.96-75.637-127.96-58.162z"
+          fill="var(--color-text-primary)"
+          fillOpacity="0.5"
+        />
+        <path
+          d="M0 212.32l127.96 75.638V154.159z"
+          fill="var(--color-text-primary)"
+          fillOpacity="0.6"
+        />
       </svg>
     </div>
   );
@@ -995,7 +938,7 @@ function BnbCoinBadge() {
       <svg width="12" height="12" viewBox="0 0 32 32" fill="none">
         <path
           d="M9.696 13.92 16 7.616l6.308 6.308 3.668-3.668L16 0 6.028 9.972zM0 16l3.668-3.668L7.336 16l-3.668 3.668zm9.696 2.08L16 24.384l6.308-6.308 3.67 3.666L16 32 6.028 22.028l-.052-.052zm14.968-2.08 3.668-3.668L32 16l-3.668 3.668zM19.72 15.998 16 12.276l-2.75 2.748-.318.318-.65.65-.005.006.004.005L16 19.72l3.72-3.72v-.002z"
-          fill="#fff"
+          fill="var(--color-text-primary)"
         />
       </svg>
     </div>

@@ -167,11 +167,7 @@ function validateAddress(chain: Chain, address: string): string | undefined {
 // ---------------------------------------------------------------------------
 
 export function WithdrawModal() {
-  return (
-    <AsyncModal id={WITHDRAW_MODAL_ID}>
-      {(props) => <Body {...props} />}
-    </AsyncModal>
-  );
+  return <AsyncModal id={WITHDRAW_MODAL_ID}>{(props) => <Body {...props} />}</AsyncModal>;
 }
 
 // ---------------------------------------------------------------------------
@@ -192,8 +188,7 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
   const { data: portfolioData } = useWalletPortfolios();
 
   const nativeBalance = useMemo(
-    () =>
-      (portfolioData?.portfolios ?? []).find((p) => p.address === nativeToken?.address),
+    () => (portfolioData?.portfolios ?? []).find((p) => p.address === nativeToken?.address),
     [portfolioData?.portfolios, nativeToken],
   );
 
@@ -245,10 +240,7 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
   // -------------------------------------------------------------------------
   const [addressValue, setAddressValue] = useState("");
 
-  const handleAddressChange = useCallback(
-    (raw: string) => setAddressValue(raw.trim()),
-    [],
-  );
+  const handleAddressChange = useCallback((raw: string) => setAddressValue(raw.trim()), []);
 
   const handlePaste = useCallback(async () => {
     const text = await navigator.clipboard.readText();
@@ -435,7 +427,7 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
       hideCloseButton
       backdrop="blur"
       classNames={{
-        base: "!bg-[#18181b] !rounded-[14px] !border !border-[rgba(39,39,42,1)] !shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] max-w-[420px]",
+        base: "!bg-surface-interactive !rounded-[14px] !border !border-border-control !shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] max-w-[420px]",
         body: "!p-0",
       }}
     >
@@ -444,26 +436,26 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
           {/* Header */}
           <div className="flex items-start justify-between px-5 pt-5 pb-2">
             <div className="flex items-center gap-2.5">
-              <div className="flex items-center justify-center w-9 h-9 rounded-[12px] bg-zinc-700/40">
+              <div className="flex items-center justify-center w-9 h-9 rounded-[12px] bg-surface-strong/40">
                 {nativeToken ? (
                   <TokenIcon symbol={nativeToken.symbol} size={22} />
                 ) : (
-                  <div className="w-5 h-5 rounded-full bg-zinc-600" />
+                  <div className="w-5 h-5 rounded-full bg-surface-emphasis" />
                 )}
               </div>
               <div>
-                <h3 className="text-base font-semibold text-white">
-                  {t("extend.account.withdraw")}
+                <h3 className="text-base font-semibold text-text-primary">
+                  {t("account.withdraw")}
                 </h3>
-                <p className="text-xs text-zinc-500 mt-0.5">
-                  {t("extend.account.sendToWallet", { chain: chainName })}
+                <p className="text-xs text-text-muted mt-0.5">
+                  {t("account.sendToWallet" as never, { chain: chainName })}
                 </p>
               </div>
             </div>
             <button
               type="button"
               onClick={handleClose}
-              className="p-1 rounded-[10px] hover:bg-[rgba(39,39,42,0.5)] text-zinc-400 hover:text-white transition-colors cursor-pointer"
+              className="p-1 rounded-[10px] hover:bg-surface-strong/50 text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
               aria-label="Close"
             >
               <XCloseIcon width={16} height={16} />
@@ -473,16 +465,20 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
           <div className="px-5 pb-5 pt-2 flex flex-col gap-3">
             {!isSupportedChain ? (
               <div className="rounded-[10px] border border-amber-500/20 bg-amber-500/5 px-4 py-6 text-sm text-amber-300 text-center">
-                {t("extend.account.transferComingSoon", { chain: chainName })}
+                {t("account.transferComingSoon" as never, {
+                  chain: chainName,
+                })}
               </div>
             ) : (
               <>
                 {/* Amount card */}
-                <div className="rounded-[12px] bg-[#0a0a0b] border border-[#27272a] px-3.5 py-3">
+                <div className="rounded-[12px] bg-surface-base border border-border-subtle px-3.5 py-3">
                   <div className="flex items-center justify-between text-[11px]">
-                    <span className="text-zinc-500">{t("extend.account.send_amount")}</span>
-                    <span className="text-zinc-500">
-                      {t("extend.account.balance_with_amount", {
+                    <span className="text-text-muted">
+                      {t("account.send_amount" as never)}
+                    </span>
+                    <span className="text-text-muted">
+                      {t("account.balance_with_amount" as never, {
                         amount: balanceDisplay,
                         symbol: nativeToken.symbol,
                       })}
@@ -497,13 +493,15 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
                       placeholder="0.0"
                       disabled={isExecuting}
                       className={cn(
-                        "flex-1 min-w-0 bg-transparent border-0 outline-none text-3xl font-medium text-white placeholder:text-zinc-600 tabular-nums",
+                        "flex-1 min-w-0 bg-transparent border-0 outline-none text-3xl font-medium text-text-primary placeholder:text-text-disabled tabular-nums",
                         "disabled:opacity-60",
                       )}
                     />
-                    <div className="flex items-center gap-1.5 h-8 pl-1.5 pr-2.5 rounded-full bg-[#27272a] border border-[#3f3f46] shrink-0">
+                    <div className="flex items-center gap-1.5 h-8 pl-1.5 pr-2.5 rounded-full bg-surface-strong border border-border-control shrink-0">
                       <TokenIcon symbol={nativeToken.symbol} size={18} />
-                      <span className="text-sm font-medium text-white">{nativeToken.symbol}</span>
+                      <span className="text-sm font-medium text-text-primary">
+                        {nativeToken.symbol}
+                      </span>
                     </div>
                   </div>
                   <div className="mt-1.5 flex items-center justify-between gap-2">
@@ -511,35 +509,39 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
                       <button
                         type="button"
                         onClick={handleHalf}
-                        disabled={!nativeBalance?.amount || nativeBalance.amount === "0" || isExecuting}
-                        className="cursor-pointer px-2 py-0.5 rounded-md text-[10px] uppercase tracking-wider text-zinc-300 bg-zinc-800/60 hover:bg-zinc-700/80 hover:text-[#C7FF2E] transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-zinc-800/60 disabled:hover:text-zinc-300"
+                        disabled={
+                          !nativeBalance?.amount || nativeBalance.amount === "0" || isExecuting
+                        }
+                        className="cursor-pointer px-2 py-0.5 rounded-md text-[10px] uppercase tracking-wider text-text-secondary bg-surface-interactive/60 hover:bg-surface-strong/80 hover:text-brand-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-surface-interactive/60 disabled:hover:text-text-secondary"
                       >
-                        {t("extend.account.withdraw_half")}
+                        {t("account.withdraw_half" as never)}
                       </button>
                       <button
                         type="button"
                         onClick={handleMax}
-                        disabled={!nativeBalance?.amount || nativeBalance.amount === "0" || isExecuting}
-                        className="cursor-pointer px-2 py-0.5 rounded-md text-[10px] uppercase tracking-wider text-zinc-300 bg-zinc-800/60 hover:bg-zinc-700/80 hover:text-[#C7FF2E] transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-zinc-800/60 disabled:hover:text-zinc-300"
+                        disabled={
+                          !nativeBalance?.amount || nativeBalance.amount === "0" || isExecuting
+                        }
+                        className="cursor-pointer px-2 py-0.5 rounded-md text-[10px] uppercase tracking-wider text-text-secondary bg-surface-interactive/60 hover:bg-surface-strong/80 hover:text-brand-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-surface-interactive/60 disabled:hover:text-text-secondary"
                       >
-                        {t("extend.account.withdraw_all")}
+                        {t("account.withdraw_all" as never)}
                       </button>
                     </div>
-                    <span className="text-[11px] text-zinc-500 tabular-nums">
+                    <span className="text-[11px] text-text-muted tabular-nums">
                       {usdValue ?? "\u00A0"}
                     </span>
                   </div>
                 </div>
 
-                {amountError && (
-                  <p className="text-xs text-rose-400 -mt-1">{amountError}</p>
-                )}
+                {amountError && <p className="text-xs text-rose-400 -mt-1">{amountError}</p>}
 
                 {/* Address card */}
-                <div className="rounded-[12px] bg-[#0a0a0b] border border-[#27272a] px-3.5 py-3">
+                <div className="rounded-[12px] bg-surface-base border border-border-subtle px-3.5 py-3">
                   <div className="flex items-center justify-between text-[11px] mb-1.5">
-                    <span className="text-zinc-500">
-                      {t("extend.account.wallet_address_chain", { chain: chainName })}
+                    <span className="text-text-muted">
+                      {t("account.wallet_address_chain" as never, {
+                        chain: chainName,
+                      })}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -547,12 +549,12 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
                       type="text"
                       value={addressValue}
                       onChange={(e) => handleAddressChange(e.target.value)}
-                      placeholder={t("extend.account.transfer_placeholder_chain", {
+                      placeholder={t("account.transfer_placeholder_chain" as never, {
                         chain: chainName,
                       })}
                       disabled={isExecuting}
                       className={cn(
-                        "flex-1 min-w-0 bg-transparent border-0 outline-none text-sm text-white placeholder:text-zinc-600",
+                        "flex-1 min-w-0 bg-transparent border-0 outline-none text-sm text-text-primary placeholder:text-text-disabled",
                         "disabled:opacity-60",
                       )}
                     />
@@ -561,13 +563,22 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
                         type="button"
                         onClick={handlePaste}
                         disabled={isExecuting}
-                        className="shrink-0 flex items-center gap-1 h-7 px-2.5 rounded-[8px] text-xs font-medium transition-colors cursor-pointer bg-zinc-700/60 hover:bg-zinc-700 text-zinc-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="shrink-0 flex items-center gap-1 h-7 px-2.5 rounded-[8px] text-xs font-medium transition-colors cursor-pointer bg-surface-strong/60 hover:bg-surface-strong text-text-secondary hover:text-text-primary disabled:opacity-40 disabled:cursor-not-allowed"
                       >
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
                           <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
                           <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
                         </svg>
-                        {t("extend.account.paste")}
+                        {t("account.paste" as never)}
                       </button>
                     )}
                     {addressValue && (
@@ -575,9 +586,18 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
                         type="button"
                         onClick={() => setAddressValue("")}
                         disabled={isExecuting}
-                        className="shrink-0 flex items-center justify-center w-6 h-6 rounded-full text-zinc-500 hover:text-zinc-300 hover:bg-zinc-700/60 transition-colors cursor-pointer disabled:opacity-40"
+                        className="shrink-0 flex items-center justify-center w-6 h-6 rounded-full text-text-muted hover:text-text-secondary hover:bg-surface-strong/60 transition-colors cursor-pointer disabled:opacity-40"
                       >
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <svg
+                          width="10"
+                          height="10"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
                           <line x1="18" y1="6" x2="6" y2="18" />
                           <line x1="6" y1="6" x2="18" y2="18" />
                         </svg>
@@ -586,16 +606,14 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
                   </div>
                 </div>
 
-                {addressError && (
-                  <p className="text-xs text-rose-400 -mt-1">{addressError}</p>
-                )}
+                {addressError && <p className="text-xs text-rose-400 -mt-1">{addressError}</p>}
 
                 {createTxError && !txError && (
-                  <p className="text-xs text-rose-400">{t("extend.account.transfer_errors.create_transaction_error")}</p>
+                  <p className="text-xs text-rose-400">
+                    {t("account.transfer_errors.create_transaction_error")}
+                  </p>
                 )}
-                {txError && (
-                  <p className="text-xs text-rose-400">{txError}</p>
-                )}
+                {txError && <p className="text-xs text-rose-400">{txError}</p>}
 
                 {/* Submit */}
                 <button
@@ -603,16 +621,27 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
                   onClick={handleSubmit}
                   disabled={submitDisabled}
                   className={cn(
-                    "cursor-pointer mt-1 w-full h-12 rounded-[12px] font-semibold text-black",
-                    "bg-[#C7FF2E] hover:bg-[#b6ed1c] active:bg-[#a6d913]",
+                    "cursor-pointer mt-1 w-full h-12 rounded-[12px] font-semibold text-text-inverse",
+                    "bg-action-primary hover:bg-action-primary-hover active:bg-action-primary-pressed",
                     "transition-colors flex items-center justify-center gap-2",
-                    "disabled:bg-[#3f3f46] disabled:text-zinc-500 disabled:cursor-not-allowed",
+                    "disabled:bg-surface-emphasis disabled:text-text-muted disabled:cursor-not-allowed",
                   )}
                 >
                   {isExecuting && (
                     <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z" />
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"
+                      />
                     </svg>
                   )}
                   {submitLabel}

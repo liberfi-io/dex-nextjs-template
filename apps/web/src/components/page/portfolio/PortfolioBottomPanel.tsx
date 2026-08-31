@@ -30,19 +30,14 @@ export interface PortfolioBottomPanelProps {
  *      few items the underline rhythm felt sparse; pills give each
  *      tab a more deliberate visual weight.
  */
-export function PortfolioBottomPanel({
-  chain,
-  address,
-}: PortfolioBottomPanelProps) {
+export function PortfolioBottomPanel({ chain, address }: PortfolioBottomPanelProps) {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<PortfolioBottomTab>("assets");
 
-  const tabItems = useMemo<
-    ReadonlyArray<PortfolioTabItem<PortfolioBottomTab>>
-  >(
+  const tabItems = useMemo<ReadonlyArray<PortfolioTabItem<PortfolioBottomTab>>>(
     () => [
-      { key: "assets", label: t("extend.portfolio.tabs.assets") },
-      { key: "activities", label: t("extend.portfolio.tabs.activities") },
+      { key: "assets", label: t("portfolio.tabs.assets") },
+      { key: "activities", label: t("portfolio.tabs.activities") },
     ],
     [t],
   );
@@ -62,12 +57,8 @@ export function PortfolioBottomPanel({
           / ~24px (desktop) from the panel edge — the rhythm matches
           the header + chart cards above. */}
       <div className="min-h-0 flex-1 overflow-hidden px-2 lg:px-3 pb-2">
-        {activeTab === "assets" && (
-          <PortfolioAssetsTable chain={chain} address={address} />
-        )}
-        {activeTab === "activities" && (
-          <PortfolioActivitiesTable chain={chain} address={address} />
-        )}
+        {activeTab === "assets" && <PortfolioAssetsTable chain={chain} address={address} />}
+        {activeTab === "activities" && <PortfolioActivitiesTable chain={chain} address={address} />}
       </div>
     </div>
   );
@@ -92,18 +83,14 @@ interface PortfolioTabBarProps<K extends Key> {
  *     row from the table; horizontal padding (`px-2 lg:px-3`) matches
  *     the table content's outer padding so the first tab's clickable
  *     area aligns with the table's first column.
- *   - Inactive tabs: `text-default-500` with a faint hover background
+ *   - Inactive tabs: `text-text-muted` with a faint hover background
  *     (`bg-default-100/50`) for affordance.
  *   - Active tab: solid `bg-default-100` pill + `text-foreground`. The
  *     pill is `rounded-full` rather than a hard underline so it sits
  *     comfortably inside the rounded card without competing visually
  *     with the panel's border.
  */
-function PortfolioTabBar<K extends Key>({
-  items,
-  value,
-  onChange,
-}: PortfolioTabBarProps<K>) {
+function PortfolioTabBar<K extends Key>({ items, value, onChange }: PortfolioTabBarProps<K>) {
   return (
     <div className="flex items-center gap-1 border-b border-default-100 px-2 lg:px-3 py-2">
       {items.map((item) => {
@@ -119,7 +106,7 @@ function PortfolioTabBar<K extends Key>({
               "rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-colors cursor-pointer whitespace-nowrap",
               active
                 ? "bg-default-100 text-foreground"
-                : "text-default-500 hover:text-foreground hover:bg-default-100/50",
+                : "text-text-muted hover:text-foreground hover:bg-default-100/50",
             )}
           >
             {item.label}

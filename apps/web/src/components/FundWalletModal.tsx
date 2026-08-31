@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  type ReactNode,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { type ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import encodeQR from "@paulmillr/qr";
 import { useTranslation } from "@liberfi.io/i18n";
 import {
@@ -42,10 +36,7 @@ import {
   XCloseIcon,
   toast,
 } from "@liberfi.io/ui";
-import {
-  AsyncModal,
-  type RenderAsyncModalProps,
-} from "@liberfi.io/ui-scaffold";
+import { AsyncModal, type RenderAsyncModalProps } from "@liberfi.io/ui-scaffold";
 import { createWalletClient, custom, parseUnits, type Hex } from "viem";
 import { polygon } from "viem/chains";
 import { useWallets, type EvmWalletAdapter } from "@liberfi.io/wallet-connector";
@@ -102,7 +93,7 @@ export function FundWalletModal() {
           onOpenChange={props.onOpenChange}
           size="md"
           classNames={{
-            base: "!bg-[#18181b] !rounded-[14px] !border !border-[rgba(39,39,42,1)] !shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)]",
+            base: "!bg-surface-interactive !rounded-[14px] !border !border-border-control !shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)]",
             body: "!p-0",
           }}
         >
@@ -185,12 +176,8 @@ function WalletSelector({
 }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
-  const {
-    solanaAddress,
-    evmAddress,
-    kalshiUsdcBalance,
-    polymarketUsdcBalance,
-  } = usePredictWallet();
+  const { solanaAddress, evmAddress, kalshiUsdcBalance, polymarketUsdcBalance } =
+    usePredictWallet();
 
   const wallets = useMemo(() => {
     const list: {
@@ -229,24 +216,25 @@ function WalletSelector({
     <div className="relative">
       <button
         type="button"
-        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[10px] bg-zinc-800/50 hover:bg-[rgba(39,39,42,0.5)] border border-zinc-700/50 transition-colors cursor-pointer focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[10px] bg-surface-interactive/50 hover:bg-surface-strong/50 border border-border-control/50 transition-colors cursor-pointer focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
         onClick={() => setOpen((v) => !v)}
       >
         <div
           className="flex items-center justify-center w-7 h-7 rounded-[10px]"
           style={{
-            background: "linear-gradient(to bottom right, rgba(199,255,46,0.08), rgba(23,201,100,0.08))",
-            border: "1px solid rgba(199,255,46,0.1)",
+            background:
+              "linear-gradient(to bottom right, hsl(var(--heroui-primary) / 0.08), hsl(var(--heroui-success) / 0.08))",
+            border: "1px solid hsl(var(--heroui-primary) / 0.1)",
           }}
         >
           {current.chainIcon}
         </div>
         <div className="flex-1 min-w-0 text-left">
-          <div className="text-sm font-medium text-zinc-300 truncate">
+          <div className="text-sm font-medium text-text-secondary truncate">
             {current.address ? truncateAddress(current.address) : "—"}
           </div>
-          <div className="text-xs text-zinc-500">
-            {t("extend.account.usdcOnChain", {
+          <div className="text-xs text-text-muted">
+            {t("account.usdcOnChain" as never, {
               amount: formatUsdc(current.balance ?? 0),
               chain: current.chainName,
             })}
@@ -255,10 +243,7 @@ function WalletSelector({
         <ChevronDownIcon
           width={16}
           height={16}
-          className={cn(
-            "text-zinc-500 transition-transform",
-            open && "rotate-180",
-          )}
+          className={cn("text-text-muted transition-transform", open && "rotate-180")}
         />
       </button>
 
@@ -267,8 +252,8 @@ function WalletSelector({
           className="absolute left-0 right-0 mt-2 z-50 overflow-hidden"
           style={{
             borderRadius: 14,
-            border: "1px solid rgba(39,39,42,1)",
-            background: "rgba(24,24,27,1)",
+            border: "1px solid var(--color-border-control)",
+            background: "var(--color-surface-interactive)",
             boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)",
           }}
         >
@@ -279,7 +264,7 @@ function WalletSelector({
                 <button
                   key={w.key}
                   type="button"
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[10px] hover:bg-[rgba(39,39,42,0.5)] transition-colors cursor-pointer"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[10px] hover:bg-surface-strong/50 transition-colors cursor-pointer"
                   onClick={() => {
                     onSelect(w.key);
                     setOpen(false);
@@ -288,18 +273,19 @@ function WalletSelector({
                   <div
                     className="flex items-center justify-center w-7 h-7 rounded-[10px]"
                     style={{
-                      background: "linear-gradient(to bottom right, rgba(199,255,46,0.08), rgba(23,201,100,0.08))",
-                      border: "1px solid rgba(199,255,46,0.1)",
+                      background:
+                        "linear-gradient(to bottom right, hsl(var(--heroui-primary) / 0.08), hsl(var(--heroui-success) / 0.08))",
+                      border: "1px solid hsl(var(--heroui-primary) / 0.1)",
                     }}
                   >
                     {w.chainIcon}
                   </div>
                   <div className="flex-1 min-w-0 text-left">
-                    <div className="text-sm font-medium text-zinc-300 truncate">
+                    <div className="text-sm font-medium text-text-secondary truncate">
                       {w.address ? truncateAddress(w.address) : "—"}
                     </div>
-                    <div className="text-xs text-zinc-500">
-                      {t("extend.account.usdcOnChain", {
+                    <div className="text-xs text-text-muted">
+                      {t("account.usdcOnChain" as never, {
                         amount: formatUsdc(w.balance ?? 0),
                         chain: w.chainName,
                       })}
@@ -334,17 +320,17 @@ function ModalHeader({
           <button
             type="button"
             onClick={onBack}
-            className="p-1 rounded-[10px] hover:bg-[rgba(39,39,42,0.5)] text-zinc-400 hover:text-white transition-colors cursor-pointer focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            className="p-1 rounded-[10px] hover:bg-surface-strong/50 text-text-secondary hover:text-text-primary transition-colors cursor-pointer focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
           >
             <ChevronLeftIcon width={18} height={18} />
           </button>
         )}
-        <h3 className="text-lg font-semibold text-white">{title}</h3>
+        <h3 className="text-lg font-semibold text-text-primary">{title}</h3>
       </div>
       <button
         type="button"
         onClick={onClose}
-        className="p-1 rounded-[10px] hover:bg-[rgba(39,39,42,0.5)] text-zinc-400 hover:text-white transition-colors cursor-pointer focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        className="p-1 rounded-[10px] hover:bg-surface-strong/50 text-text-secondary hover:text-text-primary transition-colors cursor-pointer focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
       >
         <XCloseIcon width={18} height={18} />
       </button>
@@ -393,9 +379,9 @@ function MainScreen({
   );
 
   const handleDeployAndApprove = useCallback(async () => {
-    const evmWallet = wallets.find(
-      (w) => w.chainNamespace === "EVM" && w.isConnected,
-    ) as EvmWalletAdapter | undefined;
+    const evmWallet = wallets.find((w) => w.chainNamespace === "EVM" && w.isConnected) as
+      | EvmWalletAdapter
+      | undefined;
     if (!evmWallet || !evmAddress) {
       throw new Error("EVM wallet not connected");
     }
@@ -429,7 +415,14 @@ function MainScreen({
     queryClient.invalidateQueries({
       queryKey: polymarketSetupQueryKey(evmAddress),
     });
-  }, [wallets, evmAddress, polymarketSafeDeployed, polymarketTokenApproved, relayConfig, queryClient]);
+  }, [
+    wallets,
+    evmAddress,
+    polymarketSafeDeployed,
+    polymarketTokenApproved,
+    relayConfig,
+    queryClient,
+  ]);
 
   const isSolana = selectedWallet === "solana";
   const balance = isSolana ? kalshiUsdcBalance : polymarketUsdcBalance;
@@ -440,7 +433,7 @@ function MainScreen({
 
   return (
     <div>
-      <ModalHeader title={t("extend.predict.fundWallet.title")} onClose={onClose} />
+      <ModalHeader title={t("predict.fundWallet.title")} onClose={onClose} />
       <div className="px-5 pb-5 space-y-4">
         <WalletSelector selected={selectedWallet} onSelect={onSelectWallet} />
 
@@ -464,39 +457,45 @@ function MainScreen({
         {needsPrerequisite ? (
           <div className="flex flex-col items-center gap-4 py-6">
             <div className="w-14 h-14 rounded-full bg-amber-500/10 flex items-center justify-center">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400">
+              <svg
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-amber-400"
+              >
                 <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
                 <line x1="12" y1="9" x2="12" y2="13" />
                 <line x1="12" y1="17" x2="12.01" y2="17" />
               </svg>
             </div>
-            <p className="text-sm text-zinc-400 text-center">
-              {needsKyc
-                ? t("extend.predict.kyc.unverified")
-                : t("extend.predict.setup.unverified")}
+            <p className="text-sm text-text-secondary text-center">
+              {needsKyc ? t("predict.kyc.unverified") : t("predict.setup.unverified")}
             </p>
             <button
               type="button"
-              onClick={() => needsKyc ? setIsKycModalOpen(true) : setIsSetupModalOpen(true)}
-              className="px-6 py-2.5 rounded-[10px] bg-[#c7ff2e]/10 border border-[#c7ff2e]/25 text-[#c7ff2e] hover:bg-[#c7ff2e]/20 hover:border-[#c7ff2e]/40 text-sm font-semibold transition-colors cursor-pointer focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+              onClick={() => (needsKyc ? setIsKycModalOpen(true) : setIsSetupModalOpen(true))}
+              className="px-6 py-2.5 rounded-[10px] bg-action-primary/10 border border-brand-primary/25 text-brand-primary hover:bg-action-primary/20 hover:border-brand-primary/40 text-sm font-semibold transition-colors cursor-pointer focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
             >
-              {needsKyc
-                ? t("extend.predict.kyc.unverifiedShort")
-                : t("extend.predict.setup.unverifiedShort")}
+              {needsKyc ? t("predict.kyc.unverifiedShort") : t("predict.setup.unverifiedShort")}
             </button>
           </div>
         ) : (
           <>
             <div className="text-center">
-              <div className="text-[10px] uppercase tracking-wider text-zinc-500 font-medium mb-1">
-                {t("extend.predict.fundWallet.walletBalance")}
+              <div className="text-[10px] uppercase tracking-wider text-text-muted font-medium mb-1">
+                {t("predict.fundWallet.walletBalance")}
               </div>
               <div className="flex items-center justify-center gap-2">
                 <UsdcIcon width={24} height={24} />
-              <span className="text-2xl font-bold text-[#c7ff2e] tabular-nums">
-                {formatUsdc(balance ?? 0)}
-              </span>
-              <span className="text-sm text-zinc-500 self-end mb-0.5">USDC</span>
+                <span className="text-2xl font-bold text-brand-primary tabular-nums">
+                  {formatUsdc(balance ?? 0)}
+                </span>
+                <span className="text-sm text-text-muted self-end mb-0.5">USDC</span>
               </div>
             </div>
 
@@ -504,36 +503,64 @@ function MainScreen({
               <button
                 type="button"
                 onClick={onDeposit}
-                className="flex flex-col items-center gap-2 p-4 rounded-[14px] border border-[#c7ff2e]/20 bg-[#c7ff2e]/5 hover:bg-[#c7ff2e]/10 hover:border-[#c7ff2e]/40 transition-colors cursor-pointer group focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                className="flex flex-col items-center gap-2 p-4 rounded-[14px] border border-brand-primary/20 bg-action-primary/5 hover:bg-action-primary/10 hover:border-brand-primary/40 transition-colors cursor-pointer group focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
               >
-                <div className="w-10 h-10 rounded-full bg-[#c7ff2e]/10 flex items-center justify-center group-hover:bg-[#c7ff2e]/20 transition-colors">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#c7ff2e]">
+                <div className="w-10 h-10 rounded-full bg-action-primary/10 flex items-center justify-center group-hover:bg-action-primary/20 transition-colors">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-brand-primary"
+                  >
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                     <polyline points="7 10 12 15 17 10" />
                     <line x1="12" y1="15" x2="12" y2="3" />
                   </svg>
                 </div>
                 <div>
-                  <div className="text-sm font-semibold text-[#c7ff2e]">{t("extend.predict.fundWallet.deposit")}</div>
-                  <div className="text-[10px] text-zinc-500 mt-0.5">{t("extend.predict.fundWallet.depositSubtitle")}</div>
+                  <div className="text-sm font-semibold text-brand-primary">
+                    {t("predict.fundWallet.deposit")}
+                  </div>
+                  <div className="text-[10px] text-text-muted mt-0.5">
+                    {t("predict.fundWallet.depositSubtitle")}
+                  </div>
                 </div>
               </button>
 
               <button
                 type="button"
                 onClick={onWithdraw}
-                className="flex flex-col items-center gap-2 p-4 rounded-[14px] border border-orange-500/20 bg-orange-500/5 hover:bg-orange-500/10 hover:border-orange-500/40 transition-colors cursor-pointer group focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                className="flex flex-col items-center gap-2 p-4 rounded-[14px] border border-negative/20 bg-negative/5 hover:bg-negative/10 hover:border-negative/40 transition-colors cursor-pointer group focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
               >
-                <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center group-hover:bg-orange-500/20 transition-colors">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-orange-400">
+                <div className="w-10 h-10 rounded-full bg-negative/10 flex items-center justify-center group-hover:bg-negative/20 transition-colors">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-negative"
+                  >
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                     <polyline points="17 8 12 3 7 8" />
                     <line x1="12" y1="3" x2="12" y2="15" />
                   </svg>
                 </div>
                 <div>
-                  <div className="text-sm font-semibold text-orange-400">{t("extend.predict.fundWallet.withdraw")}</div>
-                  <div className="text-[10px] text-zinc-500 mt-0.5">{t("extend.predict.fundWallet.withdrawSubtitle")}</div>
+                  <div className="text-sm font-semibold text-negative">
+                    {t("predict.fundWallet.withdraw")}
+                  </div>
+                  <div className="text-[10px] text-text-muted mt-0.5">
+                    {t("predict.fundWallet.withdrawSubtitle")}
+                  </div>
                 </div>
               </button>
             </div>
@@ -561,7 +588,7 @@ function QRCodeImage({ value }: { value: string }) {
 
   return (
     <div
-      className="rounded-[10px] overflow-hidden border border-zinc-700 bg-white p-2"
+      className="rounded-[10px] overflow-hidden border border-border-control bg-white p-2"
       style={{ width: 180, height: 180 }}
       dangerouslySetInnerHTML={{ __html: svgString }}
       aria-hidden="true"
@@ -579,18 +606,16 @@ function CopyAddressRow({ address }: { address: string }) {
   }, [address]);
 
   return (
-    <div className="flex items-center gap-2 bg-zinc-800/50 rounded-[10px] px-3 py-2 border border-zinc-700/50">
-      <span className="flex-1 font-mono text-xs text-zinc-300 truncate">
-        {address}
-      </span>
+    <div className="flex items-center gap-2 bg-surface-interactive/50 rounded-[10px] px-3 py-2 border border-border-control/50">
+      <span className="flex-1 font-mono text-xs text-text-secondary truncate">{address}</span>
       <button
         type="button"
         onClick={handleCopy}
-        className="p-1.5 rounded-[10px] hover:bg-[rgba(39,39,42,0.5)] text-zinc-500 hover:text-white transition-colors cursor-pointer shrink-0 focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        className="p-1.5 rounded-[10px] hover:bg-surface-strong/50 text-text-muted hover:text-text-primary transition-colors cursor-pointer shrink-0 focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
         aria-label="Copy address"
       >
         {copied ? (
-          <CheckIcon width={14} height={14} className="text-[#c7ff2e]" />
+          <CheckIcon width={14} height={14} className="text-brand-primary" />
         ) : (
           <CopyIcon width={14} height={14} />
         )}
@@ -643,37 +668,32 @@ function DepositChainSelect({
 
   return (
     <div className="space-y-1.5">
-      <div className="text-[10px] uppercase tracking-wider text-zinc-500 font-medium">
-        {t("extend.predict.fundWallet.network")}
+      <div className="text-[10px] uppercase tracking-wider text-text-muted font-medium">
+        {t("predict.fundWallet.network")}
       </div>
       <div className="relative">
         <button
           type="button"
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[10px] bg-zinc-800/50 hover:bg-[rgba(39,39,42,0.5)] border border-zinc-700/50 transition-colors cursor-pointer focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[10px] bg-surface-interactive/50 hover:bg-surface-strong/50 border border-border-control/50 transition-colors cursor-pointer focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
           onClick={() => setOpen((v) => !v)}
         >
           <div
             className="flex items-center justify-center w-7 h-7 rounded-[10px]"
             style={{
               background:
-                "linear-gradient(to bottom right, rgba(199,255,46,0.08), rgba(23,201,100,0.08))",
-              border: "1px solid rgba(199,255,46,0.1)",
+                "linear-gradient(to bottom right, hsl(var(--heroui-primary) / 0.08), hsl(var(--heroui-success) / 0.08))",
+              border: "1px solid hsl(var(--heroui-primary) / 0.1)",
             }}
           >
             {chainIcon(current.key, 18)}
           </div>
           <div className="flex-1 min-w-0 text-left">
-            <div className="text-sm font-medium text-zinc-200 truncate">
-              {current.label}
-            </div>
+            <div className="text-sm font-medium text-text-primary truncate">{current.label}</div>
           </div>
           <ChevronDownIcon
             width={16}
             height={16}
-            className={cn(
-              "text-zinc-500 transition-transform",
-              open && "rotate-180",
-            )}
+            className={cn("text-text-muted transition-transform", open && "rotate-180")}
           />
         </button>
 
@@ -682,8 +702,8 @@ function DepositChainSelect({
             className="absolute left-0 right-0 mt-2 z-50 overflow-hidden"
             style={{
               borderRadius: 14,
-              border: "1px solid rgba(39,39,42,1)",
-              background: "rgba(24,24,27,1)",
+              border: "1px solid var(--color-border-control)",
+              background: "var(--color-surface-interactive)",
               boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)",
             }}
           >
@@ -694,7 +714,7 @@ function DepositChainSelect({
                   <button
                     key={c.key}
                     type="button"
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[10px] hover:bg-[rgba(39,39,42,0.5)] transition-colors cursor-pointer"
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[10px] hover:bg-surface-strong/50 transition-colors cursor-pointer"
                     onClick={() => {
                       onChange(c.key);
                       setOpen(false);
@@ -704,16 +724,14 @@ function DepositChainSelect({
                       className="flex items-center justify-center w-7 h-7 rounded-[10px]"
                       style={{
                         background:
-                          "linear-gradient(to bottom right, rgba(199,255,46,0.08), rgba(23,201,100,0.08))",
-                        border: "1px solid rgba(199,255,46,0.1)",
+                          "linear-gradient(to bottom right, hsl(var(--heroui-primary) / 0.08), hsl(var(--heroui-success) / 0.08))",
+                        border: "1px solid hsl(var(--heroui-primary) / 0.1)",
                       }}
                     >
                       {chainIcon(c.key, 18)}
                     </div>
                     <div className="flex-1 min-w-0 text-left">
-                      <div className="text-sm font-medium text-zinc-200">
-                        {c.label}
-                      </div>
+                      <div className="text-sm font-medium text-text-primary">{c.label}</div>
                     </div>
                   </button>
                 ))}
@@ -739,15 +757,13 @@ function KalshiDepositBody({
 }) {
   const { t } = useTranslation();
   const chainName = "Solana";
-  const explorerUrl = solanaAddress
-    ? `https://solscan.io/account/${solanaAddress}`
-    : null;
+  const explorerUrl = solanaAddress ? `https://solscan.io/account/${solanaAddress}` : null;
 
   return (
     <>
-      <div className="bg-[#c7ff2e]/5 border border-[#c7ff2e]/15 rounded-[10px] px-3 py-2.5">
-        <p className="text-xs text-[#c7ff2e]/70 leading-relaxed">
-          {t("extend.predict.fundWallet.depositInfo", { chain: chainName })}
+      <div className="bg-action-primary/5 border border-brand-primary/15 rounded-[10px] px-3 py-2.5">
+        <p className="text-xs text-brand-primary/70 leading-relaxed">
+          {t("predict.fundWallet.depositInfo", { chain: chainName })}
         </p>
       </div>
 
@@ -757,42 +773,41 @@ function KalshiDepositBody({
             <QRCodeImage value={solanaAddress} />
           </div>
           <div className="space-y-1.5">
-            <div className="text-[10px] uppercase tracking-wider text-zinc-500 font-medium">
-              {t("extend.predict.fundWallet.yourAddress", { chain: chainName })}
+            <div className="text-[10px] uppercase tracking-wider text-text-muted font-medium">
+              {t("predict.fundWallet.yourAddress", { chain: chainName })}
             </div>
             <CopyAddressRow address={solanaAddress} />
           </div>
         </>
       ) : (
         <div className="flex items-center justify-center h-32">
-          <span className="text-sm text-zinc-500">
-            {t("extend.predict.fundWallet.walletNotConnected")}
+          <span className="text-sm text-text-muted">
+            {t("predict.fundWallet.walletNotConnected")}
           </span>
         </div>
       )}
 
-      <div className="flex items-center justify-between bg-zinc-800/30 rounded-[10px] px-3 py-2.5 border border-zinc-700/50">
-        <span className="text-xs text-zinc-400">
-          {t("extend.predict.fundWallet.currentBalance")}
+      <div className="flex items-center justify-between bg-surface-interactive/30 rounded-[10px] px-3 py-2.5 border border-border-control/50">
+        <span className="text-xs text-text-secondary">
+          {t("predict.fundWallet.currentBalance")}
         </span>
         <div className="flex items-center gap-1.5">
           <UsdcIcon width={14} height={14} />
-          <span className="text-sm font-medium text-[#c7ff2e] tabular-nums">
+          <span className="text-sm font-medium text-brand-primary tabular-nums">
             {formatUsdc(balance ?? 0)}
           </span>
         </div>
       </div>
 
       <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-[10px] text-zinc-500 uppercase tracking-wider">
-          {t("extend.predict.fundWallet.supported")}
+        <span className="text-[10px] text-text-muted uppercase tracking-wider">
+          {t("predict.fundWallet.supported")}
         </span>
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-zinc-800/60 rounded-md text-[10px] text-zinc-300 border border-zinc-700/50">
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-surface-interactive/60 rounded-md text-[10px] text-text-secondary border border-border-control/50">
           <UsdcIcon width={12} height={12} /> USDC
         </span>
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-zinc-800/60 rounded-md text-[10px] text-zinc-300 border border-zinc-700/50">
-          <SolanaIcon width={12} height={12} />{" "}
-          {t("extend.predict.fundWallet.solForFees")}
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-surface-interactive/60 rounded-md text-[10px] text-text-secondary border border-border-control/50">
+          <SolanaIcon width={12} height={12} /> {t("predict.fundWallet.solForFees")}
         </span>
       </div>
 
@@ -801,9 +816,9 @@ function KalshiDepositBody({
           href={explorerUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[10px] border border-zinc-700/50 bg-zinc-800/60 hover:bg-zinc-800 text-sm text-zinc-300 hover:text-white transition-all"
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[10px] border border-border-control/50 bg-surface-interactive/60 hover:bg-surface-interactive text-sm text-text-secondary hover:text-text-primary transition-all"
         >
-          {t("extend.predict.fundWallet.viewOnExplorer", { explorer: "Solscan" })}
+          {t("predict.fundWallet.viewOnExplorer", { explorer: "Solscan" })}
           <ExternalLinkIcon />
         </a>
       )}
@@ -838,12 +853,8 @@ function PolymarketDepositBody({
     if (!supportedAssets || supportedAssets.length === 0) {
       return ordered;
     }
-    const supportedChainIds = new Set(
-      supportedAssets.map((a) => a.chainId.toLowerCase()),
-    );
-    const filtered = ordered.filter((c) =>
-      supportedChainIds.has(c.chainId.toLowerCase()),
-    );
+    const supportedChainIds = new Set(supportedAssets.map((a) => a.chainId.toLowerCase()));
+    const filtered = ordered.filter((c) => supportedChainIds.has(c.chainId.toLowerCase()));
     return filtered.length > 0 ? filtered : ordered;
   }, [supportedAssets]);
 
@@ -854,17 +865,13 @@ function PolymarketDepositBody({
   // Keep the selected chain in sync when the available set changes (e.g.
   // supportedAssets loads in after the modal opened).
   useEffect(() => {
-    if (
-      availableChains.length > 0 &&
-      !availableChains.some((c) => c.key === selectedChainKey)
-    ) {
+    if (availableChains.length > 0 && !availableChains.some((c) => c.key === selectedChainKey)) {
       setSelectedChainKey(availableChains[0].key);
     }
   }, [availableChains, selectedChainKey]);
 
   const selectedChain =
-    availableChains.find((c) => c.key === selectedChainKey) ??
-    availableChains[0];
+    availableChains.find((c) => c.key === selectedChainKey) ?? availableChains[0];
 
   const address =
     selectedChain && depositAddresses
@@ -895,9 +902,7 @@ function PolymarketDepositBody({
   const supportedSymbols = useMemo(() => {
     if (!selectedChain) return [];
     const bridgeSymbols = new Set(
-      chainAssets
-        .map((a) => a.token?.symbol?.toUpperCase())
-        .filter((s): s is string => Boolean(s)),
+      chainAssets.map((a) => a.token?.symbol?.toUpperCase()).filter((s): s is string => Boolean(s)),
     );
     const out: string[] = [selectedChain.nativeSymbol];
     if (bridgeSymbols.has("USDC")) out.push("USDC");
@@ -905,8 +910,7 @@ function PolymarketDepositBody({
     return out;
   }, [chainAssets, selectedChain]);
 
-  const explorerUrl =
-    selectedChain && address ? selectedChain.buildExplorerUrl(address) : null;
+  const explorerUrl = selectedChain && address ? selectedChain.buildExplorerUrl(address) : null;
 
   return (
     <>
@@ -917,9 +921,9 @@ function PolymarketDepositBody({
       />
 
       {selectedChain && (
-        <div className="bg-[#c7ff2e]/5 border border-[#c7ff2e]/15 rounded-[10px] px-3 py-2.5">
-          <p className="text-xs text-[#c7ff2e]/70 leading-relaxed">
-            {t("extend.predict.fundWallet.depositInfo", {
+        <div className="bg-action-primary/5 border border-brand-primary/15 rounded-[10px] px-3 py-2.5">
+          <p className="text-xs text-brand-primary/70 leading-relaxed">
+            {t("predict.fundWallet.depositInfo", {
               chain: selectedChain.label,
             })}
           </p>
@@ -929,7 +933,7 @@ function PolymarketDepositBody({
       {minAmountUsd != null && (
         <div className="bg-amber-500/5 border border-amber-500/20 rounded-[10px] px-3 py-2">
           <p className="text-xs text-amber-300">
-            {t("extend.predict.fundWallet.minDepositUsd", {
+            {t("predict.fundWallet.minDepositUsd", {
               amount: formatMinAmount(minAmountUsd),
             })}
           </p>
@@ -938,7 +942,7 @@ function PolymarketDepositBody({
 
       {depositAddressesLoading ? (
         <div className="flex items-center justify-center h-32">
-          <div className="animate-spin rounded-full h-6 w-6 border-2 border-zinc-600 border-t-zinc-300" />
+          <div className="animate-spin rounded-full h-6 w-6 border-2 border-border-control border-t-zinc-300" />
         </div>
       ) : address && selectedChain ? (
         <>
@@ -946,8 +950,8 @@ function PolymarketDepositBody({
             <QRCodeImage value={address} />
           </div>
           <div className="space-y-1.5">
-            <div className="text-[10px] uppercase tracking-wider text-zinc-500 font-medium">
-              {t("extend.predict.fundWallet.yourAddress", {
+            <div className="text-[10px] uppercase tracking-wider text-text-muted font-medium">
+              {t("predict.fundWallet.yourAddress", {
                 chain: selectedChain.label,
               })}
             </div>
@@ -956,32 +960,32 @@ function PolymarketDepositBody({
         </>
       ) : (
         <div className="flex items-center justify-center h-32">
-          <span className="text-sm text-zinc-500">
-            {t("extend.predict.fundWallet.walletNotConnected")}
+          <span className="text-sm text-text-muted">
+            {t("predict.fundWallet.walletNotConnected")}
           </span>
         </div>
       )}
 
-      <div className="flex items-center justify-between bg-zinc-800/30 rounded-[10px] px-3 py-2.5 border border-zinc-700/50">
-        <span className="text-xs text-zinc-400">
-          {t("extend.predict.fundWallet.currentBalance")}
+      <div className="flex items-center justify-between bg-surface-interactive/30 rounded-[10px] px-3 py-2.5 border border-border-control/50">
+        <span className="text-xs text-text-secondary">
+          {t("predict.fundWallet.currentBalance")}
         </span>
         <div className="flex items-center gap-1.5">
           <UsdcIcon width={14} height={14} />
-          <span className="text-sm font-medium text-[#c7ff2e] tabular-nums">
+          <span className="text-sm font-medium text-brand-primary tabular-nums">
             {formatUsdc(balance ?? 0)}
           </span>
         </div>
       </div>
 
       <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-[10px] text-zinc-500 uppercase tracking-wider">
-          {t("extend.predict.fundWallet.supported")}
+        <span className="text-[10px] text-text-muted uppercase tracking-wider">
+          {t("predict.fundWallet.supported")}
         </span>
         {supportedSymbols.map((symbol) => (
           <span
             key={symbol}
-            className="inline-flex items-center gap-1 px-2 py-0.5 bg-zinc-800/60 rounded-md text-[10px] text-zinc-300 border border-zinc-700/50"
+            className="inline-flex items-center gap-1 px-2 py-0.5 bg-surface-interactive/60 rounded-md text-[10px] text-text-secondary border border-border-control/50"
           >
             <SupportedTokenIcon symbol={symbol} /> {symbol}
           </span>
@@ -993,9 +997,9 @@ function PolymarketDepositBody({
           href={explorerUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[10px] border border-zinc-700/50 bg-zinc-800/60 hover:bg-zinc-800 text-sm text-zinc-300 hover:text-white transition-all"
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[10px] border border-border-control/50 bg-surface-interactive/60 hover:bg-surface-interactive text-sm text-text-secondary hover:text-text-primary transition-all"
         >
-          {t("extend.predict.fundWallet.viewOnExplorer", {
+          {t("predict.fundWallet.viewOnExplorer", {
             explorer: selectedChain.explorerName,
           })}
           <ExternalLinkIcon />
@@ -1059,39 +1063,23 @@ function DepositScreen({
   walletLocked?: boolean;
 }) {
   const { t } = useTranslation();
-  const {
-    solanaAddress,
-    kalshiUsdcBalance,
-    polymarketUsdcBalance,
-    polymarketSafeAddress,
-  } = usePredictWallet();
+  const { solanaAddress, kalshiUsdcBalance, polymarketUsdcBalance, polymarketSafeAddress } =
+    usePredictWallet();
 
   const isSolana = selectedWallet === "solana";
 
   return (
     <div>
-      <ModalHeader
-        title={t("extend.predict.fundWallet.depositTitle")}
-        onBack={onBack}
-        onClose={onClose}
-      />
+      <ModalHeader title={t("predict.fundWallet.depositTitle")} onBack={onBack} onClose={onClose} />
       <div className="px-5 pb-5 space-y-4">
         {/* Hide the wallet picker entirely when the caller has locked
             the wallet. The deposit body that follows already includes
             chain / address context so the user still knows which
             wallet they're funding. */}
-        {!walletLocked && (
-          <WalletSelector
-            selected={selectedWallet}
-            onSelect={onSelectWallet}
-          />
-        )}
+        {!walletLocked && <WalletSelector selected={selectedWallet} onSelect={onSelectWallet} />}
 
         {isSolana ? (
-          <KalshiDepositBody
-            solanaAddress={solanaAddress}
-            balance={kalshiUsdcBalance}
-          />
+          <KalshiDepositBody solanaAddress={solanaAddress} balance={kalshiUsdcBalance} />
         ) : (
           <PolymarketDepositBody
             polymarketSafeAddress={polymarketSafeAddress}
@@ -1164,7 +1152,7 @@ function WithdrawScreen({
   const withdrawStatus = statusData?.status;
   useEffect(() => {
     if (withdrawStatus === "confirmed") {
-      toast.success(t("extend.predict.fundWallet.withdrawalConfirmed"));
+      toast.success(t("predict.fundWallet.withdrawalConfirmed"));
       if (fromAddress) {
         queryClient.invalidateQueries({
           queryKey: balanceQueryKey(source, fromAddress),
@@ -1172,11 +1160,11 @@ function WithdrawScreen({
       }
       onClose();
     } else if (withdrawStatus === "failed") {
-      toast.error(t("extend.predict.fundWallet.withdrawalFailed"));
+      toast.error(t("predict.fundWallet.withdrawalFailed"));
       setTxHash(undefined);
       setIsSubmitting(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [withdrawStatus]);
 
   const handleMax = useCallback(() => {
@@ -1191,7 +1179,11 @@ function WithdrawScreen({
     ? /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(trimmedDest)
     : /^0x[0-9a-fA-F]{40}$/.test(trimmedDest);
 
-  const isBelowMinimum = !isSolana && !isNaN(parsedAmount) && parsedAmount > 0 && parsedAmount < POLYMARKET_MIN_WITHDRAW_USD;
+  const isBelowMinimum =
+    !isSolana &&
+    !isNaN(parsedAmount) &&
+    parsedAmount > 0 &&
+    parsedAmount < POLYMARKET_MIN_WITHDRAW_USD;
 
   const balanceCents = toCents(balance ?? 0);
   const isValid =
@@ -1216,33 +1208,27 @@ function WithdrawScreen({
         });
 
         if (!solanaWallet) throw new Error("wallet_not_connected");
-        const txBytes = Uint8Array.from(atob(buildResult.serialized_tx), (c) =>
-          c.charCodeAt(0),
-        );
+        const txBytes = Uint8Array.from(atob(buildResult.serialized_tx), (c) => c.charCodeAt(0));
         const signedBytes = await solanaWallet.signTransaction(txBytes);
-        const signedBase64 = btoa(
-          String.fromCharCode(...new Uint8Array(signedBytes)),
-        );
+        const signedBase64 = btoa(String.fromCharCode(...new Uint8Array(signedBytes)));
 
         const submitResult = await submitMutation.mutateAsync({
           source,
           signed_tx: signedBase64,
         });
-        toast.success(t("extend.predict.fundWallet.txSubmitted"));
+        toast.success(t("predict.fundWallet.txSubmitted"));
         setTxHash(submitResult.tx_hash);
       } else {
-        if (!evmAddress || !polymarketSafeAddress)
-          throw new Error("wallet_not_connected");
+        if (!evmAddress || !polymarketSafeAddress) throw new Error("wallet_not_connected");
 
-        const { deposit_address } =
-          await predictClient.preparePolymarketWithdraw({
-            safe_address: polymarketSafeAddress,
-            to: destination.trim(),
-          });
+        const { deposit_address } = await predictClient.preparePolymarketWithdraw({
+          safe_address: polymarketSafeAddress,
+          to: destination.trim(),
+        });
 
-        const evmWallet = wallets.find(
-          (w) => w.chainNamespace === "EVM" && w.isConnected,
-        ) as EvmWalletAdapter | undefined;
+        const evmWallet = wallets.find((w) => w.chainNamespace === "EVM" && w.isConnected) as
+          | EvmWalletAdapter
+          | undefined;
         if (!evmWallet) throw new Error("wallet_not_connected");
 
         await evmWallet.switchChain("137" as never);
@@ -1258,20 +1244,13 @@ function WithdrawScreen({
         const amountSmallest = parseUnits(String(parsedAmount), 6);
         const transferTx = {
           to: POLYMARKET_CONTRACTS.USDC_E,
-          data: buildTransferCalldata(
-            deposit_address as Hex,
-            amountSmallest,
-          ),
+          data: buildTransferCalldata(deposit_address as Hex, amountSmallest),
         };
 
-        const result = await executeSafe(
-          walletClient,
-          [transferTx],
-          relayConfig,
-        );
+        const result = await executeSafe(walletClient, [transferTx], relayConfig);
 
         if (result.transactionID) {
-          toast.success(t("extend.predict.fundWallet.txSubmitted"));
+          toast.success(t("predict.fundWallet.txSubmitted"));
           await pollTransaction(relayConfig, result.transactionID);
         }
 
@@ -1309,29 +1288,30 @@ function WithdrawScreen({
 
   return (
     <div>
-      <ModalHeader title={t("extend.predict.fundWallet.withdrawTitle")} onBack={onBack} onClose={onClose} />
+      <ModalHeader
+        title={t("predict.fundWallet.withdrawTitle")}
+        onBack={onBack}
+        onClose={onClose}
+      />
       <div className="px-5 pb-5 space-y-4">
         {/* See DepositScreen for rationale on the locked-wallet
             branch: the deposit/withdraw body already names the chain
             and source address, so the picker is pure noise here. */}
-        {!walletLocked && (
-          <WalletSelector
-            selected={selectedWallet}
-            onSelect={onSelectWallet}
-          />
-        )}
+        {!walletLocked && <WalletSelector selected={selectedWallet} onSelect={onSelectWallet} />}
 
         {/* Info banner */}
         <div className="bg-amber-500/5 border border-amber-500/20 rounded-[10px] px-3 py-2.5">
           <p className="text-xs text-amber-300 leading-relaxed">
-            {t("extend.predict.fundWallet.withdrawInfo", { chain: chainName })}
+            {t("predict.fundWallet.withdrawInfo", { chain: chainName })}
           </p>
         </div>
 
         {!isSolana && (
           <div className="bg-amber-500/5 border border-amber-500/20 rounded-[10px] px-3 py-2">
             <p className="text-xs text-amber-300">
-              {t("extend.predict.fundWallet.minWithdrawAmount", { amount: `$${POLYMARKET_MIN_WITHDRAW_USD}` })}
+              {t("predict.fundWallet.minWithdrawAmount", {
+                amount: `$${POLYMARKET_MIN_WITHDRAW_USD}`,
+              })}
             </p>
           </div>
         )}
@@ -1340,19 +1320,19 @@ function WithdrawScreen({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             <UsdcIcon width={16} height={16} />
-            <span className="text-xs text-zinc-400">{t("extend.predict.fundWallet.available")}</span>
+            <span className="text-xs text-text-secondary">{t("predict.fundWallet.available")}</span>
           </div>
-          <span className="text-sm font-medium text-white tabular-nums">
+          <span className="text-sm font-medium text-text-primary tabular-nums">
             {formatUsdc(balance ?? 0)}
           </span>
         </div>
 
         {/* Amount input */}
         <div className="space-y-1.5">
-          <label className="text-[10px] uppercase tracking-wider text-zinc-500 font-medium">
-            {t("extend.predict.fundWallet.amount")}
+          <label className="text-[10px] uppercase tracking-wider text-text-muted font-medium">
+            {t("predict.fundWallet.amount")}
           </label>
-          <div className="flex items-center bg-zinc-800/50 border border-zinc-700/50 rounded-[10px] focus-within:border-[#c7ff2e]/30">
+          <div className="flex items-center bg-surface-interactive/50 border border-border-control/50 rounded-[10px] focus-within:border-brand-primary/30">
             <input
               type="text"
               inputMode="decimal"
@@ -1363,41 +1343,41 @@ function WithdrawScreen({
                 if (v === "" || /^\d*\.?\d{0,2}$/.test(v)) setAmount(v);
               }}
               disabled={isPending}
-              className="flex-1 bg-transparent px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 outline-none tabular-nums"
+              className="flex-1 bg-transparent px-3 py-2.5 text-sm text-text-primary placeholder:text-text-disabled outline-none tabular-nums"
             />
             <button
               type="button"
               onClick={handleMax}
               disabled={isPending}
-              className="px-2 py-1 mr-2 text-[10px] font-semibold text-[#c7ff2e] hover:text-[#c7ff2e]/80 bg-[#c7ff2e]/10 hover:bg-[#c7ff2e]/20 rounded-md transition-colors cursor-pointer disabled:opacity-50"
+              className="px-2 py-1 mr-2 text-[10px] font-semibold text-brand-primary hover:text-brand-primary/80 bg-action-primary/10 hover:bg-action-primary/20 rounded-md transition-colors cursor-pointer disabled:opacity-50"
             >
               MAX
             </button>
-            <span className="pr-3 text-xs text-zinc-500">USDC</span>
+            <span className="pr-3 text-xs text-text-muted">USDC</span>
           </div>
         </div>
 
         {/* Destination address input */}
         <div className="space-y-1.5">
-          <label className="text-[10px] uppercase tracking-wider text-zinc-500 font-medium">
-            {t("extend.predict.fundWallet.destinationAddress")}
+          <label className="text-[10px] uppercase tracking-wider text-text-muted font-medium">
+            {t("predict.fundWallet.destinationAddress")}
           </label>
           <input
             type="text"
-            placeholder={t("extend.predict.fundWallet.addressPlaceholder", { chain: chainName })}
+            placeholder={t("predict.fundWallet.addressPlaceholder", { chain: chainName })}
             value={destination}
             onChange={(e) => setDestination(e.target.value)}
             disabled={isPending}
             className={cn(
-              "w-full bg-zinc-800/50 border rounded-[10px] px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 outline-none font-mono",
+              "w-full bg-surface-interactive/50 border rounded-[10px] px-3 py-2.5 text-sm text-text-primary placeholder:text-text-disabled outline-none font-mono",
               trimmedDest.length > 0 && !isValidAddress
-                ? "border-red-500/60 focus:border-red-500"
-                : "border-zinc-700/50 focus:border-[#c7ff2e]/30",
+                ? "border-danger/60 focus:border-danger"
+                : "border-border-control/50 focus:border-brand-primary/30",
             )}
           />
           {trimmedDest.length > 0 && !isValidAddress && (
-            <p className="text-[10px] text-red-400">
-              {t("extend.predict.fundWallet.invalidAddress", { chain: chainName })}
+            <p className="text-[10px] text-danger">
+              {t("predict.fundWallet.invalidAddress", { chain: chainName })}
             </p>
           )}
         </div>
@@ -1410,15 +1390,15 @@ function WithdrawScreen({
           className={cn(
             "w-full py-3 rounded-[10px] text-sm font-semibold transition-colors focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
             isValid && !isPending
-              ? "bg-[#c7ff2e] text-zinc-900 hover:bg-[#c7ff2e]/90 cursor-pointer"
-              : "bg-zinc-800 text-zinc-500 cursor-not-allowed",
+              ? "bg-action-primary text-text-inverse hover:bg-action-primary-hover cursor-pointer"
+              : "bg-surface-interactive text-text-muted cursor-not-allowed",
           )}
         >
           {isPending
             ? txHash
-              ? t("extend.predict.fundWallet.confirming")
-              : t("extend.predict.fundWallet.signing")
-            : t("extend.predict.fundWallet.withdrawButton")}
+              ? t("predict.fundWallet.confirming")
+              : t("predict.fundWallet.signing")
+            : t("predict.fundWallet.withdrawButton")}
         </button>
       </div>
     </div>
@@ -1452,17 +1432,14 @@ function formatMinAmount(usd: number): string {
 }
 
 const WITHDRAW_ERROR_PATTERNS: [RegExp, string][] = [
-  [/insufficient_gas|insufficient funds/i, "extend.predict.fundWallet.errorInsufficientGas"],
-  [/user (rejected|denied|cancelled)/i, "extend.predict.fundWallet.errorTxCancelled"],
-  [/unsupported chainId/i, "extend.predict.fundWallet.errorUnsupportedChain"],
-  [/wallet.not.connected|wallet_not_connected/i, "extend.predict.fundWallet.errorWalletNotConnected"],
-  [/provider.not.available|provider_not_available/i, "extend.predict.fundWallet.errorProviderUnavailable"],
+  [/insufficient_gas|insufficient funds/i, "predict.fundWallet.errorInsufficientGas"],
+  [/user (rejected|denied|cancelled)/i, "predict.fundWallet.errorTxCancelled"],
+  [/unsupported chainId/i, "predict.fundWallet.errorUnsupportedChain"],
+  [/wallet.not.connected|wallet_not_connected/i, "predict.fundWallet.errorWalletNotConnected"],
+  [/provider.not.available|provider_not_available/i, "predict.fundWallet.errorProviderUnavailable"],
 ];
 
-function friendlyWithdrawError(
-  raw: string,
-  t: (key: string) => string,
-): string {
+function friendlyWithdrawError(raw: string, t: (key: string) => string): string {
   for (const [pattern, key] of WITHDRAW_ERROR_PATTERNS) {
     if (pattern.test(raw)) return t(key);
   }

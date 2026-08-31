@@ -4,12 +4,7 @@ import { useMemo } from "react";
 import { usePathname } from "next/navigation";
 import { ChainAwareLink } from "./ChainAwareLink";
 import { useTranslation } from "@liberfi.io/i18n";
-import {
-  ChartLineIcon,
-  ZapFastIcon,
-  UserIcon,
-  cn,
-} from "@liberfi.io/ui";
+import { ChartLineIcon, ZapFastIcon, UserIcon, cn } from "@liberfi.io/ui";
 
 type SubNavItem = {
   key: "markets" | "matches" | "portfolio";
@@ -38,14 +33,13 @@ export function PredictSubNav() {
         const active =
           item.href === "/predict"
             ? !SUB_NAV_ITEMS.some(
-                (other) =>
-                  other.href !== "/predict" && pathname.startsWith(other.href),
+                (other) => other.href !== "/predict" && pathname.startsWith(other.href),
               )
             : pathname.startsWith(item.href);
         return {
           ...item,
           active,
-          label: t(`extend.predict.subnav.${item.key}`) as string,
+          label: t(`predict.subnav.${item.key}`) as string,
         };
       }),
     [pathname, t],
@@ -60,10 +54,10 @@ export function PredictSubNav() {
       // sync prevents the SubNav border from looking visually heavier than
       // the bordered sticky element rendered directly below it on /predict.
       style={{
-        background: "rgba(10,10,11,0.8)",
+        background: "hsl(var(--heroui-background) / 0.8)",
         backdropFilter: "blur(24px)",
         WebkitBackdropFilter: "blur(24px)",
-        borderBottom: "1px solid rgba(39,39,42,0.5)",
+        borderBottom: "1px solid var(--color-border-subtle)",
       }}
       aria-label="Prediction sub navigation"
     >
@@ -78,8 +72,8 @@ export function PredictSubNav() {
             className={cn(
               "flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-[10px] transition-colors cursor-pointer whitespace-nowrap focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
               item.active
-                ? "text-[#c7ff2e] bg-[#c7ff2e]/[0.08]"
-                : "text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/40",
+                ? "text-brand-primary bg-action-primary/[0.08]"
+                : "text-text-muted hover:text-text-primary hover:bg-surface-interactive/40",
             )}
           >
             {item.icon}

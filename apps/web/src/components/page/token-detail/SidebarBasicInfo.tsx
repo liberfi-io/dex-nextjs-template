@@ -24,7 +24,7 @@ export interface SidebarBasicInfoProps {
  *   ┌─────────────────────────────────┐
  *   │ ⌄ Basic Info                    │  ← collapsible header
  *   ├─────────────────────────────────┤
- *   │ Market Cap            $182.35   │  ← label 12px text-default-700
+ *   │ Market Cap            $182.35   │  ← label 12px text-text-secondary
  *   │ Liquidity             $15.6M    │     value 13px text-foreground 500
  *   │ 24h Volume            $142.4K   │
  *   │ Holders               8         │
@@ -68,44 +68,28 @@ export function SidebarBasicInfo({ chain, address }: SidebarBasicInfoProps) {
 
   return (
     <CollapsibleSection
-      title={t("extend.trade.basic_info.title")}
+      title={t("trade.basic_info.title")}
       defaultOpen
       className="border-t border-divider"
       bodyClassName="px-4 pb-4"
     >
       <ul className="flex flex-col">
         <Row
-          label={t("extend.trade.basic_info.market_cap")}
+          label={t("trade.basic_info.market_cap")}
           value={formatMCapInUsd(md?.marketCapInUsd ?? "")}
         />
         <Row
-          label={t("extend.trade.basic_info.liquidity")}
+          label={t("trade.basic_info.liquidity")}
           value={formatAmountInUsd(md?.tvlInUsd ?? "")}
         />
         <Row
-          label={t("extend.trade.basic_info.volume_24h")}
+          label={t("trade.basic_info.volume_24h")}
           value={formatAmountInUsd(stats24h?.volumesInUsd ?? "")}
         />
-        <Row
-          label={t("extend.trade.basic_info.holders")}
-          value={formatAmount(md?.holders ?? "")}
-        />
-        <Row
-          label={t("extend.trade.basic_info.supply")}
-          value={formatAmount(md?.totalSupply ?? "")}
-        />
-        {pair && (
-          <Row
-            label={t("extend.trade.basic_info.pair")}
-            value={truncateAddress(pair, 4, 4)}
-          />
-        )}
-        {createdAt && (
-          <Row
-            label={t("extend.trade.basic_info.created_at")}
-            value={createdAt}
-          />
-        )}
+        <Row label={t("trade.basic_info.holders")} value={formatAmount(md?.holders ?? "")} />
+        <Row label={t("trade.basic_info.supply")} value={formatAmount(md?.totalSupply ?? "")} />
+        {pair && <Row label={t("trade.basic_info.pair")} value={truncateAddress(pair, 4, 4)} />}
+        {createdAt && <Row label={t("trade.basic_info.created_at")} value={createdAt} />}
       </ul>
     </CollapsibleSection>
   );
@@ -119,7 +103,7 @@ export function SidebarBasicInfo({ chain, address }: SidebarBasicInfoProps) {
 function Row({ label, value }: { label: string; value: ReactNode }) {
   return (
     <li className="flex h-7 items-center justify-between gap-2">
-      <span className="text-[12px] font-normal text-default-700">{label}</span>
+      <span className="text-[12px] font-normal text-text-secondary">{label}</span>
       <span
         className="truncate text-right text-[13px] font-medium tabular-nums text-foreground"
         style={{ letterSpacing: "-0.2px" }}

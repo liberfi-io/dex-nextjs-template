@@ -119,7 +119,7 @@ export interface SidebarVolumeStatsProps {
  *
  * Clicking a tab swaps the bottom data row to that resolution. The active
  * tab gets a subtle `bg-content3` highlight and `font-semibold` label;
- * inactive tabs show `text-default-700` on a transparent track and reveal
+ * inactive tabs show `text-text-secondary` on a transparent track and reveal
  * the same highlight on hover.
  */
 export function SidebarVolumeStats({ chain, address }: SidebarVolumeStatsProps) {
@@ -154,10 +154,10 @@ export function SidebarVolumeStats({ chain, address }: SidebarVolumeStatsProps) 
       <DataRow
         slice={slice}
         labels={{
-          volume: t("extend.trade.volume.total"),
-          buys: t("extend.trade.transactions.buys"),
-          sales: t("extend.trade.transactions.sales"),
-          netBuys: t("extend.trade.transactions.net_buys"),
+          volume: t("trade.volume.total"),
+          buys: t("trade.transactions.buys"),
+          sales: t("trade.transactions.sales"),
+          netBuys: t("trade.transactions.net_buys"),
         }}
       />
     </div>
@@ -193,9 +193,7 @@ function ResolutionTab({
       <span
         className={cn(
           "text-[13px] leading-4",
-          isActive
-            ? "font-semibold text-foreground"
-            : "font-normal text-default-700",
+          isActive ? "font-semibold text-foreground" : "font-normal text-text-secondary",
         )}
       >
         {resolution}
@@ -203,12 +201,10 @@ function ResolutionTab({
       <span
         className={cn(
           "text-[13px] font-medium leading-4 tabular-nums",
-          bullish ? "text-bullish" : "text-bearish",
+          bullish ? "text-positive" : "text-negative",
         )}
       >
-        {priceChange !== undefined
-          ? formatPercent(priceChange, { showPlusGtThanZero: true })
-          : "-"}
+        {priceChange !== undefined ? formatPercent(priceChange, { showPlusGtThanZero: true }) : "-"}
       </span>
     </button>
   );
@@ -237,39 +233,29 @@ function DataRow({
     // under `1m`, Buys under `5m`, Sells under `1h`, Net Buy under `24h`).
     // Forcing the outer cells to `text-left` / `text-right` previously
     // broke that alignment.
-    <div className="flex items-center text-[13px] leading-4 text-default-700">
+    <div className="flex items-center text-[13px] leading-4 text-text-secondary">
       {/* Volume */}
       <Cell label={labels.volume}>
-        <span className="text-foreground">
-          {formatUsdCompact(slice?.volumesInUsd ?? "")}
-        </span>
+        <span className="text-foreground">{formatUsdCompact(slice?.volumesInUsd ?? "")}</span>
       </Cell>
 
       {/* Buys — count + volume, both in bullish */}
       <Cell label={labels.buys}>
-        <span className="text-bullish">
-          {formatCountCompact(slice?.buys ?? "")}
-        </span>
-        <span className="text-default-700">/</span>
-        <span className="text-bullish">
-          {formatUsdCompact(slice?.buyVolumesInUsd ?? "")}
-        </span>
+        <span className="text-positive">{formatCountCompact(slice?.buys ?? "")}</span>
+        <span className="text-text-secondary">/</span>
+        <span className="text-positive">{formatUsdCompact(slice?.buyVolumesInUsd ?? "")}</span>
       </Cell>
 
       {/* Sells — count + volume, both in bearish */}
       <Cell label={labels.sales}>
-        <span className="text-bearish">
-          {formatCountCompact(slice?.sells ?? "")}
-        </span>
-        <span className="text-default-700">/</span>
-        <span className="text-bearish">
-          {formatUsdCompact(slice?.sellVolumesInUsd ?? "")}
-        </span>
+        <span className="text-negative">{formatCountCompact(slice?.sells ?? "")}</span>
+        <span className="text-text-secondary">/</span>
+        <span className="text-negative">{formatUsdCompact(slice?.sellVolumesInUsd ?? "")}</span>
       </Cell>
 
       {/* Net Buy — bullish/bearish, sign-prefixed */}
       <Cell label={labels.netBuys}>
-        <span className={cn(netBullish ? "text-bullish" : "text-bearish")}>
+        <span className={cn(netBullish ? "text-positive" : "text-negative")}>
           {net !== undefined
             ? `${netBullish ? "+" : "-"}${formatUsdCompact(net.abs().toString())}`
             : "-"}
@@ -279,20 +265,11 @@ function DataRow({
   );
 }
 
-function Cell({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
+function Cell({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-1 flex-col items-center gap-0.5 text-center">
       <span>{label}</span>
-      <span
-        className="text-[12px] font-medium tabular-nums"
-        style={{ letterSpacing: "-0.2px" }}
-      >
+      <span className="text-[12px] font-medium tabular-nums" style={{ letterSpacing: "-0.2px" }}>
         {children}
       </span>
     </div>

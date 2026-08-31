@@ -101,13 +101,13 @@ export function useHyperliquidPlaceOrder(): (
       // Auth gate — same shape as the leverage hook so the user
       // sees the identical error in both flows.
       if (!evm?.address) {
-        const message = t("extend.perpetuals.order.needsEvmWallet");
+        const message = t("perpetuals.order.needsEvmWallet");
         toast.error(message);
         throw new Error(message);
       }
       const provider = await evm.getEip1193Provider();
       if (!provider) {
-        const message = t("extend.perpetuals.order.needsEvmWallet");
+        const message = t("perpetuals.order.needsEvmWallet");
         toast.error(message);
         throw new Error(message);
       }
@@ -295,7 +295,7 @@ export function useHyperliquidPlaceOrder(): (
         // resting limit order.
         if (filled) {
           toast.success(
-            t("extend.perpetuals.order.placed", {
+            t("perpetuals.order.placed", {
               symbol,
               side: isBuy ? "Long" : "Short",
               avgPrice: avgPrice?.toLocaleString(undefined, {
@@ -305,7 +305,7 @@ export function useHyperliquidPlaceOrder(): (
           );
         } else {
           toast.success(
-            t("extend.perpetuals.order.resting", {
+            t("perpetuals.order.resting", {
               symbol,
               side: isBuy ? "Long" : "Short",
             }),
@@ -326,8 +326,8 @@ export function useHyperliquidPlaceOrder(): (
         const reason =
           error instanceof Error
             ? error.message
-            : t("extend.perpetuals.order.placeFailed");
-        toast.error(t("extend.perpetuals.order.placeFailed", { reason }));
+            : t("perpetuals.order.placeFailed");
+        toast.error(t("perpetuals.order.placeFailed", { reason }));
         throw error;
       }
     },

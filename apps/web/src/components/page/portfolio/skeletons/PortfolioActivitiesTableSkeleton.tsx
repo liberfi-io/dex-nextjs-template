@@ -39,7 +39,7 @@ export function PortfolioActivitiesTableSkeleton({
                 <th
                   key={col.key}
                   className={cn(
-                    "h-9 px-3 align-middle text-[12px] font-medium text-default-500",
+                    "h-9 px-3 align-middle text-[12px] font-medium text-text-muted",
                     alignClass(col.align),
                     col.width,
                   )}

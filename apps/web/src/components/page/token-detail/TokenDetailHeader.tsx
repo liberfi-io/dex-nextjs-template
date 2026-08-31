@@ -69,8 +69,7 @@ function Content({ token }: { token: Token }) {
   const volume24h = stats24h?.volumesInUsd;
 
   const priceChangeAbs = useMemo(
-    () =>
-      priceChange ? new SafeBigNumber(priceChange).abs().toString() : undefined,
+    () => (priceChange ? new SafeBigNumber(priceChange).abs().toString() : undefined),
     [priceChange],
   );
   const bullish = useMemo(
@@ -117,11 +116,7 @@ function Content({ token }: { token: Token }) {
     >
       {/* Identity: avatar + name block */}
       <div className="flex shrink-0 items-center gap-3">
-        <TokenAvatar
-          token={token}
-          showProgress={false}
-          className="h-10 w-10 flex-none"
-        />
+        <TokenAvatar token={token} showProgress={false} className="h-10 w-10 flex-none" />
 
         <div className="flex min-w-0 flex-col gap-1">
           {/* Row 1: symbol + name + copy — entire row copies address on click */}
@@ -133,11 +128,11 @@ function Content({ token }: { token: Token }) {
               {token.symbol}
             </span>
             {token.name && token.name !== token.symbol && (
-              <span className="max-w-[200px] truncate text-[14px] font-normal leading-6 text-neutral transition-colors group-hover:text-primary-200">
+              <span className="max-w-[200px] truncate text-[14px] font-normal leading-6 text-text-muted transition-colors group-hover:text-primary-200">
                 {token.name}
               </span>
             )}
-            <CopyIcon className="h-[14px] w-[14px] flex-none text-neutral transition-colors group-hover:text-primary-200" />
+            <CopyIcon className="h-[14px] w-[14px] flex-none text-text-muted transition-colors group-hover:text-primary-200" />
           </div>
 
           {/* Row 2: age (with full-time tooltip) · address · socials — all 12px */}
@@ -150,7 +145,7 @@ function Content({ token }: { token: Token }) {
               </StyledTooltip>
             )}
             <span
-              className="cursor-pointer whitespace-nowrap text-neutral transition-colors hover:text-primary-200"
+              className="cursor-pointer whitespace-nowrap text-text-muted transition-colors hover:text-primary-200"
               onClick={handleCopyAddress}
             >
               {formatShortAddress(token.address)}
@@ -175,9 +170,7 @@ function Content({ token }: { token: Token }) {
                 <DiscordIcon className="h-3.5 w-3.5" />
               </SocialLink>
             )}
-            <SocialLink
-              href={searchTwitterUrl(`${token.symbol} OR ${token.address}`)}
-            >
+            <SocialLink href={searchTwitterUrl(`${token.symbol} OR ${token.address}`)}>
               <SearchIcon className="h-3.5 w-3.5" />
             </SocialLink>
           </div>
@@ -193,7 +186,7 @@ function Content({ token }: { token: Token }) {
           <span
             className={cn(
               "inline-flex items-center gap-1 text-xs tabular-nums",
-              bullish ? "text-bullish" : "text-bearish",
+              bullish ? "text-positive" : "text-negative",
             )}
           >
             {bullish ? (
@@ -209,25 +202,22 @@ function Content({ token }: { token: Token }) {
       {/* Stats group — horizontally scrollable on overflow */}
       <div className="custom-scrollbar flex min-w-0 shrink items-center gap-5 overflow-x-auto">
         <Stat
-          label={t("extend.token_list.attributes.market_cap")}
+          label={t("token_list.attributes.market_cap")}
           value={formatMCapInUsd(md?.marketCapInUsd ?? "")}
         />
         <Stat
-          label={t("extend.token_list.attributes.liquidity")}
+          label={t("token_list.attributes.liquidity")}
           value={formatAmountInUsd(md?.tvlInUsd ?? "")}
         />
         <Stat
-          label={`24h ${t("extend.token_list.attributes.volume")}`}
+          label={`24h ${t("token_list.attributes.volume")}`}
           value={formatAmountInUsd(volume24h ?? "")}
         />
         <Stat
-          label={t("extend.token_list.attributes.supply")}
+          label={t("token_list.attributes.supply")}
           value={formatAmount(md?.totalSupply ?? "")}
         />
-        <Stat
-          label={t("extend.token_list.attributes.holders")}
-          value={formatAmount(md?.holders ?? "")}
-        />
+        <Stat label={t("token_list.attributes.holders")} value={formatAmount(md?.holders ?? "")} />
       </div>
     </header>
   );
@@ -240,7 +230,7 @@ function Content({ token }: { token: Token }) {
 function Stat({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex shrink-0 flex-col items-start gap-[2px] whitespace-nowrap">
-      <span className="text-[12px] font-normal leading-4 text-default-700">{label}</span>
+      <span className="text-[12px] font-normal leading-4 text-text-secondary">{label}</span>
       <span className="text-[14px] font-medium leading-[18px] tabular-nums text-foreground">
         {value}
       </span>
@@ -253,7 +243,7 @@ function SocialLink({ href, children }: { href: string; children: React.ReactNod
     <Link
       href={href}
       target="_blank"
-      className="flex items-center text-neutral transition-colors hover:text-primary-200"
+      className="flex items-center text-text-muted transition-colors hover:text-primary-200"
     >
       {children}
     </Link>

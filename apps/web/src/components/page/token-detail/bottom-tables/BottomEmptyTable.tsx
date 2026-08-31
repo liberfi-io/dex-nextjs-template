@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  EmptyBody,
-  TableShell,
-  type BottomTableColumn,
-} from "./table-shell";
+import { EmptyBody, TableShell, type BottomTableColumn } from "./table-shell";
 
 export interface BottomEmptyTableProps {
   /** Column header definitions (GMGN-mirrored). */
@@ -34,55 +30,55 @@ export function BottomEmptyTable({ columns, minWidth }: BottomEmptyTableProps) {
 export const TOP_TRADERS_COLUMNS: ReadonlyArray<BottomTableColumn> = [
   {
     key: "wallet",
-    labelKey: "extend.trade.bottom_panel.top_traders_table.trader",
+    labelKey: "trade.bottom_panel.top_traders_table.trader",
     width: "w-[18%]",
     align: "left",
   },
   {
     key: "activity",
-    labelKey: "extend.trade.bottom_panel.top_traders_table.activity",
+    labelKey: "trade.bottom_panel.top_traders_table.activity",
     width: "w-[11%]",
     align: "right",
   },
   {
     key: "first_buy",
-    labelKey: "extend.trade.bottom_panel.top_traders_table.first_buy",
+    labelKey: "trade.bottom_panel.top_traders_table.first_buy",
     width: "w-[10%]",
     align: "right",
   },
   {
     key: "total_buy",
-    labelKey: "extend.trade.bottom_panel.top_traders_table.total_buy",
+    labelKey: "trade.bottom_panel.top_traders_table.total_buy",
     width: "w-[16%]",
     align: "right",
   },
   {
     key: "total_sell",
-    labelKey: "extend.trade.bottom_panel.top_traders_table.total_sell",
+    labelKey: "trade.bottom_panel.top_traders_table.total_sell",
     width: "w-[16%]",
     align: "right",
   },
   {
     key: "realized_pnl",
-    labelKey: "extend.trade.bottom_panel.top_traders_table.realized_pnl",
+    labelKey: "trade.bottom_panel.top_traders_table.realized_pnl",
     width: "w-[12%]",
     align: "right",
   },
   {
     key: "total_pnl",
-    labelKey: "extend.trade.bottom_panel.top_traders_table.total_pnl",
+    labelKey: "trade.bottom_panel.top_traders_table.total_pnl",
     width: "w-[12%]",
     align: "right",
   },
   {
     key: "holdings",
-    labelKey: "extend.trade.bottom_panel.top_traders_table.holdings",
+    labelKey: "trade.bottom_panel.top_traders_table.holdings",
     width: "w-[12%]",
     align: "right",
   },
   {
     key: "transfers",
-    labelKey: "extend.trade.bottom_panel.top_traders_table.transfers",
+    labelKey: "trade.bottom_panel.top_traders_table.transfers",
     width: "w-[10%]",
     align: "right",
   },
@@ -96,37 +92,37 @@ export const TOP_TRADERS_COLUMNS: ReadonlyArray<BottomTableColumn> = [
 export const DEV_TOKENS_COLUMNS: ReadonlyArray<BottomTableColumn> = [
   {
     key: "token",
-    labelKey: "extend.trade.bottom_panel.dev_tokens_table.token",
+    labelKey: "trade.bottom_panel.dev_tokens_table.token",
     width: "w-[28%]",
     align: "left",
   },
   {
     key: "created",
-    labelKey: "extend.trade.bottom_panel.dev_tokens_table.created",
+    labelKey: "trade.bottom_panel.dev_tokens_table.created",
     width: "w-[14%]",
     align: "left",
   },
   {
     key: "liquidity",
-    labelKey: "extend.trade.bottom_panel.dev_tokens_table.liquidity",
+    labelKey: "trade.bottom_panel.dev_tokens_table.liquidity",
     width: "w-[16%]",
     align: "right",
   },
   {
     key: "market_cap",
-    labelKey: "extend.trade.bottom_panel.dev_tokens_table.market_cap",
+    labelKey: "trade.bottom_panel.dev_tokens_table.market_cap",
     width: "w-[16%]",
     align: "right",
   },
   {
     key: "holders",
-    labelKey: "extend.trade.bottom_panel.dev_tokens_table.holders",
+    labelKey: "trade.bottom_panel.dev_tokens_table.holders",
     width: "w-[12%]",
     align: "right",
   },
   {
     key: "status",
-    labelKey: "extend.trade.bottom_panel.dev_tokens_table.status",
+    labelKey: "trade.bottom_panel.dev_tokens_table.status",
     width: "w-[14%]",
     align: "right",
   },

@@ -100,7 +100,7 @@ export default [
     },
     rules: {
       ...reactHooksPlugin.configs.recommended.rules,
-      "i18next/no-literal-string": "warn",
+      "i18next/no-literal-string": ["error", { mode: "jsx-text-only" }],
       "jsx-a11y/click-events-have-key-events": "off",
       "jsx-a11y/no-static-element-interactions": "off",
       "react/display-name": "off",

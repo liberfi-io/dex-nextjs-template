@@ -26,15 +26,7 @@ import { useTick } from "@liberfi.io/hooks";
 import { tokenDetailRoute } from "../../../../application/routes";
 import { useTranslation } from "@liberfi.io/i18n";
 import { tKey } from "../../../../application/t";
-import {
-  MouseEvent,
-  memo,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { MouseEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export interface BottomDevTokensTableProps {
   chain: Chain;
@@ -58,79 +50,70 @@ interface DevTokenColumn {
 const DEV_TOKEN_COLUMNS: ReadonlyArray<DevTokenColumn> = [
   {
     key: "token",
-    labelKey: "extend.trade.bottom_panel.dev_tokens_table.token",
+    labelKey: "trade.bottom_panel.dev_tokens_table.token",
     align: "left",
   },
   {
     key: "created",
-    labelKey: "extend.trade.bottom_panel.dev_tokens_table.created",
+    labelKey: "trade.bottom_panel.dev_tokens_table.created",
     align: "right",
   },
   {
     key: "migrated",
-    labelKey: "extend.trade.bottom_panel.dev_tokens_table.migrated",
+    labelKey: "trade.bottom_panel.dev_tokens_table.migrated",
     align: "center",
   },
   {
     key: "total_fee",
-    labelKey: "extend.trade.bottom_panel.dev_tokens_table.total_fee",
+    labelKey: "trade.bottom_panel.dev_tokens_table.total_fee",
     align: "right",
   },
   {
     key: "ath",
-    labelKey: "extend.trade.bottom_panel.dev_tokens_table.ath",
+    labelKey: "trade.bottom_panel.dev_tokens_table.ath",
     align: "right",
   },
   {
     key: "market_cap",
-    labelKey: "extend.trade.bottom_panel.dev_tokens_table.market_cap",
+    labelKey: "trade.bottom_panel.dev_tokens_table.market_cap",
     align: "right",
   },
   {
     key: "liquidity",
-    labelKey: "extend.trade.bottom_panel.dev_tokens_table.liquidity",
+    labelKey: "trade.bottom_panel.dev_tokens_table.liquidity",
     align: "right",
   },
   {
     key: "holders",
-    labelKey: "extend.trade.bottom_panel.dev_tokens_table.holders",
+    labelKey: "trade.bottom_panel.dev_tokens_table.holders",
     align: "right",
   },
   {
     key: "volume_1h",
-    labelKey: "extend.trade.bottom_panel.dev_tokens_table.volume_1h",
+    labelKey: "trade.bottom_panel.dev_tokens_table.volume_1h",
     align: "right",
   },
   {
     key: "bundled",
-    labelKey: "extend.trade.bottom_panel.dev_tokens_table.bundled",
+    labelKey: "trade.bottom_panel.dev_tokens_table.bundled",
     align: "right",
   },
 ];
 
-export function BottomDevTokensTable({
-  chain,
-  address,
-}: BottomDevTokensTableProps) {
+export function BottomDevTokensTable({ chain, address }: BottomDevTokensTableProps) {
   const { data: currentToken, isLoading: isTokenLoading } = useTokenQuery({
     chain,
     address,
   });
   const creator = resolveDeveloperAddress(currentToken);
 
-  const {
-    tokens,
-    isLoading,
-    hasMore,
-    loadMore,
-  } = useTokenDevTokensListScript({
+  const { tokens, isLoading, hasMore, loadMore } = useTokenDevTokensListScript({
     chain,
     creator,
     limit: 50,
   });
   const isInitialLoading =
-    isTokenLoading ||
-    (isLoading && creator !== undefined && tokens.length === 0);
+    isTokenLoading || (isLoading && creator !== undefined && tokens.length === 0);
   const isEmpty = !isTokenLoading && !isLoading && tokens.length === 0;
   const isPaging = isLoading && tokens.length > 0;
   const rowCount = hasMore || isPaging ? tokens.length + 1 : tokens.length;
@@ -165,7 +148,7 @@ export function BottomDevTokensTable({
           {isInitialLoading ? (
             <DevTokensSkeletonRows />
           ) : !creator ? (
-            <EmptyDevTokens messageKey="extend.trade.bottom_panel.dev_tokens_table.no_creator" />
+            <EmptyDevTokens messageKey="trade.bottom_panel.dev_tokens_table.no_creator" />
           ) : isEmpty ? (
             <EmptyDevTokens />
           ) : (
@@ -189,7 +172,7 @@ function DevTokenHeader() {
   const { t } = useTranslation();
   return (
     <div
-      className="grid h-9 shrink-0 border-b border-divider bg-content1 text-[12px] font-medium text-default-500"
+      className="grid h-9 shrink-0 border-b border-divider bg-content1 text-[12px] font-medium text-text-muted"
       style={{ gridTemplateColumns: GRID_TEMPLATE_COLUMNS }}
     >
       {DEV_TOKEN_COLUMNS.map((col) => (
@@ -234,13 +217,7 @@ function DevTokenVirtualRow({
   );
 }
 
-const DevTokenRow = memo(function DevTokenRow({
-  chain,
-  token,
-}: {
-  chain: Chain;
-  token: Token;
-}) {
+const DevTokenRow = memo(function DevTokenRow({ chain, token }: { chain: Chain; token: Token }) {
   const md = token.marketData;
   const stats1h = token.stats?.["1h"];
   const migrated = !!(
@@ -285,7 +262,7 @@ const TokenIdentityCell = memo(function TokenIdentityCell({
         <Avatar
           src={token.image ?? undefined}
           name={(token.symbol || token.name || token.address).slice(0, 1)}
-          className="size-6 shrink-0 bg-default-200 text-[10px] text-default-700"
+          className="size-6 shrink-0 bg-default-200 text-[10px] text-text-secondary"
           showFallback
         />
       </a>
@@ -296,7 +273,7 @@ const TokenIdentityCell = memo(function TokenIdentityCell({
         >
           {token.symbol || token.name || truncateAddress(token.address, 4, 4)}
         </a>
-        <div className="shrink-0 text-[11px] leading-4 text-neutral">
+        <div className="shrink-0 text-[11px] leading-4 text-text-muted">
           <TokenAddressCopyButton address={token.address} />
         </div>
       </div>
@@ -312,9 +289,7 @@ const TokenAddressCopyButton = memo(function TokenAddressCopyButton({
   const { t } = useTranslation();
   const copyToClipboard = useCopyToClipboard();
   const [copied, setCopied] = useState(false);
-  const copiedResetTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
-    undefined,
-  );
+  const copiedResetTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const handleCopyAddress = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
@@ -346,25 +321,21 @@ const TokenAddressCopyButton = memo(function TokenAddressCopyButton({
   return (
     <button
       type="button"
-      className="group inline-flex min-w-0 cursor-pointer items-center gap-1 font-mono text-neutral transition-colors hover:text-primary-200"
+      className="group inline-flex min-w-0 cursor-pointer items-center gap-1 font-mono text-text-muted transition-colors hover:text-primary-200"
       onClick={handleCopyAddress}
       aria-label={t("tokens.copied.address")}
     >
       <span>{truncateAddress(address, 4, 4)}</span>
       {copied ? (
-        <CheckIcon className="h-3 w-3 shrink-0 text-bullish" />
+        <CheckIcon className="h-3 w-3 shrink-0 text-positive" />
       ) : (
-        <CopyIcon className="h-3 w-3 shrink-0 text-neutral transition-colors group-hover:text-primary-200" />
+        <CopyIcon className="h-3 w-3 shrink-0 text-text-muted transition-colors group-hover:text-primary-200" />
       )}
     </button>
   );
 });
 
-const AgeCell = memo(function AgeCell({
-  value,
-}: {
-  value?: Date | string | number;
-}) {
+const AgeCell = memo(function AgeCell({ value }: { value?: Date | string | number }) {
   const date = normalizeDate(value);
   const [now, setNow] = useState(Date.now());
   useTick(({ now: nextNow }) => setNow(nextNow), 1000);
@@ -372,18 +343,11 @@ const AgeCell = memo(function AgeCell({
   const fullTime = date ? date.toLocaleString() : null;
 
   const content = (
-    <span className={cn(date ? "text-foreground" : "text-default-500")}>
-      {ageText}
-    </span>
+    <span className={cn(date ? "text-foreground" : "text-text-muted")}>{ageText}</span>
   );
 
   return (
-    <div
-      className={cn(
-        "flex items-center px-3 text-default-500",
-        justifyClass("right"),
-      )}
-    >
+    <div className={cn("flex items-center px-3 text-text-muted", justifyClass("right"))}>
       {fullTime ? (
         <StyledTooltip content={fullTime} placement="top">
           {content}
@@ -395,11 +359,7 @@ const AgeCell = memo(function AgeCell({
   );
 });
 
-const MigratedCell = memo(function MigratedCell({
-  migrated,
-}: {
-  migrated: boolean;
-}) {
+const MigratedCell = memo(function MigratedCell({ migrated }: { migrated: boolean }) {
   return (
     <div className="flex items-center justify-center px-3">
       {migrated ? (
@@ -411,11 +371,7 @@ const MigratedCell = memo(function MigratedCell({
   );
 });
 
-const UsdCell = memo(function UsdCell({
-  value,
-}: {
-  value?: string | number;
-}) {
+const UsdCell = memo(function UsdCell({ value }: { value?: string | number }) {
   return (
     <TextCell
       align="right"
@@ -425,11 +381,7 @@ const UsdCell = memo(function UsdCell({
   );
 });
 
-const PercentCell = memo(function PercentCell({
-  value,
-}: {
-  value?: string | number;
-}) {
+const PercentCell = memo(function PercentCell({ value }: { value?: string | number }) {
   const text = formatRatio(value);
   return <TextCell align="right" value={text} muted={text === "--"} />;
 });
@@ -448,7 +400,7 @@ const TextCell = memo(function TextCell({
       className={cn(
         "flex items-center px-3 tabular-nums",
         justifyClass(align),
-        muted ? "text-default-500" : "text-foreground",
+        muted ? "text-text-muted" : "text-foreground",
       )}
     >
       {value}
@@ -460,10 +412,10 @@ function EmptyDevTokens({ messageKey }: { messageKey?: string }) {
   const { t } = useTranslation();
   return (
     <div
-      className="flex flex-1 items-center justify-center py-16 text-[12px] text-default-500"
+      className="flex flex-1 items-center justify-center py-16 text-[12px] text-text-muted"
       role="status"
     >
-      {tKey(t, messageKey ?? "extend.trade.bottom_panel.no_data")}
+      {tKey(t, messageKey ?? "trade.bottom_panel.no_data")}
     </div>
   );
 }
@@ -471,14 +423,14 @@ function EmptyDevTokens({ messageKey }: { messageKey?: string }) {
 function LoadMoreRow({ isLoading }: { isLoading: boolean }) {
   const { t } = useTranslation();
   return (
-    <div className="flex h-10 items-center justify-center text-[12px] text-default-500">
+    <div className="flex h-10 items-center justify-center text-[12px] text-text-muted">
       {isLoading ? (
         <div className="flex items-center gap-2" role="status">
           <span
             aria-hidden
             className="block size-3 animate-spin rounded-full border border-default-300 border-t-default-600"
           />
-          <span>{t("extend.trade.bottom_panel.loading")}</span>
+          <span>{t("trade.bottom_panel.loading")}</span>
         </div>
       ) : (
         <span aria-hidden className="block h-px w-px" />
@@ -521,9 +473,7 @@ function normalizeDate(value: Date | string | number | undefined): Date | null {
     return Number.isNaN(value.getTime()) ? null : value;
   }
   const timestamp =
-    typeof value === "number" && value > 0 && value < 1_000_000_000_000
-      ? value * 1000
-      : value;
+    typeof value === "number" && value > 0 && value < 1_000_000_000_000 ? value * 1000 : value;
   const date = new Date(timestamp);
   return Number.isNaN(date.getTime()) ? null : date;
 }
@@ -546,8 +496,7 @@ function formatTimeDistance(date: Date, now: number): string {
 }
 
 function resolveDeveloperAddress(token: Token | undefined): string | undefined {
-  return token?.creators?.find((creator) => creator.address)?.address ??
-    token?.developerAddress;
+  return token?.creators?.find((creator) => creator.address)?.address ?? token?.developerAddress;
 }
 
 function justifyClass(align: "left" | "right" | "center" | undefined) {

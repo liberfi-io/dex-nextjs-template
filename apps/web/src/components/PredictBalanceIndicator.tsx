@@ -1,36 +1,17 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   usePositionsMulti,
   dflowKYCQueryKey,
   polymarketSetupQueryKey,
 } from "@liberfi.io/react-predict";
-import {
-  usePredictWallet,
-  KycModal,
-  SetupModal,
-} from "@liberfi.io/ui-predict";
-import {
-  useWallets,
-  type EvmWalletAdapter,
-} from "@liberfi.io/wallet-connector";
+import { usePredictWallet, KycModal, SetupModal } from "@liberfi.io/ui-predict";
+import { useWallets, type EvmWalletAdapter } from "@liberfi.io/wallet-connector";
 import { useTranslation } from "@liberfi.io/i18n";
 import { formatAmount, formatAmountInUsd, truncateAddress } from "@liberfi.io/utils";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  ChartLineIcon,
-  KalshiIcon,
-  PolymarketIcon,
-  cn,
-  useScreen,
-} from "@liberfi.io/ui";
+import { ChartLineIcon, KalshiIcon, PolymarketIcon, cn, useScreen } from "@liberfi.io/ui";
 import { useAsyncModal } from "@liberfi.io/ui-scaffold";
 import { createWalletClient, custom, type Hex } from "viem";
 import { polygon } from "viem/chains";
@@ -78,7 +59,7 @@ function PredictActionButton({
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-medium bg-zinc-700/60 text-zinc-300 hover:bg-zinc-700 hover:text-white transition-colors cursor-pointer focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+      className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-medium bg-surface-strong/60 text-text-secondary hover:bg-surface-strong hover:text-text-primary transition-colors cursor-pointer focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
     >
       {icon}
       {label}
@@ -129,7 +110,7 @@ function WalletEntry({
     // withdraw action cluster). With `items-center` the icon would
     // drift down toward the actions and look unanchored from the
     // address it identifies.
-    <div className="w-full flex items-start gap-3 px-3 py-2.5 rounded-[10px] hover:bg-[rgba(39,39,42,0.5)] transition-all">
+    <div className="w-full flex items-start gap-3 px-3 py-2.5 rounded-[10px] hover:bg-surface-strong/50 transition-all">
       {/* No decorative tile bg/border here — the Polymarket logo is a
           square brand chip with its own blue background, and the Kalshi
           logo is a green wordmark; a generic lime gradient tile clashes
@@ -137,27 +118,43 @@ function WalletEntry({
           row visually quieter. The 40px slot height roughly matches the
           right-side address + balance stack so vertical centering looks
           balanced. */}
-      <div className="flex items-center justify-center w-10 h-10 flex-shrink-0">
-        {venueIcon}
-      </div>
+      <div className="flex items-center justify-center w-10 h-10 flex-shrink-0">{venueIcon}</div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-zinc-300 truncate">
+          <span className="text-sm font-medium text-text-secondary truncate">
             {address ? truncateAddress(address) : "—"}
           </span>
           {address && (
             <button
               type="button"
-              className="p-1 rounded hover:bg-zinc-700 text-zinc-500 hover:text-white transition-colors cursor-pointer"
+              className="p-1 rounded hover:bg-surface-strong text-text-muted hover:text-text-primary transition-colors cursor-pointer"
               title="Copy Address"
               onClick={handleCopy}
             >
               {copied ? (
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
               ) : (
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
                   <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
                 </svg>
@@ -169,12 +166,8 @@ function WalletEntry({
         <div className="flex items-center gap-1.5 text-xs mt-2">
           {balancePlaceholder ?? (
             <>
-              <span className="text-zinc-500">
-                {t("extend.predict.account.availableBalance")}:
-              </span>
-              <span className="text-white font-medium">
-                {formatUsdc(balance ?? 0)} USDC
-              </span>
+              <span className="text-text-muted">{t("predict.account.availableBalance")}:</span>
+              <span className="text-text-primary font-medium">{formatUsdc(balance ?? 0)} USDC</span>
             </>
           )}
         </div>
@@ -185,9 +178,7 @@ function WalletEntry({
           // address-to-balance gap so the wallet block reads as one
           // tight three-row stack. Pill style matches the verify CTA
           // / status badge family on the address line above.
-          <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
-            {actions}
-          </div>
+          <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">{actions}</div>
         )}
       </div>
     </div>
@@ -267,7 +258,7 @@ function MergedDropdownContent({
                 <>
                   <PredictActionButton
                     icon={<ReceiveOutlinedIcon width={11} height={11} />}
-                    label={t("extend.predict.fundWallet.deposit")}
+                    label={t("predict.fundWallet.deposit")}
                     onClick={(e) => {
                       e.stopPropagation();
                       onKalshiDeposit();
@@ -275,7 +266,7 @@ function MergedDropdownContent({
                   />
                   <PredictActionButton
                     icon={<SendOutlinedIcon width={11} height={11} />}
-                    label={t("extend.predict.fundWallet.withdraw")}
+                    label={t("predict.fundWallet.withdraw")}
                     onClick={(e) => {
                       e.stopPropagation();
                       onKalshiWithdraw();
@@ -292,21 +283,30 @@ function MergedDropdownContent({
             trailing={
               kalshiKycVerified ? (
                 <span
-                  className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-bullish/15 text-bullish"
-                  title={t("extend.predict.kyc.verified") as string}
+                  className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-positive/15 text-positive"
+                  title={t("predict.kyc.verified") as string}
                 >
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="10"
+                    height="10"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  {t("extend.predict.kyc.verified")}
+                  {t("predict.kyc.verified")}
                 </span>
               ) : null
             }
             balancePlaceholder={
               kalshiKycLoading ? (
-                <span className="inline-flex items-center gap-1.5 text-zinc-500">
+                <span className="inline-flex items-center gap-1.5 text-text-muted">
                   <span className="inline-block w-3 h-3 border-[1.5px] border-current border-t-transparent rounded-full animate-spin" />
-                  {t("extend.predict.kyc.verifying")}
+                  {t("predict.kyc.verifying")}
                 </span>
               ) : !kalshiKycVerified ? (
                 <div className="flex items-center gap-1.5">
@@ -317,14 +317,23 @@ function MergedDropdownContent({
                       onKycOpen();
                     }}
                     className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-medium bg-amber-500/15 text-amber-400 hover:bg-amber-500/25 transition-colors cursor-pointer"
-                    title={t("extend.predict.kyc.unverified") as string}
+                    title={t("predict.kyc.unverified") as string}
                   >
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      width="11"
+                      height="11"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
                       <line x1="12" y1="9" x2="12" y2="13" />
                       <line x1="12" y1="17" x2="12.01" y2="17" />
                     </svg>
-                    {t("extend.predict.kyc.unverifiedShort")}
+                    {t("predict.kyc.unverifiedShort")}
                   </button>
                   <button
                     type="button"
@@ -332,8 +341,8 @@ function MergedDropdownContent({
                       e.stopPropagation();
                       onKycRefresh();
                     }}
-                    className="p-1 rounded hover:bg-zinc-700 text-zinc-500 hover:text-white transition-colors cursor-pointer"
-                    title={t("extend.predict.kyc.refresh") as string}
+                    className="p-1 rounded hover:bg-surface-strong text-text-muted hover:text-text-primary transition-colors cursor-pointer"
+                    title={t("predict.kyc.refresh") as string}
                     disabled={isKycRefreshing}
                   >
                     <svg
@@ -366,7 +375,7 @@ function MergedDropdownContent({
           // the dropdown.
           <div
             className="-mx-2 my-1"
-            style={{ borderTop: "1px solid rgba(39,39,42,1)" }}
+            style={{ borderTop: "1px solid var(--color-border-control)" }}
           />
         )}
         {evmAddress && (
@@ -379,7 +388,7 @@ function MergedDropdownContent({
                 <>
                   <PredictActionButton
                     icon={<ReceiveOutlinedIcon width={11} height={11} />}
-                    label={t("extend.predict.fundWallet.deposit")}
+                    label={t("predict.fundWallet.deposit")}
                     onClick={(e) => {
                       e.stopPropagation();
                       onPolymarketDeposit();
@@ -387,7 +396,7 @@ function MergedDropdownContent({
                   />
                   <PredictActionButton
                     icon={<SendOutlinedIcon width={11} height={11} />}
-                    label={t("extend.predict.fundWallet.withdraw")}
+                    label={t("predict.fundWallet.withdraw")}
                     onClick={(e) => {
                       e.stopPropagation();
                       onPolymarketWithdraw();
@@ -402,21 +411,30 @@ function MergedDropdownContent({
             trailing={
               polymarketSetupVerified ? (
                 <span
-                  className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-bullish/15 text-bullish"
-                  title={t("extend.predict.setup.verified") as string}
+                  className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-positive/15 text-positive"
+                  title={t("predict.setup.verified") as string}
                 >
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="10"
+                    height="10"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  {t("extend.predict.setup.verified")}
+                  {t("predict.setup.verified")}
                 </span>
               ) : null
             }
             balancePlaceholder={
               polymarketSetupLoading ? (
-                <span className="inline-flex items-center gap-1.5 text-zinc-500">
+                <span className="inline-flex items-center gap-1.5 text-text-muted">
                   <span className="inline-block w-3 h-3 border-[1.5px] border-current border-t-transparent rounded-full animate-spin" />
-                  {t("extend.predict.setup.verifying")}
+                  {t("predict.setup.verifying")}
                 </span>
               ) : !polymarketSetupVerified ? (
                 <button
@@ -426,14 +444,23 @@ function MergedDropdownContent({
                     onSetupOpen();
                   }}
                   className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-medium bg-amber-500/15 text-amber-400 hover:bg-amber-500/25 transition-colors cursor-pointer"
-                  title={t("extend.predict.setup.unverified") as string}
+                  title={t("predict.setup.unverified") as string}
                 >
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="11"
+                    height="11"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
                     <line x1="12" y1="9" x2="12" y2="13" />
                     <line x1="12" y1="17" x2="12.01" y2="17" />
                   </svg>
-                  {t("extend.predict.setup.unverifiedShort")}
+                  {t("predict.setup.unverifiedShort")}
                 </button>
               ) : undefined
             }
@@ -442,27 +469,25 @@ function MergedDropdownContent({
       </div>
 
       {/* Positions */}
-      <div style={{ borderTop: "1px solid rgba(39,39,42,1)" }} className="p-2">
+      <div style={{ borderTop: "1px solid var(--color-border-control)" }} className="p-2">
         <div className="flex items-center justify-between gap-3 px-3 py-2 rounded-[10px]">
           <div className="flex items-center gap-2.5">
-            <ChartLineIcon width={20} height={20} className="text-bullish" />
-            <span className="text-sm text-zinc-400">
-              {t("extend.predict.account.positions")}
-            </span>
+            <ChartLineIcon width={20} height={20} className="text-positive" />
+            <span className="text-sm text-text-secondary">{t("predict.account.positions")}</span>
           </div>
-          <span className="text-sm font-medium text-zinc-100 tabular-nums">
+          <span className="text-sm font-medium text-text-primary tabular-nums">
             {formatCents(positionsCents)}
           </span>
         </div>
       </div>
 
       {/* Portfolio total */}
-      <div style={{ borderTop: "1px solid rgba(39,39,42,1)" }} className="p-2">
+      <div style={{ borderTop: "1px solid var(--color-border-control)" }} className="p-2">
         <div className="flex items-center justify-between gap-3 px-3 py-2">
-          <span className="text-sm text-zinc-300 font-medium">
-            {t("extend.predict.account.portfolioTotal")}
+          <span className="text-sm text-text-secondary font-medium">
+            {t("predict.account.portfolioTotal")}
           </span>
-          <span className="text-sm font-bold text-[#c7ff2e] tabular-nums">
+          <span className="text-sm font-bold text-brand-primary tabular-nums">
             {initialLoading ? "..." : formatCents(portfolioTotalCents)}
           </span>
         </div>
@@ -509,14 +534,10 @@ export function PredictBalanceIndicator() {
   // dropdown's WalletEntry rows, so we collapse them into this single
   // sum here.
   const portfolioTotalCents =
-    toCents(kalshiUsdcBalance ?? 0) +
-    toCents(polymarketUsdcBalance ?? 0) +
-    positionsCents;
+    toCents(kalshiUsdcBalance ?? 0) + toCents(polymarketUsdcBalance ?? 0) + positionsCents;
 
   const initialLoading =
-    balanceLoading &&
-    kalshiUsdcBalance === null &&
-    polymarketUsdcBalance === null;
+    balanceLoading && kalshiUsdcBalance === null && polymarketUsdcBalance === null;
 
   const [isOpen, setIsOpen] = useState(false);
   const [isKycModalOpen, setIsKycModalOpen] = useState(false);
@@ -533,8 +554,7 @@ export function PredictBalanceIndicator() {
   // back button — the user already picked the venue one click ago, so
   // re-presenting a picker would just ask them to re-confirm the same
   // choice.
-  const { onOpen: openFundWallet } =
-    useAsyncModal<FundWalletParams>(FUND_WALLET_MODAL_ID);
+  const { onOpen: openFundWallet } = useAsyncModal<FundWalletParams>(FUND_WALLET_MODAL_ID);
 
   // Each handler closes the dropdown first (the modal will own the
   // user's focus next) and then opens the fund-wallet flow with the
@@ -589,9 +609,9 @@ export function PredictBalanceIndicator() {
   );
 
   const handleDeployAndApprove = useCallback(async () => {
-    const evmWallet = wallets.find(
-      (w) => w.chainNamespace === "EVM" && w.isConnected,
-    ) as EvmWalletAdapter | undefined;
+    const evmWallet = wallets.find((w) => w.chainNamespace === "EVM" && w.isConnected) as
+      | EvmWalletAdapter
+      | undefined;
     if (!evmWallet || !evmAddress) {
       throw new Error("EVM wallet not connected");
     }
@@ -616,11 +636,7 @@ export function PredictBalanceIndicator() {
 
     if (!polymarketTokenApproved) {
       const approvalTxns = buildAllApprovalTxns();
-      const approveResult = await executeSafe(
-        walletClient,
-        approvalTxns,
-        relayConfig,
-      );
+      const approveResult = await executeSafe(walletClient, approvalTxns, relayConfig);
       if (approveResult.transactionID) {
         await pollTransaction(relayConfig, approveResult.transactionID);
       }
@@ -708,15 +724,10 @@ export function PredictBalanceIndicator() {
       <button
         type="button"
         onClick={handleClick}
-        className="flex items-center justify-center gap-1.5 h-8 px-2.5 bg-zinc-800/60 hover:bg-zinc-800 border border-zinc-700/50 rounded-full transition-colors cursor-pointer focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        className="flex items-center justify-center gap-1.5 h-8 px-2.5 bg-surface-interactive/60 hover:bg-surface-interactive border border-border-control/50 rounded-full transition-colors cursor-pointer focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
       >
-        <ChartLineIcon
-          width={16}
-          height={16}
-          className="text-bullish"
-          aria-hidden="true"
-        />
-        <span className="text-xs font-medium text-zinc-100 tabular-nums">
+        <ChartLineIcon width={16} height={16} className="text-positive" aria-hidden="true" />
+        <span className="text-xs font-medium text-text-primary tabular-nums">
           {initialLoading ? "..." : formatCents(portfolioTotalCents)}
         </span>
         <svg
@@ -729,7 +740,7 @@ export function PredictBalanceIndicator() {
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className={`text-zinc-500 transition-transform duration-200 ${
+          className={`text-text-muted transition-transform duration-200 ${
             isOpen ? "rotate-180" : ""
           }`}
           aria-hidden="true"
@@ -762,19 +773,19 @@ export function PredictBalanceIndicator() {
           className="fixed inset-0 z-50 flex items-end justify-center"
           onClick={() => setIsOpen(false)}
         >
-          <div className="absolute inset-0 bg-black/60" />
+          <div className="absolute inset-0 bg-surface-scrim" />
           <div
             className="relative w-full max-w-sm mb-safe animate-in slide-in-from-bottom duration-200"
             style={{
               borderRadius: "14px 14px 0 0",
-              border: "1px solid rgba(39,39,42,1)",
+              border: "1px solid var(--color-border-control)",
               borderBottom: "none",
-              background: "rgba(24,24,27,1)",
+              background: "var(--color-surface-interactive)",
             }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-center pt-3 pb-1">
-              <div className="w-8 h-1 rounded-full bg-zinc-700" />
+              <div className="w-8 h-1 rounded-full bg-surface-strong" />
             </div>
             <MergedDropdownContent {...dropdownProps} />
             <div className="pb-safe" />
@@ -788,8 +799,8 @@ export function PredictBalanceIndicator() {
           className="absolute right-0 mt-2 w-80 z-50 overflow-hidden"
           style={{
             borderRadius: 14,
-            border: "1px solid rgba(39,39,42,1)",
-            background: "rgba(24,24,27,1)",
+            border: "1px solid var(--color-border-control)",
+            background: "var(--color-surface-interactive)",
             boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)",
           }}
         >

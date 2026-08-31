@@ -1,44 +1,18 @@
 "use server";
 
-import { defaultLng, defaultNS, i18next, LocaleCode, LocaleEnum } from "@liberfi.io/i18n/server";
-import en2 from "@liberfi.io/i18n/locales/en.json";
-import zh2 from "@liberfi.io/i18n/locales/zh.json";
-import en from "../application/locales/en.json";
-import zh from "../application/locales/zh.json";
+import * as sdkI18nServer from "@liberfi.io/i18n/server";
+import {
+  defaultLng,
+  defaultNS,
+  en,
+  i18next,
+  LocaleCode,
+  LocaleEnum,
+} from "@liberfi.io/i18n/server";
+
+const zh = (sdkI18nServer as typeof sdkI18nServer & { zh: typeof en }).zh;
 
 let initialized = false;
-
-type FlatTranslationResource = Record<string, string>;
-interface NestedTranslationResource {
-  [key: string]: string | NestedTranslationResource;
-}
-
-function mergeResources(
-  base: FlatTranslationResource,
-  override: NestedTranslationResource,
-): FlatTranslationResource {
-  return { ...base, ...flattenResource(override) };
-}
-
-function flattenResource(
-  resource: NestedTranslationResource,
-  prefix = "",
-): FlatTranslationResource {
-  const flattened: FlatTranslationResource = {};
-  for (const [key, value] of Object.entries(resource)) {
-    const nextKey = prefix ? `${prefix}.${key}` : key;
-    if (isPlainObject(value)) {
-      Object.assign(flattened, flattenResource(value, nextKey));
-      continue;
-    }
-    flattened[nextKey] = value;
-  }
-  return flattened;
-}
-
-function isPlainObject(value: unknown): value is NestedTranslationResource {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
 
 export async function initServerI18n(lang: LocaleCode) {
   if (initialized) return i18next;
@@ -52,10 +26,10 @@ export async function initServerI18n(lang: LocaleCode) {
     initImmediate: false,
     resources: {
       [LocaleEnum.en]: {
-        [defaultNS]: mergeResources(en2, en),
+        [defaultNS]: en,
       },
       [LocaleEnum.zh]: {
-        [defaultNS]: mergeResources(zh2, zh),
+        [defaultNS]: zh,
       },
     },
   });

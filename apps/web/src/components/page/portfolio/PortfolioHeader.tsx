@@ -3,13 +3,7 @@
 import { useCallback, useState } from "react";
 import { Tooltip } from "@heroui/react";
 import { useTranslation } from "@liberfi.io/i18n";
-import {
-  cn,
-  RefreshIcon,
-  toast,
-  TriangleDownIcon,
-  TriangleUpIcon,
-} from "@liberfi.io/ui";
+import { cn, RefreshIcon, toast, TriangleDownIcon, TriangleUpIcon } from "@liberfi.io/ui";
 import { useAsyncModal } from "@liberfi.io/ui-scaffold";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
@@ -94,7 +88,7 @@ export function PortfolioHeader() {
         },
         onError: (err) => {
           if (win && !win.closed) win.close();
-          toast.error(err.message || t("extend.account.add_cash_failed"));
+          toast.error(err.message || t("account.add_cash_failed"));
         },
       },
     );
@@ -127,23 +121,19 @@ export function PortfolioHeader() {
         <div className="flex flex-col min-w-0 flex-1 gap-1.5">
           {/* Address + copy */}
           <div className="flex items-center gap-1.5">
-            <span className="text-xs font-medium text-default-500 tabular-nums">
+            <span className="text-xs font-medium text-text-muted tabular-nums">
               {walletAddress ? truncateAddress(walletAddress) : "—"}
             </span>
             {walletAddress && (
               <Tooltip
-                content={
-                  copied
-                    ? t("extend.portfolio.copied")
-                    : t("extend.portfolio.copyAddress")
-                }
+                content={copied ? t("portfolio.copied") : t("portfolio.copyAddress")}
                 placement="top"
                 size="sm"
               >
                 <button
                   type="button"
-                  className="p-1 rounded hover:bg-default-100 text-default-400 hover:text-foreground transition-colors cursor-pointer"
-                  aria-label={t("extend.portfolio.copyAddress")}
+                  className="p-1 rounded hover:bg-default-100 text-text-muted hover:text-foreground transition-colors cursor-pointer"
+                  aria-label={t("portfolio.copyAddress")}
                   onClick={handleCopy}
                 >
                   {copied ? (
@@ -195,7 +185,7 @@ export function PortfolioHeader() {
               <span
                 className={cn(
                   "tabular-nums font-medium",
-                  bullish ? "text-bullish" : "text-bearish",
+                  bullish ? "text-positive" : "text-negative",
                 )}
               >
                 {profitUsdText}
@@ -203,7 +193,7 @@ export function PortfolioHeader() {
               <span
                 className={cn(
                   "inline-flex items-center gap-0.5 tabular-nums",
-                  bullish ? "text-bullish" : "text-bearish",
+                  bullish ? "text-positive" : "text-negative",
                 )}
               >
                 {bullish ? (
@@ -213,9 +203,7 @@ export function PortfolioHeader() {
                 )}
                 {ratioText}
               </span>
-              <span className="text-xs text-default-400">
-                ({t("extend.common.time.24h")})
-              </span>
+              <span className="text-xs text-text-muted">({t("extend.common.time.24h")})</span>
             </div>
 
             {/* Refresh — anchored to the far right of the row, isolated
@@ -224,14 +212,10 @@ export function PortfolioHeader() {
             <button
               type="button"
               onClick={() => refetchSummary()}
-              aria-label={t("extend.portfolio.refresh")}
-              className="ml-auto p-1.5 rounded-md hover:bg-default-100 text-default-400 hover:text-foreground transition-colors cursor-pointer"
+              aria-label={t("portfolio.refresh")}
+              className="ml-auto p-1.5 rounded-md hover:bg-default-100 text-text-muted hover:text-foreground transition-colors cursor-pointer"
             >
-              <RefreshIcon
-                width={14}
-                height={14}
-                className={cn(isFetching && "animate-spin")}
-              />
+              <RefreshIcon width={14} height={14} className={cn(isFetching && "animate-spin")} />
             </button>
           </div>
         </div>
@@ -246,19 +230,19 @@ export function PortfolioHeader() {
       <div className="flex items-start justify-around">
         <ActionButton
           icon={<ReceiveOutlinedIcon width={18} height={18} />}
-          label={t("extend.account.receive")}
+          label={t("account.receive")}
           onClick={() => openReceive()}
           disabled={disabled}
         />
         <ActionButton
           icon={<SendOutlinedIcon width={18} height={18} />}
-          label={t("extend.account.withdraw")}
+          label={t("account.withdraw")}
           onClick={() => openWithdraw()}
           disabled={disabled}
         />
         <ActionButton
           icon={<CashInOutlinedIcon width={18} height={18} />}
-          label={t("extend.account.add_cash")}
+          label={t("account.add_cash")}
           onClick={handleAddCash}
           disabled={disabled || isCreatingOnramp}
         />
@@ -283,7 +267,7 @@ interface ActionButtonProps {
  * Background color: `bg-default-200` (and `bg-default-300` on hover).
  * `bg-default-100` (the lightest neutral) is too close to `bg-content1`
  * in the dark theme, leaving the circle nearly invisible against the
- * card. The dropdown's `WalletActionButton` uses `bg-zinc-700/60` for
+ * card. The dropdown's `WalletActionButton` uses `bg-surface-strong/60` for
  * the same reason — we use the equivalent HeroUI token so the contrast
  * holds across themes.
  */
@@ -298,10 +282,10 @@ function ActionButton({ icon, label, onClick, disabled }: ActionButtonProps) {
         "disabled:cursor-not-allowed disabled:opacity-40",
       )}
     >
-      <span className="w-9 h-9 flex items-center justify-center rounded-full bg-default-200 text-default-600 group-hover:bg-default-300 group-hover:text-foreground transition-colors">
+      <span className="w-9 h-9 flex items-center justify-center rounded-full bg-default-200 text-text-muted group-hover:bg-default-300 group-hover:text-foreground transition-colors">
         {icon}
       </span>
-      <span className="text-[11px] text-default-500 group-hover:text-foreground transition-colors whitespace-nowrap">
+      <span className="text-[11px] text-text-muted group-hover:text-foreground transition-colors whitespace-nowrap">
         {label}
       </span>
     </button>

@@ -28,13 +28,13 @@ export function BottomAICopilot() {
   //     try {
   //       const fromToken = await fetchToken(dexClient, Chain.SOLANA, from);
   //       if (!fromToken || !fromToken.address) {
-  //         toast.error(t("extend.account.convert_errors.token_not_found", { address: from }));
+  //         toast.error(t("account.convert_errors.token_not_found", { address: from }));
   //         return;
   //       }
 
   //       const toToken = await fetchToken(dexClient, Chain.SOLANA, to);
   //       if (!toToken || !toToken.address) {
-  //         toast.error(t("extend.account.convert_errors.token_not_found", { address: to }));
+  //         toast.error(t("account.convert_errors.token_not_found", { address: to }));
   //         return;
   //       }
 

@@ -144,19 +144,19 @@ export function useHyperliquidCancelOrder(): {
       // Auth gate — same shape as the place-order / leverage hooks
       // so the user sees an identical error across all three flows.
       if (!evm?.address) {
-        const message = t("extend.perpetuals.cancel.needsEvmWallet");
+        const message = t("perpetuals.cancel.needsEvmWallet");
         toast.error(message);
         throw new Error(message);
       }
       const provider = await evm.getEip1193Provider();
       if (!provider) {
-        const message = t("extend.perpetuals.cancel.needsEvmWallet");
+        const message = t("perpetuals.cancel.needsEvmWallet");
         toast.error(message);
         throw new Error(message);
       }
 
       const missingOrderIdMessage = t(
-        "extend.perpetuals.cancel.missingOrderId",
+        "perpetuals.cancel.missingOrderId",
       );
 
       try {
@@ -231,14 +231,14 @@ export function useHyperliquidCancelOrder(): {
           throw firstError;
         }
 
-        toast.success(t("extend.perpetuals.cancel.canceled"));
+        toast.success(t("perpetuals.cancel.canceled"));
         return results;
       } catch (error) {
         const reason =
           error instanceof Error
             ? error.message
-            : t("extend.perpetuals.cancel.cancelFailed", { reason: "" });
-        toast.error(t("extend.perpetuals.cancel.cancelFailed", { reason }));
+            : t("perpetuals.cancel.cancelFailed", { reason: "" });
+        toast.error(t("perpetuals.cancel.cancelFailed", { reason }));
         throw error;
       }
     },

@@ -3,12 +3,6 @@ import path from "node:path";
 import { Chain } from "@liberfi.io/types";
 import { authenticatePrivy } from "../auth/authenticatePrivy";
 import { CONFIG } from "../config";
-import {
-  APPLICATION_LOCALE_ROOTS,
-  SDK_DOMAIN_LOCALE_ROOTS,
-} from "../locales/roots";
-import en from "../locales/en.json";
-import zh from "../locales/zh.json";
 import { MemoryStorage } from "../storage";
 import { MockAppSdk } from "../app-sdk";
 import { buildCreateOnrampWidgetUrlBody } from "../server/useCreateOnrampWidgetUrlMutation";
@@ -104,15 +98,6 @@ describe("S6-02 application adapters", () => {
         defaultFiatAmount: 25,
       },
     });
-  });
-
-  it("keeps application locale files free of SDK-owned domain copy", () => {
-    for (const resource of [en, zh]) {
-      expect(Object.keys(resource.extend).sort()).toEqual([...APPLICATION_LOCALE_ROOTS].sort());
-      for (const root of SDK_DOMAIN_LOCALE_ROOTS) {
-        expect(resource.extend).not.toHaveProperty(root);
-      }
-    }
   });
 
   it("keeps @liberfi/locales out of application locale files and UI", () => {

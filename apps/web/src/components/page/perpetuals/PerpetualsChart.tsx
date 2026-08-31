@@ -63,7 +63,7 @@ export const PerpetualsChart = memo(function PerpetualsChart({
       theme: TvChartTheme.Dark,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       locale: getTvChartLibraryLocale(i18n.language),
-      backgroundColor: "#000000",
+      backgroundColor: "var(--color-surface-base)",
       chartNames: {
         [TvChartType.TradingView]: t("perpetuals.page.chart.tradingview"),
         [TvChartType.Original]: t("perpetuals.page.chart.original"),

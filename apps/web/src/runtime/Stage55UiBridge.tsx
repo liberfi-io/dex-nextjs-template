@@ -114,7 +114,7 @@ export function RedpacketUiBridge({ children }: PropsWithChildren) {
         }),
       shareUrl: adapters.redpacket.shareUrl,
       copyText: async (text) => {
-        await browserAppSdk.copyToClipboard(text, t("extend.redpacket.share.copy_claim_url"));
+        await browserAppSdk.copyToClipboard(text, t("redpacket.share.copy_claim_url"));
       },
     }),
     [adapters.redpacket, chain, requireAuth, router, t, wallet],

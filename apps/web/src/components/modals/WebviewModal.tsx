@@ -48,9 +48,13 @@ export function WebviewModal() {
     >
       <ModalContent>
         <div className="flex flex-col h-full min-h-0">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800">
-            <h3 className="text-sm font-medium text-white truncate">{title}</h3>
-            <button type="button" onClick={onClose} className="text-zinc-400 hover:text-white">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border-subtle">
+            <h3 className="text-sm font-medium text-text-primary truncate">{title}</h3>
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-text-secondary hover:text-text-primary"
+            >
               <XCloseIcon className="w-4 h-4" />
             </button>
           </div>

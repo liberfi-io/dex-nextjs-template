@@ -13,7 +13,12 @@ import {
 import { INSTANT_TRADE_AMOUNT_ID, swapFeesFromPreset } from "../../application/swapFees";
 import { useWalletPrimaryTokenNetWorth } from "../../application/useWalletPrimaryTokenNetWorth";
 import { browserAppSdk } from "../../application/app-sdk";
-import { useInstantTradeAmount, usePresetValues, useSwap, type SwapPhase } from "@liberfi.io/ui-trade";
+import {
+  useInstantTradeAmount,
+  usePresetValues,
+  useSwap,
+  type SwapPhase,
+} from "@liberfi.io/ui-trade";
 import { useAuthCallback, useConnectedWallet } from "@liberfi.io/wallet-connector";
 
 export interface InstantBuy2Props {
@@ -32,18 +37,9 @@ export function InstantBuy({ chain, tokenAddress }: InstantBuy2Props) {
   });
   const walletNetWorth = useWalletPrimaryTokenNetWorth();
 
-  const primaryTokenSymbol = useMemo(
-    () => getPrimaryTokenSymbol(chain),
-    [chain],
-  );
-  const primaryTokenDecimals = useMemo(
-    () => getPrimaryTokenDecimals(chain),
-    [chain],
-  );
-  const primaryTokenAddress = useMemo(
-    () => getPrimaryTokenAddress(chain),
-    [chain],
-  );
+  const primaryTokenSymbol = useMemo(() => getPrimaryTokenSymbol(chain), [chain]);
+  const primaryTokenDecimals = useMemo(() => getPrimaryTokenDecimals(chain), [chain]);
+  const primaryTokenAddress = useMemo(() => getPrimaryTokenAddress(chain), [chain]);
 
   const presetSettings = usePresetValues({
     chain,
@@ -85,7 +81,7 @@ export function InstantBuy({ chain, tokenAddress }: InstantBuy2Props) {
 
     if (!amount || new SafeBigNumber(amount).lte(0.0001)) {
       toast.error(
-        t("extend.trade.buy_min_amount", {
+        t("trade.buy_min_amount", {
           amount: "0.0001",
           symbol: primaryTokenSymbol ?? "",
         }),
@@ -94,7 +90,7 @@ export function InstantBuy({ chain, tokenAddress }: InstantBuy2Props) {
     }
 
     if (new SafeBigNumber(walletNetWorth.amount).lt(amount)) {
-      toast.error(t("extend.trade.buy_insufficient_balance"));
+      toast.error(t("trade.buy_insufficient_balance"));
       browserAppSdk.events.emit("deposit:open");
       return;
     }
@@ -131,9 +127,7 @@ export function InstantBuy({ chain, tokenAddress }: InstantBuy2Props) {
       color="primary"
       radius="full"
       size="sm"
-      startContent={
-        <LightningIcon width={12} height={12} className="flex-none" />
-      }
+      startContent={<LightningIcon width={12} height={12} className="flex-none" />}
       endContent={<span>{primaryTokenSymbol}</span>}
       onPress={handleInstantBuy}
       isLoading={isSwapping}

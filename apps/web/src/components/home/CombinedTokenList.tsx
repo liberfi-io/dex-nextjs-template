@@ -273,7 +273,7 @@ export function CombinedTokenList() {
                       "text-sm sm:text-base font-medium transition-all cursor-pointer",
                       activeTab === tab
                         ? "text-foreground hover:opacity-70"
-                        : "text-zinc-500 hover:text-zinc-300",
+                        : "text-text-muted hover:text-text-secondary",
                     )}
                   >
                     {t(TAB_I18N_KEYS[tab])}

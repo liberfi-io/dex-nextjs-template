@@ -26,15 +26,7 @@ import {
 } from "@liberfi.io/utils";
 import { useTranslation } from "@liberfi.io/i18n";
 import { tKey } from "../../../../application/t";
-import {
-  MouseEvent,
-  memo,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { MouseEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export interface BottomTradesTableProps {
   chain: Chain;
@@ -52,42 +44,42 @@ const GRID_TEMPLATE_COLUMNS =
 const ACTIVITY_COLUMNS = [
   {
     key: "age",
-    labelKey: "extend.trade.bottom_panel.trades.age",
+    labelKey: "trade.bottom_panel.trades.age",
     align: "left",
   },
   {
     key: "type",
-    labelKey: "extend.trade.bottom_panel.trades.type",
+    labelKey: "trade.bottom_panel.trades.type",
     align: "left",
   },
   {
     key: "price",
-    labelKey: "extend.trade.bottom_panel.trades.price",
+    labelKey: "trade.bottom_panel.trades.price",
     align: "right",
   },
   {
     key: "amount",
-    labelKey: "extend.trade.bottom_panel.trades.amount",
+    labelKey: "trade.bottom_panel.trades.amount",
     align: "right",
   },
   {
     key: "usd",
-    labelKey: "extend.trade.bottom_panel.trades.total_usd",
+    labelKey: "trade.bottom_panel.trades.total_usd",
     align: "right",
   },
   {
     key: "gas",
-    labelKey: "extend.trade.bottom_panel.trades.gas_fee",
+    labelKey: "trade.bottom_panel.trades.gas_fee",
     align: "right",
   },
   {
     key: "trader",
-    labelKey: "extend.trade.bottom_panel.trades.trader",
+    labelKey: "trade.bottom_panel.trades.trader",
     align: "right",
   },
   {
     key: "tx",
-    labelKey: "extend.trade.bottom_panel.trades.tx",
+    labelKey: "trade.bottom_panel.trades.tx",
     align: "right",
   },
 ] as const;
@@ -100,10 +92,7 @@ interface ActivityListScriptState {
   isLoading: boolean;
   sortBy: ActivitySortBy | undefined;
   sortDirection: ActivitySortDirection;
-  setSortBy: (
-    sortBy: ActivitySortBy | undefined,
-    direction?: ActivitySortDirection,
-  ) => void;
+  setSortBy: (sortBy: ActivitySortBy | undefined, direction?: ActivitySortDirection) => void;
   hasMore: boolean;
   loadMore: () => void;
 }
@@ -123,24 +112,16 @@ const ACTIVITY_SORT_BY_COLUMN: Partial<Record<string, ActivitySortBy>> = {
  * - Missing: track state, developer marker/count, and right-side action icons.
  */
 export function BottomTradesTable({ chain, address }: BottomTradesTableProps) {
-  const {
-    activities,
-    isLoading,
-    sortBy,
-    sortDirection,
-    setSortBy,
-    hasMore,
-    loadMore,
-  } = useTokenActivitiesListScript({
-    chain,
-    address,
-    limit: 50,
-  }) as unknown as ActivityListScriptState;
+  const { activities, isLoading, sortBy, sortDirection, setSortBy, hasMore, loadMore } =
+    useTokenActivitiesListScript({
+      chain,
+      address,
+      limit: 50,
+    }) as unknown as ActivityListScriptState;
   const isInitialLoading = isLoading && activities.length === 0;
   const isEmpty = !isLoading && activities.length === 0;
   const isPaging = isLoading && activities.length > 0;
-  const rowCount =
-    hasMore || isPaging ? activities.length + 1 : activities.length;
+  const rowCount = hasMore || isPaging ? activities.length + 1 : activities.length;
   const rowProps = useMemo<ActivityVirtualRowData>(
     () => ({
       chain,
@@ -201,24 +182,18 @@ function ActivityHeader({
 }: {
   sortBy: ActivitySortBy | undefined;
   sortDirection: ActivitySortDirection;
-  onSortByChange: (
-    sortBy: ActivitySortBy | undefined,
-    direction?: ActivitySortDirection,
-  ) => void;
+  onSortByChange: (sortBy: ActivitySortBy | undefined, direction?: ActivitySortDirection) => void;
 }) {
   const { t } = useTranslation();
   return (
     <div
-      className="grid h-9 shrink-0 border-b border-divider bg-content1 text-[12px] font-medium text-default-500"
+      className="grid h-9 shrink-0 border-b border-divider bg-content1 text-[12px] font-medium text-text-muted"
       style={{ gridTemplateColumns: GRID_TEMPLATE_COLUMNS }}
     >
       {ACTIVITY_COLUMNS.map((col) => (
         <div
           key={col.key}
-          className={cn(
-            "flex h-full items-center px-3",
-            justifyClass(col.align),
-          )}
+          className={cn("flex h-full items-center px-3", justifyClass(col.align))}
           style={{ letterSpacing: "-0.2px" }}
         >
           {ACTIVITY_SORT_BY_COLUMN[col.key] ? (
@@ -249,10 +224,7 @@ function ActivitySortHeader({
   sortBy: ActivitySortBy | undefined;
   activeSortBy: ActivitySortBy | undefined;
   activeSortDirection: ActivitySortDirection;
-  onSortByChange: (
-    sortBy: ActivitySortBy | undefined,
-    direction?: ActivitySortDirection,
-  ) => void;
+  onSortByChange: (sortBy: ActivitySortBy | undefined, direction?: ActivitySortDirection) => void;
 }) {
   if (!sortBy) return label;
 
@@ -284,11 +256,7 @@ function ActivitySortHeader({
   );
 }
 
-function SortArrow({
-  direction,
-}: {
-  direction?: ActivitySortDirection;
-}) {
+function SortArrow({ direction }: { direction?: ActivitySortDirection }) {
   return (
     <span className="ml-1 flex h-fit items-center justify-center" aria-hidden>
       <span className="flex flex-col justify-around">
@@ -353,45 +321,30 @@ const ActivityRow = memo(function ActivityRow({
     >
       <AgeCell value={activity.time} />
       <div
-        className={cn(
-          "flex items-center px-3 font-medium",
-          justifyClass("left"),
-          sideMeta.color,
-        )}
+        className={cn("flex items-center px-3 font-medium", justifyClass("left"), sideMeta.color)}
       >
         {sideLabel}
       </div>
       <div
-        className={cn(
-          "flex items-center px-3 tabular-nums text-foreground",
-          justifyClass("right"),
-        )}
+        className={cn("flex items-center px-3 tabular-nums text-foreground", justifyClass("right"))}
         style={{ letterSpacing: "-0.2px" }}
       >
         {primary.priceInUsd ? formatPriceInUsd(primary.priceInUsd) : "--"}
       </div>
       <div
-        className={cn(
-          "flex items-center px-3 tabular-nums text-foreground",
-          justifyClass("right"),
-        )}
+        className={cn("flex items-center px-3 tabular-nums text-foreground", justifyClass("right"))}
         style={{ letterSpacing: "-0.2px" }}
       >
         {formatAmount(primary.amount)}
       </div>
       <TotalUsdCell value={primary.amountInUsd} color={sideMeta.color} />
       <div
-        className={cn(
-          "flex items-center px-3 tabular-nums text-foreground",
-          justifyClass("right"),
-        )}
+        className={cn("flex items-center px-3 tabular-nums text-foreground", justifyClass("right"))}
         style={{ letterSpacing: "-0.2px" }}
       >
         {formatGasFee(activity.gasFee, chain)}
       </div>
-      <div
-        className={cn("flex items-center px-3", justifyClass("right"))}
-      >
+      <div className={cn("flex items-center px-3", justifyClass("right"))}>
         <TraderAddressActions chain={chain} address={activity.walletAddress} />
       </div>
       <div className={cn("flex items-center px-3", justifyClass("right"))}>
@@ -404,11 +357,7 @@ const ActivityRow = memo(function ActivityRow({
 function TotalUsdCell({ value, color }: { value?: string; color: string }) {
   return (
     <div
-      className={cn(
-        "flex h-full items-center px-3 tabular-nums",
-        justifyClass("right"),
-        color,
-      )}
+      className={cn("flex h-full items-center px-3 tabular-nums", justifyClass("right"), color)}
       style={{ letterSpacing: "-0.2px" }}
     >
       {value ? formatAmountInUsd(value) : "--"}
@@ -416,29 +365,18 @@ function TotalUsdCell({ value, color }: { value?: string; color: string }) {
   );
 }
 
-const AgeCell = memo(function AgeCell({
-  value,
-}: {
-  value?: Date | string | number;
-}) {
+const AgeCell = memo(function AgeCell({ value }: { value?: Date | string | number }) {
   const date = normalizeDate(value);
   const ageMs = useTickAge(date ?? Date.now());
   const ageText = date ? formatAge(ageMs) : "--";
   const fullTime = date ? date.toLocaleString() : null;
 
   const content = (
-    <span className={cn(date ? "text-foreground" : "text-default-500")}>
-      {ageText}
-    </span>
+    <span className={cn(date ? "text-foreground" : "text-text-muted")}>{ageText}</span>
   );
 
   return (
-    <div
-      className={cn(
-        "flex items-center px-3 text-default-500",
-        justifyClass("left"),
-      )}
-    >
+    <div className={cn("flex items-center px-3 text-text-muted", justifyClass("left"))}>
       {fullTime ? (
         <StyledTooltip content={fullTime} placement="top">
           {content}
@@ -458,12 +396,9 @@ const TraderAddressActions = memo(function TraderAddressActions({
   address: string;
 }) {
   const { t } = useTranslation();
-  const explorer = useMemo(
-    () => getAccountExplorer(chain, address),
-    [chain, address],
-  );
+  const explorer = useMemo(() => getAccountExplorer(chain, address), [chain, address]);
   const explorerLabel = explorer
-    ? t("extend.trade.bottom_panel.open_in_explorer", {
+    ? t("trade.bottom_panel.open_in_explorer", {
         explorer: explorer.name,
       })
     : undefined;
@@ -476,7 +411,7 @@ const TraderAddressActions = memo(function TraderAddressActions({
             href={explorer.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex size-4 shrink-0 cursor-pointer items-center justify-center text-neutral transition-colors hover:text-primary-200"
+            className="flex size-4 shrink-0 cursor-pointer items-center justify-center text-text-muted transition-colors hover:text-primary-200"
             aria-label={explorerLabel}
             onClick={(e) => e.stopPropagation()}
           >
@@ -498,7 +433,7 @@ const TxHashActions = memo(function TxHashActions({
   const { t } = useTranslation();
   const explorer = useMemo(() => getTxExplorer(chain, txHash), [chain, txHash]);
   const explorerLabel = explorer
-    ? t("extend.trade.bottom_panel.open_in_explorer", {
+    ? t("trade.bottom_panel.open_in_explorer", {
         explorer: explorer.name,
       })
     : undefined;
@@ -511,7 +446,7 @@ const TxHashActions = memo(function TxHashActions({
             href={explorer.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex size-4 shrink-0 cursor-pointer items-center justify-center text-neutral transition-colors hover:text-primary-200"
+            className="flex size-4 shrink-0 cursor-pointer items-center justify-center text-text-muted transition-colors hover:text-primary-200"
             aria-label={explorerLabel}
             onClick={(e) => e.stopPropagation()}
           >
@@ -531,9 +466,7 @@ const TraderAddressCopyButton = memo(function TraderAddressCopyButton({
   const { t } = useTranslation();
   const copyToClipboard = useCopyToClipboard();
   const [copied, setCopied] = useState(false);
-  const copiedResetTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
-    undefined,
-  );
+  const copiedResetTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const handleCopyAddress = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
@@ -573,9 +506,9 @@ const TraderAddressCopyButton = memo(function TraderAddressCopyButton({
         {truncateAddress(address, 4, 4)}
       </span>
       {copied ? (
-        <CheckIcon className="h-3 w-3 shrink-0 text-bullish" />
+        <CheckIcon className="h-3 w-3 shrink-0 text-positive" />
       ) : (
-        <CopyIcon className="h-3 w-3 shrink-0 text-neutral transition-colors group-hover:text-primary-200" />
+        <CopyIcon className="h-3 w-3 shrink-0 text-text-muted transition-colors group-hover:text-primary-200" />
       )}
     </button>
   );
@@ -585,9 +518,7 @@ const HashCopyButton = memo(function HashCopyButton({ value }: { value: string }
   const { t } = useTranslation();
   const copyToClipboard = useCopyToClipboard();
   const [copied, setCopied] = useState(false);
-  const copiedResetTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
-    undefined,
-  );
+  const copiedResetTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const handleCopy = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
@@ -627,9 +558,9 @@ const HashCopyButton = memo(function HashCopyButton({ value }: { value: string }
         {truncateAddress(value, 4, 4)}
       </span>
       {copied ? (
-        <CheckIcon className="h-3 w-3 shrink-0 text-bullish" />
+        <CheckIcon className="h-3 w-3 shrink-0 text-positive" />
       ) : (
-        <CopyIcon className="h-3 w-3 shrink-0 text-neutral transition-colors group-hover:text-primary-200" />
+        <CopyIcon className="h-3 w-3 shrink-0 text-text-muted transition-colors group-hover:text-primary-200" />
       )}
     </button>
   );
@@ -652,39 +583,39 @@ interface TypeMeta {
 
 const TYPE_META: Record<ActivityType, TypeMeta> = {
   buy: {
-    labelKey: "extend.trade.bottom_panel.trades.side_buy",
-    color: "text-bullish",
+    labelKey: "trade.bottom_panel.trades.side_buy",
+    color: "text-positive",
   },
   sell: {
-    labelKey: "extend.trade.bottom_panel.trades.side_sell",
-    color: "text-bearish",
+    labelKey: "trade.bottom_panel.trades.side_sell",
+    color: "text-negative",
   },
   liquidity_initialize: {
-    labelKey: "extend.trade.bottom_panel.trades.side_add_liq",
-    color: "text-bullish",
+    labelKey: "trade.bottom_panel.trades.side_add_liq",
+    color: "text-positive",
   },
   liquidity_add: {
-    labelKey: "extend.trade.bottom_panel.trades.side_add_liq",
-    color: "text-bullish",
+    labelKey: "trade.bottom_panel.trades.side_add_liq",
+    color: "text-positive",
   },
   liquidity_remove: {
-    labelKey: "extend.trade.bottom_panel.trades.side_remove_liq",
-    color: "text-bearish",
+    labelKey: "trade.bottom_panel.trades.side_remove_liq",
+    color: "text-negative",
   },
   red_packet_create: {
-    labelKey: "extend.trade.bottom_panel.trades.side_red_packet",
+    labelKey: "trade.bottom_panel.trades.side_red_packet",
     color: "text-warning",
   },
   red_packet_claim: {
-    labelKey: "extend.trade.bottom_panel.trades.side_red_packet",
+    labelKey: "trade.bottom_panel.trades.side_red_packet",
     color: "text-warning",
   },
   red_packet_complete: {
-    labelKey: "extend.trade.bottom_panel.trades.side_red_packet",
+    labelKey: "trade.bottom_panel.trades.side_red_packet",
     color: "text-warning",
   },
   red_packet_refund: {
-    labelKey: "extend.trade.bottom_panel.trades.side_red_packet",
+    labelKey: "trade.bottom_panel.trades.side_red_packet",
     color: "text-warning",
   },
 };
@@ -693,15 +624,12 @@ function resolveTypeMeta(type: ActivityType | string | undefined): TypeMeta {
   if (type && type in TYPE_META) return TYPE_META[type as ActivityType];
   return {
     labelKey: "",
-    color: "text-default-500",
+    color: "text-text-muted",
     fallbackLabel: type ? String(type).replace(/_/g, " ") : "--",
   };
 }
 
-function formatGasFee(
-  gasFee: string | undefined,
-  chain: Chain,
-): string {
+function formatGasFee(gasFee: string | undefined, chain: Chain): string {
   if (!gasFee) return "--";
   const nativeDecimals = getNativeDecimals(chain);
   const nativeSymbol = getNativeSymbol(chain);
@@ -753,9 +681,7 @@ function normalizeDate(value: Date | string | number | undefined): Date | null {
     return Number.isNaN(value.getTime()) ? null : value;
   }
   const timestamp =
-    typeof value === "number" && value > 0 && value < 1_000_000_000_000
-      ? value * 1000
-      : value;
+    typeof value === "number" && value > 0 && value < 1_000_000_000_000 ? value * 1000 : value;
   const date = new Date(timestamp);
   return Number.isNaN(date.getTime()) ? null : date;
 }
@@ -772,10 +698,7 @@ function getAccountExplorer(
   };
 }
 
-function getTxExplorer(
-  chain: Chain,
-  txHash: string,
-): { name: string; url: string } | undefined {
+function getTxExplorer(chain: Chain, txHash: string): { name: string; url: string } | undefined {
   const url = txExplorerUrl(chain, txHash);
   if (!url) return undefined;
   return {
@@ -817,10 +740,10 @@ function EmptyActivities() {
   const { t } = useTranslation();
   return (
     <div
-      className="flex flex-1 items-center justify-center py-16 text-[12px] text-default-500"
+      className="flex flex-1 items-center justify-center py-16 text-[12px] text-text-muted"
       role="status"
     >
-      {t("extend.trade.bottom_panel.no_data")}
+      {t("trade.bottom_panel.no_data")}
     </div>
   );
 }
@@ -829,14 +752,14 @@ function LoadMoreRow({ isLoading }: { isLoading: boolean }) {
   const { t } = useTranslation();
 
   return (
-    <div className="flex h-10 items-center justify-center text-[12px] text-default-500">
+    <div className="flex h-10 items-center justify-center text-[12px] text-text-muted">
       {isLoading ? (
         <div className="flex items-center gap-2" role="status">
           <span
             aria-hidden
             className="block size-3 animate-spin rounded-full border border-default-300 border-t-default-600"
           />
-          <span>{t("extend.trade.bottom_panel.loading")}</span>
+          <span>{t("trade.bottom_panel.loading")}</span>
         </div>
       ) : (
         <span aria-hidden className="block h-px w-px" />

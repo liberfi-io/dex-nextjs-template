@@ -64,10 +64,7 @@ export interface TokenDetailHeaderMobileProps {
  * `SidebarTokenAudit` + `SidebarBasicInfo`, keeping this header focused
  * on identity and price.
  */
-export function TokenDetailHeaderMobile({
-  chain,
-  address,
-}: TokenDetailHeaderMobileProps) {
+export function TokenDetailHeaderMobile({ chain, address }: TokenDetailHeaderMobileProps) {
   const { data: token, isLoading } = useTokenQuery({ chain, address });
 
   if (!token || isLoading) return <HeaderSkeleton />;
@@ -83,8 +80,7 @@ function Content({ token }: { token: Token }) {
   const priceChange = stats24h?.priceChange;
 
   const priceChangeAbs = useMemo(
-    () =>
-      priceChange ? new SafeBigNumber(priceChange).abs().toString() : undefined,
+    () => (priceChange ? new SafeBigNumber(priceChange).abs().toString() : undefined),
     [priceChange],
   );
   const bullish = useMemo(
@@ -122,11 +118,7 @@ function Content({ token }: { token: Token }) {
     <header className="flex flex-col gap-1 border-b border-divider bg-content1 px-3 py-2.5">
       {/* Row 1 — identity (avatar + symbol + name + copy) | price column */}
       <div className="flex items-center gap-3">
-        <TokenAvatar
-          token={token}
-          showProgress={false}
-          className="h-10 w-10 flex-none"
-        />
+        <TokenAvatar token={token} showProgress={false} className="h-10 w-10 flex-none" />
 
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <div
@@ -137,11 +129,11 @@ function Content({ token }: { token: Token }) {
               {token.symbol}
             </span>
             {token.name && token.name !== token.symbol && (
-              <span className="min-w-0 truncate text-[12px] font-normal leading-4 text-neutral transition-colors group-hover:text-primary-200">
+              <span className="min-w-0 truncate text-[12px] font-normal leading-4 text-text-muted transition-colors group-hover:text-primary-200">
                 {token.name}
               </span>
             )}
-            <CopyIcon className="h-[12px] w-[12px] flex-none text-neutral transition-colors group-hover:text-primary-200" />
+            <CopyIcon className="h-[12px] w-[12px] flex-none text-text-muted transition-colors group-hover:text-primary-200" />
           </div>
 
           {/* Row 2 — age · address · socials, in a single horizontally
@@ -156,7 +148,7 @@ function Content({ token }: { token: Token }) {
               </StyledTooltip>
             )}
             <span
-              className="cursor-pointer whitespace-nowrap font-mono text-neutral transition-colors hover:text-primary-200"
+              className="cursor-pointer whitespace-nowrap font-mono text-text-muted transition-colors hover:text-primary-200"
               onClick={handleCopyAddress}
             >
               {formatShortAddress(token.address)}
@@ -181,9 +173,7 @@ function Content({ token }: { token: Token }) {
                 <DiscordIcon className="h-3.5 w-3.5" />
               </SocialLink>
             )}
-            <SocialLink
-              href={searchTwitterUrl(`${token.symbol} OR ${token.address}`)}
-            >
+            <SocialLink href={searchTwitterUrl(`${token.symbol} OR ${token.address}`)}>
               <SearchIcon className="h-3.5 w-3.5" />
             </SocialLink>
           </div>
@@ -199,17 +189,13 @@ function Content({ token }: { token: Token }) {
             {formatPriceInUsd(md?.priceInUsd ?? "")}
           </span>
           <div className="flex items-center gap-1.5 text-[12px] leading-4 tabular-nums">
-            <span className="text-default-500">
-              {t("extend.token_list.attributes.market_cap")}
-            </span>
-            <span className="text-default-700">
-              {formatMCapInUsd(md?.marketCapInUsd ?? "")}
-            </span>
+            <span className="text-text-muted">{t("token_list.attributes.market_cap")}</span>
+            <span className="text-text-secondary">{formatMCapInUsd(md?.marketCapInUsd ?? "")}</span>
             {priceChange !== undefined && (
               <span
                 className={cn(
                   "inline-flex items-center gap-0.5",
-                  bullish ? "text-bullish" : "text-bearish",
+                  bullish ? "text-positive" : "text-negative",
                 )}
               >
                 {bullish ? (
@@ -227,18 +213,12 @@ function Content({ token }: { token: Token }) {
   );
 }
 
-function SocialLink({
-  href,
-  children,
-}: {
-  href: string;
-  children: React.ReactNode;
-}) {
+function SocialLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <Link
       href={href}
       target="_blank"
-      className="flex items-center text-neutral transition-colors hover:text-primary-200"
+      className="flex items-center text-text-muted transition-colors hover:text-primary-200"
     >
       {children}
     </Link>

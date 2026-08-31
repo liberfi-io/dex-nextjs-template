@@ -27,8 +27,7 @@ import {
  * chart + tab bar + table) so that the table rows scroll alongside the
  * upper content instead of inside an inner viewport.
  */
-const TableShellScrollRootContext =
-  createContext<RefObject<HTMLDivElement | null> | null>(null);
+const TableShellScrollRootContext = createContext<RefObject<HTMLDivElement | null> | null>(null);
 
 export const TableShellScrollRootProvider = TableShellScrollRootContext.Provider;
 
@@ -85,7 +84,7 @@ export interface TableShellProps {
  * so it stays visible as the body scrolls. All visual tokens (font sizes,
  * borders, colors) match the design reference §7:
  *
- * - header: 36px, text-default-500, 12px / 500
+ * - header: 36px, text-text-muted, 12px / 500
  * - body row: 40px, border-bottom default-50, hover bg-default-50/60
  * - column heads: aligned per column spec, right-aligned for numerics
  *
@@ -120,19 +119,14 @@ export function TableShell({
 
   const tableMarkup = (
     <>
-      <table
-        className={cn(
-          "w-full table-fixed border-collapse text-[12px]",
-          minWidth,
-        )}
-      >
+      <table className={cn("w-full table-fixed border-collapse text-[12px]", minWidth)}>
         <thead className="sticky top-0 z-10 bg-content1">
           <tr className="border-b border-divider">
             {columns.map((col) => (
               <th
                 key={col.key}
                 className={cn(
-                  "h-9 px-3 align-middle text-[12px] font-medium text-default-500",
+                  "h-9 px-3 align-middle text-[12px] font-medium text-text-muted",
                   alignClass(col.align),
                   col.width,
                 )}
@@ -144,8 +138,7 @@ export function TableShell({
           </tr>
         </thead>
         {children}
-        {infiniteScroll &&
-        (infiniteScroll.hasMore || infiniteScroll.isLoading) ? (
+        {infiniteScroll && (infiniteScroll.hasMore || infiniteScroll.isLoading) ? (
           <InfiniteScrollSentinel
             colSpan={columns.length}
             rootRef={scrollRootRef}
@@ -183,10 +176,7 @@ export function TableShell({
         // wider than the mobile viewport.
         <div className="overflow-x-auto">{tableMarkup}</div>
       ) : (
-        <div
-          ref={ownScrollRef}
-          className="custom-scrollbar min-h-0 flex-1 overflow-auto"
-        >
+        <div ref={ownScrollRef} className="custom-scrollbar min-h-0 flex-1 overflow-auto">
           {tableMarkup}
         </div>
       )}
@@ -198,22 +188,13 @@ export function TableShell({
  * Stable empty-state body. Used by {@link EmptyTable} as well as by data
  * tables when the result set is empty.
  */
-export function EmptyBody({
-  colSpan,
-  messageKey,
-}: {
-  colSpan: number;
-  messageKey?: string;
-}) {
+export function EmptyBody({ colSpan, messageKey }: { colSpan: number; messageKey?: string }) {
   const { t } = useTranslation();
   return (
     <tbody>
       <tr>
-        <td
-          colSpan={colSpan}
-          className="py-16 text-center text-[12px] text-default-500"
-        >
-          {tKey(t, messageKey ?? "extend.trade.bottom_panel.no_data")}
+        <td colSpan={colSpan} className="py-16 text-center text-[12px] text-text-muted">
+          {tKey(t, messageKey ?? "trade.bottom_panel.no_data")}
         </td>
       </tr>
     </tbody>
@@ -287,7 +268,7 @@ function InfiniteScrollSentinel({
       <tr ref={sentinelRef}>
         <td colSpan={colSpan} className="h-10 align-middle">
           {isLoading ? (
-            <div className="flex items-center justify-center gap-2 text-[12px] text-default-500">
+            <div className="flex items-center justify-center gap-2 text-[12px] text-text-muted">
               <Spinner size="sm" />
             </div>
           ) : (

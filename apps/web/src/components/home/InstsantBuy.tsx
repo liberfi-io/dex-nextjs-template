@@ -11,10 +11,14 @@ import { INSTANT_TRADE_AMOUNT_ID, swapFeesFromPreset } from "../../application/s
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { useWalletPrimaryTokenNetWorth } from "../../application/useWalletPrimaryTokenNetWorth";
 import { browserAppSdk } from "../../application/app-sdk";
-import { useInstantTradeAmount, usePresetValues, useSwap, type SwapPhase } from "@liberfi.io/ui-trade";
+import {
+  useInstantTradeAmount,
+  usePresetValues,
+  useSwap,
+  type SwapPhase,
+} from "@liberfi.io/ui-trade";
 import { useAuthCallback, useConnectedWallet } from "@liberfi.io/wallet-connector";
 import { useMemo } from "react";
-
 
 export function InstantBuy({ token }: TokenListActionsProps) {
   const { chain: chainId } = useCurrentChain();
@@ -75,14 +79,14 @@ export function InstantBuy({ token }: TokenListActionsProps) {
 
     if (!amount || new SafeBigNumber(amount).lte(0.0001)) {
       toast.error(
-        t("extend.trade.buy_min_amount", { amount: "0.0001", symbol: primaryTokenSymbol ?? "" }),
+        t("trade.buy_min_amount", { amount: "0.0001", symbol: primaryTokenSymbol ?? "" }),
       );
       return;
     }
 
     // balance is insufficient
     if (new SafeBigNumber(walletNetWorth.amount).lt(amount)) {
-      toast.error(t("extend.trade.buy_insufficient_balance"));
+      toast.error(t("trade.buy_insufficient_balance"));
       browserAppSdk.events.emit("deposit:open");
       return;
     }

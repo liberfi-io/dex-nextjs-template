@@ -24,15 +24,7 @@ import {
 } from "@liberfi.io/utils";
 import { useTranslation } from "@liberfi.io/i18n";
 import { tKey } from "../../../../application/t";
-import {
-  MouseEvent,
-  memo,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { MouseEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { alignClass } from "./table-shell";
 import { TOP_TRADERS_COLUMNS } from "./BottomEmptyTable";
 
@@ -60,9 +52,7 @@ type TokenTopTradersSortBy =
   | "netflowUsd"
   | "createdAt";
 type TokenTopTradersSortDirection = "asc" | "desc";
-type TokenTopTradersListScriptWithSort = ReturnType<
-  typeof useTokenTopTradersListScript
-> & {
+type TokenTopTradersListScriptWithSort = ReturnType<typeof useTokenTopTradersListScript> & {
   sortBy: TokenTopTradersSortBy | undefined;
   sortDirection: TokenTopTradersSortDirection | undefined;
   setSortBy: (s: TokenTopTradersSortBy) => void;
@@ -71,9 +61,7 @@ type TokenTopTradersListScriptWithSort = ReturnType<
     direction?: TokenTopTradersSortDirection,
   ) => void;
 };
-const TOP_TRADER_SORT_BY_COLUMN: Partial<
-  Record<string, TokenTopTradersSortBy>
-> = {
+const TOP_TRADER_SORT_BY_COLUMN: Partial<Record<string, TokenTopTradersSortBy>> = {
   activity: "lastActiveAt",
   total_buy: "buyVolume",
   total_sell: "sellVolume",
@@ -81,9 +69,7 @@ const TOP_TRADER_SORT_BY_COLUMN: Partial<
   total_pnl: "totalPnl",
 };
 
-type TokenTopTraderRow = ReturnType<
-  typeof useTokenTopTradersListScript
->["traders"][number] & {
+type TokenTopTraderRow = ReturnType<typeof useTokenTopTradersListScript>["traders"][number] & {
   totalRealizedPnlInUsd?: string;
   unrealizedPnlInUsd?: string;
   totalPnlInUsd?: string;
@@ -109,20 +95,9 @@ type TokenTopTraderRow = ReturnType<
  * Uses the token top-traders endpoint and renders trader-specific PnL /
  * buy / sell fields returned by the SDK.
  */
-export function BottomTopTradersTable({
-  chain,
-  address,
-}: BottomTopTradersTableProps) {
+export function BottomTopTradersTable({ chain, address }: BottomTopTradersTableProps) {
   const { t } = useTranslation();
-  const {
-    traders,
-    isLoading,
-    sortBy,
-    sortDirection,
-    setSort,
-    hasMore,
-    loadMore,
-  } =
+  const { traders, isLoading, sortBy, sortDirection, setSort, hasMore, loadMore } =
     useTokenTopTradersListScript({
       chain,
       address,
@@ -158,29 +133,21 @@ export function BottomTopTradersTable({
   return (
     <div className="flex h-[70vh] w-full flex-col overflow-hidden md:h-full">
       <div className="custom-scrollbar min-h-0 flex-1 overflow-x-auto overflow-y-hidden overscroll-x-contain">
-        <div
-          className="flex h-full flex-col"
-          style={TABLE_SIZE_STYLE}
-        >
+        <div className="flex h-full flex-col" style={TABLE_SIZE_STYLE}>
           <div
-            className="grid h-9 shrink-0 border-b border-divider bg-content1 text-[12px] font-medium text-default-500"
+            className="grid h-9 shrink-0 border-b border-divider bg-content1 text-[12px] font-medium text-text-muted"
             style={{ gridTemplateColumns: GRID_TEMPLATE_COLUMNS }}
           >
             {TOP_TRADERS_COLUMNS.map((col) => (
               <div
                 key={col.key}
-                className={cn(
-                  "flex h-full items-center px-3",
-                  justifyClass(col.align),
-                )}
+                className={cn("flex h-full items-center px-3", justifyClass(col.align))}
                 style={{ letterSpacing: "-0.2px" }}
               >
                 {TOP_TRADER_SORT_BY_COLUMN[col.key] ? (
                   <TopTraderSortHeader
                     label={tKey(t, col.labelKey)}
-                    sortBeforeSlash={
-                      col.key === "total_buy" || col.key === "total_sell"
-                    }
+                    sortBeforeSlash={col.key === "total_buy" || col.key === "total_sell"}
                     sortBy={TOP_TRADER_SORT_BY_COLUMN[col.key]}
                     activeSortBy={sortBy}
                     activeSortDirection={sortDirection}
@@ -242,11 +209,7 @@ function TopTraderSortHeader({
   return (
     <span className="inline-flex items-center gap-1">
       {sortBeforeSlash ? (
-        <SortLabelWithIconBeforeSlash
-          label={label}
-          sort={sort}
-          onSortChange={handleSortChange}
-        />
+        <SortLabelWithIconBeforeSlash label={label} sort={sort} onSortChange={handleSortChange} />
       ) : (
         <Sortable sort={sort} onSortChange={handleSortChange}>
           {label}
@@ -329,7 +292,7 @@ const TopTraderRow = memo(function TopTraderRow({
     >
       <div className={cn("flex items-center px-3", justifyClass("left"))}>
         <div className="flex min-w-0 items-center gap-2">
-          <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-content3 text-[10px] font-semibold text-default-700">
+          <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-content3 text-[10px] font-semibold text-text-secondary">
             {rank}
           </span>
           <TraderAddressActions chain={chain} address={trader.address} />
@@ -354,10 +317,7 @@ const TopTraderRow = memo(function TopTraderRow({
       <PnlCell value={trader.totalRealizedPnlInUsd} ratio={trader.realizedPnl} />
       <PnlCell value={trader.totalPnlInUsd} ratio={trader.roi} strong />
       <HoldingsCell amountInUsd={trader.amountInUsd} ratio={trader.ratio} />
-      <TransferCell
-        inCount={trader.transferInCount}
-        outCount={trader.transferOutCount}
-      />
+      <TransferCell inCount={trader.transferInCount} outCount={trader.transferOutCount} />
     </div>
   );
 });
@@ -370,12 +330,9 @@ const TraderAddressActions = memo(function TraderAddressActions({
   address: string;
 }) {
   const { t } = useTranslation();
-  const explorer = useMemo(
-    () => getAccountExplorer(chain, address),
-    [chain, address],
-  );
+  const explorer = useMemo(() => getAccountExplorer(chain, address), [chain, address]);
   const explorerLabel = explorer
-    ? t("extend.trade.bottom_panel.open_in_explorer", {
+    ? t("trade.bottom_panel.open_in_explorer", {
         explorer: explorer.name,
       })
     : undefined;
@@ -388,7 +345,7 @@ const TraderAddressActions = memo(function TraderAddressActions({
             href={explorer.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex size-4 shrink-0 cursor-pointer items-center justify-center text-neutral transition-colors hover:text-primary-200"
+            className="flex size-4 shrink-0 cursor-pointer items-center justify-center text-text-muted transition-colors hover:text-primary-200"
             aria-label={explorerLabel}
             onClick={(e) => e.stopPropagation()}
           >
@@ -408,9 +365,7 @@ const TraderAddressCopyButton = memo(function TraderAddressCopyButton({
   const { t } = useTranslation();
   const copyToClipboard = useCopyToClipboard();
   const [copied, setCopied] = useState(false);
-  const copiedResetTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
-    undefined,
-  );
+  const copiedResetTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const handleCopyAddress = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
@@ -450,9 +405,9 @@ const TraderAddressCopyButton = memo(function TraderAddressCopyButton({
         {truncateAddress(address, 4, 4)}
       </span>
       {copied ? (
-        <CheckIcon className="h-3 w-3 shrink-0 text-bullish" />
+        <CheckIcon className="h-3 w-3 shrink-0 text-positive" />
       ) : (
-        <CopyIcon className="h-3 w-3 shrink-0 text-neutral transition-colors group-hover:text-primary-200" />
+        <CopyIcon className="h-3 w-3 shrink-0 text-text-muted transition-colors group-hover:text-primary-200" />
       )}
     </button>
   );
@@ -471,20 +426,15 @@ const TradeFlowCell = memo(function TradeFlowCell({
   tokenAmount?: string;
   count?: number;
 }) {
-  const tone = side === "buy" ? "text-bullish" : "text-bearish";
+  const tone = side === "buy" ? "text-positive" : "text-negative";
   return (
-    <div
-      className={cn(
-        "flex flex-col justify-center px-3 tabular-nums",
-        alignClass("right"),
-      )}
-    >
+    <div className={cn("flex flex-col justify-center px-3 tabular-nums", alignClass("right"))}>
       <div className={cn("text-[12px] leading-4", tone)}>
         {formatAmountInUsdOrZero(volumeUsd)}
-        <span className="px-1 text-default-500">/</span>
+        <span className="px-1 text-text-muted">/</span>
         {formatAmountInUsdOrZero(avgPriceUsd)}
       </div>
-      <div className="text-[11px] leading-4 text-neutral">
+      <div className="text-[11px] leading-4 text-text-muted">
         {formatAmountOrZero(tokenAmount)}
         <span className="px-1">/</span>
         {(count ?? 0).toLocaleString()} {TX_LABEL}
@@ -505,12 +455,12 @@ const PnlCell = memo(function PnlCell({
   const n = value === undefined || value === "" ? 0 : Number(value);
   const tone =
     n === undefined || Number.isNaN(n)
-      ? "text-default-500"
+      ? "text-text-muted"
       : n > 0
-        ? "text-bullish"
+        ? "text-positive"
         : n < 0
-          ? "text-bearish"
-          : "text-default-500";
+          ? "text-negative"
+          : "text-text-muted";
 
   return (
     <div
@@ -540,23 +490,21 @@ const HoldingsCell = memo(function HoldingsCell({
   ratio?: string;
 }) {
   const ratioValue = parseRatioFrom100(ratio);
-  const ratioText =
-    ratioValue === undefined ? undefined : formatPercent(ratioValue / 100);
-  const progressWidth =
-    ratioValue === undefined ? 0 : Math.max(0, Math.min(100, ratioValue));
+  const ratioText = ratioValue === undefined ? undefined : formatPercent(ratioValue / 100);
+  const progressWidth = ratioValue === undefined ? 0 : Math.max(0, Math.min(100, ratioValue));
   const hasRatio = ratioText !== undefined;
 
   return (
     <div
       className={cn(
-        "flex flex-col justify-center gap-1 px-3 tabular-nums text-default-500",
+        "flex flex-col justify-center gap-1 px-3 tabular-nums text-text-muted",
         alignClass("right"),
       )}
     >
       <div className="flex items-center justify-end gap-1 text-[12px] leading-4 text-foreground">
         <span>{amountInUsd ? formatAmountInUsd(amountInUsd) : "--"}</span>
         {hasRatio ? (
-          <span className="rounded bg-content3 px-1.5 py-0.5 text-[11px] leading-4 text-default-600">
+          <span className="rounded bg-content3 px-1.5 py-0.5 text-[11px] leading-4 text-text-muted">
             {ratioText}
           </span>
         ) : null}
@@ -582,12 +530,7 @@ const TransferCell = memo(function TransferCell({
 }) {
   const hasAny = inCount !== undefined || outCount !== undefined;
   return (
-    <div
-      className={cn(
-        "flex flex-col justify-center px-3 text-default-500",
-        alignClass("right"),
-      )}
-    >
+    <div className={cn("flex flex-col justify-center px-3 text-text-muted", alignClass("right"))}>
       {hasAny ? (
         <span className="text-[12px] leading-4 text-foreground">
           {(inCount ?? 0).toLocaleString()} / {(outCount ?? 0).toLocaleString()}
@@ -599,29 +542,18 @@ const TransferCell = memo(function TransferCell({
   );
 });
 
-const AgeCell = memo(function AgeCell({
-  value,
-}: {
-  value?: Date | string | number;
-}) {
+const AgeCell = memo(function AgeCell({ value }: { value?: Date | string | number }) {
   const date = normalizeDate(value);
   const ageMs = useTickAge(date ?? Date.now());
   const ageText = date ? formatAge(ageMs) : "--";
   const fullTime = date ? date.toLocaleString() : null;
 
   const content = (
-    <span className={cn(date ? "text-foreground" : "text-default-500")}>
-      {ageText}
-    </span>
+    <span className={cn(date ? "text-foreground" : "text-text-muted")}>{ageText}</span>
   );
 
   return (
-    <div
-      className={cn(
-        "flex items-center px-3 text-default-500",
-        justifyClass("right"),
-      )}
-    >
+    <div className={cn("flex items-center px-3 text-text-muted", justifyClass("right"))}>
       {fullTime ? (
         <StyledTooltip content={fullTime} placement="top">
           {content}
@@ -639,9 +571,7 @@ function normalizeDate(value: Date | string | number | undefined): Date | null {
     return Number.isNaN(value.getTime()) ? null : value;
   }
   const timestamp =
-    typeof value === "number" && value > 0 && value < 1_000_000_000_000
-      ? value * 1000
-      : value;
+    typeof value === "number" && value > 0 && value < 1_000_000_000_000 ? value * 1000 : value;
   const date = new Date(timestamp);
   return Number.isNaN(date.getTime()) ? null : date;
 }
@@ -650,10 +580,10 @@ function EmptyTopTraders() {
   const { t } = useTranslation();
   return (
     <div
-      className="flex flex-1 items-center justify-center py-16 text-[12px] text-default-500"
+      className="flex flex-1 items-center justify-center py-16 text-[12px] text-text-muted"
       role="status"
     >
-      {t("extend.trade.bottom_panel.no_data")}
+      {t("trade.bottom_panel.no_data")}
     </div>
   );
 }
@@ -661,14 +591,14 @@ function EmptyTopTraders() {
 function LoadMoreRow({ isLoading }: { isLoading: boolean }) {
   const { t } = useTranslation();
   return (
-    <div className="flex h-10 items-center justify-center text-[12px] text-default-500">
+    <div className="flex h-10 items-center justify-center text-[12px] text-text-muted">
       {isLoading ? (
         <div className="flex items-center gap-2" role="status">
           <span
             aria-hidden
             className="block size-3 animate-spin rounded-full border border-default-300 border-t-default-600"
           />
-          <span>{t("extend.trade.bottom_panel.loading")}</span>
+          <span>{t("trade.bottom_panel.loading")}</span>
         </div>
       ) : (
         <span aria-hidden className="block h-px w-px" />

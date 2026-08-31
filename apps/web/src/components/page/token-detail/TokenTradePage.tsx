@@ -116,7 +116,7 @@ function TokenSplitHandle({
       role="separator"
       aria-orientation={isHorizontal ? "horizontal" : "vertical"}
       className={[
-        "group relative flex items-center justify-center bg-default-200 text-default-400 transition-colors duration-150 ease-in-out hover:bg-default-400 hover:text-foreground/80",
+        "group relative flex items-center justify-center bg-default-200 text-text-muted transition-colors duration-150 ease-in-out hover:bg-default-400 hover:text-foreground/80",
         isHorizontal
           ? "h-[4px] w-full cursor-ns-resize"
           : "h-full w-[4px] cursor-ew-resize",

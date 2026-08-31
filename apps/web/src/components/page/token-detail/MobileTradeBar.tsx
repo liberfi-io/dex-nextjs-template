@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  Modal,
-  ModalContent,
-  useDisclosure,
-} from "@heroui/react";
+import { Modal, ModalContent, useDisclosure } from "@heroui/react";
 import { cn } from "@liberfi.io/ui";
 import { useTranslation } from "@liberfi.io/i18n";
 import { useCallback, useState } from "react";
@@ -45,11 +41,7 @@ type Direction = "buy" | "sell";
  * padding). Consumers reserve the same amount of `padding-bottom` on the
  * page scroll container so the last list row isn't obscured.
  */
-export function MobileTradeBar({
-  chain,
-  tokenAddress,
-  tokenSymbol,
-}: MobileTradeBarProps) {
+export function MobileTradeBar({ chain, tokenAddress, tokenSymbol }: MobileTradeBarProps) {
   const { t } = useTranslation();
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   // Remember which CTA opened the sheet so the modal seeds InstantTrade
@@ -74,16 +66,8 @@ export function MobileTradeBar({
         // env() variable.
         className="fixed bottom-0 left-0 right-0 z-30 flex gap-2.5 border-t border-divider bg-content1 px-4 pt-3 pb-[max(env(safe-area-inset-bottom),0.75rem)]"
       >
-        <TradeCta
-          direction="buy"
-          label={t("extend.trade.buy")}
-          onPress={() => handleOpen("buy")}
-        />
-        <TradeCta
-          direction="sell"
-          label={t("extend.trade.sell")}
-          onPress={() => handleOpen("sell")}
-        />
+        <TradeCta direction="buy" label={t("trade.buy")} onPress={() => handleOpen("buy")} />
+        <TradeCta direction="sell" label={t("trade.sell")} onPress={() => handleOpen("sell")} />
       </nav>
 
       <TradeSheet
@@ -116,9 +100,7 @@ function TradeCta({
         // Buy = bullish surface w/ black text; Sell = bearish.
         // Match the desktop trade-panel tab colours so the sheet's
         // selected tab visually flows from the tapped CTA.
-        direction === "buy"
-          ? "bg-bullish text-black"
-          : "bg-bearish text-black",
+        direction === "buy" ? "bg-positive text-text-inverse" : "bg-negative text-text-inverse",
       )}
     >
       {label}
@@ -168,11 +150,7 @@ function TradeSheet({
         <div className="flex justify-center pt-2.5 pb-1">
           <span className="block h-1 w-9 rounded-full bg-content3" />
         </div>
-        <TradingPanel
-          chain={chain}
-          tokenAddress={tokenAddress}
-          defaultDirection={direction}
-        />
+        <TradingPanel chain={chain} tokenAddress={tokenAddress} defaultDirection={direction} />
       </ModalContent>
     </Modal>
   );

@@ -16,21 +16,18 @@ export const PulseInstantBuy = memo(function PulseInstantBuy({
   const { amount, primaryTokenSymbol, buy } = usePulseInstantBuy();
   const [isBuying, setIsBuying] = useState(false);
 
-  const handlePress = useCallback(
-    async () => {
-      if (isBuying) return;
+  const handlePress = useCallback(async () => {
+    if (isBuying) return;
 
-      setIsBuying(true);
-      onStart?.();
-      try {
-        await buy(token.address);
-      } finally {
-        setIsBuying(false);
-        onSettled?.();
-      }
-    },
-    [buy, isBuying, onSettled, onStart, token.address],
-  );
+    setIsBuying(true);
+    onStart?.();
+    try {
+      await buy(token.address);
+    } finally {
+      setIsBuying(false);
+      onSettled?.();
+    }
+  }, [buy, isBuying, onSettled, onStart, token.address]);
 
   const formattedAmount = formatInstantTradeButtonAmount(amount);
   const label =
@@ -45,7 +42,7 @@ export const PulseInstantBuy = memo(function PulseInstantBuy({
       radius="full"
       size="sm"
       startContent={
-        <LightningIcon className="flex-none" style={{ color: "#c7ff2e" }} />
+        <LightningIcon className="flex-none" style={{ color: "var(--color-brand-primary)" }} />
       }
       onPress={handlePress}
       isLoading={isBuying}
@@ -53,9 +50,10 @@ export const PulseInstantBuy = memo(function PulseInstantBuy({
       disableRipple
       className={cn("absolute right-0 -bottom-3 min-w-0 w-auto flex-none")}
       style={{
-        background: "linear-gradient(rgba(199,255,46,0.08), rgba(199,255,46,0.08)), #0a0a0b",
-        border: "1px solid rgba(199,255,46,0.2)",
-        color: "#c7ff2e",
+        background:
+          "linear-gradient(hsl(var(--heroui-primary) / 0.08), hsl(var(--heroui-primary) / 0.08)), #0a0a0b",
+        border: "1px solid hsl(var(--heroui-primary) / 0.2)",
+        color: "var(--color-brand-primary)",
         fontWeight: 600,
       }}
     >

@@ -1,11 +1,4 @@
-import {
-  createContext,
-  PropsWithChildren,
-  useCallback,
-  useContext,
-  useMemo,
-  useRef,
-} from "react";
+import { createContext, PropsWithChildren, useCallback, useContext, useMemo, useRef } from "react";
 import { useAtomValue } from "jotai";
 import { useTranslation } from "@liberfi.io/i18n";
 import { toast } from "@liberfi.io/ui";
@@ -21,10 +14,7 @@ import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { browserAppSdk } from "../../application/app-sdk";
 import { useWalletPrimaryTokenNetWorth } from "../../application/useWalletPrimaryTokenNetWorth";
 import { usePresetValues, useSwap, type SwapPhase } from "@liberfi.io/ui-trade";
-import {
-  useAuthCallback,
-  useConnectedWallet,
-} from "@liberfi.io/wallet-connector";
+import { useAuthCallback, useConnectedWallet } from "@liberfi.io/wallet-connector";
 import { pulseSettingsAtom } from "../../states/pulse";
 
 type PulseInstantBuyContextType = {
@@ -47,10 +37,7 @@ type PulseInstantBuyProviderProps = PropsWithChildren<{
   type: PulseListType;
 }>;
 
-export function PulseInstantBuyProvider({
-  type,
-  children,
-}: PulseInstantBuyProviderProps) {
+export function PulseInstantBuyProvider({ type, children }: PulseInstantBuyProviderProps) {
   const { chain: chainId } = useCurrentChain();
   const { t } = useTranslation();
   const wallet = useConnectedWallet(chainId);
@@ -84,18 +71,9 @@ export function PulseInstantBuyProvider({
     onError: handleSwapError,
   });
 
-  const primaryTokenSymbol = useMemo(
-    () => getPrimaryTokenSymbol(chainId),
-    [chainId],
-  );
-  const primaryTokenDecimals = useMemo(
-    () => getPrimaryTokenDecimals(chainId),
-    [chainId],
-  );
-  const primaryTokenAddress = useMemo(
-    () => getPrimaryTokenAddress(chainId),
-    [chainId],
-  );
+  const primaryTokenSymbol = useMemo(() => getPrimaryTokenSymbol(chainId), [chainId]);
+  const primaryTokenDecimals = useMemo(() => getPrimaryTokenDecimals(chainId), [chainId]);
+  const primaryTokenAddress = useMemo(() => getPrimaryTokenAddress(chainId), [chainId]);
 
   const presetSettings = usePresetValues({
     chain: chainId,
@@ -154,7 +132,7 @@ export function PulseInstantBuyProvider({
 
     if (!amount || new SafeBigNumber(amount).lte(0.0001)) {
       toast.error(
-        t("extend.trade.buy_min_amount", {
+        t("trade.buy_min_amount", {
           amount: "0.0001",
           symbol: primaryTokenSymbol ?? "",
         }),
@@ -163,7 +141,7 @@ export function PulseInstantBuyProvider({
     }
 
     if (new SafeBigNumber(walletNetWorth.amount).lt(amount)) {
-      toast.error(t("extend.trade.buy_insufficient_balance"));
+      toast.error(t("trade.buy_insufficient_balance"));
       browserAppSdk.events.emit("deposit:open");
       return;
     }

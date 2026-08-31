@@ -63,7 +63,13 @@ export function AppBottomToolbar() {
         startContent={<SettingsIcon width={16} height={16} />}
         onPress={handlePresetClick}
       >
-        {t(`extend.trade.settings.preset${preset + 1}`)}
+        {t(
+          ([
+            "trade.settings.preset1",
+            "trade.settings.preset2",
+            "trade.settings.preset3",
+          ] as const)[preset],
+        )}
       </Button>
 
       <BottomToolBarWallet />
@@ -73,8 +79,8 @@ export function AppBottomToolbar() {
       <StyledTooltip content={t("extend.toolbar.media_track_tooltip")}>
         <Button
           size="sm"
-          className="relative h-6 min-h-0 px-1 gap-1 bg-transparent hover:bg-content1 text-neutral text-xs overflow-visible"
-          startContent={<TwitterIcon width={16} height={16} className="text-neutral" />}
+          className="relative h-6 min-h-0 px-1 gap-1 bg-transparent hover:bg-content1 text-text-muted text-xs overflow-visible"
+          startContent={<TwitterIcon width={16} height={16} className="text-text-muted" />}
           onPress={onOpenMediaTrack}
         >
           {t("extend.toolbar.media_track")}
@@ -85,8 +91,8 @@ export function AppBottomToolbar() {
       <StyledTooltip content={t("extend.toolbar.ai_copilot_tooltip")} closeDelay={0}>
         <Button
           size="sm"
-          className="relative h-6 min-h-0 px-2 gap-1 bg-transparent hover:bg-content1 text-neutral text-xs overflow-visible"
-          startContent={<RobotIcon width={18} height={18} className="text-neutral" />}
+          className="relative h-6 min-h-0 px-2 gap-1 bg-transparent hover:bg-content1 text-text-muted text-xs overflow-visible"
+          startContent={<RobotIcon width={18} height={18} className="text-text-muted" />}
           onPress={onOpenAICopilot}
         >
           {t("extend.toolbar.ai_copilot")}
@@ -112,7 +118,7 @@ export function AppBottomToolbar() {
           <DiscordIcon
             width={18}
             height={18}
-            className="text-neutral hover:opacity-80 cursor-pointer"
+            className="text-text-muted hover:opacity-80 cursor-pointer"
           />
         </Button>
       </StyledTooltip>
@@ -125,7 +131,7 @@ export function AppBottomToolbar() {
           <TwitterIcon
             width={18}
             height={18}
-            className="text-neutral hover:opacity-80 cursor-pointer"
+            className="text-text-muted hover:opacity-80 cursor-pointer"
           />
         </Button>
       </StyledTooltip>
@@ -133,7 +139,7 @@ export function AppBottomToolbar() {
         <UserGuideIcon
           width={18}
           height={18}
-          className="text-neutral hover:opacity-80 cursor-pointer"
+          className="text-text-muted hover:opacity-80 cursor-pointer"
         />
       </StyledTooltip>
     </div>

@@ -1,16 +1,8 @@
 "use client";
 
 import { useTokenQuery, useTokenSecurityQuery } from "@liberfi.io/react";
-import {
-  Chain,
-  type TokenMarketData,
-} from "@liberfi.io/types";
-import {
-  CheckIcon,
-  StyledTooltip,
-  XCloseIcon,
-  cn,
-} from "@liberfi.io/ui";
+import { Chain, type TokenMarketData } from "@liberfi.io/types";
+import { CheckIcon, StyledTooltip, XCloseIcon, cn } from "@liberfi.io/ui";
 import { formatAmount, formatPercent, SafeBigNumber } from "@liberfi.io/utils";
 import { useTranslation } from "@liberfi.io/i18n";
 import { tKey } from "../../../application/t";
@@ -34,7 +26,7 @@ const RISK_RATIO_THRESHOLD = 0.1;
 type Status = "good" | "bad" | "neutral";
 
 interface Metric {
-  /** Translation key suffix (relative to `extend.trade.audit`). */
+  /** Translation key suffix (relative to `trade.audit`). */
   key: string;
   /** Value to render (already formatted). */
   value: ReactNode;
@@ -68,8 +60,8 @@ interface Metric {
  *
  * Every cell is wrapped in a tooltip explaining what the metric measures.
  * Layout draws on Tailwind primitives — no inline color hexes; all colors
- * resolve through the HeroUI theme tokens (`text-bullish`, `text-bearish`,
- * `text-default-700`, etc.) so this section adapts to theme switches.
+ * resolve through the HeroUI theme tokens (`text-positive`, `text-negative`,
+ * `text-text-secondary`, etc.) so this section adapts to theme switches.
  */
 export function SidebarTokenAudit({ chain, address }: SidebarTokenAuditProps) {
   const { t } = useTranslation();
@@ -85,14 +77,14 @@ export function SidebarTokenAudit({ chain, address }: SidebarTokenAuditProps) {
   return (
     <section
       className="border-t border-divider bg-content1 px-3 py-5"
-      aria-label={t("extend.trade.audit.title")}
+      aria-label={t("trade.audit.title")}
     >
       <div className="grid grid-cols-4 gap-x-2 gap-y-5">
         {metrics.map((m) => (
           <AuditCell
             key={m.key}
-            label={tKey(t, `extend.trade.audit.${m.key}`)}
-            tooltip={tKey(t, `extend.trade.audit.${m.key}_tip`)}
+            label={tKey(t, `trade.audit.${m.key}`)}
+            tooltip={tKey(t, `trade.audit.${m.key}_tip`)}
             value={m.value}
             status={m.status}
             showStatusIcon={m.showStatusIcon}
@@ -117,17 +109,11 @@ function AuditCell({
   showStatusIcon?: boolean;
 }) {
   const valueColor =
-    status === "good"
-      ? "text-bullish"
-      : status === "bad"
-        ? "text-bearish"
-        : "text-foreground";
+    status === "good" ? "text-positive" : status === "bad" ? "text-negative" : "text-foreground";
   return (
     <StyledTooltip content={tooltip} placement="top">
       <div className="flex min-w-0 cursor-default flex-col items-center gap-1 text-center leading-none">
-        <span className="text-[12px] font-normal text-default-700">
-          {label}
-        </span>
+        <span className="text-[12px] font-normal text-text-secondary">{label}</span>
         <span
           className={cn(
             "flex items-center justify-center gap-1 text-[12px] font-medium tabular-nums",
@@ -149,10 +135,10 @@ function AuditCell({
  */
 function StatusBadge({ status }: { status: Status }) {
   if (status === "good") {
-    return <CheckIcon className="h-2.5 w-2.5 shrink-0 text-bullish" />;
+    return <CheckIcon className="h-2.5 w-2.5 shrink-0 text-positive" />;
   }
   if (status === "bad") {
-    return <XCloseIcon className="h-2.5 w-2.5 shrink-0 text-bearish" />;
+    return <XCloseIcon className="h-2.5 w-2.5 shrink-0 text-negative" />;
   }
   return null;
 }
@@ -234,19 +220,12 @@ function counterMetric(key: string, count: number | undefined): Metric {
   return { key, value: formatAmount(count.toString()), status: "neutral" };
 }
 
-function booleanMetric(
-  key: string,
-  value: boolean | undefined,
-  safeWhen: boolean,
-): Metric {
+function booleanMetric(key: string, value: boolean | undefined, safeWhen: boolean): Metric {
   if (value === undefined) return unknownMetric(key);
   return { key, value: "", status: value === safeWhen ? "good" : "bad" };
 }
 
-function burnMetric(
-  key: string,
-  security: TokenSecurityDetails | undefined,
-): Metric {
+function burnMetric(key: string, security: TokenSecurityDetails | undefined): Metric {
   const burnRatio = getBurnRatio(security);
   if (burnRatio !== undefined) {
     const burned = new SafeBigNumber(burnRatio).gt(0);
