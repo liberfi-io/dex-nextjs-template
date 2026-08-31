@@ -88,15 +88,18 @@ export const InstantTradeListButton = memo(function InstantTradeListButton({
       color={color}
       className={cn("min-w-0 w-auto flex-none", className)}
       disableRipple
-      startContent={<LightningIcon className="flex-none" style={{ color: "#c7ff2e" }} />}
+      startContent={
+        <LightningIcon className="flex-none" style={{ color: "var(--color-brand-primary)" }} />
+      }
       isDisabled={isDisabled}
       isLoading={isSwapping}
       spinner={<Spinner size="sm" color="current" />}
       onPress={handleSwap}
       style={{
-        background: "linear-gradient(rgba(199,255,46,0.08), rgba(199,255,46,0.08)), #0a0a0b",
-        border: "1px solid rgba(199,255,46,0.2)",
-        color: "#c7ff2e",
+        background:
+          "linear-gradient(hsl(var(--heroui-primary) / 0.08), hsl(var(--heroui-primary) / 0.08)), var(--color-surface-base)",
+        border: "1px solid hsl(var(--heroui-primary) / 0.2)",
+        color: "var(--color-brand-primary)",
         fontWeight: 600,
       }}
     >

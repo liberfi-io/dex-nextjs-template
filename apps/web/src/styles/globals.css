@@ -2,14 +2,35 @@
 @import "@liberfi.io/ui-tokens/tailwind/tailwind.css";
 
 /*
- * Forward-port newer @theme tokens that ship in react-sdk @liberfi.io/ui
- * `src/tailwind/tailwind.css` but have not been released to npm yet (this
- * consumer is pinned to v0.3.6 which lacks them). Remove a row once the
- * corresponding token lands in the published @liberfi.io/ui version we
- * depend on.
+ * Forward-port the semantic contract from the sibling react-sdk while this
+ * consumer remains pinned to the last published @liberfi.io/ui package.
+ * Remove this block after the matching SDK release is installed.
  */
 @theme {
-  --color-border-light: hsl(var(--heroui-default-100));
+  --color-brand-primary: hsl(var(--heroui-primary));
+  --color-brand-secondary: hsl(var(--heroui-secondary));
+  --color-text-primary: hsl(var(--heroui-foreground));
+  --color-text-secondary: hsl(var(--heroui-default-700));
+  --color-text-muted: hsl(var(--heroui-default-600));
+  --color-text-disabled: hsl(var(--heroui-default-500));
+  --color-text-inverse: hsl(var(--heroui-primary-foreground));
+  --color-surface-base: hsl(var(--heroui-background));
+  --color-surface-raised: hsl(var(--heroui-content1));
+  --color-surface-interactive: hsl(var(--heroui-content2));
+  --color-surface-strong: hsl(var(--heroui-content3));
+  --color-surface-emphasis: hsl(var(--heroui-content4));
+  --color-surface-scrim: hsl(var(--heroui-overlay) / 0.6);
+  --color-border-light: hsl(var(--heroui-default-200));
+  --color-border-subtle: hsl(var(--heroui-default-300));
+  --color-border-control: hsl(var(--heroui-default-500));
+  --color-action-primary: hsl(var(--heroui-primary));
+  --color-action-primary-hover: hsl(var(--heroui-primary-500));
+  --color-action-primary-pressed: hsl(var(--heroui-primary-300));
+  --color-positive: #22c55e;
+  --color-negative: #ff4d6d;
+  --color-status-success: hsl(var(--heroui-success));
+  --color-status-warning: hsl(var(--heroui-warning));
+  --color-status-danger: hsl(var(--heroui-danger));
 }
 
 @source "../../src/**/*.{js,ts,jsx,tsx,mdx}";
@@ -38,39 +59,39 @@
     --safe-area-inset-bottom: calc(100vh - var(--tg-viewport-height, 100vh));
     --safe-area-inset-stable-bottom: calc(100vh - var(--tg-viewport-stable-height, 100vh));
 
-    --aw-bg-primary: #0c0f13;
-    --aw-bg-secondary: #15181f;
-    --aw-bg-tertiary: #1a1f28;
-    --aw-bg-hover: #121821;
-    --aw-bg-hover-2: #16202a;
-    --aw-bg-hover-3: #1a1d23;
-    --aw-bg-hover-4: #2a2f38;
-    --aw-border: #2a3441;
-    --aw-border-secondary: #2a2f38;
-    --aw-text-primary: #e8edf5;
-    --aw-text-secondary: #b0b8c3;
-    --aw-text-tertiary: #9ca3af;
-    --aw-text-quaternary: #8a8f98;
-    --aw-text-muted: #6c7684;
-    --aw-text-placeholder: #566173;
-    --aw-accent: #c8ff3d;
-    --aw-accent-hover: #b8ef2d;
-    --aw-accent-secondary: #8ba84e;
-    --aw-accent-secondary-hover: #9bb85e;
-    --aw-accent-text: #0b0d0f;
+    --aw-bg-primary: var(--color-surface-base);
+    --aw-bg-secondary: var(--color-surface-raised);
+    --aw-bg-tertiary: var(--color-surface-interactive);
+    --aw-bg-hover: var(--color-surface-interactive);
+    --aw-bg-hover-2: var(--color-surface-strong);
+    --aw-bg-hover-3: var(--color-surface-strong);
+    --aw-bg-hover-4: var(--color-surface-emphasis);
+    --aw-border: var(--color-border-control);
+    --aw-border-secondary: var(--color-border-subtle);
+    --aw-text-primary: var(--color-text-primary);
+    --aw-text-secondary: var(--color-text-secondary);
+    --aw-text-tertiary: var(--color-text-muted);
+    --aw-text-quaternary: var(--color-text-muted);
+    --aw-text-muted: var(--color-text-disabled);
+    --aw-text-placeholder: var(--color-text-disabled);
+    --aw-accent: var(--color-brand-primary);
+    --aw-accent-hover: var(--color-action-primary-hover);
+    --aw-accent-secondary: var(--color-brand-secondary);
+    --aw-accent-secondary-hover: hsl(var(--heroui-secondary-500));
+    --aw-accent-text: var(--color-text-inverse);
     --aw-info: #3b82f6;
     --aw-info-bg: rgba(59, 130, 246, 0.1);
-    --aw-warning: #f59e0b;
-    --aw-warning-bg: rgba(245, 158, 11, 0.1);
-    --aw-danger: #ef4444;
-    --aw-danger-bg: rgba(239, 68, 68, 0.1);
-    --aw-scrollbar: #27313d;
-    --aw-scrollbar-hover: #526175;
-    --aw-shadow-accent-xs: 0 0 14px rgba(200, 255, 61, 0.2);
-    --aw-shadow-accent-sm: 0 0 6px rgba(200, 255, 61, 0.3);
-    --aw-shadow-accent-md: 0 0 12px rgba(200, 255, 61, 0.35);
-    --aw-shadow-accent-lg: 0 0 12px rgba(200, 255, 61, 0.4);
-    --aw-shadow-accent-xl: 0 0 12px rgba(200, 255, 61, 0.45);
+    --aw-warning: hsl(var(--heroui-warning));
+    --aw-warning-bg: hsl(var(--heroui-warning) / 0.1);
+    --aw-danger: hsl(var(--heroui-danger));
+    --aw-danger-bg: hsl(var(--heroui-danger) / 0.1);
+    --aw-scrollbar: var(--color-surface-emphasis);
+    --aw-scrollbar-hover: var(--color-border-control);
+    --aw-shadow-accent-xs: 0 0 14px hsl(var(--heroui-primary) / 0.2);
+    --aw-shadow-accent-sm: 0 0 6px hsl(var(--heroui-primary) / 0.3);
+    --aw-shadow-accent-md: 0 0 12px hsl(var(--heroui-primary) / 0.35);
+    --aw-shadow-accent-lg: 0 0 12px hsl(var(--heroui-primary) / 0.4);
+    --aw-shadow-accent-xl: 0 0 12px hsl(var(--heroui-primary) / 0.45);
   }
 }
 
@@ -130,7 +151,7 @@
 
   .custom-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: rgb(63 63 70 / 0.9) transparent;
+    scrollbar-color: var(--color-surface-emphasis) transparent;
   }
 
   .custom-scrollbar::-webkit-scrollbar {
@@ -140,7 +161,7 @@
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
     border-radius: 4px;
-    background-color: rgb(63 63 70 / 0.9);
+    background-color: var(--color-surface-emphasis);
   }
 
   .custom-scrollbar::-webkit-scrollbar-track {
@@ -152,12 +173,16 @@
     inset: 0;
     pointer-events: none;
     opacity: 0.025;
-    background-image: radial-gradient(circle at 1px 1px, rgb(255 255 255) 1px, transparent 0);
+    background-image: radial-gradient(
+      circle at 1px 1px,
+      var(--color-text-primary) 1px,
+      transparent 0
+    );
     background-size: 20px 20px;
   }
 
   .glass {
-    background: rgba(10, 10, 11, 0.8);
+    background: hsl(var(--heroui-background) / 0.8);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
   }
@@ -312,12 +337,13 @@
   font-weight: 500 !important;
   color: hsl(var(--heroui-foreground)) !important;
 }
-.axiom-trade-panel [role="tablist"][class*="rounded-none"] [role="tab"]:not([data-selected="true"]) {
+.axiom-trade-panel
+  [role="tablist"][class*="rounded-none"]
+  [role="tab"]:not([data-selected="true"]) {
   background-color: transparent !important;
   font-weight: 400 !important;
   color: hsl(var(--heroui-default-500)) !important;
 }
-
 
 /* Main Buy/Sell action button */
 .axiom-trade-panel button[class*="bg-success"][class*="w-full"],
@@ -350,7 +376,9 @@
  * to the other controls. Give each button a soft chip background with a
  * hover lift so the row reads as interactive configuration.
  */
-.axiom-trade-panel .flex.items-center.gap-2 > button[data-react-aria-pressable="true"][class*="h-5"] {
+.axiom-trade-panel
+  .flex.items-center.gap-2
+  > button[data-react-aria-pressable="true"][class*="h-5"] {
   height: 24px !important;
   min-height: 24px !important;
   padding: 0 8px !important;
@@ -358,14 +386,23 @@
   background-color: hsl(var(--heroui-default-100)) !important;
   color: hsl(var(--heroui-foreground-600)) !important;
   font-size: 12px !important;
-  transition: background-color 150ms ease, color 150ms ease !important;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease !important;
 }
-.axiom-trade-panel .flex.items-center.gap-2 > button[data-react-aria-pressable="true"][class*="h-5"]:hover,
-.axiom-trade-panel .flex.items-center.gap-2 > button[data-react-aria-pressable="true"][class*="h-5"][data-hover="true"] {
+.axiom-trade-panel
+  .flex.items-center.gap-2
+  > button[data-react-aria-pressable="true"][class*="h-5"]:hover,
+.axiom-trade-panel
+  .flex.items-center.gap-2
+  > button[data-react-aria-pressable="true"][class*="h-5"][data-hover="true"] {
   background-color: hsl(var(--heroui-default-200)) !important;
   color: hsl(var(--heroui-foreground)) !important;
 }
-.axiom-trade-panel .flex.items-center.gap-2 > button[data-react-aria-pressable="true"][class*="h-5"] svg {
+.axiom-trade-panel
+  .flex.items-center.gap-2
+  > button[data-react-aria-pressable="true"][class*="h-5"]
+  svg {
   width: 12px !important;
   height: 12px !important;
 }
