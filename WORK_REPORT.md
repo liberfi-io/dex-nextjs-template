@@ -378,3 +378,37 @@
 - 部署结果：GitHub Actions Deploy to Vercel run `33421324893`、job `99584138386` 成功，用时 6 分 6 秒；Build、Deploy 与成功通知步骤全部通过，生产地址为 `https://liberfi-coy7vq94a-sgt-lab.vercel.app`。
 - 线上检查：生产地址可达并返回 Vercel SSO 的 `302` 跳转，说明部署入口已生效但受项目访问保护，未在未授权会话中继续页面级验证。
 - Workflow 说明：仅有 GitHub Actions Node.js 20 action runtime 弃用提示，不影响部署；本条最终记录提交使用 `[skip ci]`，避免仅文档更新再次触发生产部署。
+
+## 2026-09-01：恢复 Launchpad 创建代币曲线预览完整视觉（提交前）
+
+- 仓库与分支：`react-sdk/main`；通过同级 `dex-nextjs-template/main` 的本地 SDK source alias 和 3000 端口开发服务验证。
+- 拟用提交标题：`fix(ui-launchpad): restore complete curve preview`。
+- 问题背景：Launchpad 从模板迁移到 React SDK 时，原有带坐标轴、网格、渐变面积、点状曲线、端点与市值图例的完整预览被简化为一条基础 SVG 实线，导致当前创建新币弹窗与历史设计明显不一致；初版恢复后曲线采样点全部可见，又造成点过密、接近连成实线。
+- 完成事项：使用原生 SVG 恢复横纵坐标轴、刻度标签、弱网格、主题色渐变面积、稀疏圆点虚线、起止端点及动态 Starting MC / Migration MC 图例；保留 40 个计算采样点保证曲线平滑，但只显示两个端点，并将曲线调整为 `2 8` 的圆点间隔，避免密集点遮蔽曲线。
+- 影响范围：仅影响 `@liberfi.io/ui-launchpad` 的曲线预览展示；不修改 Launchpad 表单、曲线计算接口、公开 Props、交易创建流程、钱包交互或 ChainStream SDK。
+- 回归防线：新增组件测试，锁定网格、双轴、渐变面积、稀疏虚线、两个端点、Token supply 标签及双图例契约。
+- 验证结果：`@liberfi.io/ui-launchpad` 3 个测试套件、5 项测试、类型检查、ESLint 与 `git diff --check` 已通过；消费者 TypeScript 类型检查和全量 32 个 Jest 套件、169 项测试通过。真实 Pump 与 Raydium 弹窗确认图表包含 11 条网格线、双轴、13 个刻度标签、渐变区域、40 个平滑计算采样和仅 2 个可见端点，切换平台后图例数据同步变化，浏览器控制台无错误；发布前将继续执行 SDK 全量 production build。
+- 预期推送状态：功能提交将 fast-forward 推送到 `react-sdk/origin/main`，禁止 force push；Release workflow 成功后拉取自动生成的 release commit。
+- Workflow 策略：提交标题不包含 `[skip ci]`，按用户确认触发 React SDK `Release` workflow；npm 发布成功后在模板统一升级正式 `@liberfi.io/*` 版本并触发 Vercel production 部署。
+- ChainStream 约束：`@chainstream-io/sdk` 保持当前 `2.1.14` 版本，本轮不做任何版本升级。
+
+## 2026-09-01：恢复 Launchpad 创建代币曲线预览完整视觉（提交后）
+
+- 仓库与分支：`react-sdk/main`。
+- 提交：`f10a0a23b` — `fix(ui-launchpad): restore complete curve preview`；workflow 生成的 release commit 为 `9a8a99e8b` — `chore: release packages`。
+- 最终完成事项：恢复 Launchpad 曲线预览的坐标轴、刻度、弱网格、主题渐变面积、稀疏圆点曲线、双端点和动态市值图例；40 个曲线计算采样点只保留起止两点可见，避免密集点连成实线。
+- 验证结果：SDK 全量 build 24/24 个任务、`@liberfi.io/ui-launchpad` 3 个测试套件共 5 项、类型检查、ESLint、`git diff --check`、消费者 169 项全量测试及 Pump/Raydium 真实弹窗检查通过；浏览器控制台无错误。
+- 发布结果：GitHub Actions Release run `33429979997`、job `99612718375` 成功，用时 4 分 27 秒；25 个公共包均已通过官方 npm registry 的指定版本查询，关键修复包为 `@liberfi.io/ui-launchpad@1.0.5`，release commit 已通过 `pull --ff-only` 同步，本地与远端一致。
+- ChainStream 约束：官方 npm 元数据确认 `@liberfi.io/client@0.3.92` 仍精确依赖 `@chainstream-io/sdk@2.1.14`，本轮未升级 ChainStream。
+- Workflow 说明：仅有 GitHub Actions Node.js 20 action runtime 弃用提示，不影响 npm 发布结果。
+
+## 2026-09-01：升级模板使用的 React SDK 曲线预览修复版本（提交前）
+
+- 仓库与分支：`dex-nextjs-template/main`；本地与 `origin/main` 无分叉。
+- 拟用提交标题：`chore(deps): upgrade liberfi sdk packages`。
+- 计划完成事项：将 `apps/web/package.json` 实际使用的 24 个 `@liberfi.io/*` 依赖统一升级到 Release `9a8a99e8b` 发布的正式 patch 版本并刷新 `pnpm-lock.yaml`；重点将 `@liberfi.io/ui-launchpad` 从 `1.0.4` 升级到 `1.0.5`。
+- 影响范围：仅更新模板的 React SDK npm 依赖、锁文件与本工作记录；不修改业务调用接口、Launchpad 数据、创建代币流程或钱包交互。
+- ChainStream 约束：按用户明确要求，`@chainstream-io/sdk` manifest 保持 `^2.1.14`，锁文件实际解析必须继续保持 `2.1.14`。
+- 验证计划：检查全部 workspace manifest 的 dependencies、devDependencies、peerDependencies 和锁文件旧版本残留；运行 TypeScript、全量 Jest、配置契约测试、ESLint、`git diff --check` 与发布所需的 `pnpm build:web`。
+- 预期推送状态：验证通过后 fast-forward 推送到 `dex-nextjs-template/origin/main`，禁止 force push。
+- Workflow 策略：依赖提交不包含 `[skip ci]`，按用户确认触发 Vercel production Deploy workflow；部署完成后使用 `[skip ci]` 的报告提交补记最终结果，避免重复部署。
