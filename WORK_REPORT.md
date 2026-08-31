@@ -252,3 +252,12 @@
 - 验证结果：消费者 TypeScript 类型检查、目标 ESLint、12 项配置契约测试和 `git diff --check` 通过；真实首屏 HTTP 200 响应在执行 JavaScript 前已包含骨架标记、10 行 `88px` SDK skeleton 和 shimmer，浏览器确认 hydration 后无缝进入相同列表骨架。消费者全量 Jest 32 个套件中 31 个通过、167 项中 163 项通过，唯一失败仍为既有 `application-locale-runtime.test.tsx` 的 4 项旧资源断言，与本次文件无重叠。规格与规范两轴复审最终均无发现。未重启现有开发服务、未执行 production build。
 - 推送状态：当前改动尚未提交、尚未推送。
 - Workflow 状态：本轮未授权推送，因此未触发 GitHub Actions workflow 或 Vercel 部署。
+
+## 2026-09-01：修复发现页首屏骨架缺失（提交后）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 提交：`5e16e63` — `fix(discover): render initial token skeleton [skip ci]`。
+- 完成事项：在发现页 token 列表尺寸尚未测得时直接显示 SDK `TokenList` 原生加载态，尺寸有效后切换回实际 Trending、Stock 或 New Token widget；首屏骨架不再等待 hydration 和 `ResizeObserver`，并与真实列表共享完整视觉及响应式契约。
+- 验证结果：聚焦测试 2 项、TypeScript 类型检查、目标 ESLint、12 项配置契约测试、`git diff --check` 及真实首屏 HTML/浏览器验证通过；全量测试仅保留既有 locale 资源断言 4 项失败。规格与规范最终复审均无发现。
+- 推送状态：功能提交与本记录提交仅存在于本地 `main`，尚未推送；未使用 force push。
+- Workflow 状态：功能提交标题包含 `[skip ci]`；本轮未推送，因此未触发 GitHub Actions workflow 或 Vercel 部署。
