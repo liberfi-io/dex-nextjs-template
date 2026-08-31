@@ -304,3 +304,13 @@
 - 验证结果：SDK `pnpm build` 24/24 个任务通过；i18n 60 项、UI 143 项、Launchpad 4 项、Token 62 项、Portfolio 18 项、Scaffold 35 项测试全部通过；`git diff --check` 通过。官方 npm registry 已逐包确认目标版本，其中 `ui-predict` 的 `latest` 元数据曾短暂滞后，但指定版本 `4.0.74` 已可从官方 registry 正常解析。
 - Workflow 结果：GitHub Actions Release run `33415039510` 成功，job `99563546939` 用时 5 分 52 秒；仅有 Node.js 20 deprecation 提示，不影响发布结果。
 - 推送状态：触发提交和 release commit 均已位于 `react-sdk/origin/main`，未使用 force push；SDK 工作区干净。
+
+## 2026-09-01：升级模板使用的 React SDK 正式版本
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 提交标题：`chore(deps): upgrade liberfi sdk packages`。
+- 完成事项：将 `apps/web/package.json` 中实际使用的 24 个 `@liberfi.io/*` 依赖统一升级到本轮 React SDK Release 发布的正式版本，并通过 `pnpm install --no-frozen-lockfile` 刷新 `pnpm-lock.yaml`；关键版本包括 `client@0.3.90`、`i18n@0.1.273`、`react@0.3.90`、`ui@0.3.76`、`ui-launchpad@1.0.3`、`ui-portfolio@3.0.75`、`ui-predict@4.0.74`、`ui-tokens@3.0.76` 和 `ui-trade@3.0.76`。
+- ChainStream 约束：按用户明确要求，消费者 `@chainstream-io/sdk` 继续保持 `^2.1.14`，锁文件实际解析仍为 `2.1.14`；扫描确认未引入 `2.1.27` 或其他 ChainStream 版本。
+- 验证结果：`pnpm list --depth 0` 确认全部直接依赖解析到目标 npm 版本；消费者全量 Jest 32/32 个套件、169/169 项测试通过，12 项构建配置契约测试、TypeScript 类型检查、目标 ESLint、旧 SDK 版本残留扫描、`git diff --check` 和 `pnpm build:web` 均通过。production build 完成 20/20 个静态页面生成，仅保留既有 PostCSS 与 Sentry/OpenTelemetry 警告。
+- 推送计划：与导航修复及部署修复提交一起快进推送到 `origin/main`，不使用 force push。
+- Workflow 策略：提交标题不包含 `[skip ci]`；本轮明确允许消费者的 push workflow 继续执行 Vercel 生产部署。
