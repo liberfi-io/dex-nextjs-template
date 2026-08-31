@@ -1,6 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
-import { footerVisibleFromShow, headerVisibleFromHide } from "./layout-chrome";
+import {
+  footerVisibleFromShow,
+  headerVisibleFromHide,
+  resolveHeaderNavigationKey,
+} from "./layout-chrome";
 
 const WEB_SRC = path.resolve(__dirname, "..");
 
@@ -28,6 +32,32 @@ describe("application shell chrome mapping", () => {
     expect(footerVisibleFromShow("mobile")).toEqual(["mobile"]);
     expect(footerVisibleFromShow("tablet")).toEqual(["tablet", "mobile"]);
     expect(footerVisibleFromShow(null)).toEqual([]);
+  });
+
+  it("keeps token details associated with the navigation entry that opened them", () => {
+    const tokenDetailPath = "/tokens/sol/mint";
+
+    expect(resolveHeaderNavigationKey(tokenDetailPath, "discover")).toBe("discover");
+    expect(resolveHeaderNavigationKey(tokenDetailPath, "pulse")).toBe("pulse");
+    expect(resolveHeaderNavigationKey(tokenDetailPath)).toBe("discover");
+  });
+
+  it("propagates Pulse as the source of token-detail navigation", () => {
+    const pulsePage = fs.readFileSync(
+      path.join(WEB_SRC, "components/pulse/PulsePage.tsx"),
+      "utf8",
+    );
+    const appLayout = fs.readFileSync(
+      path.join(WEB_SRC, "components/NewAppLayout.tsx"),
+      "utf8",
+    );
+
+    expect(pulsePage).toMatch(
+      /tokenDetailRoute\(chainId, token\.address, \{\s*source: "pulse",?\s*\}\)/,
+    );
+    expect(appLayout).toMatch(
+      /resolveHeaderNavigationKey\(\s*pathname,\s*tokenDetailSource,?\s*\)/,
+    );
   });
 
   it("keeps page chrome hooks off @liberfi/ui-base", () => {

@@ -5,9 +5,30 @@ import { atom, useAtomValue, useSetAtom } from "jotai";
 
 export type ShellLayout = "desktop" | "tablet" | "mobile";
 
+export type HeaderNavigationKey =
+  | "discover"
+  | "pulse"
+  | "perpetuals"
+  | "predict"
+  | "portfolio";
+
 const hideHeaderOnLayoutAtom = atom<ShellLayout | null>(null);
 const showBottomNavigationBarOnLayoutAtom = atom<ShellLayout | null>("mobile");
 const bottomNavigationBarActiveKeyAtom = atom<string | undefined>(undefined);
+
+export function resolveHeaderNavigationKey(
+  pathname: string,
+  tokenDetailSource?: string | null,
+): HeaderNavigationKey {
+  if (pathname.startsWith("/tokens") && tokenDetailSource === "pulse") {
+    return "pulse";
+  }
+  if (pathname.startsWith("/pulse")) return "pulse";
+  if (pathname.startsWith("/perpetuals")) return "perpetuals";
+  if (pathname.startsWith("/predict")) return "predict";
+  if (pathname.startsWith("/portfolio")) return "portfolio";
+  return "discover";
+}
 
 export function headerVisibleFromHide(
   hide: ShellLayout | null,

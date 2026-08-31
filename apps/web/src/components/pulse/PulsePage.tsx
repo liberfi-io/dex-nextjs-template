@@ -169,7 +169,11 @@ export function PulsePage() {
 
   const handleSelectToken = useCallback(
     (token: Token) => {
-      router.push(tokenDetailRoute(chainId, token.address));
+      router.push(
+        tokenDetailRoute(chainId, token.address, {
+          source: "pulse",
+        }),
+      );
     },
     [router, chainId],
   );

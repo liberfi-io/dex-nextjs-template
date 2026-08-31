@@ -10,6 +10,14 @@ export enum AppRoute {
   holdings = "/holdings",
 }
 
+export type TokenDetailSource = "discover" | "pulse";
+
+export const TOKEN_DETAIL_SOURCE_QUERY_PARAM = "source";
+
+export interface TokenDetailRouteOptions {
+  source?: TokenDetailSource;
+}
+
 const TOKEN_DETAIL_CHAIN_SEGMENTS: Record<string, "sol" | "eth" | "bsc"> = {
   sol: "sol",
   solana: "sol",
@@ -35,8 +43,15 @@ export function tokenDetailChainSegment(
 export function tokenDetailRoute(
   chain: Chain | string | number | null | undefined,
   address: string,
+  options?: TokenDetailRouteOptions,
 ): string {
-  return `${AppRoute.trade}/${tokenDetailChainSegment(chain)}/${address}`;
+  const pathname = `${AppRoute.trade}/${tokenDetailChainSegment(chain)}/${address}`;
+  if (!options?.source) return pathname;
+
+  const searchParams = new URLSearchParams({
+    [TOKEN_DETAIL_SOURCE_QUERY_PARAM]: options.source,
+  });
+  return `${pathname}?${searchParams.toString()}`;
 }
 
 /** Parse `/tokens/[[...slug]]`. Empty or unknown chain is null so the page can redirect. */

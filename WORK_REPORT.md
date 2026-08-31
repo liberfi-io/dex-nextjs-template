@@ -272,3 +272,35 @@
 - 验证结果：`@liberfi.io/ui-tokens` 全量 11 个测试套件、62 项测试通过，TypeScript 类型检查、目标 ESLint 和 `git diff --check` 通过；现有本地发现页确认真实列表行与骨架行均为 88px，弱分割线与页面背景协调；未重启开发服务、未执行 production build。
 - 推送状态：SDK 功能提交、消费者首屏骨架提交及对应工作记录已快进推送至各自 `origin/main`，未使用 force push。
 - Workflow 状态：所有提交标题均包含 `[skip ci]`；按提交 SHA 查询 GitHub Actions 未生成 run，未触发远端部署。
+
+## 2026-09-01：保持 Token 详情页的来源导航高亮
+
+- 仓库与分支：`dex-nextjs-template/main`；复用同级 `react-sdk` 本地链接与现有 3000 端口开发服务验证。
+- 提交标题：`fix(navigation): preserve token detail source`。
+- 问题背景：发现页和 Pulse 都进入相同的 `/tokens/{chain}/{address}` 详情路由，Header 之前只根据 pathname 判断当前导航；详情路由不匹配 `/pulse` 时会回退到“发现”，导致从 Pulse 新币、即将完成或已迁移列表进入详情后错误高亮“发现”。
+- 完成事项：为 Token 详情路由增加可选且类型受限的来源参数；Pulse 的三个列表通过共用点击处理器进入详情时携带 `source=pulse`，发现页和其他未显式标记来源的入口仍默认归属“发现”；Header 统一通过来源感知的导航解析器计算高亮，在 Pulse 来源的详情页继续使用 Header 搜索进入其他 Token 时也保留 Pulse 上下文。
+- 回归防线：先新增失败测试稳定复现 `/tokens/...` 携带 Pulse 来源仍被解析为 Discover，再完成实现；新增路由生成、Header 来源解析、Pulse 点击入口接线测试，聚焦 2 个测试套件共 16 项通过。
+- 验证结果：聚焦 2 个测试套件共 16 项通过；升级正式 npm SDK 后消费者全量 Jest 32/32 个套件、169/169 项通过；TypeScript 类型检查、目标 ESLint、12 项配置契约测试、`git diff --check` 和 production build 通过。现有开发服务此前实测 `/tokens/sol/mint` 的 Header 将 Discover 标记为当前页，`/tokens/sol/mint?source=pulse` 则将 Pulse 标记为当前页；本轮安装新依赖后该既有服务请求无响应，未擅自停止或重启占用 3000 端口的进程。
+- 推送计划：与后续 SDK 依赖升级和部署修复提交一起快进推送到 `origin/main`，不使用 force push。
+- Workflow 策略：提交标题不包含 `[skip ci]`；按用户确认，本轮推送允许触发 Vercel 生产部署。
+
+## 2026-09-01：发布最新 React SDK 主题与国际化改动（提交前）
+
+- 仓库与分支：`react-sdk/main`；本地与 `origin/main` 一致，业务修改已通过此前多个 `[skip ci]` 提交进入主分支，当前 SDK 工作区干净。
+- 拟用提交标题：`chore(release): publish latest sdk packages`；该提交仅用于触发仓库既定 Release workflow，不重复修改已经提交的业务源码。
+- 问题背景：语义暗色主题、国际化资源集中化、Launchpad Modal 与表单主题、Portfolio 列表视觉以及 TokenList 骨架行高等改动此前为避免部署均跳过 CI，尚未形成可供生产消费者安装的新 npm 版本。
+- 计划完成事项：执行 SDK production build 与相关测试；创建 release 触发提交并推送 `main`；等待 Release workflow 统一 patch bump、构建和发布全部 `@liberfi.io/*` 公共包；拉取 workflow 生成的 release commit，并从官方 npm registry 复核实际版本及 `@liberfi.io/client` 依赖。
+- 影响范围：发布当前 `react-sdk/main` 已有变更；按用户明确要求，`@chainstream-io/sdk` 在 SDK manifest、lockfile 和消费者中均保持 `2.1.14`，本轮不升级 ChainStream、不接入其新版 Prediction API。
+- 验证计划：运行 `pnpm build`、相关 UI/i18n/Launchpad/Token skeleton 测试及 `git diff --check`；Release 成功后复核 25 个公共包版本、release commit 和官方 npm 元数据。
+- 预期推送状态：release 触发提交将快进推送到 `react-sdk/origin/main`，禁止 force push；workflow 生成的 release commit 随后拉取到本地。
+- Workflow 策略：本次提交不包含 `[skip ci]`，明确允许并要求触发 `Release` workflow；消费者 Vercel 部署在 npm 发布并完成依赖升级后单独执行。
+
+## 2026-09-01：发布最新 React SDK 主题与国际化改动（提交后）
+
+- 仓库与分支：`react-sdk/main`；release 触发提交 `1189dc186` — `chore(release): publish latest sdk packages`，workflow 生成的 release commit 为 `ecdbeda34` — `chore: release packages`，本地已按规则 `pull --ff-only` 同步并与 `origin/main` 一致。
+- 最终完成事项：通过既定 Release workflow 对全部 25 个 `@liberfi.io/*` 公共包统一执行 patch bump、构建并发布；主题、国际化、Launchpad、Portfolio 与 TokenList 骨架等此前跳过 CI 的修改现已具备正式 npm 版本。
+- 版本结果：关键包包括 `@liberfi.io/client@0.3.90`、`@liberfi.io/i18n@0.1.273`、`@liberfi.io/ui@0.3.76`、`@liberfi.io/ui-launchpad@1.0.3`、`@liberfi.io/ui-perpetuals@1.1.73`、`@liberfi.io/ui-portfolio@3.0.75`、`@liberfi.io/ui-predict@4.0.74`、`@liberfi.io/ui-scaffold@2.0.75`、`@liberfi.io/ui-tokens@3.0.76`、`@liberfi.io/ui-trade@3.0.76`；其余公共包也均按计划增加一个 patch。
+- ChainStream 约束：按用户要求未升级 `@chainstream-io/sdk`；新发布的 `@liberfi.io/client@0.3.90` 经官方 npm 元数据确认仍精确依赖 `2.1.14`，SDK manifest 和 lockfile 未引入其他 ChainStream 版本。
+- 验证结果：SDK `pnpm build` 24/24 个任务通过；i18n 60 项、UI 143 项、Launchpad 4 项、Token 62 项、Portfolio 18 项、Scaffold 35 项测试全部通过；`git diff --check` 通过。官方 npm registry 已逐包确认目标版本，其中 `ui-predict` 的 `latest` 元数据曾短暂滞后，但指定版本 `4.0.74` 已可从官方 registry 正常解析。
+- Workflow 结果：GitHub Actions Release run `33415039510` 成功，job `99563546939` 用时 5 分 52 秒；仅有 Node.js 20 deprecation 提示，不影响发布结果。
+- 推送状态：触发提交和 release commit 均已位于 `react-sdk/origin/main`，未使用 force push；SDK 工作区干净。

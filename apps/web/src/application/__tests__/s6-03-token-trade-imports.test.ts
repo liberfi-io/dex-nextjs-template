@@ -36,6 +36,9 @@ function collectImports(specifier: string): string[] {
 describe("S6-03 token/trade app adapters", () => {
   it("builds token detail routes without @liberfi/ui-dex", () => {
     expect(tokenDetailRoute(Chain.SOLANA, "mint")).toBe("/tokens/sol/mint");
+    expect(tokenDetailRoute(Chain.SOLANA, "mint", { source: "pulse" })).toBe(
+      "/tokens/sol/mint?source=pulse",
+    );
     expect(tokenDetailRoute("ethereum", "0xabc")).toBe("/tokens/eth/0xabc");
     expect(tokenDetailChainSegment("bnb")).toBe("bsc");
     expect(AppRoute.trade).toBe("/tokens");
@@ -159,4 +162,3 @@ describe("S6-03 token/trade app adapters", () => {
     );
   });
 });
-

@@ -22,7 +22,7 @@ import {
   useState,
   type ComponentType,
 } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Chain, Token } from "@liberfi.io/types";
 import {
@@ -84,8 +84,14 @@ import {
   truncateAddress,
   type PredefinedToken,
 } from "@liberfi.io/utils";
-import { useShellChrome } from "../application/layout-chrome";
-import { tokenDetailRoute } from "../application/routes";
+import {
+  resolveHeaderNavigationKey,
+  useShellChrome,
+} from "../application/layout-chrome";
+import {
+  TOKEN_DETAIL_SOURCE_QUERY_PARAM,
+  tokenDetailRoute,
+} from "../application/routes";
 import { useCreateOnrampWidgetUrlMutation } from "../application/server/useCreateOnrampWidgetUrlMutation";
 import { queryClient } from "../libs/queryClient";
 import { AuthProviders } from "./AuthProviders";
@@ -191,9 +197,15 @@ function PageShell({ children }: PropsWithChildren) {
   useChainUrlSync();
   const { t } = useTranslation();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const router = useChainAwareRouter();
   const { chain } = useCurrentChain();
   const { headerVisible, footerVisible } = useShellChrome();
+  const tokenDetailSource = searchParams.get(TOKEN_DETAIL_SOURCE_QUERY_PARAM);
+  const activeNavigationKey = resolveHeaderNavigationKey(
+    pathname,
+    tokenDetailSource,
+  );
 
   const navItems: NavItem[] = useMemo(
     () =>
@@ -271,9 +283,13 @@ function PageShell({ children }: PropsWithChildren) {
 
   const handleSelectToken = useCallback(
     (token: Token) => {
-      router.push(tokenDetailRoute(token.chain, token.address));
+      router.push(
+        tokenDetailRoute(token.chain, token.address, {
+          source: activeNavigationKey === "pulse" ? "pulse" : undefined,
+        }),
+      );
     },
-    [router],
+    [activeNavigationKey, router],
   );
 
   const openActiveSearch = useCallback(async () => {
@@ -362,12 +378,7 @@ function PageShell({ children }: PropsWithChildren) {
                   <Logo icon={<LogoIcon />} miniIcon={<MiniLogoIcon />} />
                   <div className="hidden sm:flex items-center gap-1 ml-2">
                     {navItems.map((item) => {
-                      const active =
-                        item.href === "/"
-                          ? !navItemsConfig.some(
-                              (other) => other.href !== "/" && pathname.startsWith(other.href),
-                            )
-                          : pathname.startsWith(item.href);
+                      const active = item.key === activeNavigationKey;
                       return (
                         <NavTab
                           key={item.key}
