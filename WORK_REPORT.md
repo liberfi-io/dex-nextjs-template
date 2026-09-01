@@ -667,3 +667,13 @@
 - 验证结果：本地浏览器通过“发现列表 → Token 详情”路径稳定复现并验证修复，焦点仍落在相同滚动容器但计算样式由 `outline-style: auto` 变为 `none`；键盘导航链接仍显示主题色 2px 焦点环。Web 38/38 个测试套件共 185/185 项、TypeScript 类型检查和定向 ESLint 全部通过。
 - 推送状态：计划仅暂存本事项的两个代码/测试文件及本条工作记录，fast-forward 推送至 `origin/main`；本地其余 K 线数据源、价格格式化与工具栏相关开发改动保持未暂存，不进入本次提交。
 - Workflow 状态：功能提交与后续纯报告提交均使用 `[skip ci]`，跳过 GitHub Actions，不触发 Vercel 部署或其他 workflow。
+
+## 2026-09-02：修复 Token 详情页偶发蓝色焦点边框（提交后）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 提交：`87902bc` — `fix(token): suppress page scroll focus outline [skip ci]`。
+- 完成事项：Token 详情页页面级滚动容器在客户端路由进入后即使被 Chrome 自动聚焦，也不再显示覆盖整个内容区的蓝色原生 outline；真实交互控件继续保留主题键盘焦点提示，并已增加防止样式回退的回归测试。
+- 影响范围：桌面及平板 Token 详情页的滚动容器焦点外观；页面布局、滚动、K 线、交易、数据请求和 React SDK 均未改变。本地其余 K 线数据源及价格格式化开发内容未进入提交。
+- 验证结果：本地浏览器原路径复测确认容器仍为实际焦点目标且 `outline-style: none`，导航链接键盘焦点环仍为主题色 2px；Web 38/38 个测试套件共 185/185 项、TypeScript 类型检查和定向 ESLint 全部通过。
+- 推送状态：提交已 fast-forward 推送至 `origin/main`，远端主分支指向 `87902bc80defca94dc833031db6f19e7acb1bb29`，未使用 force push。
+- Workflow 状态：提交包含 `[skip ci]`；按该 commit 查询 GitHub Actions run 为空，未触发 Vercel 部署或其他 workflow。
