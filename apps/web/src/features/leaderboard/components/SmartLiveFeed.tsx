@@ -3,18 +3,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import { useTickAge } from "@liberfi.io/hooks";
-import { useTranslation } from "@liberfi.io/i18n";
+import { useLocalizedTimeFormatter, useTranslation } from "@liberfi.io/i18n";
 import { cn, PauseIcon, VirtualList, type VirtualRowComponentProps } from "@liberfi.io/ui";
 import { CopyButton } from "../../../components/CopyButton";
 import { GradientAvatar } from "../../../components/GradientAvatar";
 import type { WorldCupTranslate } from "../../worldcup/display";
-import {
-  formatAgeMs,
-  formatPrice,
-  formatUsd,
-  parseTimestampMs,
-  shortAddress,
-} from "../format";
+import { formatPrice, formatUsd, parseTimestampMs, shortAddress } from "../format";
 import { useSmartMoneyLiveFeed } from "../data/queries";
 import { subscribeSmartMoneyLiveFeed } from "../data/liveFeedSubscription";
 import { liveActivityKey } from "../data/liveFeedAdapter";
@@ -110,7 +104,10 @@ function filterAndSortLiveActivities(
 ): SmartMoneyLiveActivity[] {
   const filtered = rows.filter((row) => {
     if (filters.type !== "all" && row.type !== filters.type) return false;
-    if (filters.categories.length > 0 && !row.tags.some((tag) => filters.categories.includes(tag))) {
+    if (
+      filters.categories.length > 0 &&
+      !row.tags.some((tag) => filters.categories.includes(tag))
+    ) {
       return false;
     }
     if (
@@ -145,13 +142,7 @@ function filterAndSortLiveActivities(
   });
 }
 
-export function SmartLiveFeed({
-  tag,
-  scope,
-}: {
-  tag?: string | null;
-  scope: LeaderboardScope;
-}) {
+export function SmartLiveFeed({ tag, scope }: { tag?: string | null; scope: LeaderboardScope }) {
   const { t } = useTranslation();
   const router = useRouter();
   const { data, isLoading, isError } = useSmartMoneyLiveFeed(tag);
@@ -201,10 +192,7 @@ export function SmartLiveFeed({
     [data?.activities, liveRows],
   );
   const worldcupMatchBySlug = useWorldcupMatchBySlug(rows);
-  const visibleRows = useMemo(
-    () => filterAndSortLiveActivities(rows, filters),
-    [filters, rows],
-  );
+  const visibleRows = useMemo(() => filterAndSortLiveActivities(rows, filters), [filters, rows]);
   const categoryOptions = useMemo(
     () => Array.from(new Set(rows.flatMap((row) => row.tags))).sort(),
     [rows],
@@ -236,15 +224,21 @@ export function SmartLiveFeed({
       },
       {
         value: "amount_desc",
-        label: t("extend.leaderboard.liveFeed.sortAmountDesc", { defaultValue: "Amount high to low" }),
+        label: t("extend.leaderboard.liveFeed.sortAmountDesc", {
+          defaultValue: "Amount high to low",
+        }),
       },
       {
         value: "amount_asc",
-        label: t("extend.leaderboard.liveFeed.sortAmountAsc", { defaultValue: "Amount low to high" }),
+        label: t("extend.leaderboard.liveFeed.sortAmountAsc", {
+          defaultValue: "Amount low to high",
+        }),
       },
       {
         value: "price_desc",
-        label: t("extend.leaderboard.liveFeed.sortPriceDesc", { defaultValue: "Price high to low" }),
+        label: t("extend.leaderboard.liveFeed.sortPriceDesc", {
+          defaultValue: "Price high to low",
+        }),
       },
       {
         value: "price_asc",
@@ -252,11 +246,15 @@ export function SmartLiveFeed({
       },
       {
         value: "shares_desc",
-        label: t("extend.leaderboard.liveFeed.sortSharesDesc", { defaultValue: "Shares high to low" }),
+        label: t("extend.leaderboard.liveFeed.sortSharesDesc", {
+          defaultValue: "Shares high to low",
+        }),
       },
       {
         value: "shares_asc",
-        label: t("extend.leaderboard.liveFeed.sortSharesAsc", { defaultValue: "Shares low to high" }),
+        label: t("extend.leaderboard.liveFeed.sortSharesAsc", {
+          defaultValue: "Shares low to high",
+        }),
       },
     ],
     [t],
@@ -268,9 +266,12 @@ export function SmartLiveFeed({
 
   const handleTrader = (wallet: string) => {
     if (!wallet) return;
-    router.push(`/predict/leaderboard/${encodeURIComponent(wallet)}${buildLeaderboardSearch({ scope })}`, {
-      scroll: false,
-    });
+    router.push(
+      `/predict/leaderboard/${encodeURIComponent(wallet)}${buildLeaderboardSearch({ scope })}`,
+      {
+        scroll: false,
+      },
+    );
   };
 
   const pauseUpdates = useCallback(() => {
@@ -385,7 +386,12 @@ export function SmartLiveFeed({
           onMouseLeave={resumeUpdates}
         >
           <div className="flex h-full w-[980px] max-w-none flex-col lg:w-full">
-            <div className={cn(DESKTOP_GRID, "shrink-0 border-b border-border-subtle/50 px-3 py-2 text-[11px] font-medium uppercase tracking-wide text-text-muted")}>
+            <div
+              className={cn(
+                DESKTOP_GRID,
+                "shrink-0 border-b border-border-subtle/50 px-3 py-2 text-[11px] font-medium uppercase tracking-wide text-text-muted",
+              )}
+            >
               <div>{t("extend.leaderboard.liveFeed.time", { defaultValue: "Time" })}</div>
               <div>{t("extend.leaderboard.liveFeed.type", { defaultValue: "Type" })}</div>
               <div>{t("extend.leaderboard.liveFeed.trader", { defaultValue: "Trader" })}</div>
@@ -561,7 +567,9 @@ function LiveFeedSelect({
                 type="button"
                 className={cn(
                   "flex w-full cursor-pointer items-center rounded-md px-2.5 py-2 text-left text-xs font-medium transition-colors",
-                  value === "" ? "bg-positive/10 text-positive" : "text-text-muted hover:bg-surface-interactive/60 hover:text-text-primary",
+                  value === ""
+                    ? "bg-positive/10 text-positive"
+                    : "text-text-muted hover:bg-surface-interactive/60 hover:text-text-primary",
                 )}
                 onClick={() => {
                   onChange("");
@@ -614,7 +622,11 @@ function LiveFeedBody({
   if (isLoading) return <EmptyState label={t("extend.leaderboard.loading")} />;
   if (isError) return <EmptyState label={t("extend.leaderboard.loadError")} />;
   if (rows.length === 0) {
-    return <EmptyState label={t("extend.leaderboard.liveFeed.empty", { defaultValue: "No live activity yet" })} />;
+    return (
+      <EmptyState
+        label={t("extend.leaderboard.liveFeed.empty", { defaultValue: "No live activity yet" })}
+      />
+    );
   }
   return (
     <VirtualList
@@ -680,7 +692,9 @@ function outcomeLabel(row: SmartMoneyLiveActivity): string {
 }
 
 function outcomeTone(row: SmartMoneyLiveActivity): "bullish" | "bearish" | "neutral" {
-  const raw = String(row.outcome || row.market?.outcomes?.[0]?.label || "").trim().toLowerCase();
+  const raw = String(row.outcome || row.market?.outcomes?.[0]?.label || "")
+    .trim()
+    .toLowerCase();
   if (!raw) return "neutral";
   if (["yes", "up", "over", "above", "higher", "long"].includes(raw)) return "bullish";
   if (["no", "down", "under", "below", "lower", "short"].includes(raw)) return "bearish";
@@ -725,20 +739,13 @@ function liveFeedWorldcupMatchSlug(row: SmartMoneyLiveActivity): string | null {
 }
 
 function LiveActivityAge({ ts }: { ts: string | number | null | undefined }) {
+  const { formatAge } = useLocalizedTimeFormatter();
   const timestampMs = parseTimestampMs(ts);
   const ageMs = useTickAge(timestampMs ?? Date.now());
-  return <>{timestampMs == null ? "—" : formatAgeMs(ageMs)}</>;
+  return <>{timestampMs == null ? "—" : formatAge(ageMs)}</>;
 }
 
-function MarketAvatar({
-  src,
-  seed,
-  size = 28,
-}: {
-  src?: string;
-  seed?: string;
-  size?: number;
-}) {
+function MarketAvatar({ src, seed, size = 28 }: { src?: string; seed?: string; size?: number }) {
   const [failed, setFailed] = useState(false);
   if (src && !failed) {
     return (
@@ -777,7 +784,10 @@ function MarketOutcomeCell({
           size={30}
         />
         <div className="min-w-0">
-          <EventTitleLink slug={eventSlug(row)} className="line-clamp-1 text-sm font-medium text-text-primary">
+          <EventTitleLink
+            slug={eventSlug(row)}
+            className="line-clamp-1 text-sm font-medium text-text-primary"
+          >
             {display.title || "—"}
           </EventTitleLink>
           <div className="mt-0.5 flex min-w-0 items-center gap-1.5">
@@ -801,7 +811,10 @@ function MarketOutcomeCell({
         size={30}
       />
       <div className="min-w-0">
-        <EventTitleLink slug={eventSlug(row)} className="line-clamp-1 text-sm font-medium text-text-primary">
+        <EventTitleLink
+          slug={eventSlug(row)}
+          className="line-clamp-1 text-sm font-medium text-text-primary"
+        >
           {marketTitle(row)}
         </EventTitleLink>
         <div className="mt-0.5">
@@ -828,7 +841,12 @@ function DesktopRow({
   const { t } = useTranslation();
 
   return (
-    <div className={cn(DESKTOP_GRID, "min-h-[64px] border-b border-border-subtle/40 px-3 py-3 text-sm hover:bg-surface-interactive/20")}>
+    <div
+      className={cn(
+        DESKTOP_GRID,
+        "min-h-[64px] border-b border-border-subtle/40 px-3 py-3 text-sm hover:bg-surface-interactive/20",
+      )}
+    >
       <div className="text-xs text-text-muted">
         <LiveActivityAge ts={row.timestamp} />
       </div>
@@ -848,7 +866,9 @@ function DesktopRow({
           <CopyButton
             value={row.wallet}
             title={t("extend.leaderboard.copy")}
-            copiedMessage={t("extend.leaderboard.copiedAddress", { defaultValue: "Address copied" })}
+            copiedMessage={t("extend.leaderboard.copiedAddress", {
+              defaultValue: "Address copied",
+            })}
             size={12}
             className="shrink-0 p-0.5 hover:bg-transparent"
           />

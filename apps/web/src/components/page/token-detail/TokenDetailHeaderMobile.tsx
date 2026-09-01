@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  formatAge,
   formatMCapInUsd,
   formatPercent,
   formatPriceInUsd,
@@ -28,7 +27,7 @@ import {
   useCopyToClipboard,
 } from "@liberfi.io/ui";
 import { TokenAvatar } from "@liberfi.io/ui-tokens";
-import { useTranslation } from "@liberfi.io/i18n";
+import { useLocalizedTimeFormatter, useTranslation } from "@liberfi.io/i18n";
 import { formatShortAddress } from "../../../application/format";
 import { MouseEvent, useCallback, useMemo } from "react";
 
@@ -73,6 +72,7 @@ export function TokenDetailHeaderMobile({ chain, address }: TokenDetailHeaderMob
 
 function Content({ token }: { token: Token }) {
   const { t } = useTranslation();
+  const { formatAge } = useLocalizedTimeFormatter();
   const copyToClipboard = useCopyToClipboard();
 
   const md = token.marketData;
@@ -88,7 +88,7 @@ function Content({ token }: { token: Token }) {
     [priceChange],
   );
 
-  // Live-updating age — formats as "2h" / "3d" / etc.
+  // Keep the localized age live while retaining the full timestamp tooltip.
   const ageMs = useTickAge(token.createdAt ?? Date.now());
   const ageText = token.createdAt ? formatAge(ageMs) : null;
   const fullCreatedAt = useMemo(() => {

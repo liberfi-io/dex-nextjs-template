@@ -8,7 +8,7 @@ import {
   formatMCapInUsd,
   truncateAddress,
 } from "@liberfi.io/utils";
-import { useTranslation } from "@liberfi.io/i18n";
+import { useLocalizedTimeFormatter, useTranslation } from "@liberfi.io/i18n";
 import { CollapsibleSection } from "@liberfi.io/ui-scaffold";
 import { ReactNode, useMemo } from "react";
 
@@ -39,6 +39,7 @@ export interface SidebarBasicInfoProps {
  */
 export function SidebarBasicInfo({ chain, address }: SidebarBasicInfoProps) {
   const { t } = useTranslation();
+  const { formatUnit } = useLocalizedTimeFormatter();
   const { data: token } = useTokenQuery({ chain, address });
 
   const md = token?.marketData;
@@ -83,7 +84,7 @@ export function SidebarBasicInfo({ chain, address }: SidebarBasicInfoProps) {
           value={formatAmountInUsd(md?.tvlInUsd ?? "")}
         />
         <Row
-          label={t("trade.basic_info.volume_24h")}
+          label={`${formatUnit(24, "hour")} ${t("token_list.attributes.volume")}`}
           value={formatAmountInUsd(stats24h?.volumesInUsd ?? "")}
         />
         <Row label={t("trade.basic_info.holders")} value={formatAmount(md?.holders ?? "")} />

@@ -175,6 +175,7 @@ function ResolutionTab({
   stat: TokenStatsByResolution | undefined;
   onSelect: (r: Resolution) => void;
 }) {
+  const { t } = useTranslation();
   const priceChange = stat?.priceChange;
   const bullish = useMemo(
     () => priceChange === undefined || new SafeBigNumber(priceChange).gte(0),
@@ -196,7 +197,7 @@ function ResolutionTab({
           isActive ? "font-semibold text-foreground" : "font-normal text-text-secondary",
         )}
       >
-        {resolution}
+        {t(`common.resolution.${resolution}`)}
       </span>
       <span
         className={cn(

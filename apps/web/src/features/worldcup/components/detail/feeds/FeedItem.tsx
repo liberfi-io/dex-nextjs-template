@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { cn } from "@liberfi.io/ui";
-import { formatAge } from "@liberfi.io/utils";
-import { useTranslation } from "@liberfi.io/i18n";
+import { useLocalizedTimeFormatter, useTranslation } from "@liberfi.io/i18n";
 import type { WcFeed } from "../../../types";
 import { FeedMedia } from "./FeedMedia";
 
@@ -19,11 +18,6 @@ function userUrl(feed: WcFeed): string | undefined {
   return feed.user.handle ? `${TWEET_BASE}/${feed.user.handle}` : undefined;
 }
 
-/** Relative age in seconds for {@link formatAge}. */
-function ageSeconds(timestampMs: number): number {
-  return Math.max(0, Math.floor((Date.now() - timestampMs) / 1000));
-}
-
 /**
  * Single feed card. Layout benchmarks the ui-media-track tweet card:
  * avatar + name + verified badge + @handle + relative time, then clamped text
@@ -32,6 +26,7 @@ function ageSeconds(timestampMs: number): number {
  */
 export function FeedItem({ feed }: { feed: WcFeed }) {
   const { t } = useTranslation();
+  const { formatAge } = useLocalizedTimeFormatter();
   const [expanded, setExpanded] = useState(false);
 
   const href = tweetUrl(feed);
@@ -50,12 +45,7 @@ export function FeedItem({ feed }: { feed: WcFeed }) {
       )}
 
       <header className="flex items-start gap-2.5">
-        <a
-          href={profileHref}
-          target="_blank"
-          rel="noreferrer"
-          className="shrink-0"
-        >
+        <a href={profileHref} target="_blank" rel="noreferrer" className="shrink-0">
           {feed.user.avatar ? (
             <img
               src={feed.user.avatar}
@@ -65,9 +55,7 @@ export function FeedItem({ feed }: { feed: WcFeed }) {
             />
           ) : (
             <span className="flex size-9 items-center justify-center rounded-full bg-surface-interactive text-xs text-text-muted">
-              {(feed.user.name ?? feed.user.handle ?? "?")
-                .charAt(0)
-                .toUpperCase()}
+              {(feed.user.name ?? feed.user.handle ?? "?").charAt(0).toUpperCase()}
             </span>
           )}
         </a>
@@ -89,18 +77,13 @@ export function FeedItem({ feed }: { feed: WcFeed }) {
           <div className="flex items-center gap-1 text-xs text-text-muted">
             {feed.user.handle && <span className="truncate">@{feed.user.handle}</span>}
             {feed.user.handle && <span aria-hidden>·</span>}
-            <span className="shrink-0">{formatAge(ageSeconds(feed.timestampMs))}</span>
+            <span className="shrink-0">{formatAge(Date.now() - feed.timestampMs)}</span>
           </div>
         </div>
       </header>
 
       {text && (
-        <a
-          href={href}
-          target="_blank"
-          rel="noreferrer"
-          className="block"
-        >
+        <a href={href} target="_blank" rel="noreferrer" className="block">
           <p
             className={cn(
               "whitespace-pre-wrap break-words text-sm leading-relaxed text-text-secondary",

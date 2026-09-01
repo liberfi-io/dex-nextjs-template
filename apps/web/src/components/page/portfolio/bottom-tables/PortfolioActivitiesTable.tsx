@@ -6,7 +6,7 @@ import { usePortfolioActivitiesScript } from "@liberfi.io/ui-portfolio";
 import type { Activity, ActivityType, Chain, Token } from "@liberfi.io/types";
 import { cn } from "@liberfi.io/ui";
 import { formatAmount, formatAmountInUsd, truncateAddress, txExplorerUrl } from "@liberfi.io/utils";
-import { useTranslation } from "@liberfi.io/i18n";
+import { useLocalizedTimeFormatter, useTranslation } from "@liberfi.io/i18n";
 import { tKey } from "../../../../application/t";
 import {
   alignClass,
@@ -169,6 +169,7 @@ interface ActivityRowProps {
 
 function ActivityRow({ activity, now, tokenByAddress }: ActivityRowProps) {
   const { t } = useTranslation();
+  const { formatAgeSince } = useLocalizedTimeFormatter();
   const sideMeta = resolveTypeMeta(activity.type);
   const sideLabel = sideMeta.labelKey
     ? tKey(t, sideMeta.labelKey)
@@ -184,7 +185,7 @@ function ActivityRow({ activity, now, tokenByAddress }: ActivityRowProps) {
   return (
     <tr className="h-12 border-b border-border-subtle/30 transition-colors hover:bg-content2">
       <td className={cn("px-3 align-middle text-text-muted", alignClass("left"))}>
-        {formatAgeShort(activity.time, now)}
+        {formatAgeSince(activity.time, now)}
       </td>
       <td className={cn("px-3 align-middle font-medium", alignClass("left"), sideMeta.color)}>
         {sideLabel}
@@ -313,22 +314,6 @@ function resolveTypeMeta(type: ActivityType | string | undefined): TypeMeta {
  */
 function activityKey(a: Activity): string {
   return `${a.txHash}:${a.from?.address ?? ""}:${a.to?.address ?? ""}:${a.poolAddress ?? ""}`;
-}
-
-function formatAgeShort(from: Date | string | number | undefined, now: number): string {
-  if (from == null) return "--";
-  const t = from instanceof Date ? from.getTime() : new Date(from).getTime();
-  const sec = Math.max(0, Math.floor((now - t) / 1000));
-  if (sec < 60) return `${sec}s`;
-  const min = Math.floor(sec / 60);
-  if (min < 60) return `${min}m`;
-  const hr = Math.floor(min / 60);
-  if (hr < 24) return `${hr}h`;
-  const day = Math.floor(hr / 24);
-  if (day < 30) return `${day}d`;
-  const mo = Math.floor(day / 30);
-  if (mo < 12) return `${mo}mo`;
-  return `${Math.floor(day / 365)}y`;
 }
 
 interface ActivityTokenAvatarProps {

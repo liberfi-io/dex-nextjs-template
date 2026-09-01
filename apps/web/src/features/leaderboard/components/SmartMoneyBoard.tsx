@@ -16,7 +16,7 @@
 import { memo, useMemo, useRef, useState } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useTickAge } from "@liberfi.io/hooks";
-import { useTranslation } from "@liberfi.io/i18n";
+import { useLocalizedTimeFormatter, useTranslation } from "@liberfi.io/i18n";
 import { cn, Sortable } from "@liberfi.io/ui";
 import { CopyInline } from "../../../components/CopyButton";
 import { GradientAvatar } from "../../../components/GradientAvatar";
@@ -24,7 +24,6 @@ import { useSmartMoneyBoard } from "../data/queries";
 import {
   formatPercent,
   formatRate,
-  formatAgeMs,
   formatSignedUsd,
   formatUsd,
   intervalVolume,
@@ -100,7 +99,11 @@ export function SmartMoneyBoard({
 type SortField = "netPnl" | "winRate" | "balance" | "vol" | "txs" | "lastTrade";
 
 /** Numeric sort accessor for a column. */
-function sortValue(entry: SmartWalletEntry, field: SortField, interval: LeaderboardInterval): number {
+function sortValue(
+  entry: SmartWalletEntry,
+  field: SortField,
+  interval: LeaderboardInterval,
+): number {
   switch (field) {
     case "netPnl":
       return entry.score;
@@ -160,8 +163,7 @@ function BoardTable({
   const virtualItems = virtualizer.getVirtualItems();
   const waitingForVirtualRows = rows.length > 0 && virtualItems.length === 0;
 
-  const windowShort =
-    interval === "all" ? null : t(`extend.leaderboard.intervalShort.${interval}`);
+  const windowShort = interval === "all" ? null : t(`extend.leaderboard.intervalShort.${interval}`);
   const netPnlLabel = windowShort
     ? t("extend.leaderboard.col.netPnlWindow", { w: windowShort })
     : t("extend.leaderboard.col.netPnl");
@@ -189,31 +191,55 @@ function BoardTable({
             <span className="text-center">#</span>
             <span>{t("extend.leaderboard.col.trader")}</span>
             <span className="flex justify-end text-right">
-              <Sortable sort={sortDirFor("netPnl")} onSortChange={onSortChange("netPnl")} directions={DESC_ONLY_SORT}>
+              <Sortable
+                sort={sortDirFor("netPnl")}
+                onSortChange={onSortChange("netPnl")}
+                directions={DESC_ONLY_SORT}
+              >
                 {netPnlLabel}
               </Sortable>
             </span>
             <span className="flex justify-end text-right">
-              <Sortable sort={sortDirFor("winRate")} onSortChange={onSortChange("winRate")} directions={DESC_ONLY_SORT}>
+              <Sortable
+                sort={sortDirFor("winRate")}
+                onSortChange={onSortChange("winRate")}
+                directions={DESC_ONLY_SORT}
+              >
                 {t("extend.leaderboard.col.winRate")}
               </Sortable>
             </span>
             <span className="flex justify-end text-right">
-              <Sortable sort={sortDirFor("balance")} onSortChange={onSortChange("balance")} directions={DESC_ONLY_SORT}>
+              <Sortable
+                sort={sortDirFor("balance")}
+                onSortChange={onSortChange("balance")}
+                directions={DESC_ONLY_SORT}
+              >
                 {t("extend.leaderboard.col.balance")}
               </Sortable>
             </span>
             <span className="flex items-center justify-end gap-1 text-right">
-              <Sortable sort={sortDirFor("vol")} onSortChange={onSortChange("vol")} directions={DESC_ONLY_SORT}>
+              <Sortable
+                sort={sortDirFor("vol")}
+                onSortChange={onSortChange("vol")}
+                directions={DESC_ONLY_SORT}
+              >
                 {volLabel}
               </Sortable>
               <span className="text-text-disabled">/</span>
-              <Sortable sort={sortDirFor("txs")} onSortChange={onSortChange("txs")} directions={DESC_ONLY_SORT}>
+              <Sortable
+                sort={sortDirFor("txs")}
+                onSortChange={onSortChange("txs")}
+                directions={DESC_ONLY_SORT}
+              >
                 {t("extend.leaderboard.col.txs")}
               </Sortable>
             </span>
             <span className="flex justify-end text-right">
-              <Sortable sort={sortDirFor("lastTrade")} onSortChange={onSortChange("lastTrade")} directions={DESC_ONLY_SORT}>
+              <Sortable
+                sort={sortDirFor("lastTrade")}
+                onSortChange={onSortChange("lastTrade")}
+                directions={DESC_ONLY_SORT}
+              >
                 {t("extend.leaderboard.col.lastTrade")}
               </Sortable>
             </span>
@@ -361,16 +387,29 @@ const BoardRow = memo(function BoardRow({
 });
 
 function LastTradeAge({ ts }: { ts: string | number | null | undefined }) {
+  const { formatAge } = useLocalizedTimeFormatter();
   const timestampMs = parseTimestampMs(ts);
   const ageMs = useTickAge(timestampMs ?? Date.now());
-  return timestampMs == null ? "—" : formatAgeMs(ageMs);
+  return timestampMs == null ? "—" : formatAge(ageMs);
 }
 
 /** Gold / silver / bronze medal styles for the top-3 positions. */
 const MEDALS: Record<1 | 2 | 3, { gradient: string; shadow: string; text: string }> = {
-  1: { gradient: "linear-gradient(135deg,#fde68a,#f59e0b)", shadow: "0 0 10px rgba(245,158,11,0.45)", text: "#1a1a05" },
-  2: { gradient: "linear-gradient(135deg,#f1f5f9,#94a3b8)", shadow: "0 0 10px rgba(148,163,184,0.4)", text: "#11151c" },
-  3: { gradient: "linear-gradient(135deg,#e9b277,#b45309)", shadow: "0 0 10px rgba(180,83,9,0.4)", text: "#1a0f03" },
+  1: {
+    gradient: "linear-gradient(135deg,#fde68a,#f59e0b)",
+    shadow: "0 0 10px rgba(245,158,11,0.45)",
+    text: "#1a1a05",
+  },
+  2: {
+    gradient: "linear-gradient(135deg,#f1f5f9,#94a3b8)",
+    shadow: "0 0 10px rgba(148,163,184,0.4)",
+    text: "#11151c",
+  },
+  3: {
+    gradient: "linear-gradient(135deg,#e9b277,#b45309)",
+    shadow: "0 0 10px rgba(180,83,9,0.4)",
+    text: "#1a0f03",
+  },
 };
 
 /**

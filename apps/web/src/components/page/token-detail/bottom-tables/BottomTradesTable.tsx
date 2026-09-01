@@ -17,14 +17,13 @@ import { SortAscIcon } from "../../../../application/icons/SortAscIcon";
 import { SortDescIcon } from "../../../../application/icons/SortDescIcon";
 import {
   accountExplorerUrl,
-  formatAge,
   formatAmount,
   formatAmountInUsd,
   formatPriceInUsd,
   txExplorerUrl,
   truncateAddress,
 } from "@liberfi.io/utils";
-import { useTranslation } from "@liberfi.io/i18n";
+import { useLocalizedTimeFormatter, useTranslation } from "@liberfi.io/i18n";
 import { tKey } from "../../../../application/t";
 import { MouseEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -366,6 +365,7 @@ function TotalUsdCell({ value, color }: { value?: string; color: string }) {
 }
 
 const AgeCell = memo(function AgeCell({ value }: { value?: Date | string | number }) {
+  const { formatAge } = useLocalizedTimeFormatter();
   const date = normalizeDate(value);
   const ageMs = useTickAge(date ?? Date.now());
   const ageText = date ? formatAge(ageMs) : "--";

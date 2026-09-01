@@ -15,16 +15,10 @@ import {
   type VirtualRowComponentProps,
 } from "@liberfi.io/ui";
 import { useTokenDevTokensListScript } from "@liberfi.io/ui-tokens";
-import {
-  formatAge,
-  formatAmount,
-  formatAmountInUsd,
-  formatPercent,
-  truncateAddress,
-} from "@liberfi.io/utils";
+import { formatAmount, formatAmountInUsd, formatPercent, truncateAddress } from "@liberfi.io/utils";
 import { useTick } from "@liberfi.io/hooks";
 import { tokenDetailRoute } from "../../../../application/routes";
-import { useTranslation } from "@liberfi.io/i18n";
+import { useLocalizedTimeFormatter, useTranslation } from "@liberfi.io/i18n";
 import { tKey } from "../../../../application/t";
 import { MouseEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -336,10 +330,11 @@ const TokenAddressCopyButton = memo(function TokenAddressCopyButton({
 });
 
 const AgeCell = memo(function AgeCell({ value }: { value?: Date | string | number }) {
+  const { formatAge, formatUnit } = useLocalizedTimeFormatter();
   const date = normalizeDate(value);
   const [now, setNow] = useState(Date.now());
   useTick(({ now: nextNow }) => setNow(nextNow), 1000);
-  const ageText = date ? formatTimeDistance(date, now) : "--";
+  const ageText = date ? formatTimeDistance(date, now, formatAge, formatUnit) : "--";
   const fullTime = date ? date.toLocaleString() : null;
 
   const content = (
@@ -485,11 +480,18 @@ function formatRatio(value: string | number | undefined): string {
   return formatPercent(n);
 }
 
-function formatTimeDistance(date: Date, now: number): string {
+function formatTimeDistance(
+  date: Date,
+  now: number,
+  formatAge: (ageMilliseconds: number) => string,
+  formatUnit: (value: number, unit: "second") => string,
+): string {
   const target = date.getTime();
   if (target > now) {
     const remainingMs = target - now;
-    if (remainingMs < 10_000) return `T-${Math.ceil(remainingMs / 1000)}s`;
+    if (remainingMs < 10_000) {
+      return `T-${formatUnit(Math.ceil(remainingMs / 1000), "second")}`;
+    }
     return `T-${formatAge(remainingMs)}`;
   }
   return formatAge(now - target);

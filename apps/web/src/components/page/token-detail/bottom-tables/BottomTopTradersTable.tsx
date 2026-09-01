@@ -16,13 +16,12 @@ import {
 } from "@liberfi.io/ui";
 import {
   accountExplorerUrl,
-  formatAge,
   formatAmount,
   formatAmountInUsd,
   formatPercent,
   truncateAddress,
 } from "@liberfi.io/utils";
-import { useTranslation } from "@liberfi.io/i18n";
+import { useLocalizedTimeFormatter, useTranslation } from "@liberfi.io/i18n";
 import { tKey } from "../../../../application/t";
 import { MouseEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { alignClass } from "./table-shell";
@@ -543,6 +542,7 @@ const TransferCell = memo(function TransferCell({
 });
 
 const AgeCell = memo(function AgeCell({ value }: { value?: Date | string | number }) {
+  const { formatAge } = useLocalizedTimeFormatter();
   const date = normalizeDate(value);
   const ageMs = useTickAge(date ?? Date.now());
   const ageText = date ? formatAge(ageMs) : "--";

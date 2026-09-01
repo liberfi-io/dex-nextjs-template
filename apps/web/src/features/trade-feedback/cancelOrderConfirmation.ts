@@ -3,6 +3,7 @@
 import { createElement, useCallback, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { useQueryClient, type QueryClient } from "@tanstack/react-query";
+import { useLocalizedTimeFormatter } from "@liberfi.io/i18n";
 import {
   ordersMultiQueryKey,
   ordersQueryKey,
@@ -76,9 +77,7 @@ function dataContainsOpenOrder(data: unknown, orderId: string): boolean {
     return !status || OPEN_ORDER_STATUSES.has(status);
   }
 
-  return Object.values(record).some((value) =>
-    dataContainsOpenOrder(value, orderId),
-  );
+  return Object.values(record).some((value) => dataContainsOpenOrder(value, orderId));
 }
 
 function normalizeOpenOrders(data: unknown): unknown {
@@ -118,11 +117,9 @@ function hasOpenOrder(data: unknown, orderId: string): boolean {
 }
 
 function getOrdersWalletSets(input: ConfirmCancelOrderInput) {
-  const kalshi_user =
-    input.kalshiUser ?? (input.source === "kalshi" ? input.user : undefined);
+  const kalshi_user = input.kalshiUser ?? (input.source === "kalshi" ? input.user : undefined);
   const polymarket_user =
-    input.polymarketUser ??
-    (input.source === "polymarket" ? input.user : undefined);
+    input.polymarketUser ?? (input.source === "polymarket" ? input.user : undefined);
   const sourceWallet =
     input.source === "kalshi"
       ? { kalshi_user: input.user, polymarket_user: undefined }
@@ -137,9 +134,7 @@ function getOrdersWalletSets(input: ConfirmCancelOrderInput) {
   }
   if (kalshi_user || polymarket_user) {
     const duplicate = result.some(
-      (item) =>
-        item.kalshi_user === kalshi_user &&
-        item.polymarket_user === polymarket_user,
+      (item) => item.kalshi_user === kalshi_user && item.polymarket_user === polymarket_user,
     );
     if (!duplicate) {
       result.push({ kalshi_user, polymarket_user });
@@ -154,23 +149,19 @@ function removeOrderFromEnrichedCaches(
   input: ConfirmCancelOrderInput,
 ): void {
   for (const wallets of getOrdersWalletSets(input)) {
-    queryClient.setQueryData<PredictOrdersResponse>(
-      ordersMultiQueryKey(wallets),
-      (previous) => {
-        if (!previous) return previous;
-        return {
-          ...previous,
-          orders: previous.orders.filter((order) => order.id !== input.orderId),
-        };
-      },
-    );
+    queryClient.setQueryData<PredictOrdersResponse>(ordersMultiQueryKey(wallets), (previous) => {
+      if (!previous) return previous;
+      return {
+        ...previous,
+        orders: previous.orders.filter((order) => order.id !== input.orderId),
+      };
+    });
   }
 }
 
 function CountdownLabel({ deadlineAt }: { deadlineAt: number }) {
-  const [remainingMs, setRemainingMs] = useState(() =>
-    Math.max(0, deadlineAt - Date.now()),
-  );
+  const { formatUnit } = useLocalizedTimeFormatter();
+  const [remainingMs, setRemainingMs] = useState(() => Math.max(0, deadlineAt - Date.now()));
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -182,7 +173,7 @@ function CountdownLabel({ deadlineAt }: { deadlineAt: number }) {
   return createElement(
     "span",
     { className: "predict-trade-toast-countdown" },
-    `${Math.max(0, Math.ceil(remainingMs / 1000))}s`,
+    formatUnit(Math.max(0, Math.ceil(remainingMs / 1000)), "second"),
   );
 }
 
@@ -191,11 +182,7 @@ function isChineseLocale(i18n?: LocaleLike): boolean {
   return language.toLowerCase().startsWith("zh");
 }
 
-function translateWithFallback(
-  t: TranslateFn,
-  key: string,
-  fallback: string,
-): string {
+function translateWithFallback(t: TranslateFn, key: string, fallback: string): string {
   const value = t(key as never);
   return value && value !== key ? value : fallback;
 }
@@ -213,26 +200,13 @@ export function getCancelOrderConfirmationMessages(
     : {
         submitted: "Your cancel request was submitted. Confirming the result.",
         completed: "Order canceled",
-        delayed:
-          "Your cancel request was submitted. Confirmation is taking a little longer.",
+        delayed: "Your cancel request was submitted. Confirmation is taking a little longer.",
       };
 
   return {
-    submitted: translateWithFallback(
-      t,
-      "predict.trade.cancelSubmitted",
-      fallback.submitted,
-    ),
-    completed: translateWithFallback(
-      t,
-      "predict.trade.cancelCompleted",
-      fallback.completed,
-    ),
-    delayed: translateWithFallback(
-      t,
-      "predict.trade.cancelDelayed",
-      fallback.delayed,
-    ),
+    submitted: translateWithFallback(t, "predict.trade.cancelSubmitted", fallback.submitted),
+    completed: translateWithFallback(t, "predict.trade.cancelCompleted", fallback.completed),
+    delayed: translateWithFallback(t, "predict.trade.cancelDelayed", fallback.delayed),
   };
 }
 
@@ -248,8 +222,7 @@ export function useCancelOrderResultConfirmation(): (
       const progressToast = toast as ToastWithProgress;
       const id = `predict-cancel-order-${orderId}-${Date.now()}`;
       const deadlineAt = Date.now() + MAX_DURATION_MS;
-      const params =
-        input.user ? { source: input.source, wallet_address: input.user } : undefined;
+      const params = input.user ? { source: input.source, wallet_address: input.user } : undefined;
 
       progressToast.progress({
         id,
@@ -299,8 +272,7 @@ export function useCancelOrderResultConfirmation(): (
         }
 
         const elapsed = Date.now() - startedAt;
-        const waitMs =
-          elapsed < SLOW_AFTER_MS ? FAST_INTERVAL_MS : SLOW_INTERVAL_MS;
+        const waitMs = elapsed < SLOW_AFTER_MS ? FAST_INTERVAL_MS : SLOW_INTERVAL_MS;
         await sleep(Math.min(waitMs, Math.max(0, deadlineAt - Date.now())));
       }
 

@@ -12,6 +12,9 @@ jest.mock("next/navigation", () => ({
 }));
 
 jest.mock("@liberfi.io/i18n", () => ({
+  useLocalizedTimeFormatter: () => ({
+    formatAgeSince: () => "just now",
+  }),
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 

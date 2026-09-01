@@ -19,7 +19,6 @@ import {
 } from "@liberfi.io/ui";
 import { TokenAvatar } from "@liberfi.io/ui-tokens";
 import {
-  formatAge,
   formatAmount,
   formatAmountInUsd,
   formatMCapInUsd,
@@ -28,7 +27,7 @@ import {
   SafeBigNumber,
   searchTwitterUrl,
 } from "@liberfi.io/utils";
-import { useTranslation } from "@liberfi.io/i18n";
+import { useLocalizedTimeFormatter, useTranslation } from "@liberfi.io/i18n";
 import { formatShortAddress } from "../../../application/format";
 import { MouseEvent, useCallback, useMemo } from "react";
 
@@ -61,6 +60,7 @@ export function TokenDetailHeader({ chain, address }: TokenDetailHeaderProps) {
 
 function Content({ token }: { token: Token }) {
   const { t } = useTranslation();
+  const { formatAge, formatUnit } = useLocalizedTimeFormatter();
   const copyToClipboard = useCopyToClipboard();
 
   const md = token.marketData;
@@ -77,7 +77,7 @@ function Content({ token }: { token: Token }) {
     [priceChange],
   );
 
-  // age — tick every second; formatted "2h", with full-time tooltip
+  // Keep the localized age live while retaining the full timestamp tooltip.
   const ageMs = useTickAge(token.createdAt ?? Date.now());
   const ageText = token.createdAt ? formatAge(ageMs) : null;
   const fullCreatedAt = useMemo(() => {
@@ -210,7 +210,7 @@ function Content({ token }: { token: Token }) {
           value={formatAmountInUsd(md?.tvlInUsd ?? "")}
         />
         <Stat
-          label={`24h ${t("token_list.attributes.volume")}`}
+          label={`${formatUnit(24, "hour")} ${t("token_list.attributes.volume")}`}
           value={formatAmountInUsd(volume24h ?? "")}
         />
         <Stat

@@ -19,7 +19,7 @@ import {
   YAxis,
 } from "recharts";
 import { useTickAge } from "@liberfi.io/hooks";
-import { useTranslation } from "@liberfi.io/i18n";
+import { useLocalizedTimeFormatter, useTranslation } from "@liberfi.io/i18n";
 import { cn } from "@liberfi.io/ui";
 import { predictEventHref } from "src/components/page/predict-source";
 import {
@@ -29,7 +29,6 @@ import {
   useWalletPositions,
 } from "../data/queries";
 import {
-  formatAgeMs,
   formatPercent,
   formatRate,
   formatSignedUsd,
@@ -70,11 +69,7 @@ export function TotalValueCard({
   tag?: string | null;
 }) {
   const { t } = useTranslation();
-  const walletDaily = useWalletDailyPnl(
-    mode === "wallet" ? wallet : undefined,
-    interval,
-    tag,
-  );
+  const walletDaily = useWalletDailyPnl(mode === "wallet" ? wallet : undefined, interval, tag);
   const portfolioDaily = usePortfolioDailyPnl(
     mode === "portfolio" ? user : undefined,
     interval,
@@ -112,10 +107,10 @@ export function TotalValueCard({
         <MiniStat
           label={t("extend.leaderboard.detail.totalPnl")}
           value={
-            <span className={cn("inline-flex items-baseline gap-4", pnlColorClass(summary.totalPnl))}>
-              <span className="text-xs font-medium">
-                {formatPercent(summary.totalPnlRatio)}
-              </span>
+            <span
+              className={cn("inline-flex items-baseline gap-4", pnlColorClass(summary.totalPnl))}
+            >
+              <span className="text-xs font-medium">{formatPercent(summary.totalPnlRatio)}</span>
               <span>{formatSignedUsd(summary.totalPnl)}</span>
             </span>
           }
@@ -220,16 +215,11 @@ export function PerformanceBiasCard({ summary }: { summary: WalletPnlSummary }) 
   );
 }
 
-function LiveAge({
-  ts,
-  className,
-}: {
-  ts?: string | number | null;
-  className?: string;
-}) {
+function LiveAge({ ts, className }: { ts?: string | number | null; className?: string }) {
+  const { formatAge } = useLocalizedTimeFormatter();
   const timestampMs = parseTimestampMs(ts);
   const ageMs = useTickAge(timestampMs ?? Date.now());
-  return <span className={className}>{timestampMs == null ? EMPTY_VALUE : formatAgeMs(ageMs)}</span>;
+  return <span className={className}>{timestampMs == null ? EMPTY_VALUE : formatAge(ageMs)}</span>;
 }
 
 // ---------------------------------------------------------------------------
@@ -288,16 +278,11 @@ export function YieldRiskCard({
     {
       label: t("extend.leaderboard.detail.settlementWinRate"),
       value:
-        summary.settlementWinRate == null
-          ? EMPTY_VALUE
-          : formatRate(summary.settlementWinRate),
+        summary.settlementWinRate == null ? EMPTY_VALUE : formatRate(summary.settlementWinRate),
     },
     {
       label: t("extend.leaderboard.detail.settledRatio"),
-      value:
-        summary.settlementRatio == null
-          ? EMPTY_VALUE
-          : formatRate(summary.settlementRatio),
+      value: summary.settlementRatio == null ? EMPTY_VALUE : formatRate(summary.settlementRatio),
     },
   ];
 
@@ -309,9 +294,7 @@ export function YieldRiskCard({
             <div className="mb-1 text-[11px] font-medium uppercase tracking-wide text-text-muted">
               {m.label}
             </div>
-            <div className="text-sm font-semibold tabular-nums text-white">
-              {m.value}
-            </div>
+            <div className="text-sm font-semibold tabular-nums text-white">{m.value}</div>
           </div>
         ))}
       </div>
@@ -351,15 +334,10 @@ export function YieldRiskCard({
             {exposure.map((e, i) => (
               <span key={e.label} className="flex items-center gap-1 text-[11px] text-text-muted">
                 <span
-                  className={cn(
-                    "size-2 rounded-sm",
-                    EXPOSURE_COLORS[i % EXPOSURE_COLORS.length],
-                  )}
+                  className={cn("size-2 rounded-sm", EXPOSURE_COLORS[i % EXPOSURE_COLORS.length])}
                 />
                 <span className="max-w-[90px] truncate">{e.label}</span>
-                <span className="tabular-nums text-text-muted">
-                  {(e.ratio * 100).toFixed(1)}%
-                </span>
+                <span className="tabular-nums text-text-muted">{(e.ratio * 100).toFixed(1)}%</span>
               </span>
             ))}
           </div>
@@ -414,9 +392,7 @@ function SevenDayPnlChart({
   const pad = (max - min) * 0.15 || 1;
 
   // Only label the 1st, 4th and 7th day on the x axis.
-  const xTicks = [0, 3, 6]
-    .filter((i) => i < data.length)
-    .map((i) => data[i].label);
+  const xTicks = [0, 3, 6].filter((i) => i < data.length).map((i) => data[i].label);
 
   return (
     <div className="mt-4 border-t border-border-subtle/60 pt-3">
@@ -441,7 +417,11 @@ function SevenDayPnlChart({
             />
             <ReferenceLine y={0} stroke="var(--color-border-control)" strokeWidth={1} />
             <Tooltip
-              cursor={{ stroke: "var(--color-text-disabled)", strokeWidth: 1, strokeDasharray: "4 4" }}
+              cursor={{
+                stroke: "var(--color-text-disabled)",
+                strokeWidth: 1,
+                strokeDasharray: "4 4",
+              }}
               isAnimationActive={false}
               wrapperStyle={{ zIndex: 2, outline: "none" }}
               content={<DailyPnlTooltip />}
@@ -590,7 +570,7 @@ function interpolatePnl(ts: number, known: { ts: number; pnl: number }[]): numbe
     const r = (ts - prev.ts) / (next.ts - prev.ts);
     return prev.pnl + (next.pnl - prev.pnl) * r;
   }
-  return (prev ?? next as { ts: number; pnl: number }).pnl;
+  return (prev ?? (next as { ts: number; pnl: number })).pnl;
 }
 
 /**
@@ -606,12 +586,7 @@ function formatDayLabel(ts: number, withWeekday: boolean, locale?: string): stri
   });
 }
 
-const EXPOSURE_COLORS = [
-  "bg-emerald-500",
-  "bg-sky-500",
-  "bg-amber-500",
-  "bg-fuchsia-500",
-];
+const EXPOSURE_COLORS = ["bg-emerald-500", "bg-sky-500", "bg-amber-500", "bg-fuchsia-500"];
 
 /**
  * Aggregate position value by category tag (excluding the product tag and
@@ -626,9 +601,7 @@ function buildExposure(
   for (const tk of tokens) {
     const value = Math.max(0, tk.currentValue);
     if (value <= 0) continue;
-    const cats = tk.tags.filter(
-      (tag) => tag && tag !== productTag && !/^\d+$/.test(tag),
-    );
+    const cats = tk.tags.filter((tag) => tag && tag !== productTag && !/^\d+$/.test(tag));
     if (cats.length === 0) continue;
     const cat = cats[0];
     byTag.set(cat, (byTag.get(cat) ?? 0) + value);

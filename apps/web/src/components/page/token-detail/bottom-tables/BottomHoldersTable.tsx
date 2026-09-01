@@ -16,14 +16,13 @@ import {
 } from "@liberfi.io/ui";
 import {
   accountExplorerUrl,
-  formatAge,
   formatAmount,
   formatAmountInUsd,
   formatPercent,
   SafeBigNumber,
   truncateAddress,
 } from "@liberfi.io/utils";
-import { useTranslation } from "@liberfi.io/i18n";
+import { useLocalizedTimeFormatter, useTranslation } from "@liberfi.io/i18n";
 import { tKey } from "../../../../application/t";
 import { MouseEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -467,6 +466,7 @@ const BalanceActivityCell = memo(function BalanceActivityCell({
   nativeBalance?: string;
   lastActiveAt?: Date | string | number;
 }) {
+  const { formatAge } = useLocalizedTimeFormatter();
   const date = normalizeDate(lastActiveAt);
   const ageMs = useTickAge(date ?? Date.now());
   const ageText = date ? formatAge(ageMs) : "--";
@@ -600,6 +600,7 @@ const HoldingsCell = memo(function HoldingsCell({
 });
 
 const AgeCell = memo(function AgeCell({ value }: { value?: Date | string | number }) {
+  const { formatAge } = useLocalizedTimeFormatter();
   const date = normalizeDate(value);
   const ageMs = useTickAge(date ?? Date.now());
   const ageText = date ? formatAge(ageMs) : "--";

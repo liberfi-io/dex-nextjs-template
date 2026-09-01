@@ -17,30 +17,17 @@
  * `../format`.
  */
 
-import {
-  useEffect,
-  useLayoutEffect,
-  useReducer,
-  useRef,
-  useState,
-  type RefObject,
-} from "react";
+import { useEffect, useLayoutEffect, useReducer, useRef, useState, type RefObject } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useTickAge } from "@liberfi.io/hooks";
-import { useTranslation } from "@liberfi.io/i18n";
+import { useLocalizedTimeFormatter, useTranslation } from "@liberfi.io/i18n";
 import { cn, Sortable } from "@liberfi.io/ui";
 import { CopyInline } from "../../../components/CopyButton";
 import { GradientAvatar } from "../../../components/GradientAvatar";
-import {
-  useWalletActivities,
-  useWalletPnl,
-  useWalletPositions,
-} from "../data/queries";
+import { useWalletActivities, useWalletPnl, useWalletPositions } from "../data/queries";
 import {
   formatPercent,
-  formatAgeMs,
   formatPrice,
-  formatRelativeTime,
   formatSignedUsd,
   formatUsd,
   parseTimestampMs,
@@ -57,12 +44,7 @@ import type {
   WalletPnlSummary,
   WalletTokenPnl,
 } from "../types";
-import {
-  EventTitleLink,
-  PerformanceBiasCard,
-  TotalValueCard,
-  YieldRiskCard,
-} from "./SummaryCards";
+import { EventTitleLink, PerformanceBiasCard, TotalValueCard, YieldRiskCard } from "./SummaryCards";
 import { ActivityTypeBadge } from "./ActivityTypeBadge";
 import {
   leaderboardDisplay,
@@ -84,8 +66,7 @@ const TAB_STATUS: Record<"open" | "closed", PositionStatus> = {
 const ROW_ESTIMATE = 64;
 
 /** Position table grid template (desktop). */
-const TABLE_GRID =
-  "grid-cols-[minmax(160px,1.7fr)_128px_64px_96px_80px_96px_88px_88px_78px_62px]";
+const TABLE_GRID = "grid-cols-[minmax(160px,1.7fr)_128px_64px_96px_80px_96px_88px_88px_78px_62px]";
 
 export function WalletDetailPanel({
   wallet,
@@ -124,7 +105,13 @@ export function WalletDetailPanel({
           <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
             <TotalValueCard summary={data.summary} wallet={wallet} interval={interval} tag={tag} />
             <PerformanceBiasCard summary={data.summary} />
-            <YieldRiskCard summary={data.summary} wallet={wallet} interval={interval} requestTag={tag} tag={data.tag} />
+            <YieldRiskCard
+              summary={data.summary}
+              wallet={wallet}
+              interval={interval}
+              requestTag={tag}
+              tag={data.tag}
+            />
           </div>
           <WalletTabs
             wallet={wallet}
@@ -164,7 +151,17 @@ function WalletHeader({
           title={t("extend.leaderboard.back")}
           className="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-lg text-text-secondary transition-colors hover:bg-surface-interactive/60 hover:text-white"
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden
+          >
             <path d="m15 18-6-6 6-6" />
           </svg>
         </button>
@@ -189,9 +186,10 @@ function WalletHeader({
 }
 
 function WalletLastActiveAge({ ts }: { ts?: string | number | null }) {
+  const { formatAge } = useLocalizedTimeFormatter();
   const timestampMs = parseTimestampMs(ts);
   const ageMs = useTickAge(timestampMs ?? Date.now());
-  return timestampMs == null ? "N/A" : formatAgeMs(ageMs);
+  return timestampMs == null ? "N/A" : formatAge(ageMs);
 }
 
 // ---------------------------------------------------------------------------
@@ -262,7 +260,11 @@ function WalletTabs({
   } | null>(null);
 
   const tabs: { key: DetailTab; label: string; count?: number }[] = [
-    { key: "open", label: t("extend.leaderboard.detail.tabs.open"), count: summary.openPositionCount },
+    {
+      key: "open",
+      label: t("extend.leaderboard.detail.tabs.open"),
+      count: summary.openPositionCount,
+    },
     { key: "closed", label: t("extend.leaderboard.detail.tabs.closed") },
     { key: "activity", label: t("extend.leaderboard.tabs.activity") },
   ];
@@ -334,11 +336,7 @@ function WalletTabs({
  * Window-style virtualizer bound to the panel's scroll surface. Tracks the
  * list wrapper's offset within the scroll element as `scrollMargin`.
  */
-function useWindowList(
-  scrollRef: RefObject<HTMLElement>,
-  count: number,
-  deps: unknown[],
-) {
+function useWindowList(scrollRef: RefObject<HTMLElement>, count: number, deps: unknown[]) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [scrollMargin, setScrollMargin] = useState(0);
 
@@ -392,20 +390,13 @@ function PositionsTable({
 }) {
   const { t } = useTranslation();
   const translate = t as WorldCupTranslate;
-  const {
-    data,
-    isLoading,
-    isPlaceholderData,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useWalletPositions(wallet, sort?.field, sort?.order, interval, tag, TAB_STATUS[tab]);
+  const { data, isLoading, isPlaceholderData, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useWalletPositions(wallet, sort?.field, sort?.order, interval, tag, TAB_STATUS[tab]);
 
   // Cycle a column through desc → asc → unsorted (ui-tokens Sortable contract).
-  const handleSort =
-    (field: PositionSortField) => (dir: "asc" | "desc" | undefined) => {
-      onSort(dir ? { field, order: dir } : null);
-    };
+  const handleSort = (field: PositionSortField) => (dir: "asc" | "desc" | undefined) => {
+    onSort(dir ? { field, order: dir } : null);
+  };
   const sortFor = (field: PositionSortField): SortOrder | undefined =>
     sort?.field === field ? sort.order : undefined;
 
@@ -461,7 +452,13 @@ function PositionsTable({
           {/* Column header — same column layout across breakpoints. On desktop
               (lg+) the table shrinks to fit the available width; below lg it keeps
               a fixed min width and the box scrolls horizontally. */}
-          <div className={cn("grid", TABLE_GRID, "items-center gap-1.5 border-b border-border-subtle/50 px-3 py-2 text-[11px] font-medium uppercase tracking-wide text-text-muted")}>
+          <div
+            className={cn(
+              "grid",
+              TABLE_GRID,
+              "items-center gap-1.5 border-b border-border-subtle/50 px-3 py-2 text-[11px] font-medium uppercase tracking-wide text-text-muted",
+            )}
+          >
             <span>{t("extend.leaderboard.detail.colMarket")}</span>
             <span className="text-center">{t("extend.leaderboard.detail.colSide")}</span>
             <span className="text-right">{t("extend.leaderboard.detail.colShares")}</span>
@@ -490,7 +487,11 @@ function PositionsTable({
             <span className="text-right">{t("extend.leaderboard.detail.colStatus")}</span>
           </div>
 
-          <div ref={wrapRef} className="relative w-full" style={{ height: virtualizer.getTotalSize() }}>
+          <div
+            ref={wrapRef}
+            className="relative w-full"
+            style={{ height: virtualizer.getTotalSize() }}
+          >
             {virtualItems.map((vItem) => {
               const isLoaderRow = vItem.index >= rows.length;
               const p = rows[vItem.index];
@@ -536,19 +537,14 @@ function positionStatus(p: WalletTokenPnl): "open" | "won" | "lost" {
  * Relative "time since" that re-renders every second so the value keeps
  * ticking live while the wallet detail stays open.
  */
-function LiveRelativeTime({
-  ts,
-  className,
-}: {
-  ts?: string | number | null;
-  className?: string;
-}) {
+function LiveRelativeTime({ ts, className }: { ts?: string | number | null; className?: string }) {
+  const { formatAgeSince } = useLocalizedTimeFormatter();
   const [, tick] = useReducer((n: number) => n + 1, 0);
   useEffect(() => {
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, []);
-  return <span className={className}>{formatRelativeTime(ts)}</span>;
+  return <span className={className}>{formatAgeSince(ts)}</span>;
 }
 
 /**
@@ -604,9 +600,15 @@ function PositionRow({
   const display = leaderboardDisplay(position, worldcupMatchBySlug, t as WorldCupTranslate);
   const status = positionStatus(position);
   const statusMeta = {
-    open: { label: t("extend.leaderboard.detail.status.open"), cls: "bg-surface-strong/40 text-text-secondary" },
+    open: {
+      label: t("extend.leaderboard.detail.status.open"),
+      cls: "bg-surface-strong/40 text-text-secondary",
+    },
     won: { label: t("extend.leaderboard.detail.status.won"), cls: "bg-positive/15 text-positive" },
-    lost: { label: t("extend.leaderboard.detail.status.lost"), cls: "bg-negative/15 text-negative" },
+    lost: {
+      label: t("extend.leaderboard.detail.status.lost"),
+      cls: "bg-negative/15 text-negative",
+    },
   }[status];
 
   const sideMeta =
@@ -654,14 +656,21 @@ function PositionRow({
         <div className="text-right text-sm font-semibold tabular-nums text-white">
           {formatUsd(position.currentValue)}
         </div>
-        <div className={cn("text-right text-sm font-semibold tabular-nums", pnlColorClass(position.totalPnl))}>
+        <div
+          className={cn(
+            "text-right text-sm font-semibold tabular-nums",
+            pnlColorClass(position.totalPnl),
+          )}
+        >
           {formatSignedUsd(position.totalPnl)}
           <div className="text-[11px] font-medium">{formatPercent(position.totalPnlRatio)}</div>
         </div>
         <div className={cn("text-right text-sm tabular-nums", pnlColorClass(position.realizedPnl))}>
           {formatSignedUsd(position.realizedPnl)}
         </div>
-        <div className={cn("text-right text-sm tabular-nums", pnlColorClass(position.unrealizedPnl))}>
+        <div
+          className={cn("text-right text-sm tabular-nums", pnlColorClass(position.unrealizedPnl))}
+        >
           {formatSignedUsd(position.unrealizedPnl)}
         </div>
         <LiveRelativeTime
@@ -697,8 +706,11 @@ function ActivityList({
 }) {
   const { t } = useTranslation();
   const translate = t as WorldCupTranslate;
-  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useWalletActivities(wallet, interval, tag);
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useWalletActivities(
+    wallet,
+    interval,
+    tag,
+  );
 
   const allActivities = data?.pages.flatMap((p) => p.activities) ?? [];
   const worldcupMatchBySlug = useWorldcupMatchBySlug(allActivities);
@@ -740,7 +752,7 @@ function ActivityList({
           const a = activities[vItem.index];
           return (
             <div
-              key={isLoaderRow ? "loader" : a.activityId ?? `${a.activityTs}-${vItem.index}`}
+              key={isLoaderRow ? "loader" : (a.activityId ?? `${a.activityTs}-${vItem.index}`)}
               ref={virtualizer.measureElement}
               data-index={vItem.index}
               className="absolute left-0 top-0 w-full"
@@ -779,7 +791,12 @@ function ActivityRow({
   const outcome = transText(activity.outcomeTrans, activity.outcome);
 
   return (
-    <div className={cn("flex items-center gap-3 px-3 py-3", !last && "border-b border-border-subtle/40")}>
+    <div
+      className={cn(
+        "flex items-center gap-3 px-3 py-3",
+        !last && "border-b border-border-subtle/40",
+      )}
+    >
       <MarketAvatar
         src={display.imageUrl}
         seed={activity.conditionId || activity.tokenId || activity.eventSlug}

@@ -592,3 +592,33 @@
 - 线上检查：生产地址返回 Vercel SSO 的 HTTP 302 跳转，确认部署入口已生效但受项目访问保护，未在未授权会话中继续页面级检查。
 - 推送状态：React SDK 功能与 release commit、模板功能与依赖提交均已 fast-forward 推送至各自 `origin/main`，未使用 force push；工作区其余未提交的 K 线工具栏与行情切换开发内容保持原状，未进入本次发布。
 - Workflow 说明：React SDK Release 与模板 Vercel Deploy 均成功；两个 workflow 仅有 GitHub Actions Node.js 20 runtime 弃用提示，不影响发布与部署。模板功能提交使用 `[skip ci]` 避免依赖升级前重复部署，本条最终纯文档提交同样使用 `[skip ci]`。
+## 2026-09-01：统一全站时间国际化并发布生产环境（提交前）
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`；两个仓库修改前均与各自 `origin/main` 无分叉，模板继续通过本地源码别名联调同级 `react-sdk`。
+- 拟用提交标题：React SDK 使用 `fix(i18n): localize relative and duration times`；模板在 npm 发布完成后使用 `fix(i18n): consume localized time formatting` 与对应 SDK 依赖升级提交。
+- 问题背景：多个页面将相对时间和周期直接拼接为 `just now`、`1s`、`1m`、`1h` 等英文缩写，切换中文后活动列表、K 线周期、预测倒计时和统计标签仍显示英文；旧版 `zh` 语言标识传给 `Intl` 时还会默认生成简体文本，与项目繁体中文语义不一致。
+- 完成事项：在 `@liberfi.io/i18n` 建立统一的本地化时间格式器，覆盖刚刚、秒、分钟、小时、天、月、年和固定周期；将 Token、Portfolio、Prediction、Perpetuals、Channels、Media Track、TradingView 及模板自有列表、详情、排行榜、世界杯和交易反馈中的可见时间统一迁移；补齐全部语言资源，并将旧版 `zh` 显式归一为 `zh-Hant`。
+- 影响范围：时间文案与周期标签的展示层，不改变行情接口所需的 `1m/1h` 协议值、时间筛选语义、排序逻辑或业务请求；本地尚未提交的 K 线工具栏、行情切换和数据源扩展改动继续排除在本轮提交与发布之外。
+- 验证结果：React SDK 受影响的 8 个包共 16 项 TypeScript/ESLint 任务通过，i18n 19/19、ui-predict 37/37、ui-tokens 64/64、ui-portfolio 18/18、ui-tradingview 30/30 项测试通过；模板 37/37 个 Jest 套件共 181/181 项、14 项配置契约、TypeScript、ESLint 与 `git diff --check` 全部通过。本地繁体页面确认显示 `1秒 / 1分鐘 / 1小時 / 1天 / 24小時 交易量`，不再出现 `just now`、简体时间单位或裸 `24h` 标签。
+- 推送状态：计划先将 React SDK 时间国际化提交 fast-forward 推送，等待 npm patch release 完成，再在模板升级正式 npm 版本并 fast-forward 推送；禁止 force push。
+- Workflow 状态：本轮按用户要求正常触发 React SDK Release workflow 和模板 Vercel production deploy；发布与部署结果将在 workflow 完成后追加记录。
+
+## 2026-09-01：统一全站时间国际化并发布 React SDK（提交后）
+
+- 仓库与分支：`react-sdk/main`；功能提交和自动 release commit 均已进入远端主分支。
+- 提交：`e54b6f2d4` — `fix(i18n): localize relative and duration times`；release commit 为 `06cdc2cad` — `chore: release packages`。
+- 完成事项：统一的本地化时间格式器、14 套语言资源和 Token、Portfolio、Prediction、Perpetuals、Channels、Media Track、TradingView 等模块迁移均已发布；英文环境使用本地化短单位，简体与繁体中文分别显示对应的秒、分钟、小时、天、月、年及“刚刚/剛剛”。
+- 影响范围：React SDK 的时间展示公共能力和相关 UI 包；协议参数与内部 resolution 枚举仍保持原始 `1m/1h` 等值。未提交的 K 线工具栏、行情切换和数据源开发内容未进入提交、CI checkout 或 npm 包。
+- 验证结果：推送前 React SDK 全量 build 24/24 个任务通过；Release workflow run `33525680094`、job `99915781789` 成功，用时 5 分 43 秒；24 个公共包的新版本端点均已通过官方 npm registry 验证。
+- 推送状态：功能提交和 release commit 已 fast-forward 同步到 `react-sdk/origin/main`，本地与远端无分叉，未使用 force push。
+- Workflow 状态：React SDK Release 已成功；仅有 GitHub Actions Node.js 20 runtime 弃用提示，不影响构建和发布。
+
+## 2026-09-01：模板接入本地化时间与新版 React SDK（提交前）
+
+- 仓库与分支：`dex-nextjs-template/main`；提交前与 `origin/main` 无分叉。
+- 拟用提交标题：功能提交使用 `fix(i18n): consume localized time formatting [skip ci]`；依赖提交使用 `chore(deps): bump react sdk packages`。
+- 完成事项：模板自有的资产活动、Token 详情、排行榜、世界杯动态和撤单反馈已统一使用 SDK 时间格式器；24 个 `@liberfi.io/*` 直接依赖已更新到本次 patch release 并刷新 `pnpm-lock.yaml`，`@chainstream-io/sdk` 保持 `2.1.14`。
+- 影响范围：模板可见时间文案、React SDK 依赖声明与锁文件；不修改行情接口、排序、业务时间范围或 ChainStream SDK。
+- 验证结果：正式 npm 依赖安装完成；模板 37/37 个 Jest 套件共 181/181 项、14 项配置契约、TypeScript、ESLint 与 `git diff --check` 全部通过。本地开发服务已在 3000 端口重启，日志确认全部 `@liberfi.io/*` 继续 source alias 到同级 `react-sdk`；繁体 Token 详情页确认无 `just now`、简体单位或裸 `24h` 标签。
+- 推送状态：计划先以 `[skip ci]` 推送模板功能提交，再由依赖提交触发一次 Vercel production deploy；禁止 force push。
+- Workflow 状态：功能提交跳过 workflow，依赖提交正常触发目标 Vercel 部署，结果将在部署完成后追加。

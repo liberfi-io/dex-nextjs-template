@@ -61,35 +61,6 @@ export function formatPrice(probability: number): string {
   return `${(probability * 100).toFixed(1)}¢`;
 }
 
-/** `1.2h` / `3d 4h` / `12m` — a holding duration in seconds. */
-export function formatHoldingTime(seconds: number): string {
-  const total = Math.max(0, Math.floor(seconds));
-  if (total === 0) return "—";
-  const days = Math.floor(total / 86_400);
-  const hours = Math.floor((total % 86_400) / 3600);
-  const minutes = Math.floor((total % 3600) / 60);
-  if (days > 0) return `${days}d ${hours}h`;
-  if (hours > 0) return `${hours}h ${minutes}m`;
-  return `${minutes}m`;
-}
-
-/** `10m` / `2h` / `3d` / `5w` — compact "time since" from an elapsed duration. */
-export function formatAgeMs(ageMs: number): string {
-  const sec = Math.floor(Math.max(0, ageMs) / 1000);
-  if (sec < 60) return `${sec}s`;
-  const min = Math.floor(sec / 60);
-  if (min < 60) return `${min}m`;
-  const hours = Math.floor(min / 60);
-  if (hours < 24) return `${hours}h`;
-  const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}d`;
-  const weeks = Math.floor(days / 7);
-  if (weeks < 5) return `${weeks}w`;
-  const months = Math.floor(days / 30);
-  if (months < 12) return `${months}mo`;
-  return `${Math.floor(days / 365)}y`;
-}
-
 /** Timestamp parser accepting epoch milliseconds, numeric strings, or ISO dates. */
 export function parseTimestampMs(ts: string | number | null | undefined): number | null {
   if (ts == null || ts === "") return null;
@@ -98,13 +69,6 @@ export function parseTimestampMs(ts: string | number | null | undefined): number
   if (Number.isFinite(numeric) && numeric > 0) return numeric;
   const parsed = Date.parse(String(ts));
   return Number.isFinite(parsed) ? parsed : null;
-}
-
-/** `10m` / `2h` / `3d` / `5w` — compact "time since" from an ISO/epoch timestamp. */
-export function formatRelativeTime(ts: string | number | null | undefined): string {
-  const ms = parseTimestampMs(ts);
-  if (ms == null) return "—";
-  return formatAgeMs(Date.now() - ms);
 }
 
 /** `0x1234…cdef` — short EVM address. */
