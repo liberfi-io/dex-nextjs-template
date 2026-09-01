@@ -510,3 +510,14 @@
 - 验证结果：本地 SDK source alias 页面实测 `trump`、`tr`、`1`、`fff` 均为 24px，最大高度差由 4px 降为 0、垂直中心偏差由 2px 降为 0；`ui-tokens` 12/12 个测试套件共 64/64 项、`ui-predict` 11/11 个测试套件共 37/37 项、两包 TypeScript 与 ESLint、消费者 TypeScript 和 `git diff --check` 均通过。
 - 推送状态：React SDK 与模板在修改前均与各自 `origin/main` 无分叉；计划以 fast-forward 方式推送，禁止 force push。
 - Workflow 状态：按用户要求，本轮 React SDK 功能提交与模板报告提交均使用 `[skip ci]`，不触发 npm Release、Vercel 部署或其他 GitHub workflow。
+
+## 2026-09-01：修复资产汇总数据源并优化汇总卡片布局（提交前）
+
+- 仓库与分支：`dex-nextjs-template/main`；修改前本地与 `origin/main` 无分叉，继续复用现有 3000 端口开发服务及同级 `react-sdk` source alias。
+- 拟用提交标题：`fix(portfolio): restore net worth summary layout [skip ci]`。
+- 问题背景：Portfolio 客户端配置启用了 `/api/balance` 原始余额兼容分支，该接口不包含市场价格且兼容映射将 USD 字段固定为 0，导致资产列表可显示约 1.832 USDC，但账户汇总金额和资产分布显示为 0；同时汇总卡片的信息和操作按钮集中在上半部，下方存在大面积无效空白，视觉节奏失衡。
+- 完成事项：移除 Portfolio 客户端的 `nativeBalanceApiUrl` 配置，使资产汇总、持仓和资产分布恢复使用 ChainStream 净值数据；保留 `/api/balance` 路由及 SOL、ETH、BNB 原生余额 hooks，仅继续服务 Hyperliquid 充值手续费余额场景；重新组织汇总卡片层级，将刷新入口移至地址行、24H 变化拆为辅助信息行、操作区锚定卡片底部并同步骨架屏。
+- 影响范围：影响资产页净值数据源、资产汇总卡片及其骨架屏；不修改 `/api/balance` 路由实现、充值流程、钱包地址解析、ChainStream SDK 版本或 React SDK 代码。
+- 验证结果：客户端配置回归测试已完成红灯复现并由红转绿；模板 34/34 个 Jest 套件共 175/175 项、TypeScript、相关文件 ESLint 和 `git diff --check` 全部通过。本地 `/portfolio` 返回 HTTP 200，3000 端口开发服务确认启用本地 SDK alias；本地 `/api/balance` 仍可查询目标钱包并返回 USDC 原始余额 `1.831681`，未登录浏览器下骨架屏新布局与相邻资产分布卡片底边对齐。
+- 推送状态：计划以 fast-forward 方式推送到 `origin/main`，禁止 force push。
+- Workflow 状态：按用户要求，功能提交与最终报告提交均使用 `[skip ci]`，不触发 GitHub workflow、npm 发布或 Vercel 部署。

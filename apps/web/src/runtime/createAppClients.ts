@@ -40,7 +40,6 @@ export function createDexClients(
     }),
     api: factories.createApi(dexTokenProvider, {
       serverUrl: config.dexAggregatorUrl,
-      nativeBalanceApiUrl: "/api/balance",
     }),
   };
 }

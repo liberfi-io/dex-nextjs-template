@@ -30,7 +30,7 @@ const CONFIG: RuntimeConfig = {
 };
 
 describe("application client factory", () => {
-  it("constructs both dex clients from one token provider and endpoint", () => {
+  it("constructs both dex clients from one token provider and keeps portfolio data on ChainStream", () => {
     const tokenProvider = { getToken: async () => "dex-token" };
     const createChainStream = jest.fn(
       (...args: ConstructorParameters<typeof ChainStreamClient>) => new ChainStreamClient(...args),
@@ -46,7 +46,6 @@ describe("application client factory", () => {
     });
     expect(createApi).toHaveBeenCalledWith(tokenProvider, {
       serverUrl: CONFIG.dexAggregatorUrl,
-      nativeBalanceApiUrl: "/api/balance",
     });
   });
 
