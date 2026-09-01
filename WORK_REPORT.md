@@ -782,3 +782,14 @@
 - 验证结果：`@liberfi.io/ui-tradingview` 14/14 个测试套件共 50/50 项通过，TypeScript、Prettier 与 `git diff --check` 通过；真实 Token 详情页双窗口验证显示 `BRAINFART / USD  1m` 与 `USDC / USD  1m` 均可见且位于左侧，标题为白色、interval 为灰色，首窗口无关闭按钮、次窗口有关闭按钮；推送钩子执行的全仓 build 24/24 个任务成功。
 - 推送状态：React SDK 提交已 fast-forward 推送至 `origin/main`，本地与远端均指向 `a110b79b1961868b6a427333756b1dfb2bdbdf1b`，未使用 force push；工作记录将通过独立 `[skip ci]` 文档提交同步至模板仓库。
 - Workflow 结果：React SDK 提交包含 `[skip ci]`，按该 commit 查询 GitHub Actions run 为空，未触发 npm Release、Vercel 部署或其他 GitHub workflow；工作记录提交同样使用 `[skip ci]`。
+
+## 2026-09-02：发布最新 React SDK 并部署模板生产环境（发布后）
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`。
+- 提交：React SDK 发布触发提交 `da8299f15` — `chore(release): publish latest sdk packages`，Release 自动版本提交 `c5face5e2` — `chore: release packages`；模板依赖升级提交 `cbbd490` — `chore(deps): bump react sdk packages`；本条记录拟使用 `docs: record sdk release and production deploy [skip ci]` 单独提交。
+- 问题背景：Twitter 未知链容错、底部面板标题能力及 K 线多窗口标题修复已进入 React SDK 主分支，但此前提交均跳过 workflow，npm 与模板线上依赖尚未包含这些改动。
+- 完成事项：React SDK 25 个公共包统一完成 patch 发布，其中 `@liberfi.io/client@0.3.96`、`@liberfi.io/react@0.3.96`、`@liberfi.io/ui@0.3.82`、`@liberfi.io/ui-media-track@0.1.277`、`@liberfi.io/ui-scaffold@2.0.81`、`@liberfi.io/ui-tradingview@0.1.235`、`@liberfi.io/ui-perpetuals@1.1.79`、`@liberfi.io/ui-predict@4.0.80`；模板全部 24 个直接引用的 `@liberfi.io/*` 依赖已同步到对应新版本并刷新锁文件，`@chainstream-io/sdk` 明确保留 `2.1.14` 不变；模板已完成 Vercel 生产部署并将 `https://app.liberfi.io` 更新到本次产物。
+- 影响范围：React SDK npm 公共包、模板生产依赖与锁文件、Vercel 线上版本；两仓库中尚未提交的 K 线数据源、工具栏及价格格式化开发内容均保持原状，未进入发布提交。
+- 验证结果：React SDK 推送钩子全仓构建 24/24 个任务通过，Release workflow 成功且 25 个精确版本及关键 tarball 均经官方 npm registry 验证可用；模板依赖比对 24/24 匹配，Web 38/38 个测试套件共 181/181 项、14 项配置契约、TypeScript 类型检查与生产构建全部通过；Vercel workflow 构建和部署成功，生产域名 `https://app.liberfi.io` 实测返回 HTTP 200，独立部署域名 `https://liberfi-93x5j153n-sgt-lab.vercel.app` 已就绪且受 Vercel SSO 保护。
+- 推送状态：React SDK 发布提交与模板依赖提交均已 fast-forward 推送到各自 `origin/main`，未使用 force push；React SDK 本地与远端指向 `c5face5e2`，模板依赖发布时本地与远端指向 `cbbd490`；本条纯工作记录将独立推送。
+- Workflow 状态：React SDK `Release` run `33547156063` 成功完成并发布 npm；模板 `Deploy to Vercel` run `33548918173`、job `99993232190` 于 6 分 12 秒内成功完成，生产别名已切换；本条报告提交包含 `[skip ci]`，避免再次触发发布或部署。
