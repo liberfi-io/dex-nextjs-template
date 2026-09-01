@@ -750,3 +750,24 @@
 - 验证结果：`ui-media-track` 2/2 个测试套件共 7/7 项、TypeScript、ESLint 和格式检查通过；本地 Twitter 面板持续观察 20 秒无控制台 error；React SDK 推送钩子执行的全仓 build 24/24 个任务成功。
 - 推送状态：React SDK 功能提交已 fast-forward 推送至 `origin/main`，本地与远端均指向 `28be552f74868caade2c69746da4dfd1a1a521d6`，未使用 force push；未发布 npm、未更新模板 SDK 版本、未部署 Vercel。
 - Workflow 状态：React SDK 功能提交包含 `[skip ci]`，按提交查询 GitHub Actions run 为空；工作记录提交同样使用 `[skip ci]`，不触发 GitHub workflow 或部署。
+
+## 2026-09-02：恢复 K 线多窗口标题信息与主题层级（提交前）
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`；提交前两个本地分支均与各自 `origin/main` 无分叉，本地其他 K 线工具栏、数据源及价格格式化开发改动继续保留且不纳入本次暂存。
+- 拟用提交标题：React SDK 使用 `fix(tradingview): restore multi-chart pane headers [skip ci]`；模板使用 `docs: record multi-chart pane header fix [skip ci]`。
+- 问题背景：K 线开启多窗口后，各窗口标题栏实际渲染了 token 信息，但错误地使用 TradingView 背景色变量作为文字前景色，形成黑底黑字，只剩 interval 可见并被不可见文本挤到近似居中位置；同时单个 symbol 解析结果没有写入同步缓存，标题只能退化为合约地址。
+- 计划完成事项：在 TradingView iframe 内恢复每个图表区域的 token/报价币与 interval 标题；使用主题主文字色和次文字色建立信息层级；缓存单个 symbol 解析结果并复用并发请求；保留首个当前 token 图表不可关闭、其他图表可关闭的约束；补充标题渲染、关闭策略和 symbol 缓存回归测试。
+- 影响范围：`@liberfi.io/ui-tradingview` 的多窗口标题注入、窗口关闭交互、symbol 解析缓存及相关测试；单窗口页面、K 线数据、交易逻辑、模板依赖版本与 Vercel 配置不受影响。
+- 验证计划：运行 `@liberfi.io/ui-tradingview` 全量 Jest、TypeScript 类型检查、Prettier 与 `git diff --check`；在模板本地 Token 详情页实际创建双窗口，校验两个标题可见且左对齐、主次文字色不同、首窗口无关闭按钮、次窗口可关闭。
+- 预期推送状态：只精确暂存本事项涉及的 React SDK 组件、resolver 与测试，以及本工作记录；分别 fast-forward 推送至对应 `origin/main`，禁止 force push。
+- Workflow 策略：所有提交标题包含 `[skip ci]`，跳过 GitHub Actions，不触发 npm Release、Vercel 部署或其他 workflow。
+
+## 2026-09-02：恢复 K 线多窗口标题信息与主题层级（提交后）
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`。
+- React SDK 提交：`a110b79b1` — `fix(tradingview): restore multi-chart pane headers [skip ci]`。
+- 最终完成事项：多窗口标题栏恢复显示每个图表的 token/报价币及 interval，并统一为左对齐；token 标题使用主题主文字色，interval 与关闭按钮使用主题次文字色；单个 symbol 解析结果会写入缓存并复用并发请求，避免标题退化为合约地址；首个当前 token 图表继续禁止关闭，次级图表保留关闭入口。
+- 影响范围：`@liberfi.io/ui-tradingview` 的多窗口区域标题、关闭交互、symbol resolver 缓存与回归测试；其他未提交的 K 线工具栏、行情数据源、价格格式化和模板业务代码未进入本次功能提交。
+- 验证结果：`@liberfi.io/ui-tradingview` 14/14 个测试套件共 50/50 项通过，TypeScript、Prettier 与 `git diff --check` 通过；真实 Token 详情页双窗口验证显示 `BRAINFART / USD  1m` 与 `USDC / USD  1m` 均可见且位于左侧，标题为白色、interval 为灰色，首窗口无关闭按钮、次窗口有关闭按钮；推送钩子执行的全仓 build 24/24 个任务成功。
+- 推送状态：React SDK 提交已 fast-forward 推送至 `origin/main`，本地与远端均指向 `a110b79b1961868b6a427333756b1dfb2bdbdf1b`，未使用 force push；工作记录将通过独立 `[skip ci]` 文档提交同步至模板仓库。
+- Workflow 结果：React SDK 提交包含 `[skip ci]`，按该 commit 查询 GitHub Actions run 为空，未触发 npm Release、Vercel 部署或其他 GitHub workflow；工作记录提交同样使用 `[skip ci]`。
