@@ -521,3 +521,14 @@
 - 验证结果：客户端配置回归测试已完成红灯复现并由红转绿；模板 34/34 个 Jest 套件共 175/175 项、TypeScript、相关文件 ESLint 和 `git diff --check` 全部通过。本地 `/portfolio` 返回 HTTP 200，3000 端口开发服务确认启用本地 SDK alias；本地 `/api/balance` 仍可查询目标钱包并返回 USDC 原始余额 `1.831681`，未登录浏览器下骨架屏新布局与相邻资产分布卡片底边对齐。
 - 推送状态：计划以 fast-forward 方式推送到 `origin/main`，禁止 force push。
 - Workflow 状态：按用户要求，功能提交与最终报告提交均使用 `[skip ci]`，不触发 GitHub workflow、npm 发布或 Vercel 部署。
+
+## 2026-09-01：修复资产汇总数据源并优化汇总卡片布局（提交后）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 提交：`b2692cc` — `fix(portfolio): restore net worth summary layout [skip ci]`。
+- 问题背景：资产列表已通过行情数据计算出 USDC 价值，但 Portfolio 汇总仍被 `/api/balance` 原始余额兼容分支接管并得到固定的零 USD 字段，造成账户总额、资产分布与资产列表不一致；汇总卡片同时存在顶部信息拥挤、下半部留白失衡的问题。
+- 最终完成事项：Portfolio 已恢复使用 ChainStream 净值数据，资产汇总、持仓和分布回到同一数据语义；`/api/balance` 继续只承担充值场景的原生代币手续费余额查询。汇总卡片已建立清晰的地址、金额、24H 辅助信息和底部操作区层级，刷新入口与骨架屏同步调整，减少无效留白及加载布局跳动。
+- 影响范围：资产页客户端数据源、汇总卡片和对应骨架屏；未升级 `@chainstream-io/sdk`，未修改 React SDK、充值流程或 `/api/balance` 路由。
+- 验证结果：34/34 个 Jest 套件共 175/175 项、TypeScript、相关文件 ESLint、`git diff --check` 和本地开发页面检查全部通过；`/portfolio` 返回 HTTP 200，`/api/balance` 仍可返回目标钱包的 USDC 原始余额 `1.831681`。
+- 推送状态：功能提交已 fast-forward 推送至 `origin/main`，未使用 force push；最终报告提交将在同一分支继续 fast-forward 推送。
+- Workflow 状态：功能提交包含 `[skip ci]`，GitHub 对提交 `b2692cc` 的 Actions 查询结果为空；未触发 GitHub workflow、npm 发布或 Vercel 部署。最终报告提交同样使用 `[skip ci]`。
