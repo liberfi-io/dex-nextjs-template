@@ -677,3 +677,14 @@
 - 验证结果：本地浏览器原路径复测确认容器仍为实际焦点目标且 `outline-style: none`，导航链接键盘焦点环仍为主题色 2px；Web 38/38 个测试套件共 185/185 项、TypeScript 类型检查和定向 ESLint 全部通过。
 - 推送状态：提交已 fast-forward 推送至 `origin/main`，远端主分支指向 `87902bc80defca94dc833031db6f19e7acb1bb29`，未使用 force push。
 - Workflow 状态：提交包含 `[skip ci]`；按该 commit 查询 GitHub Actions run 为空，未触发 Vercel 部署或其他 workflow。
+
+## 2026-09-02：精简底部 Twitter 追踪面板顶部控件（提交前）
+
+- 仓库与分支：`dex-nextjs-template/main`；本地分支与 `origin/main` 一致，本地开发服务继续联调同级 `react-sdk` 源码。
+- 拟用提交标题：`fix(media-track): simplify bottom Twitter panel controls [skip ci]`。
+- 问题背景：从底部工具栏打开 Twitter 追踪抽屉后，面板顶部重复展示钱包胶囊和 Preset 切换，占用有限的抽屉空间并分散用户对推文内容的注意力。
+- 完成事项：仅从可拖拽的底部 Twitter 抽屉中移除钱包胶囊与 Preset 切换及其无用依赖；保留原有固定高度顶部区域、悬停暂停状态与暂停图标反馈，避免内容位移或既有交互退化；新增组件渲染回归测试。
+- 影响范围：只影响 `BottomTweets` 抽屉；独立 `/media-track` 页面、常驻底部工具栏的钱包和 Preset 入口、推文列表、Launchpad 操作及 React SDK 均不改变。
+- 验证结果：本地浏览器确认抽屉内没有钱包或 Preset 文案，悬停后暂停图标正常出现且首条推文纵向位置保持不变；Web 39/39 个测试套件共 186/186 项、14 项构建配置契约、TypeScript 类型检查、定向 ESLint 与代码审查全部通过。
+- 推送状态：计划仅暂存本事项的组件、测试和工作记录并形成本地提交；本地其余 K 线数据源与价格格式化改动保持未暂存。本轮未获推送授权，不推送远端。
+- Workflow 状态：本地提交使用 `[skip ci]`；由于不推送，不会触发 GitHub Actions、Vercel 部署或其他远端 workflow。
