@@ -556,3 +556,15 @@
 - 验证计划：运行 `@liberfi.io/ui-tradingview` 全量测试、TypeScript 与 ESLint；运行模板 Web 全量测试、TypeScript、ESLint、主题契约、`git diff --check`，并通过现有本地 Token 详情页核对图表背景和可达拖拽边界。
 - 预期推送状态：仅暂存上述主题与布局修复，以 fast-forward 方式分别推送到两个仓库的 `origin/main`，禁止 force push；工具栏相关文件和混合文件中的工具栏 hunks 保持未暂存。
 - Workflow 策略：两个功能提交及后续纯报告提交均使用 `[skip ci]`；不触发 GitHub Actions Release、npm 发布、Vercel 部署或其他 workflow。
+
+## 2026-09-01：统一 K 线主题并修复图表高度拖拽边界（提交后）
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`。
+- 提交：React SDK `f5b3714a5` — `fix(tradingview): apply semantic chart palette [skip ci]`；模板 `6a2d833` — `fix(chart): align theme and resize bounds [skip ci]`。
+- 最终完成事项：TradingView 已使用当前语义主题的背景 `#050807`、涨色 `#c7ff2e` 与跌色 `#f76816`，覆盖蜡烛、柱线、空心 K 线、平均 K 线、折线、面积、基准线及成交量；加载已保存图表、初始化完成或主题更新后均会重新应用调色板。模板 iframe 外壳、边框、文字和强调色同步收敛到暗色主题。
+- 布局修复：Token 详情页移除了向下拖动时强制保留 200px 活动列表的错误上限，4px 分隔条现在可到达外层视口底部；底部数据区继续位于页面折叠区域并可滚动访问，向上拖动仍保留 200px 最小图表高度。
+- 排除结果：“已恢复并跑通 token 详情页 K 线工具栏”及其多图表、图表类型、指标、价格/市值、USD/原生币切换、数据源扩展和 feature override 修改均未进入上述提交，仍完整保留在两个本地工作区等待后续处理。
+- 验证结果：React SDK `@liberfi.io/ui-tradingview` 8/8 个测试套件共 26/26 项、TypeScript、ESLint 和 `git diff --check` 通过；模板 Web 37/37 个 Jest 套件共 181/181 项、14 项配置契约、TypeScript、ESLint 和 `git diff --check` 通过。本地页面测得外层高度 827px、Header 72px，修复后的最大图表高度为 751px，分隔条剩余底部距离为 0。
+- 构建结果：React SDK 推送前 hook 自动执行全量构建，24/24 个任务成功；本轮未执行模板 production build，也未发布 npm。
+- 推送状态：两个功能提交均已 fast-forward 推送到各自 `origin/main`，远端 commit 与本地 HEAD 一致，未使用 force push。
+- Workflow 结果：两个提交均包含 `[skip ci]`；按 commit 查询 GitHub Actions run 均为空，未触发 Release、npm 发布、Vercel 部署或其他 workflow。最终 `WORK_REPORT.md` 纯文档提交同样使用 `[skip ci]`。
