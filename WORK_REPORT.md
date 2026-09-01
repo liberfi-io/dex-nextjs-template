@@ -532,3 +532,15 @@
 - 验证结果：34/34 个 Jest 套件共 175/175 项、TypeScript、相关文件 ESLint、`git diff --check` 和本地开发页面检查全部通过；`/portfolio` 返回 HTTP 200，`/api/balance` 仍可返回目标钱包的 USDC 原始余额 `1.831681`。
 - 推送状态：功能提交已 fast-forward 推送至 `origin/main`，未使用 force push；最终报告提交将在同一分支继续 fast-forward 推送。
 - Workflow 状态：功能提交包含 `[skip ci]`，GitHub 对提交 `b2692cc` 的 Actions 查询结果为空；未触发 GitHub workflow、npm 发布或 Vercel 部署。最终报告提交同样使用 `[skip ci]`。
+
+## 2026-09-01：发布资产页汇总修复并部署生产环境
+
+- 仓库与分支：`dex-nextjs-template/main`；部署基线为 `5d97d33`，包含资产净值数据源修复、汇总卡片与骨架屏优化以及对应工作记录。
+- 发布评估：本轮待发布代码全部位于模板仓库，`react-sdk` 无代码、manifest 或构建产物变化，因此无需发布 npm，也无需 bump `@liberfi.io/*` 依赖；`@chainstream-io/sdk` 继续保持 `2.1.14`。
+- 发布事项：通过 `Deploy to Vercel` 的 `workflow_dispatch` 对当前 `main` 直接执行 production build 和 production deploy，没有创建无业务价值的空提交，也未触发 SDK 更新 workflow。
+- 影响范围：线上资产页的账户汇总、资产分布数据一致性，以及汇总卡片和加载骨架的视觉层级；充值场景使用的 `/api/balance` 原生代币余额能力保持不变。
+- 验证结果：部署前模板 34/34 个 Jest 套件共 175/175 项、TypeScript、相关 ESLint、`git diff --check` 和本地页面验证已通过；远端 Vercel Build、Deploy 与成功通知步骤全部通过。
+- 部署结果：GitHub Actions run `33513711224`、job `99875370597` 成功，用时 6 分 16 秒；生产部署地址为 `https://liberfi-l09so4uyu-sgt-lab.vercel.app`。
+- 线上检查：生产地址返回 Vercel SSO 的 HTTP 302 跳转，确认部署入口已生效但受项目访问保护，未在未授权会话中继续页面级检查。
+- 推送状态：部署结果记录将以 `[skip ci]` 的纯文档提交 fast-forward 推送至 `origin/main`，禁止 force push。
+- Workflow 状态：本次仅手动触发目标 Vercel 部署 workflow；没有发布 React SDK npm 包、没有 bump 模板 SDK 版本。纯文档结果提交使用 `[skip ci]`，避免再次触发部署。
