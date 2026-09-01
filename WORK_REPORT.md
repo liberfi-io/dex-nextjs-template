@@ -1023,3 +1023,14 @@
 - 验证计划：React SDK 执行 i18n/ui-portfolio 测试、类型检查、lint、whitespace 和全仓 `pnpm build`；发布后从 npm 官方 registry 确认关键包版本并拉取 release commit；模板复查所有 workspace 三类依赖、刷新 lockfile、执行定向/全量测试、类型检查、lint、whitespace 和发布所需 production build；最终等待 Vercel workflow 成功并验证生产域名 HTTP 200。
 - 预期推送状态：React SDK 功能提交普通 fast-forward 推送 `main` 触发 Release，workflow 生成的 release commit 拉回本地；模板依赖提交普通 fast-forward 推送 `main` 触发 Vercel，禁止 force push。
 - Workflow 策略：React SDK 功能提交与模板依赖提交不使用 `[skip ci]`，分别允许 Release 与 Vercel workflow；纯 WORK_REPORT 提交使用 `[skip ci]`，避免重复发布或部署。
+
+## 2026-09-02：提交 React SDK 多链余额状态修复（提交后）
+
+- 仓库与分支：`react-sdk/main`。
+- 提交：`6a7dfd037` — `fix(portfolio): isolate balances across chain switches`。
+- 问题背景：切换链或 Chainstream 余额请求失败时，Header 可能读取 React Query/context 中的旧链余额；底部通用主代币价格 tooltip 所需国际化 key 也尚未进入 npm 包。
+- 最终完成事项：Portfolio 状态管理器在查询错误时清空 summary，只发布链与钱包地址匹配的数据，并允许余额先于 PnL 返回；账户信息 hook 在消费端再次同步校验 summary 作用域；补齐通用主代币价格中英文文案和旧链、错误缓存回归测试。
+- 影响范围：`@liberfi.io/i18n`、`@liberfi.io/ui-portfolio` 及其依赖发布链；不修改 `@chainstream-io/sdk`、余额后端、`/api/balance` 或交易协议。
+- 验证结果：i18n 13/13 个套件共 77/77 项、ui-portfolio 6/6 个套件共 21/21 项测试通过；两包类型检查、lint、Prettier、whitespace 通过；React SDK 全仓 build 24/24 成功。
+- 推送状态：功能提交已创建于本地 `react-sdk/main`，工作区干净且领先 `origin/main` 1 个提交；下一步普通 fast-forward 推送并等待 Release workflow，禁止 force push。
+- Workflow 状态：功能提交未使用 `[skip ci]`，推送后应触发 `Release` 并发布 npm；模板尚未更新依赖或部署。
