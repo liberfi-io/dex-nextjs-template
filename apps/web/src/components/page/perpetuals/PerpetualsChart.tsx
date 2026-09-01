@@ -4,6 +4,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "@liberfi.io/i18n";
 import {
   TradingView,
+  TvChartFeature,
   TvChartHandle,
   TvChartKlineStyle,
   TvChartLayout,
@@ -69,6 +70,7 @@ export const PerpetualsChart = memo(function PerpetualsChart({
         [TvChartType.TradingView]: t("perpetuals.page.chart.tradingview"),
         [TvChartType.Original]: t("perpetuals.page.chart.original"),
       },
+      disabledFeatures: ["trading_account_manager" as TvChartFeature],
     }),
     [datafeed, i18n.language, symbol, t],
   );

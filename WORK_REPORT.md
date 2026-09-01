@@ -568,3 +568,14 @@
 - 构建结果：React SDK 推送前 hook 自动执行全量构建，24/24 个任务成功；本轮未执行模板 production build，也未发布 npm。
 - 推送状态：两个功能提交均已 fast-forward 推送到各自 `origin/main`，远端 commit 与本地 HEAD 一致，未使用 force push。
 - Workflow 结果：两个提交均包含 `[skip ci]`；按 commit 查询 GitHub Actions run 均为空，未触发 Release、npm 发布、Vercel 部署或其他 workflow。最终 `WORK_REPORT.md` 纯文档提交同样使用 `[skip ci]`。
+
+## 2026-09-01：禁用 K 线 Account Manager 并发布生产环境（提交前）
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`；修改前两个仓库均与各自 `origin/main` 无分叉，继续复用模板现有 3000 端口开发服务及同级 `react-sdk` source alias 联调。
+- 拟用提交标题：React SDK 使用 `fix(tradingview): support consumer feature overrides`；模板使用 `fix(chart): disable unused account manager`，依赖升级使用 `chore(deps): bump react sdk packages`。
+- 问题背景：TradingView 的 Account Manager 不承载 Liberfi 的业务账户与订单数据，在永续合约及 Token 详情 K 线中点击后只会展开空白面板、压缩有效图表区域，造成误导和视觉异常；SDK 虽已有 feature 配置字段，但初始化 Widget 时未将消费者配置透传到底层 TradingView。
+- 完成事项：React SDK 将消费者的 `disabledFeatures` 与 `enabledFeatures` 合并到 Widget 初始化配置，完成去重并确保禁用配置优先，同时补充 `TradingAccountManager` feature 枚举和回归测试；模板在 Perpetuals 与 Token 详情两处 K 线显式禁用 `trading_account_manager`，保留页面原有持仓、订单、成交等业务面板。
+- 影响范围：仅影响 `@liberfi.io/ui-tradingview` 的 feature 配置透传及模板两处 TradingView 初始化配置；不修改行情、交易、账户、钱包、图表主题、工具栏或页面底部业务数据区。本轮不升级 `@chainstream-io/sdk`。
+- 验证结果：React SDK 7/7 个测试套件共 25/25 项、类型检查与 ESLint 通过；模板 37/37 个 Jest 套件共 181/181 项、类型检查、定向 ESLint和 `git diff --check` 通过。本地浏览器确认 Perpetuals 与 Token 详情 TradingView iframe 内 `Account Manager` 数量均为 0，Token 详情行情、工具栏与页面业务底部区正常显示，控制台无错误。
+- 推送状态：计划仅暂存本事项相关文件和混合文件中的对应 hunks，以 fast-forward 方式推送到两个仓库的 `origin/main`，禁止 force push；工作区其余未提交开发内容保持原状。
+- Workflow 状态：React SDK 功能提交将正常触发 Release workflow 完成 npm patch 发布；发布成功并确认官方 npm registry 版本后，模板仅 bump 本次 React SDK 版本并刷新 lockfile，再触发 Vercel production deploy。最终纯报告提交使用 `[skip ci]`，避免重复发布或部署。

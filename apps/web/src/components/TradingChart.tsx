@@ -6,6 +6,7 @@ import { useTranslation } from "@liberfi.io/i18n";
 import { Chain } from "@liberfi.io/types";
 import {
   TradingView,
+  TvChartFeature,
   TvChartKlineStyle,
   TvChartLayout,
   TvChartTheme,
@@ -68,6 +69,7 @@ export function TradingChart({ chain, address, className }: TradingChartProps) {
       layout: TvChartLayout.Layout1A,
       chartType: TvChartType.TradingView,
       kLineStyle: TvChartKlineStyle.Candles,
+      disabledFeatures: ["trading_account_manager" as TvChartFeature],
       theme: TvChartTheme.Dark,
       ...TRADING_VIEW_THEME_COLORS,
       timezone: "Etc/UTC",
