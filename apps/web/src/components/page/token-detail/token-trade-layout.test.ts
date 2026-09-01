@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import {
   TOKEN_TRADE_MIN_CHART_HEIGHT,
   TOKEN_TRADE_SPLIT_HANDLE_HEIGHT,
@@ -28,5 +30,16 @@ describe("token trade chart resize bounds", () => {
         headerHeight: 96,
       }),
     ).toBe(TOKEN_TRADE_MIN_CHART_HEIGHT);
+  });
+
+  it("suppresses the browser outline on the non-interactive page scroll container", () => {
+    const pageSource = fs.readFileSync(
+      path.join(__dirname, "TokenTradePage.tsx"),
+      "utf8",
+    );
+
+    expect(pageSource).toMatch(
+      /ref=\{outerRef\}[\s\S]*?className="[^"]*overflow-auto[^"]*outline-none[^"]*"/,
+    );
   });
 });

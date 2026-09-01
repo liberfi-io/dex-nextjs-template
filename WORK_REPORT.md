@@ -656,3 +656,14 @@
 - 线上检查：生产地址返回 Vercel SSO 的 HTTP 302 跳转，确认部署入口已生效但受项目访问保护，未在未授权会话中继续页面级检查。
 - 推送状态：两个仓库的本轮功能、release 与依赖提交均已 fast-forward 推送，未使用 force push；本地 K 线工具栏、行情切换和数据源开发改动继续保留，未混入本轮提交或发布。
 - Workflow 说明：React SDK Release 与模板 Vercel Deploy 均成功；两个 workflow 仅有 GitHub Actions Node.js 20 runtime 弃用提示，不影响发布与部署。最终纯文档提交使用 `[skip ci]`，避免再次触发部署。
+
+## 2026-09-02：修复 Token 详情页偶发蓝色焦点边框（提交前）
+
+- 仓库与分支：`dex-nextjs-template/main`；提交前本地分支与 `origin/main` 无分叉，本地开发服务继续通过源码别名联调同级 `react-sdk`。
+- 拟用提交标题：`fix(token): suppress page scroll focus outline [skip ci]`。
+- 问题背景：从发现或 Pulse 列表进入 Token 详情页时，Chrome 偶尔会将焦点恢复到页面级滚动容器，并绘制覆盖详情内容边界的蓝色原生 outline；点击空白区域后焦点转移，边框才会消失，造成页面存在异常选中框的视觉误解。
+- 完成事项：为 Token 详情页的非交互式页面滚动容器增加仅在获得焦点时生效的 outline 抑制样式，并补充回归测试；按钮、链接、输入框等真实交互控件的主题键盘焦点提示保持不变。
+- 影响范围：仅影响桌面及平板 Token 详情页最外层滚动容器的浏览器原生焦点外观，不改变页面滚动、分栏拖拽、TradingView、交易表单、路由焦点恢复或键盘导航行为；不涉及 `react-sdk`。
+- 验证结果：本地浏览器通过“发现列表 → Token 详情”路径稳定复现并验证修复，焦点仍落在相同滚动容器但计算样式由 `outline-style: auto` 变为 `none`；键盘导航链接仍显示主题色 2px 焦点环。Web 38/38 个测试套件共 185/185 项、TypeScript 类型检查和定向 ESLint 全部通过。
+- 推送状态：计划仅暂存本事项的两个代码/测试文件及本条工作记录，fast-forward 推送至 `origin/main`；本地其余 K 线数据源、价格格式化与工具栏相关开发改动保持未暂存，不进入本次提交。
+- Workflow 状态：功能提交与后续纯报告提交均使用 `[skip ci]`，跳过 GitHub Actions，不触发 Vercel 部署或其他 workflow。

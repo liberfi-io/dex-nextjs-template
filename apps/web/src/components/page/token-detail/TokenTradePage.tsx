@@ -273,10 +273,11 @@ function TokenTradeDesktopPage({ chain, address }: TokenTradePageProps) {
     // Page-level scroll container — outer overflow-auto captures the
     // overflow from the LEFT column's natural content height. This mirrors
     // GMGN's structure where the outer `<main>` is the single scroll
-    // viewport for the page.
+    // viewport for the page. Chrome may focus scroll containers during
+    // client-side navigation, so suppress its native page-sized outline.
     <div
       ref={outerRef}
-      className="relative h-[calc(100vh-0.625rem)] w-full overflow-auto md:h-[calc(100vh-0.625rem)] lg:h-[calc(100vh-var(--header-height)-2.875rem)]"
+      className="relative h-[calc(100vh-0.625rem)] w-full overflow-auto focus:outline-none md:h-[calc(100vh-0.625rem)] lg:h-[calc(100vh-var(--header-height)-2.875rem)]"
     >
       {/* Inner flex row pinned to outer viewport via `min-h-full`, matching
           GMGN's `flex relative min-h-full`. This anchors the row to the
