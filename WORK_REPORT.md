@@ -698,3 +698,13 @@
 - 验证结果：组件渲染测试覆盖推文内容、目标控件隐藏及暂停反馈；Web 39/39 个测试套件共 186/186 项、14 项配置契约、TypeScript、ESLint、本地浏览器交互验证和双轴代码审查均通过，审查无剩余发现。
 - 推送状态：功能提交已在本地 `main` 创建，尚未推送；其余本地 K 线开发内容未混入提交。
 - Workflow 状态：提交包含 `[skip ci]` 且未推送，因此未触发 GitHub Actions 或部署。
+
+## 2026-09-02：精简底部 Twitter 追踪面板顶部控件（推送后）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 提交：功能提交 `8f440bd` — `fix(media-track): simplify bottom Twitter panel controls [skip ci]`；提交后工作记录 `ab47204` — `docs: record bottom Twitter panel cleanup [skip ci]`。
+- 完成事项：底部 Twitter 追踪抽屉已隐藏钱包胶囊和 Preset 切换，同时保留固定高度顶部区域、悬停暂停状态及暂停图标反馈；独立追踪页面与常驻底部工具栏保持原状。
+- 影响范围：仅底部可拖拽 Twitter 面板及其回归测试和工作记录，不涉及 React SDK、行情数据、钱包逻辑或部署配置。
+- 验证结果：Web 39/39 个测试套件共 186/186 项、14 项配置契约、TypeScript、ESLint、本地浏览器验证和双轴代码审查全部通过；悬停前后首条推文位置保持一致。
+- 推送状态：功能与工作记录提交均已 fast-forward 推送至 `origin/main`，远端主分支指向 `ab472048fbbd1d005c6060417d4b063464548441`，未使用 force push；本地其余 K 线开发内容未进入提交。
+- Workflow 状态：两个已推送提交均包含 `[skip ci]`，按 commit 查询 GitHub Actions run 均为空，未触发 Vercel 部署或其他 workflow；本条纯报告提交同样使用 `[skip ci]`。
