@@ -109,7 +109,7 @@ export function PortfolioAllocationChart({
 
   return (
     <ChartShell className={className}>
-      <div className="flex h-full w-full items-center gap-4 lg:gap-6">
+      <div className="flex h-full w-full flex-col items-center justify-center gap-2 sm:flex-row sm:gap-6">
         {/* Pie */}
         <div className="relative h-[200px] w-[200px] shrink-0">
           <ResponsiveContainer>
@@ -136,14 +136,14 @@ export function PortfolioAllocationChart({
         </div>
 
         {/* Legend */}
-        <ul className="flex flex-1 min-w-0 flex-col gap-1.5">
+        <ul className="flex w-full max-w-[260px] min-w-0 flex-none flex-col gap-1.5">
           {slices.map((slice, index) => (
             <li key={slice.key}>
               <button
                 type="button"
                 onClick={() => setActiveIndex(index)}
                 className={cn(
-                  "w-full flex items-center justify-between gap-2 px-2 py-1.5 rounded-md text-left transition-colors cursor-pointer",
+                  "grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-4 rounded-md px-2 py-1.5 text-left transition-colors cursor-pointer",
                   index === activeIndex ? "bg-default-100" : "hover:bg-default-50",
                 )}
               >
@@ -200,14 +200,17 @@ function EmptyState({ message }: { message: string }) {
 /** Renders when the chart is loading and there is no cached data yet. */
 export function PortfolioAllocationChartLoadingBody() {
   return (
-    <div className="flex h-full w-full items-center gap-4 lg:gap-6 animate-pulse">
+    <div className="flex h-full w-full flex-col items-center justify-center gap-2 sm:flex-row sm:gap-6 animate-pulse">
       <div className="relative h-[200px] w-[200px] shrink-0 rounded-full border-[16px] border-default-100" />
-      <ul className="flex flex-1 min-w-0 flex-col gap-2">
+      <ul className="flex w-full max-w-[260px] min-w-0 flex-none flex-col gap-2">
         {[...Array(5)].map((_, i) => (
-          <li key={i} className="flex items-center gap-2 rounded-md px-2 py-1.5">
+          <li
+            key={i}
+            className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-md px-2 py-1.5"
+          >
             <span className="h-2 w-2 rounded-full bg-default-200" />
             <span className="h-3 w-20 rounded bg-default-200" />
-            <span className="h-3 w-12 rounded bg-default-100 ml-auto" />
+            <span className="h-3 w-12 rounded bg-default-100" />
           </li>
         ))}
       </ul>
