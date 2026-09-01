@@ -478,6 +478,17 @@
 - 推送状态：React SDK 与模板在修改前均与各自 `origin/main` 无分叉；计划以 fast-forward 方式推送，禁止 force push。
 - Workflow 状态：按用户要求，本轮 React SDK 功能提交与模板报告提交均使用 `[skip ci]`，不触发 npm Release、Vercel 部署或其他 GitHub workflow。
 
+## 2026-09-01：修复搜索历史单字符条目尺寸与对齐（提交后）
+
+- 仓库与分支：`react-sdk/main`；工作事项统一记录在 `dex-nextjs-template/main` 的 `WORK_REPORT.md`。
+- 提交：`dee5eaa6f` — `fix(search): align single-character history chips [skip ci]`。
+- 问题背景：搜索历史中的单字符英文或数字触发 HeroUI Chip 的紧凑尺寸分支，使数字 `1` 等条目比普通关键词低 4px、垂直中心偏移 2px，造成同一行内容明显不对齐。
+- 完成事项：Token 搜索与预测搜索均通过稳定内容节点绕开不适用于搜索词的单字符紧凑样式，统一所有历史词条为 24px；新增两项使用真实 HeroUI Chip 的回归测试，锁定单字符与多字符尺寸一致性。
+- 影响范围：仅调整 `@liberfi.io/ui-tokens` 与 `@liberfi.io/ui-predict` 搜索历史的视觉对齐和对应测试，不改变搜索历史存储、搜索接口、点击行为或对外组件 API。
+- 验证结果：本地 SDK source alias 页面实测四个历史词条高度差和中心偏差均为 0；`ui-tokens` 12/12 个测试套件共 64/64 项、`ui-predict` 11/11 个测试套件共 37/37 项、两包 TypeScript 与 ESLint、消费者 TypeScript、`git diff --check` 以及推送前 SDK 全量 build 24/24 个任务全部通过。
+- 推送状态：提交已 fast-forward 推送至 `react-sdk/origin/main`，本地与远端无分叉，未使用 force push。
+- Workflow 状态：提交包含 `[skip ci]`；指定 commit 查询无任何 GitHub Actions run，本轮未发布 npm、未触发 Vercel 部署。最终 `WORK_REPORT.md` 提交同样使用 `[skip ci]`。
+
 ## 2026-09-01：修复搜索 Modal 的 ESC 键位提示国际化（提交后）
 
 - 仓库与分支：`react-sdk/main`；工作事项统一记录在 `dex-nextjs-template/main` 的 `WORK_REPORT.md`。
@@ -488,3 +499,14 @@
 - 验证结果：`ui-tokens` 11/11 个测试套件共 63/63 项、`ui-predict` 10/10 个测试套件共 36/36 项、两包 TypeScript 与 ESLint、消费者 TypeScript、`git diff --check` 及推送前 SDK 全量 build 24/24 个任务全部通过；中文本地页面确认 `ESC` 单行显示且 Escape 关闭功能正常。
 - 推送状态：提交已 fast-forward 推送到 `react-sdk/origin/main`，本地与远端无分叉，未使用 force push。
 - Workflow 状态：提交包含 `[skip ci]`；指定 commit 查询无任何 GitHub Actions run，Release workflow 最新记录仍为此前的 `33468749966`，本轮未发布 npm、未触发部署。最终 `WORK_REPORT.md` 提交同样使用 `[skip ci]`。
+
+## 2026-09-01：修复搜索历史单字符条目尺寸与对齐（提交前）
+
+- 仓库与分支：`react-sdk/main`；工作事项统一记录在 `dex-nextjs-template/main` 的 `WORK_REPORT.md`。
+- 拟用提交标题：`fix(search): align single-character history chips [skip ci]`。
+- 问题背景：搜索历史中的单字符英文或数字会触发 HeroUI Chip 的单字符紧凑样式，实际高度由普通关键词的 24px 缩小为 20px，导致同一行历史词条的高度和垂直中心不一致。
+- 完成事项：Token 搜索与预测搜索的历史词条均改为使用稳定的内容节点，避免单字符被错误识别为紧凑头像式 Chip；为两个同构入口新增真实 HeroUI Chip 回归测试，确保单字符与多字符历史词条统一使用 24px 高度。
+- 影响范围：仅影响 `@liberfi.io/ui-tokens` 与 `@liberfi.io/ui-predict` 的搜索历史词条展示和对应测试；不修改历史数据、搜索请求、点击选择、清空逻辑或公开组件接口。
+- 验证结果：本地 SDK source alias 页面实测 `trump`、`tr`、`1`、`fff` 均为 24px，最大高度差由 4px 降为 0、垂直中心偏差由 2px 降为 0；`ui-tokens` 12/12 个测试套件共 64/64 项、`ui-predict` 11/11 个测试套件共 37/37 项、两包 TypeScript 与 ESLint、消费者 TypeScript 和 `git diff --check` 均通过。
+- 推送状态：React SDK 与模板在修改前均与各自 `origin/main` 无分叉；计划以 fast-forward 方式推送，禁止 force push。
+- Workflow 状态：按用户要求，本轮 React SDK 功能提交与模板报告提交均使用 `[skip ci]`，不触发 npm Release、Vercel 部署或其他 GitHub workflow。
