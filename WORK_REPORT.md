@@ -444,3 +444,14 @@
 - 验证结果：React SDK i18n 类型检查及 12/12 个套件共 61/61 项测试通过；模板 TypeScript、ESLint、34/34 个 Jest 套件共 175/175 项、13 项构建配置契约、主题扫描与两仓库 `git diff --check` 通过。现有 3000 端口开发服务确认本地 SDK alias 生效，浏览器逐页验证六个入口、六项二级菜单、激活态与 `/predict` 重定向正常，未发现失效主题类名。
 - 审查结果：提交前按规范与需求两轴复审，修正旧 Matches 路由边界及一处无关 QueryClient 配置覆盖后，两轴均无剩余发现。
 - 版本与发布状态：`@chainstream-io/sdk` manifest 继续保持 `^2.1.14`，lockfile 仅解析 `2.1.14`；本轮仅本地提交，未推送远端、未发布 npm、未触发 GitHub workflow 或 Vercel 部署。本地联调继续通过同级 `react-sdk` source alias 运行。
+
+## 2026-09-01：发布新版预测模块并部署模板（提交前）
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`。
+- 拟用模板提交标题：`chore(deps): upgrade liberfi sdk packages`。
+- 发布范围：将预测六模块的集中式国际化随 React SDK 发布，并将模板实际使用的 24 个 `@liberfi.io/*` 依赖统一升级到本次正式 Release 版本；关键包包括 `@liberfi.io/i18n@0.1.276`、`@liberfi.io/react-predict@0.3.77` 与 `@liberfi.io/ui-predict@4.0.77`。
+- 发布前修正：React SDK pre-push 全量构建发现非英文 locale 缺少英语基准词条，已补齐 13 份语言目录的 key 覆盖并新增 locale 完整性回归测试，避免缺词条再次阻断 CSV 导出与发布。
+- React SDK 状态：功能提交 `7c2aa5c55` 与国际化覆盖修复提交 `c5050ac72` 已推送；GitHub Actions Release run `33468749966` 成功，workflow 生成的 release commit `20f7414e1` 已同步，本地与远端一致；全部目标版本已通过官方 npm registry 指定版本查询。
+- ChainStream 约束：按用户明确要求，`@chainstream-io/sdk` 保持 `^2.1.14`，本轮不升级该依赖。
+- 验证计划：刷新 `pnpm-lock.yaml`，扫描全部 workspace manifest 的 dependencies、devDependencies、peerDependencies 与锁文件残留；执行类型检查、全量测试、ESLint、配置契约、`git diff --check` 与使用正式 npm 依赖的 production build。
+- 部署计划：验证通过后 fast-forward 推送到 `dex-nextjs-template/origin/main`，触发 Vercel production Deploy workflow；部署成功后以 `[skip ci]` 报告提交记录最终 commit、run、job、生产地址与验证结果，避免纯文档更新重复部署。
