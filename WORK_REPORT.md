@@ -1002,3 +1002,13 @@
 - 验证结果：`@liberfi.io/ui-trade` 6/6 个 Jest 套件共 26/26 项通过，SDK 类型检查、lint 与 Prettier 通过；模板定向测试 1/1、Web 类型检查、lint、Prettier、whitespace 与调试残留检查通过；本地页面已验证预设同步及未失焦输入在背景关闭后仍保留。
 - 推送状态：两笔功能提交已创建于本地 `main`；待提交本条工作记录并确认远端无新增提交后，分别以普通 fast-forward 推送至 `origin/main`，禁止 force push。
 - Workflow 状态：两笔功能提交与本条工作记录均包含 `[skip ci]`，预期跳过 GitHub Actions、Vercel 部署、npm 发布及其他 push workflow。
+
+## 2026-09-02：快捷交易预设同步与输入保留修复（推送完成）
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`，均通过普通 fast-forward 与各自 `origin/main` 同步。
+- 提交：React SDK `4f8b26473` — `fix(ui-trade): preserve and sync preset selection [skip ci]`；模板功能 `68c9b47` — `fix(toolbar): sync quick trade preset [skip ci]`；提交后记录 `c10e8a6` — `docs: record quick trade preset fix [skip ci]`；本条最终记录使用 `docs: record quick trade preset push [skip ci]`。
+- 完成事项：Modal 切换当前页面链的预设后，底部 Preset 立即同步；编辑其他链不会改变底部当前链状态；点击背景关闭前会先提交尚未失焦的输入；SDK 通过公开 hook 提供预设写入能力，避免模板依赖内部 atom。
+- 影响范围：快捷交易预设 Modal、底部 Preset 按钮、即时交易金额状态 hook 及公开类型；React SDK 中未提交的 i18n、portfolio 并行修改仍原样保留。
+- 验证结果：SDK 6/6 个测试套件共 26/26 项、模板定向测试 1/1、两边类型检查、lint、格式与 whitespace 均通过；React SDK push hook 额外完成全仓 24/24 个构建任务。
+- 推送状态：React SDK 远端 `main` 已指向 `4f8b264737b31c04c839fa3b31b9c11f8d47b726`；模板远端 `main` 已指向 `c10e8a6e0eda738d3e9606e58f2cd58cc940499a`；均未使用 force push，本条最终记录将继续普通 fast-forward 推送。
+- Workflow 状态：按 React SDK 功能提交、模板功能提交和工作记录提交逐一查询 GitHub Actions，结果均为空；`[skip ci]` 已生效，未触发 GitHub Actions、Vercel 部署或 npm 发布。本条最终记录同样包含 `[skip ci]`。
