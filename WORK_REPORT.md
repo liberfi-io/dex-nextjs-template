@@ -936,3 +936,14 @@
 - 验证结果：钱包链状态定向测试 6/6、TypeScript、相关 ESLint 与 whitespace 检查通过；此前 Web 全量 43/43 个套件共 198/198 项通过。
 - 推送状态：功能提交已创建于本地 `main`；本条记录提交后将全部本地提交 fast-forward 推送至 `origin/main`，禁止 force push。
 - Workflow 状态：功能提交及本条纯工作记录提交均包含 `[skip ci]`，预期不触发 GitHub Actions、Vercel 部署或其他 workflow。
+
+## 2026-09-02：资产页跨链骨架与余额回退修复（推送完成）
+
+- 仓库与分支：`dex-nextjs-template/main`，本地与远端通过普通 fast-forward 同步。
+- 提交：`7929b9d` — `fix(portfolio): unify loading and balance fallbacks [skip ci]`；`fcc02ae` — `docs: record portfolio loading fix [skip ci]`；`abac29f` — `fix(wallet): hide stale chain balance [skip ci]`；`47dc2d9` — `docs: record stale balance guard [skip ci]`；本条最终记录使用 `docs: record portfolio loading push [skip ci]`。
+- 问题背景：资产页跨链 loading 结构与圆环可见性不一致，持仓请求失败或切链时还存在缓存原生币余额误显示风险。
+- 完成事项：所有链统一使用 SOL 风格整页骨架，分布区同时显示高对比度圆环与紧凑图例，认证与底部表格复用正式结构；原生币余额在错误、链不匹配或地址不匹配时隐藏，并正确区分零余额与不可用状态。
+- 影响范围：资产页 loading、代币分布与资产表骨架、顶部/底部钱包余额及提现余额展示；不涉及 React SDK 发布、交易提交、K 线或生产部署。
+- 验证结果：Web 43/43 个 Jest 测试套件共 198/198 项、14 项配置契约、TypeScript、相关 ESLint 与 whitespace 通过；钱包链状态定向测试无缓存运行 6/6 通过；Chrome 登录态 BSC 骨架显示圆环与列表，未出现可见 hydration 错误。
+- 推送状态：四笔提交已从 `55234e4` fast-forward 推送至 `origin/main`，远端指向 `47dc2d9e0002fe0d0ababc67de42d60c6f635edd`，未使用 force push；本条最终记录将继续以 fast-forward 推送。
+- Workflow 状态：四笔已推送提交均包含 `[skip ci]`，逐 commit 查询 GitHub Actions run 均为空；本条最终记录同样包含 `[skip ci]`，不触发 GitHub Actions、Vercel 部署或其他 workflow。
