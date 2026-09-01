@@ -643,3 +643,16 @@
 - 验证结果：官方 npm registry 已确认 24 个目标版本全部可下载；正式依赖安装完成，模板 37/37 个 Jest 套件共 181/181 项、14 项配置契约、TypeScript、ESLint 和 `git diff --check` 全部通过。
 - 推送状态：计划 fast-forward 推送到 `origin/main` 并等待目标部署完成，禁止 force push。
 - Workflow 状态：本提交不带 `[skip ci]`，将正常触发 `Deploy to Vercel` production workflow。
+
+## 2026-09-01：统一全站时间国际化并发布生产环境（提交后）
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`。
+- React SDK 提交与发布：功能提交 `e54b6f2d4` — `fix(i18n): localize relative and duration times` 已 fast-forward 推送；Release run `33525680094`、job `99915781789` 成功，用时 5 分 43 秒；release commit `06cdc2cad` 已同步，本地与远端无分叉。
+- npm 发布结果：24 个公共包均完成 patch 发布并通过官方 npm registry 端点验证；核心版本为 `@liberfi.io/i18n@0.1.278`、`@liberfi.io/react@0.3.95`、`@liberfi.io/ui-perpetuals@1.1.78`、`@liberfi.io/ui-portfolio@3.0.80`、`@liberfi.io/ui-predict@4.0.79`、`@liberfi.io/ui-tokens@3.0.81` 和 `@liberfi.io/ui-tradingview@0.1.234`。
+- 模板提交：功能提交 `0053bdf` — `fix(i18n): consume localized time formatting [skip ci]`；依赖提交 `6161ef2` — `chore(deps): bump react sdk packages`。24 个 `@liberfi.io/*` 直接依赖及锁文件已统一更新，`@chainstream-io/sdk` 保持 `2.1.14`。
+- 完成事项：全站相对时间、周期、倒计时和统计窗口统一按当前语言渲染；中文环境的 `just now`、`1s`、`1m`、`1h` 等遗留已替换为“刚刚/剛剛”、秒、分钟/分鐘、小时/小時等对应文本，繁体兼容语言标识不会再被 `Intl` 误判为简体。
+- 验证结果：React SDK 相关测试、类型检查、ESLint及全量 build 24/24 个任务通过；模板 37/37 个 Jest 套件共 181/181 项、14 项配置契约、TypeScript、ESLint 与格式检查通过。本地源码联调页面确认 `1秒 / 1分鐘 / 1小時 / 1天 / 24小時 交易量` 正确显示。
+- 部署结果：Vercel production run `33527012766`、job `99920322114` 成功，用时 6 分 32 秒；Build、Deploy 与成功通知步骤全部通过，生产地址为 `https://liberfi-bwemz4ma4-sgt-lab.vercel.app`。
+- 线上检查：生产地址返回 Vercel SSO 的 HTTP 302 跳转，确认部署入口已生效但受项目访问保护，未在未授权会话中继续页面级检查。
+- 推送状态：两个仓库的本轮功能、release 与依赖提交均已 fast-forward 推送，未使用 force push；本地 K 线工具栏、行情切换和数据源开发改动继续保留，未混入本轮提交或发布。
+- Workflow 说明：React SDK Release 与模板 Vercel Deploy 均成功；两个 workflow 仅有 GitHub Actions Node.js 20 runtime 弃用提示，不影响发布与部署。最终纯文档提交使用 `[skip ci]`，避免再次触发部署。
