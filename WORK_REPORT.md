@@ -466,3 +466,25 @@
 - 部署结果：GitHub Actions Deploy to Vercel run `33469556631`、job `99736350005` 成功，用时 6 分 22 秒；Build、Deploy 与成功通知步骤全部通过，生产地址为 `https://liberfi-bvgupfl2l-sgt-lab.vercel.app`。
 - 线上检查：生产地址可达并返回 Vercel SSO 的 `302` 跳转，说明部署入口已生效但受项目访问保护，未在未授权会话中继续页面级验证。
 - Workflow 说明：Release 与 Deploy 仅有 GitHub Actions Node.js 20 action runtime 弃用提示，不影响发布和部署；本条最终记录提交使用 `[skip ci]`，避免纯文档更新再次触发 workflow。
+
+## 2026-09-01：修复搜索 Modal 的 ESC 键位提示国际化（提交前）
+
+- 仓库与分支：`react-sdk/main`；工作事项统一记录在 `dex-nextjs-template/main` 的 `WORK_REPORT.md`。
+- 拟用提交标题：`fix(search): keep escape key label unlocalized [skip ci]`。
+- 问题背景：搜索 Modal 无关键词时，输入框右侧展示的是用于提示关闭快捷键的物理键名，但组件错误复用了 `common.escape` 国际化文案；中文界面显示“退出”并在紧凑键帽内换行，造成控件形变且偏离快捷键提示语义。
+- 完成事项：将 Token 搜索与预测搜索两个同构入口的键位提示统一固定为大写 `ESC`，不再经过国际化；保留鼠标点击和键盘 Escape 关闭 Modal 的现有行为，并为两个入口新增固定键名回归测试。
+- 影响范围：仅影响 `@liberfi.io/ui-tokens` 与 `@liberfi.io/ui-predict` 搜索输入框的空关键词尾部键位提示；不修改搜索请求、搜索历史、结果选择、国际化资源或公开组件接口。
+- 验证结果：两组定向测试已完成红灯复现并由红转绿；`ui-tokens` 11/11 个测试套件共 63/63 项、`ui-predict` 10/10 个测试套件共 36/36 项、两包 TypeScript 与 ESLint、消费者 TypeScript 和 `git diff --check` 均通过。中文本地页面实测 `ESC` 单行显示为 `23.39 × 16px`，按 Escape 后 Modal 正常关闭。
+- 推送状态：React SDK 与模板在修改前均与各自 `origin/main` 无分叉；计划以 fast-forward 方式推送，禁止 force push。
+- Workflow 状态：按用户要求，本轮 React SDK 功能提交与模板报告提交均使用 `[skip ci]`，不触发 npm Release、Vercel 部署或其他 GitHub workflow。
+
+## 2026-09-01：修复搜索 Modal 的 ESC 键位提示国际化（提交后）
+
+- 仓库与分支：`react-sdk/main`；工作事项统一记录在 `dex-nextjs-template/main` 的 `WORK_REPORT.md`。
+- 提交：`4d633e250` — `fix(search): keep escape key label unlocalized [skip ci]`。
+- 问题背景：Token 搜索 Modal 的快捷键提示被中文国际化为“退出”，在有限键帽空间内换行并产生视觉形变，同时误把物理按键名称表达成了操作文案；同构的预测搜索入口存在相同隐患。
+- 完成事项：Token 搜索与预测搜索均固定显示大写 `ESC`，不再调用 `common.escape` 翻译；鼠标点击键帽和键盘 Escape 关闭行为保持不变，并新增两项组件回归测试锁定键位标签契约。
+- 影响范围：仅调整 `@liberfi.io/ui-tokens` 与 `@liberfi.io/ui-predict` 搜索输入框的空关键词尾部提示和对应测试，不修改国际化资源、搜索数据流、历史记录、结果选择或公开接口。
+- 验证结果：`ui-tokens` 11/11 个测试套件共 63/63 项、`ui-predict` 10/10 个测试套件共 36/36 项、两包 TypeScript 与 ESLint、消费者 TypeScript、`git diff --check` 及推送前 SDK 全量 build 24/24 个任务全部通过；中文本地页面确认 `ESC` 单行显示且 Escape 关闭功能正常。
+- 推送状态：提交已 fast-forward 推送到 `react-sdk/origin/main`，本地与远端无分叉，未使用 force push。
+- Workflow 状态：提交包含 `[skip ci]`；指定 commit 查询无任何 GitHub Actions run，Release workflow 最新记录仍为此前的 `33468749966`，本轮未发布 npm、未触发部署。最终 `WORK_REPORT.md` 提交同样使用 `[skip ci]`。
