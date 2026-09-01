@@ -1034,3 +1034,14 @@
 - 验证结果：i18n 13/13 个套件共 77/77 项、ui-portfolio 6/6 个套件共 21/21 项测试通过；两包类型检查、lint、Prettier、whitespace 通过；React SDK 全仓 build 24/24 成功。
 - 推送状态：功能提交已创建于本地 `react-sdk/main`，工作区干净且领先 `origin/main` 1 个提交；下一步普通 fast-forward 推送并等待 Release workflow，禁止 force push。
 - Workflow 状态：功能提交未使用 `[skip ci]`，推送后应触发 `Release` 并发布 npm；模板尚未更新依赖或部署。
+
+## 2026-09-02：发布多链余额状态修复并升级模板 SDK 依赖（提交后）
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`。
+- 提交：React SDK 功能提交 `6a7dfd037` — `fix(portfolio): isolate balances across chain switches`，Release workflow 生成版本提交 `fdae9612f` — `chore: release packages`；模板依赖提交 `9094821` — `chore(deps): bump react sdk for wallet fixes`；本条记录使用 `docs: record wallet sdk release and bump [skip ci]` 独立提交。
+- 问题背景：多链余额隔离和通用主代币价格提示仅在本地 SDK 源码联调中生效，生产模板仍引用上一批 npm 包，切链时可能继续显示旧链余额或缺少最新国际化文案。
+- 完成事项：React SDK Release workflow 已将本轮固定版本组发布到 npm 官方源，其中 `@liberfi.io/react@0.3.98`、`@liberfi.io/i18n@0.1.281`、`@liberfi.io/ui-portfolio@3.0.83` 等版本均已确认可安装；模板所有直接使用的 `@liberfi.io/*` dependencies 已统一升级到同轮版本并刷新 lockfile，`@chainstream-io/sdk` 按要求保持 `^2.1.14` 不变。
+- 影响范围：Header 与 Portfolio 的跨链余额状态、底部主代币价格提示、模板 npm 依赖解析及后续 Vercel 生产部署；不修改 Chainstream 余额接口、`/api/balance`、交易协议或钱包地址规则。
+- 验证结果：React SDK 发布前 i18n 13/13 个套件共 77/77 项、ui-portfolio 6/6 个套件共 21/21 项及全仓 24/24 个构建任务通过；模板升级后 Web 45/45 个 Jest 套件共 204/204 项、14 项构建配置契约、TypeScript、ESLint 与 whitespace 全部通过；隔离临时目录使用 npm 包完成 production build，23/23 个静态页面生成成功，只有既有 postcss-calc 与 Sentry/OpenTelemetry webpack warning。
+- 推送状态：React SDK 功能提交与 release commit 已在 `origin/main`；模板依赖提交已创建于本地 `main`，待本条工作记录提交后普通 fast-forward 推送，禁止 force push。
+- Workflow 状态：React SDK `Release` run `33564254356` 成功，npm 发布完成；模板依赖提交未使用 `[skip ci]`，推送后将触发 Vercel 部署；本条纯工作记录使用 `[skip ci]`，避免重复部署。
