@@ -903,3 +903,14 @@
 - 验证结果：Web 全量 43/43 个 Jest 测试套件共 198/198 项、14 项构建配置契约、TypeScript、全部相关 ESLint 与 `git diff --check` 通过；复用现有 dev server 在 Chrome 登录态验证 BSC 分布骨架同时显示圆环与图例，SOL 内容可正常退场，未出现可见 hydration 错误。
 - 推送状态：计划将当前全部修改精确提交至本地 `main`，随后在确认远端无新增提交后 fast-forward 推送至 `origin/main`，禁止 force push。
 - Workflow 状态：功能提交与后续纯工作记录提交均使用 `[skip ci]`，跳过 GitHub Actions、Vercel 部署及其他由 push 触发的 workflow。
+
+## 2026-09-02：统一跨链骨架与原生币余额异常回退（提交后）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 提交：`7929b9d` — `fix(portfolio): unify loading and balance fallbacks [skip ci]`；本条记录拟使用 `docs: record portfolio loading fix [skip ci]` 独立提交。
+- 问题背景：不同链的数据缓存与响应时序使资产页呈现不一致的分区骨架，暗色主题下分布圆环几乎不可见；持仓接口报错或切链时还可能短暂暴露缓存原生币余额，并将合法零余额误判为不可用。
+- 完成事项：资产页认证等待和首次主数据加载统一为整页 SOL 风格骨架，代币分布固定显示清晰圆环与紧凑图例，底部资产表复用正式列定义，接口失败后可退出骨架；顶部、底部与提现弹窗统一余额格式化和错误回退，查询失败或旧链数据不再展示，零余额正确显示为 `0`；相关 loading、错误、切链和余额测试已补齐。
+- 影响范围：资产页 loading、代币分布和资产表骨架、钱包原生币余额及提现余额展示；不涉及 React SDK、转账提交、K 线、npm 发布或生产部署。
+- 验证结果：Web 43/43 个 Jest 测试套件共 198/198 项、14 项配置契约、TypeScript、相关 ESLint 与 `git diff --check` 全部通过；Chrome 登录态 BSC 页面验证圆环与图例同时可见，SOL 页面可正常退场，未出现可见 hydration 错误。
+- 推送状态：功能提交已创建于本地 `main`；待提交本条纯工作记录后，将两笔提交 fast-forward 推送至 `origin/main`，禁止 force push。
+- Workflow 状态：功能提交及本条工作记录提交均包含 `[skip ci]`，预期跳过 GitHub Actions、Vercel 部署和其他 push workflow。
