@@ -4,8 +4,12 @@ import { useMemo, useState, type Key, type ReactNode } from "react";
 import type { Chain } from "@liberfi.io/types";
 import { cn } from "@liberfi.io/ui";
 import { useTranslation } from "@liberfi.io/i18n";
-import { PortfolioAssetsTable } from "./bottom-tables/PortfolioAssetsTable";
+import {
+  PortfolioAssetsTable,
+  PORTFOLIO_ASSET_COLUMNS,
+} from "./bottom-tables/PortfolioAssetsTable";
 import { PortfolioActivitiesTable } from "./bottom-tables/PortfolioActivitiesTable";
+import { PortfolioAssetsTableSkeleton } from "./skeletons/PortfolioAssetsTableSkeleton";
 
 type PortfolioBottomTab = "assets" | "activities";
 
@@ -31,16 +35,8 @@ export interface PortfolioBottomPanelProps {
  *      tab a more deliberate visual weight.
  */
 export function PortfolioBottomPanel({ chain, address }: PortfolioBottomPanelProps) {
-  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<PortfolioBottomTab>("assets");
-
-  const tabItems = useMemo<ReadonlyArray<PortfolioTabItem<PortfolioBottomTab>>>(
-    () => [
-      { key: "assets", label: t("portfolio.tabs.assets") },
-      { key: "activities", label: t("portfolio.tabs.activities") },
-    ],
-    [t],
-  );
+  const tabItems = usePortfolioTabItems();
 
   return (
     <div className="flex h-full w-full flex-col overflow-hidden rounded-2xl border border-default-100 bg-content1">
@@ -61,6 +57,38 @@ export function PortfolioBottomPanel({ chain, address }: PortfolioBottomPanelPro
         {activeTab === "activities" && <PortfolioActivitiesTable chain={chain} address={address} />}
       </div>
     </div>
+  );
+}
+
+/** Loading panel shared by the authentication gate and the assets table's first fetch. */
+export function PortfolioBottomPanelSkeleton() {
+  const tabItems = usePortfolioTabItems();
+
+  return (
+    <div
+      data-testid="portfolio-bottom-panel-skeleton"
+      className="flex h-full w-full flex-col overflow-hidden rounded-2xl border border-default-100 bg-content1"
+    >
+      <PortfolioTabBar<PortfolioBottomTab>
+        items={tabItems}
+        value="assets"
+        onChange={() => undefined}
+      />
+      <div className="min-h-0 flex-1 overflow-hidden px-2 pb-2 lg:px-3">
+        <PortfolioAssetsTableSkeleton columns={PORTFOLIO_ASSET_COLUMNS} />
+      </div>
+    </div>
+  );
+}
+
+function usePortfolioTabItems(): ReadonlyArray<PortfolioTabItem<PortfolioBottomTab>> {
+  const { t } = useTranslation();
+  return useMemo(
+    () => [
+      { key: "assets", label: t("portfolio.tabs.assets") },
+      { key: "activities", label: t("portfolio.tabs.activities") },
+    ],
+    [t],
   );
 }
 

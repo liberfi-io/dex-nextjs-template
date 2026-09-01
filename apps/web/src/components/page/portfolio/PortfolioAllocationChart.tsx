@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import { Skeleton } from "@heroui/react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Sector } from "recharts";
 import type { PieSectorDataItem } from "recharts/types/polar/Pie";
 import { useWalletPortfoliosQuery } from "@liberfi.io/react";
@@ -201,7 +202,18 @@ function EmptyState({ message }: { message: string }) {
 export function PortfolioAllocationChartLoadingBody() {
   return (
     <div className="flex h-full w-full flex-col items-center justify-center gap-2 sm:flex-row sm:gap-6 animate-pulse">
-      <div className="relative h-[200px] w-[200px] shrink-0 rounded-full border-[16px] border-default-100" />
+      <div
+        data-testid="portfolio-allocation-donut-skeleton"
+        className="relative h-[200px] w-[200px] shrink-0 rounded-full"
+      >
+        <Skeleton className="absolute inset-0 rounded-full">
+          <div className="h-[200px] w-[200px]" />
+        </Skeleton>
+        <div
+          data-testid="portfolio-allocation-donut-hole"
+          className="absolute inset-[32px] rounded-full bg-content1"
+        />
+      </div>
       <ul className="flex w-full max-w-[260px] min-w-0 flex-none flex-col gap-2">
         {[...Array(5)].map((_, i) => (
           <li
@@ -215,6 +227,15 @@ export function PortfolioAllocationChartLoadingBody() {
         ))}
       </ul>
     </div>
+  );
+}
+
+/** Standalone loading card shared by authentication and portfolio data loading. */
+export function PortfolioAllocationChartSkeleton() {
+  return (
+    <ChartShell>
+      <PortfolioAllocationChartLoadingBody />
+    </ChartShell>
   );
 }
 

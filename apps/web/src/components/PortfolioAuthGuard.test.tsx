@@ -63,6 +63,9 @@ describe("PortfolioAuthGuard", () => {
     expect(screen.queryByTestId("portfolio-header-skeleton")).not.toBeNull();
     expect(screen.queryByTestId("portfolio-allocation-skeleton")).not.toBeNull();
     expect(screen.queryByTestId("portfolio-bottom-panel-skeleton")).not.toBeNull();
+    expect(screen.queryByTestId("portfolio-assets-table-skeleton")).not.toBeNull();
+    expect(screen.queryByText("portfolio.tabs.assets")).not.toBeNull();
+    expect(screen.queryByText("portfolio.tabs.activities")).not.toBeNull();
 
     const tableHeader = screen.getByTestId("portfolio-table-header-skeleton");
     expect(tableHeader.className.split(" ")).not.toContain("border-b");

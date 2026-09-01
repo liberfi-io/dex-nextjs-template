@@ -23,7 +23,7 @@ import {
 import { PortfolioAssetsTableSkeleton } from "../skeletons/PortfolioAssetsTableSkeleton";
 import { resolvePortfolioTokenSymbol } from "./portfolio-token-symbol";
 
-const COLUMNS: ReadonlyArray<BottomTableColumn> = [
+export const PORTFOLIO_ASSET_COLUMNS: ReadonlyArray<BottomTableColumn> = [
   {
     key: "token",
     labelKey: "portfolio.headers.token",
@@ -174,12 +174,12 @@ export function PortfolioAssetsTable({ chain, address }: PortfolioAssetsTablePro
   }
 
   if (isInitialLoading) {
-    return <PortfolioAssetsTableSkeleton columns={COLUMNS} />;
+    return <PortfolioAssetsTableSkeleton columns={PORTFOLIO_ASSET_COLUMNS} />;
   }
 
   return (
     <TableShell
-      columns={COLUMNS}
+      columns={PORTFOLIO_ASSET_COLUMNS}
       minWidth="min-w-[820px]"
       infiniteScroll={{
         hasMore,
@@ -200,7 +200,9 @@ export function PortfolioAssetsTable({ chain, address }: PortfolioAssetsTablePro
           />
         ))}
       </tbody>
-      {isEmpty ? <EmptyBody colSpan={COLUMNS.length} messageKey="portfolio.noAssets" /> : null}
+      {isEmpty ? (
+        <EmptyBody colSpan={PORTFOLIO_ASSET_COLUMNS.length} messageKey="portfolio.noAssets" />
+      ) : null}
     </TableShell>
   );
 }

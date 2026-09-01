@@ -3,6 +3,7 @@
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { useConnectedWallet } from "@liberfi.io/wallet-connector";
 import { useWalletSummary } from "@liberfi.io/ui-portfolio";
+import { useWalletPortfoliosQuery } from "@liberfi.io/react";
 import {
   useHideHeader,
   useSetBottomNavigationBarActiveKey,
@@ -11,7 +12,7 @@ import {
 import { PortfolioHeader } from "./PortfolioHeader";
 import { PortfolioAllocationChart } from "./PortfolioAllocationChart";
 import { PortfolioBottomPanel } from "./PortfolioBottomPanel";
-import { PortfolioHeaderSkeleton } from "./skeletons/PortfolioHeaderSkeleton";
+import { PortfolioPageSkeleton } from "./skeletons/PortfolioPageSkeleton";
 
 /**
  * `/portfolio` page — wallet identity card + token allocation breakdown +
@@ -41,13 +42,29 @@ export function PortfolioPage() {
   const wallet = useConnectedWallet(chain);
   const address = wallet?.address ?? "";
 
-  // First-paint header skeleton — only when the summary query has never
-  // resolved on this wallet. Subsequent 15s polls flip `isFetching` true
-  // but `data` stays defined, so the skeleton does not flash on every
-  // refetch. This is the same pattern other React Query consumers in this
-  // app use for "no-flash polling".
-  const { data: summaryData, isPending } = useWalletSummary();
-  const headerLoading = isPending && !summaryData;
+  // Keep the initial loading boundary at page level. The summary, chart,
+  // and table queries can resolve at different speeds on each chain; if
+  // every section owns its own first-load fallback, cached chains render a
+  // different patchwork of content and skeletons. Waiting for the two
+  // primary data sources makes the whole page transition as one unit while
+  // still preserving cached data during background polling.
+  const {
+    data: summaryData,
+    isPending: summaryPending,
+    isError: summaryError,
+  } = useWalletSummary();
+  const {
+    data: portfolioData,
+    isPending: portfolioPending,
+    isError: portfolioError,
+  } = useWalletPortfoliosQuery({ chain, address, limit: 100 }, { enabled: !!address });
+  const pageLoading =
+    (summaryPending && !summaryData && !summaryError) ||
+    (!!address && portfolioPending && !portfolioData && !portfolioError);
+
+  if (pageLoading) {
+    return <PortfolioPageSkeleton />;
+  }
 
   return (
     <div className="relative w-full h-full">
@@ -73,7 +90,7 @@ export function PortfolioPage() {
               row, anchoring the buttons to the card bottom when the
               chart pulls the row taller. */}
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
-          {headerLoading ? <PortfolioHeaderSkeleton /> : <PortfolioHeader />}
+          <PortfolioHeader />
           <PortfolioAllocationChart chain={chain} address={address} />
         </div>
 

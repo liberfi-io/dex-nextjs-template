@@ -9,8 +9,7 @@ import { AsyncModal, type RenderAsyncModalProps } from "@liberfi.io/ui-scaffold"
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { useAccountInfo } from "@liberfi.io/ui-portfolio";
 import { Chain } from "@liberfi.io/types";
-import { chainDisplayName, formatAmount, formatAmountInUsd } from "@liberfi.io/utils";
-import { useWalletPortfolios } from "../../application/useWalletPortfolios";
+import { chainDisplayName, formatAmountInUsd } from "@liberfi.io/utils";
 import { useConnectedWallet } from "@liberfi.io/wallet-connector";
 import { isValidWalletAddress } from "../../application/wallet";
 import {
@@ -28,6 +27,10 @@ import {
 import { useCreateTransferTransactionMutation } from "../../application/server/useCreateTransferTransactionMutation";
 import { useSendTransferTransactionMutation } from "../../application/server/useSendTransferTransactionMutation";
 import { usePrimaryTokenQuotePrice } from "../../application/usePrimaryTokenQuotePrice";
+import {
+  formatWalletPrimaryTokenBalance,
+  useWalletPrimaryTokenNetWorth,
+} from "../../application/useWalletPrimaryTokenNetWorth";
 
 export const WITHDRAW_MODAL_ID = "withdraw-wallet";
 
@@ -185,17 +188,10 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
   // Fixed to the chain's native token — no selection needed.
   const nativeToken = useMemo(() => getNativeToken(chain), [chain]);
 
-  // Portfolio data for balance of the native token.
-  const { data: portfolioData } = useWalletPortfolios();
-
-  const nativeBalanceAmount = portfolioData?.balanceInNative;
+  const nativeBalanceAmount = useWalletPrimaryTokenNetWorth()?.amount;
   const nativeQuotePrice = usePrimaryTokenQuotePrice();
 
-  const balanceDisplay = useMemo(() => {
-    const n = Number(nativeBalanceAmount);
-    if (!n) return "0";
-    return formatAmount(n);
-  }, [nativeBalanceAmount]);
+  const balanceDisplay = formatWalletPrimaryTokenBalance(nativeBalanceAmount);
 
   // -------------------------------------------------------------------------
   // Amount state — responsive inputValue + debounced committedAmount

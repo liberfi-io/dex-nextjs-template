@@ -3,7 +3,10 @@ import { Chain } from "@liberfi.io/types";
 import fs from "node:fs";
 import path from "node:path";
 import { useCurrentWalletAddress } from "./useCurrentWalletAddress";
-import { useWalletPrimaryTokenNetWorth } from "./useWalletPrimaryTokenNetWorth";
+import {
+  formatWalletPrimaryTokenBalance,
+  useWalletPrimaryTokenNetWorth,
+} from "./useWalletPrimaryTokenNetWorth";
 
 const WEB_SRC = path.resolve(__dirname, "..");
 
@@ -72,6 +75,50 @@ describe("useCurrentWalletAddress", () => {
 
     expect(result.current?.amount).toBe("0.0183");
   });
+
+  it("does not expose cached balance data after the Chainstream query fails", () => {
+    mockUseCurrentChain.mockReturnValue({ chain: Chain.ETHEREUM });
+    mockUseConnectedWallet.mockReturnValue({ address: "0xeth-wallet" });
+    mockUseWalletPortfoliosQuery.mockReturnValue({
+      data: {
+        chain: Chain.ETHEREUM,
+        address: "0xeth-wallet",
+        balanceInNative: "0",
+        balanceInUsd: "0",
+        portfolios: [],
+      },
+      isError: true,
+      error: new Error("Chainstream returned 500"),
+    });
+
+    const { result } = renderHook(() => useWalletPrimaryTokenNetWorth());
+
+    expect(result.current).toBeUndefined();
+  });
+
+  it("hides the previous chain balance as soon as the selected chain changes", () => {
+    mockUseCurrentChain.mockReturnValue({ chain: Chain.ETHEREUM });
+    mockUseConnectedWallet.mockReturnValue({ address: "0xeth-wallet" });
+    mockUseWalletPortfoliosQuery.mockReturnValue({
+      data: {
+        chain: Chain.SOLANA,
+        address: "sol-wallet",
+        balanceInNative: "1.25",
+        balanceInUsd: "125",
+        portfolios: [],
+      },
+      isError: false,
+    });
+
+    const { result } = renderHook(() => useWalletPrimaryTokenNetWorth());
+
+    expect(result.current).toBeUndefined();
+  });
+
+  it("formats a successful zero balance as zero and an unavailable balance as a placeholder", () => {
+    expect(formatWalletPrimaryTokenBalance("0")).toBe("0");
+    expect(formatWalletPrimaryTokenBalance(undefined)).toBe("--");
+  });
 });
 
 describe("WithdrawModal native balance", () => {
@@ -81,7 +128,7 @@ describe("WithdrawModal native balance", () => {
       "utf8",
     );
 
-    expect(source).toContain("portfolioData?.balanceInNative");
+    expect(source).toContain("formatWalletPrimaryTokenBalance(nativeBalanceAmount)");
     expect(source).not.toMatch(/portfolios[^;]+find\(/s);
   });
 });

@@ -4,8 +4,10 @@ import { useCallback, useMemo } from "react";
 import { Avatar, Button } from "@heroui/react";
 import { cn, SettingsIcon, WalletIcon } from "@liberfi.io/ui";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
-import { formatAmount } from "@liberfi.io/utils";
-import { useWalletPrimaryTokenNetWorth } from "./useWalletPrimaryTokenNetWorth";
+import {
+  formatWalletPrimaryTokenBalance,
+  useWalletPrimaryTokenNetWorth,
+} from "./useWalletPrimaryTokenNetWorth";
 import { getPrimaryTokenAvatar } from "./tokens";
 import { useOpenPresetForm } from "./useOpenPresetForm";
 
@@ -24,7 +26,7 @@ export function SwitchWallet({ enableSettings = false }: SwitchWalletProps) {
     <div className="flex items-center gap-2">
       <div className="h-8 px-3 bg-content2 flex items-center gap-2 text-sm rounded-full">
         <WalletIcon width={16} height={16} className="text-text-muted" />
-        {balance?.amount ? formatAmount(balance.amount) : "--"}
+        {formatWalletPrimaryTokenBalance(balance?.amount)}
         <Avatar className="w-4 h-4 bg-transparent" src={primaryTokenAvatar} />
       </div>
       <Button

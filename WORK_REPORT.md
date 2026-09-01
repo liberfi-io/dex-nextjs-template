@@ -870,3 +870,36 @@
 - 验证结果：Web 42/42 个 Jest 测试套件共 192/192 项、14 项构建配置契约、TypeScript、相关 ESLint 与 whitespace 全部通过；Chrome 登录态 Solana 资产页显示正确钱包、余额、USDC 分布图与持仓表，刷新及冷加载均无 hydration 错误。
 - 推送状态：三个提交已从 `3934f2e` fast-forward 推送至 `origin/main`，远端主分支指向 `6a1404d21e0972c142a8e8b381b01ce5f00219d2`，未使用 force push。
 - Workflow 状态：三个已推送提交均包含 `[skip ci]`；按各提交查询 GitHub Actions run 均为空，未触发 Vercel 部署、npm 发布或其他 GitHub workflow。本条纯工作记录提交同样使用 `[skip ci]`。
+
+## 2026-09-02：统一资产页跨链加载骨架（本地完成，未提交）
+
+- 仓库与分支：`dex-nextjs-template/main`，修改基于与 `origin/main` 一致的 `55234e4`。
+- 拟用提交标题：`fix(portfolio): unify cross-chain loading skeleton [skip ci]`。
+- 问题背景：资产页认证等待、钱包汇总、代币分布和资产表分别维护加载状态与重复骨架；不同链的缓存和接口响应速度不同，会拼出“部分内容已显示、部分区域仍为骨架”的不一致页面，旧的认证骨架还与正式分布图和资产表结构发生偏离。
+- 完成事项：将首次主数据加载边界提升到资产页级别，钱包汇总或当前链持仓主数据未就绪时整页统一显示同一套骨架；认证等待、分布图 loading 和底部资产表复用正式组件的卡片、图例与列定义，删除重复的分布图骨架实现；接口明确失败后允许退出页级骨架，避免异常链永久被 loading 遮罩；补充页级切换、认证等待、图表布局及错误退场回归测试。
+- 影响范围：资产页首次进入、切链和认证等待时的 loading 展示，以及分布图和资产表骨架组件；不改变钱包地址解析、持仓计算、代币分布算法、交易交互、React SDK 或后端接口。
+- 验证结果：Web 43/43 个 Jest 测试套件共 199/199 项、14 项构建配置契约、TypeScript、相关 ESLint 与 `git diff --check` 全部通过；复用现有 dev server 在 Chrome 登录态验证，切到未缓存链时页头、分布图和底部面板三部分骨架同时出现，切回 SOL 后整页正常退场并显示资产内容，页面未出现可见 hydration 错误。联调日志同时确认 SOL `net-worth` 返回 200，而当前 BSC/ETH `net-worth` 返回 500，该接口异常不属于本次前端骨架修改。
+- 推送状态：本事项仅保留为本地未提交修改，未暂存、未提交、未推送；工作区其他钱包和多链开发改动保持原状。
+- Workflow 状态：未推送，未触发 GitHub Actions、Vercel 部署、npm 发布或其他远端 workflow；后续如提交将使用 `[skip ci]`。
+
+## 2026-09-02：按 SOL 视觉基准恢复代币分布圆环骨架（本地修正，未提交）
+
+- 仓库与分支：`dex-nextjs-template/main`，修改基于与 `origin/main` 一致的 `55234e4`。
+- 拟用提交标题：`fix(portfolio): unify cross-chain loading skeleton [skip ci]`。
+- 问题背景：首次统一跨链骨架时复用了 `border-default-100` 绘制圆环，该颜色在暗色卡片上几乎不可见，导致 ETH/BSC 的代币分布 loading 视觉上只剩右侧图例列表，没有达到以 SOL 原骨架为基准的要求。
+- 完成事项：恢复 SOL 原有的实心 shimmer 圆盘加中心挖空方案，形成清晰可见的环形图骨架；保留右侧最大 `260px` 的紧凑图例与整体居中布局；新增圆环容器、中心孔和禁止退化为低对比度边框的回归断言。
+- 影响范围：仅资产页代币分布 loading 的圆环视觉和对应测试；页级 loading 边界、资产表骨架、持仓查询及业务数据不变。
+- 验证结果：代币分布、页级 loading 与认证骨架定向测试 11/11 通过，Web 全量 43/43 个测试套件共 198/198 项、14 项配置契约、TypeScript、相关 ESLint 与 `git diff --check` 全部通过；Chrome 登录态 BSC 页面实测同时显示清晰圆环与右侧列表，DOM 同时存在圆环、中心孔及图例结构。
+- 推送状态：修正保留为本地未提交修改，未暂存、未提交、未推送；未覆盖工作区其他并行开发内容。
+- Workflow 状态：未推送，未触发 GitHub Actions、Vercel 部署、npm 发布或其他远端 workflow；后续提交继续使用 `[skip ci]`。
+
+## 2026-09-02：统一跨链骨架与原生币余额异常回退（提交前）
+
+- 仓库与分支：`dex-nextjs-template/main`，提交前本地与 `origin/main` 均指向 `55234e464ff880620a920e4748b6a7dcbb779fb2`，无分叉。
+- 拟用提交标题：`fix(portfolio): unify loading and balance fallbacks [skip ci]`。
+- 问题背景：资产页不同链因缓存与请求时序产生分区骨架，认证态又维护重复实现；代币分布圆环在暗色主题下对比度不足；同时 Chainstream 持仓接口失败时，顶部和提现入口可能继续展示缓存原生币余额，且原有真值判断会把合法的零余额误显示为不可用。
+- 完成事项：资产页首次数据加载统一使用整页 SOL 风格骨架，分布区固定呈现清晰圆环与紧凑图例，底部面板复用正式标签与资产表列定义；失败后允许退出骨架；原生币余额统一通过共享格式化函数区分零值与不可用状态，并在持仓查询报错时隐藏缓存余额，顶部工具栏、钱包切换和提现弹窗复用同一语义；补充跨链 loading、错误退场、认证骨架、圆环结构、零余额与查询失败回归测试。
+- 影响范围：资产页首次进入、认证等待与切链 loading，代币分布及资产表骨架，顶部/底部钱包余额和提现余额展示；不改变转账提交协议、持仓计算、React SDK、K 线或后端接口。
+- 验证结果：Web 全量 43/43 个 Jest 测试套件共 198/198 项、14 项构建配置契约、TypeScript、全部相关 ESLint 与 `git diff --check` 通过；复用现有 dev server 在 Chrome 登录态验证 BSC 分布骨架同时显示圆环与图例，SOL 内容可正常退场，未出现可见 hydration 错误。
+- 推送状态：计划将当前全部修改精确提交至本地 `main`，随后在确认远端无新增提交后 fast-forward 推送至 `origin/main`，禁止 force push。
+- Workflow 状态：功能提交与后续纯工作记录提交均使用 `[skip ci]`，跳过 GitHub Actions、Vercel 部署及其他由 push 触发的 workflow。
