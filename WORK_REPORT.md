@@ -719,3 +719,13 @@
 - 验证结果：本地浏览器确认首条推文纵向位置由 `y=115` 上移至 `y=57`，悬停后暂停图标仅出现在标题且列表不位移；模板 Web 39/39 个测试套件共 186/186 项、14 项配置契约、TypeScript、ESLint 与格式检查通过；React SDK `ui-scaffold` 14/14 个测试套件共 35/35 项、TypeScript、Lint 与格式检查通过。
 - 推送状态：计划仅精确暂存本事项涉及的 React SDK 类型文件、模板组件、布局、回归测试及本条工作记录，分别 fast-forward 推送至对应 `origin/main`；两仓库其余本地 K 线开发改动保持未暂存。
 - Workflow 状态：所有提交均使用 `[skip ci]`，跳过 GitHub Actions，不触发 Vercel 部署、npm 发布或其他远端 workflow。
+
+## 2026-09-02：消除 Twitter 追踪面板顶部留白并优化暂停提示（提交后）
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`。
+- 提交：React SDK `4b010e915` — `fix(scaffold): support accessible custom panel titles [skip ci]`；模板 `01fbf24` — `fix(media-track): move pause state into panel title [skip ci]`。
+- 完成事项：删除 Twitter 追踪面板内容区顶部的固定占位，将暂停反馈移动到面板标题旁，并在面板关闭时清理暂停状态；可拖拽面板在使用 React 节点标题时可显式传入无障碍名称，避免对话框标题语义退化。
+- 影响范围：底部 Twitter 追踪面板、React SDK `ui-scaffold` 的可拖拽内容类型、回归测试及工作记录；两仓库其他本地 K 线开发改动未进入提交。
+- 验证结果：浏览器验证确认内容顶部空白消失、暂停图标仅在标题中显示且不引起列表位移；模板 39/39 个测试套件共 186/186 项、配置契约、TypeScript 与 ESLint 通过；React SDK `ui-scaffold` 14/14 个测试套件共 35/35 项、TypeScript 与 Lint 通过，推送钩子执行的全仓 build 24/24 个任务成功。
+- 推送状态：两个功能提交均已 fast-forward 推送到各自 `origin/main`，本地与远端对应提交一致，未使用 force push；未发布 npm，未更新模板依赖版本，未部署 Vercel。
+- Workflow 状态：两个功能提交均包含 `[skip ci]`，按提交查询 GitHub Actions run 均为空，未触发部署、npm 发布或其他 GitHub workflow；本条纯文档提交同样使用 `[skip ci]`。
