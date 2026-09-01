@@ -579,3 +579,16 @@
 - 验证结果：React SDK 7/7 个测试套件共 25/25 项、类型检查与 ESLint 通过；模板 37/37 个 Jest 套件共 181/181 项、类型检查、定向 ESLint和 `git diff --check` 通过。本地浏览器确认 Perpetuals 与 Token 详情 TradingView iframe 内 `Account Manager` 数量均为 0，Token 详情行情、工具栏与页面业务底部区正常显示，控制台无错误。
 - 推送状态：计划仅暂存本事项相关文件和混合文件中的对应 hunks，以 fast-forward 方式推送到两个仓库的 `origin/main`，禁止 force push；工作区其余未提交开发内容保持原状。
 - Workflow 状态：React SDK 功能提交将正常触发 Release workflow 完成 npm patch 发布；发布成功并确认官方 npm registry 版本后，模板仅 bump 本次 React SDK 版本并刷新 lockfile，再触发 Vercel production deploy。最终纯报告提交使用 `[skip ci]`，避免重复发布或部署。
+
+## 2026-09-01：禁用 K 线 Account Manager 并发布生产环境（提交后）
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`。
+- React SDK 提交与发布：功能提交 `54c06d84f` — `fix(tradingview): support consumer feature overrides` 已 fast-forward 推送；GitHub Actions Release run `33519589575`、job `99895170035` 成功，用时 5 分 50 秒；workflow release commit `edeb9a8a4` 已同步，本地与远端一致。
+- npm 发布结果：本次 workspace patch release 的 24 个公共包均发布成功并通过官方 npm registry 查询；`@liberfi.io/ui-tradingview` 由 `0.1.232` 升级到 `0.1.233`，包含消费者 feature 配置透传、禁用优先级处理、`TradingAccountManager` 枚举及回归测试。
+- 模板提交：功能提交 `4fee2f8` — `fix(chart): disable unused account manager [skip ci]`，依赖提交 `0363678` — `chore(deps): bump react sdk packages`；Perpetuals 与 Token 详情 K 线均显式禁用 Account Manager，同时保留各自页面底部的持仓、订单、成交和活动等业务区域。
+- 依赖结果：模板实际使用的 24 个 `@liberfi.io/*` 直接依赖已统一升级到本次 Release 版本并刷新 `pnpm-lock.yaml`；`@chainstream-io/sdk` manifest 与 lockfile 均继续保持 `2.1.14`，本轮未升级 ChainStream。
+- 验证结果：React SDK 7/7 个测试套件共 25/25 项、类型检查、ESLint 和推送前全量构建 24/24 个任务通过；模板 37/37 个 Jest 套件共 181/181 项、14 项构建配置契约、TypeScript、全量 ESLint、依赖版本扫描与 `git diff --check` 全部通过。隔离 worktree 使用正式 npm 依赖的 production build 成功生成 23/23 个页面；本地浏览器确认两处 TradingView iframe 内 Account Manager 数量均为 0，控制台无错误。
+- 部署结果：GitHub Actions Deploy to Vercel run `33521349687`、job `99901122434` 成功，用时 5 分 33 秒；Build、Deploy 与成功通知步骤全部通过，生产地址为 `https://liberfi-bzybxbmal-sgt-lab.vercel.app`。
+- 线上检查：生产地址返回 Vercel SSO 的 HTTP 302 跳转，确认部署入口已生效但受项目访问保护，未在未授权会话中继续页面级检查。
+- 推送状态：React SDK 功能与 release commit、模板功能与依赖提交均已 fast-forward 推送至各自 `origin/main`，未使用 force push；工作区其余未提交的 K 线工具栏与行情切换开发内容保持原状，未进入本次发布。
+- Workflow 说明：React SDK Release 与模板 Vercel Deploy 均成功；两个 workflow 仅有 GitHub Actions Node.js 20 runtime 弃用提示，不影响发布与部署。模板功能提交使用 `[skip ci]` 避免依赖升级前重复部署，本条最终纯文档提交同样使用 `[skip ci]`。
