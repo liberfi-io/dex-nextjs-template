@@ -859,3 +859,14 @@
 - 验证结果：布局测试 2/2 通过，并包含在 Web 42/42 个测试套件、192/192 项全量通过结果中；TypeScript、ESLint、whitespace 通过；清理 `.next` 缓存并重启 dev server 后，Chrome 登录态资产页真实显示 USDC 分布图、钱包卡片和持仓表，刷新及冷加载均无 hydration 错误。
 - 推送状态：功能提交已在本地 `main` 创建，待与钱包修复及本工作记录一并 fast-forward 推送，禁止 force push。
 - Workflow 状态：提交包含 `[skip ci]`；推送后应跳过 GitHub Actions、Vercel 部署及其他 push workflow。
+
+## 2026-09-02：钱包链状态与资产分布图修复（推送完成）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 提交：钱包修复 `9af75dd` — `fix(wallet): scope native balances to current chain [skip ci]`；资产布局 `fb7b656` — `fix(portfolio): compact and center token allocation legend [skip ci]`；提交后工作记录 `6a1404d` — `docs: record wallet and portfolio fixes [skip ci]`。
+- 问题背景：多链切换时钱包地址、原生币余额和报价存在 Solana 专用假设与旧链数据残留风险；资产页代币分布图图例被横向拉满，代币信息与金额间距过大且组合未居中。
+- 完成事项：钱包地址、原生币汇总余额、底部报价、提现估值及 Query 数据隔离已统一按当前链处理；资产页环形图与最大 `260px` 的紧凑图例已整体居中，并补齐正式态、loading、链切换、余额和报价回归测试。
+- 影响范围：底部工具栏、钱包地址、资产原生币余额、提现弹窗、Query 默认展示及资产分布图布局；不涉及 React SDK 发布、K 线、转账协议或生产部署。
+- 验证结果：Web 42/42 个 Jest 测试套件共 192/192 项、14 项构建配置契约、TypeScript、相关 ESLint 与 whitespace 全部通过；Chrome 登录态 Solana 资产页显示正确钱包、余额、USDC 分布图与持仓表，刷新及冷加载均无 hydration 错误。
+- 推送状态：三个提交已从 `3934f2e` fast-forward 推送至 `origin/main`，远端主分支指向 `6a1404d21e0972c142a8e8b381b01ce5f00219d2`，未使用 force push。
+- Workflow 状态：三个已推送提交均包含 `[skip ci]`；按各提交查询 GitHub Actions run 均为空，未触发 Vercel 部署、npm 发布或其他 GitHub workflow。本条纯工作记录提交同样使用 `[skip ci]`。
