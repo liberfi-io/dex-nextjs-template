@@ -455,3 +455,14 @@
 - ChainStream 约束：按用户明确要求，`@chainstream-io/sdk` 保持 `^2.1.14`，本轮不升级该依赖。
 - 验证计划：刷新 `pnpm-lock.yaml`，扫描全部 workspace manifest 的 dependencies、devDependencies、peerDependencies 与锁文件残留；执行类型检查、全量测试、ESLint、配置契约、`git diff --check` 与使用正式 npm 依赖的 production build。
 - 部署计划：验证通过后 fast-forward 推送到 `dex-nextjs-template/origin/main`，触发 Vercel production Deploy workflow；部署成功后以 `[skip ci]` 报告提交记录最终 commit、run、job、生产地址与验证结果，避免纯文档更新重复部署。
+
+## 2026-09-01：发布新版预测模块并部署模板（提交后）
+
+- React SDK 提交与发布：预测国际化功能提交 `7c2aa5c55`、locale 覆盖修复提交 `c5050ac72` 已 fast-forward 推送；GitHub Actions Release run `33468749966`、job `99733966795` 成功，用时 5 分 13 秒；workflow release commit `20f7414e1` 已通过 `pull --ff-only` 同步，本地与远端一致。
+- npm 发布结果：模板使用的 24 个 `@liberfi.io/*` 包均已发布并通过官方 npm registry 指定版本查询；关键预测包为 `@liberfi.io/i18n@0.1.276`、`@liberfi.io/react-predict@0.3.77` 与 `@liberfi.io/ui-predict@4.0.77`。
+- 模板提交：`9093912` — `chore(deps): upgrade liberfi sdk packages`；已将 `apps/web/package.json` 的 24 个 React SDK 直接依赖统一升级到本次 Release 版本并刷新 `pnpm-lock.yaml`，随后 fast-forward 推送到 `dex-nextjs-template/origin/main`。
+- ChainStream 约束：`@chainstream-io/sdk` manifest 继续保持 `^2.1.14`，lockfile 仅解析 `2.1.14`，本轮未升级 ChainStream。
+- 验证结果：消费者 TypeScript、ESLint、workspace gates、34/34 个 Jest 套件共 175/175 项、13 项构建配置契约、依赖版本扫描和 `git diff --check` 全部通过；使用正式 npm 依赖的 `pnpm build:web` 成功生成 23/23 个页面。本地 SDK source alias 服务重启成功，预测页面运行态返回正常。
+- 部署结果：GitHub Actions Deploy to Vercel run `33469556631`、job `99736350005` 成功，用时 6 分 22 秒；Build、Deploy 与成功通知步骤全部通过，生产地址为 `https://liberfi-bvgupfl2l-sgt-lab.vercel.app`。
+- 线上检查：生产地址可达并返回 Vercel SSO 的 `302` 跳转，说明部署入口已生效但受项目访问保护，未在未授权会话中继续页面级验证。
+- Workflow 说明：Release 与 Deploy 仅有 GitHub Actions Node.js 20 action runtime 弃用提示，不影响发布和部署；本条最终记录提交使用 `[skip ci]`，避免纯文档更新再次触发 workflow。
