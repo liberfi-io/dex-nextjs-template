@@ -1045,3 +1045,14 @@
 - 验证结果：React SDK 发布前 i18n 13/13 个套件共 77/77 项、ui-portfolio 6/6 个套件共 21/21 项及全仓 24/24 个构建任务通过；模板升级后 Web 45/45 个 Jest 套件共 204/204 项、14 项构建配置契约、TypeScript、ESLint 与 whitespace 全部通过；隔离临时目录使用 npm 包完成 production build，23/23 个静态页面生成成功，只有既有 postcss-calc 与 Sentry/OpenTelemetry webpack warning。
 - 推送状态：React SDK 功能提交与 release commit 已在 `origin/main`；模板依赖提交已创建于本地 `main`，待本条工作记录提交后普通 fast-forward 推送，禁止 force push。
 - Workflow 状态：React SDK `Release` run `33564254356` 成功，npm 发布完成；模板依赖提交未使用 `[skip ci]`，推送后将触发 Vercel 部署；本条纯工作记录使用 `[skip ci]`，避免重复部署。
+
+## 2026-09-02：多链余额状态修复发布与生产部署完成
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`，两仓库均通过普通 fast-forward 推送并同步远端。
+- 提交：React SDK `6a7dfd037` — `fix(portfolio): isolate balances across chain switches`、release commit `fdae9612f`；模板 `9094821` — `chore(deps): bump react sdk for wallet fixes`、提交后记录 `e762400` — `docs: record wallet sdk release and bump [skip ci]`；本条最终记录使用 `docs: record wallet sdk production deploy [skip ci]`。
+- 问题背景：需要将已验证的多链余额隔离、错误回退与通用主代币价格提示从本地 SDK 联调链路完整发布到 npm，并让生产模板消费对应版本。
+- 完成事项：React SDK npm 固定版本组发布成功，模板全部直接使用的 `@liberfi.io/*` 包同步升级并锁定新解析结果，`@chainstream-io/sdk` 维持 `2.1.14`；模板依赖提交单独作为 push HEAD 触发 production Vercel workflow，部署产物已上线。
+- 影响范围：Header、资产页及其共享状态中的跨链余额显示，底部主代币价格提示，React SDK npm 包、模板依赖与 Vercel 生产环境；不变更后端余额接口和交易流程。
+- 验证结果：SDK 定向测试、类型检查、lint 与 24/24 全仓构建通过；模板 45/45 个 Jest 套件共 204/204 项、14 项配置契约、TypeScript、ESLint、whitespace 和隔离 production build 通过；Vercel 生产部署地址 `https://liberfi-qo87m18wm-sgt-lab.vercel.app` 创建成功，`https://app.liberfi.io` 返回 HTTP 200。
+- 推送状态：React SDK `origin/main` 已包含功能与 release commit；模板依赖提交已推送至 `origin/main`，本条及前一条纯工作记录将以普通 fast-forward 补充推送，未使用 force push。
+- Workflow 状态：React SDK `Release` run `33564254356` 成功；模板 `Deploy to Vercel` run `33565711987`、job `100048276622` 在 6 分 40 秒内成功；最终纯工作记录包含 `[skip ci]`，不重复触发 npm 发布或 Vercel 部署。
