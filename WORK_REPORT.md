@@ -947,3 +947,14 @@
 - 验证结果：Web 43/43 个 Jest 测试套件共 198/198 项、14 项配置契约、TypeScript、相关 ESLint 与 whitespace 通过；钱包链状态定向测试无缓存运行 6/6 通过；Chrome 登录态 BSC 骨架显示圆环与列表，未出现可见 hydration 错误。
 - 推送状态：四笔提交已从 `55234e4` fast-forward 推送至 `origin/main`，远端指向 `47dc2d9e0002fe0d0ababc67de42d60c6f635edd`，未使用 force push；本条最终记录将继续以 fast-forward 推送。
 - Workflow 状态：四笔已推送提交均包含 `[skip ci]`，逐 commit 查询 GitHub Actions run 均为空；本条最终记录同样包含 `[skip ci]`，不触发 GitHub Actions、Vercel 部署或其他 workflow。
+
+## 2026-09-02：预热并轮询多链主代币价格（提交前）
+
+- 仓库与分支：`dex-nextjs-template/main`，基于与 `origin/main` 一致的 `574f580`。
+- 拟用提交标题：`perf(market): prefetch primary token prices [skip ci]`。
+- 问题背景：底部主代币价格仅按当前链发起查询，首次切换到 SOL、ETH 或 BSC 的其他链时需要等待对应 wrapped native token 的 Chainstream Token 请求完成，容易让用户误认为链切换没有生效。
+- 完成事项：在应用运行时 Provider 内新增无界面的主代币价格预热器，页面加载后并行查询 WSOL、WETH、WBNB，并以 60 秒周期持续刷新；预热查询与底部价格组件复用同一 React Query key，切链时可立即读取已缓存的对应链价格；补充三链地址、轮询参数和运行时挂载回归测试。
+- 影响范围：仅底部主代币美元价格的预加载、缓存与轮询时序；不改变 Chainstream 接口、价格字段、钱包余额、链选择、交易流程或 React SDK。
+- 验证结果：定向价格测试 5/5 通过；Web 全量 44/44 个 Jest 测试套件共 203/203 项、14 项构建配置契约、TypeScript、ESLint 与 `git diff --check` 全部通过；复用现有 3000 端口本地 SDK 联调服务验证页面返回 HTTP 200。
+- 推送状态：计划仅提交本事项的预热器、运行时挂载、回归测试和本条工作记录；不暂存 React SDK 或其他工作区内容，暂不推送远端。
+- Workflow 状态：提交标题包含 `[skip ci]`；本地提交不会触发 GitHub Actions、Vercel 部署、npm 发布或其他远端 workflow。

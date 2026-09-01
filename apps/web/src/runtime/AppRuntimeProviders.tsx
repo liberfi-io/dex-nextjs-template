@@ -11,6 +11,7 @@ import { PortfolioClientProvider, PortfolioProvider } from "@liberfi.io/ui-portf
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { useAuth, useConnectedWallet } from "@liberfi.io/wallet-connector";
 import { PinataProvider } from "../application/pinata";
+import { PrimaryTokenPricePoller } from "../application/PrimaryTokenPricePoller";
 import { useDexTokenProvider } from "../application/useDexTokenProvider";
 import { HyperliquidAccountStateSync } from "../components/HyperliquidAccountStateSync";
 import { MARKET_DATA_FEATURE_CAPABILITY } from "../libs/featureFlags";
@@ -121,6 +122,7 @@ export function AppRuntimeProviders({
         subscribeClient={clients.api}
         capabilities={reactCapabilities}
       >
+        <PrimaryTokenPricePoller />
         <Stage51AdaptersProvider api={clients.api}>
           <Stage53AdaptersProvider>
             <Stage54AdaptersProvider
