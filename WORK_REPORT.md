@@ -729,3 +729,24 @@
 - 验证结果：浏览器验证确认内容顶部空白消失、暂停图标仅在标题中显示且不引起列表位移；模板 39/39 个测试套件共 186/186 项、配置契约、TypeScript 与 ESLint 通过；React SDK `ui-scaffold` 14/14 个测试套件共 35/35 项、TypeScript 与 Lint 通过，推送钩子执行的全仓 build 24/24 个任务成功。
 - 推送状态：两个功能提交均已 fast-forward 推送到各自 `origin/main`，本地与远端对应提交一致，未使用 force push；未发布 npm，未更新模板依赖版本，未部署 Vercel。
 - Workflow 状态：两个功能提交均包含 `[skip ci]`，按提交查询 GitHub Actions run 均为空，未触发部署、npm 发布或其他 GitHub workflow；本条纯文档提交同样使用 `[skip ci]`。
+
+## 2026-09-02：修复 Twitter 实时订阅遇到未知链时持续报错（提交前）
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`；提交前两个本地分支均与各自 `origin/main` 无分叉。
+- 拟用提交标题：React SDK 使用 `fix(media-track): tolerate unsupported token chains [skip ci]`；模板使用 `docs: record media track chain fallback [skip ci]`。
+- 问题背景：Twitter 实时订阅数据可能在可选 token 元数据的链字段中返回 `robinhood` 等非链来源标识；旧转换逻辑将其视为致命异常，导致整条推文被丢弃，并由每次订阅回调持续输出 `Unsupported chain` 错误。
+- 完成事项：在订阅消息转换边界对未知链进行容错，只忽略无法识别的 token 增强信息并继续保留推文内容；公开的严格 token 转换函数继续抛出未知链错误，保持既有 API 类型和调用语义；新增 `robinhood` 回归用例及严格转换行为测试。
+- 影响范围：React SDK `ui-media-track` 的实时推文 DTO 转换与测试，以及当前项目工作记录；不改变已支持链映射、推文正文、翻译、Launchpad、行情数据或部署配置。
+- 验证结果：故障测试先稳定复现 `Unsupported chain: robinhood`，修复后 `ui-media-track` 2/2 个测试套件共 7/7 项、TypeScript 与 ESLint 全部通过；本地源码联调打开 Twitter 面板并持续观察 20 秒，面板正常显示且控制台 error 为 0。
+- 推送状态：计划仅精确暂存本事项涉及的两个 React SDK 文件及本条工作记录，分别 fast-forward 推送至对应 `origin/main`；两仓库其余本地 K 线开发内容保持未暂存。
+- Workflow 状态：所有提交均使用 `[skip ci]`，跳过 GitHub Actions，不触发 Vercel 部署、npm 发布或其他远端 workflow。
+
+## 2026-09-02：修复 Twitter 实时订阅遇到未知链时持续报错（提交后）
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`。
+- 提交：React SDK `28be552f7` — `fix(media-track): tolerate unsupported token chains [skip ci]`；模板工作记录提交使用 `docs: record media track chain fallback [skip ci]`。
+- 完成事项：Twitter 实时订阅在收到 `robinhood` 等未知链标识时不再丢弃整条推文或持续输出异常，只忽略不可用的 token 卡片数据；直接调用严格 token 转换 API 时仍会明确抛错，兼顾页面可用性与底层数据校验能力。
+- 影响范围：React SDK `ui-media-track` 的订阅消息转换、回归测试及当前项目工作记录；其他本地 K 线、行情和工具栏开发改动未进入提交。
+- 验证结果：`ui-media-track` 2/2 个测试套件共 7/7 项、TypeScript、ESLint 和格式检查通过；本地 Twitter 面板持续观察 20 秒无控制台 error；React SDK 推送钩子执行的全仓 build 24/24 个任务成功。
+- 推送状态：React SDK 功能提交已 fast-forward 推送至 `origin/main`，本地与远端均指向 `28be552f74868caade2c69746da4dfd1a1a521d6`，未使用 force push；未发布 npm、未更新模板 SDK 版本、未部署 Vercel。
+- Workflow 状态：React SDK 功能提交包含 `[skip ci]`，按提交查询 GitHub Actions run 为空；工作记录提交同样使用 `[skip ci]`，不触发 GitHub workflow 或部署。
