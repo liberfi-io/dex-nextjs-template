@@ -1012,3 +1012,14 @@
 - 验证结果：SDK 6/6 个测试套件共 26/26 项、模板定向测试 1/1、两边类型检查、lint、格式与 whitespace 均通过；React SDK push hook 额外完成全仓 24/24 个构建任务。
 - 推送状态：React SDK 远端 `main` 已指向 `4f8b264737b31c04c839fa3b31b9c11f8d47b726`；模板远端 `main` 已指向 `c10e8a6e0eda738d3e9606e58f2cd58cc940499a`；均未使用 force push，本条最终记录将继续普通 fast-forward 推送。
 - Workflow 状态：按 React SDK 功能提交、模板功能提交和工作记录提交逐一查询 GitHub Actions，结果均为空；`[skip ci]` 已生效，未触发 GitHub Actions、Vercel 部署或 npm 发布。本条最终记录同样包含 `[skip ci]`。
+
+## 2026-09-02：发布多链余额状态修复并升级生产依赖（提交前）
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`，执行前均与各自 `origin/main` 无分叉；模板仅新增本工作记录，React SDK 待提交 5 个 i18n/portfolio 文件。
+- 拟用提交标题：React SDK 使用 `fix(portfolio): isolate balances across chain switches`；模板依赖升级使用 `chore(deps): bump react sdk for wallet fixes`；工作记录另行使用 `[skip ci]` 提交。
+- 问题背景：Chainstream ETH/BSC 余额接口失败或切链请求尚未完成时，Header 可能继续消费缓存中的旧链余额；底部主代币通用价格提示还依赖尚未发布的国际化 key。本地源码联调已生效，但 npm 与 Vercel 生产环境尚未获得这些修复。
+- 计划完成事项：React SDK 在 Portfolio 查询失败时清空 summary，仅发布链与钱包地址完全匹配的数据，并让 Header 同步拒绝旧链 summary；补齐通用主代币价格提示及回归测试；通过 Release workflow 发布 npm；模板随后将实际使用的全部 `@liberfi.io/*` 依赖统一升级到官方 npm latest，刷新 lockfile并部署 Vercel。
+- 影响范围：Header 账户余额、Portfolio summary 状态、主代币价格 tooltip、React SDK npm 包版本、模板依赖与生产部署；`@chainstream-io/sdk` 保持当前版本不变，不改余额后端接口或 `/api/balance`。
+- 验证计划：React SDK 执行 i18n/ui-portfolio 测试、类型检查、lint、whitespace 和全仓 `pnpm build`；发布后从 npm 官方 registry 确认关键包版本并拉取 release commit；模板复查所有 workspace 三类依赖、刷新 lockfile、执行定向/全量测试、类型检查、lint、whitespace 和发布所需 production build；最终等待 Vercel workflow 成功并验证生产域名 HTTP 200。
+- 预期推送状态：React SDK 功能提交普通 fast-forward 推送 `main` 触发 Release，workflow 生成的 release commit 拉回本地；模板依赖提交普通 fast-forward 推送 `main` 触发 Vercel，禁止 force push。
+- Workflow 策略：React SDK 功能提交与模板依赖提交不使用 `[skip ci]`，分别允许 Release 与 Vercel workflow；纯 WORK_REPORT 提交使用 `[skip ci]`，避免重复发布或部署。
