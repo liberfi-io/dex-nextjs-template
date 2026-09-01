@@ -925,3 +925,14 @@
 - 验证结果：钱包链状态定向测试 6/6、TypeScript、相关 ESLint 与 `git diff --check` 通过。
 - 推送状态：计划将该防护与本条提交前记录一并提交，随后追加提交后记录，再将全部本地提交 fast-forward 推送至 `origin/main`。
 - Workflow 状态：提交标题包含 `[skip ci]`，跳过 GitHub Actions、Vercel 部署和其他 push workflow。
+
+## 2026-09-02：补齐切链缓存余额身份校验（提交后）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 提交：`abac29f` — `fix(wallet): hide stale chain balance [skip ci]`；本条记录拟使用 `docs: record stale balance guard [skip ci]` 独立提交。
+- 问题背景：切链期间 React Query 可能仍持有上一条链的成功响应，只检查请求错误不足以阻止旧链原生币余额短暂显示。
+- 完成事项：余额结果现会同时匹配当前链和当前钱包地址，查询失败、链不匹配或地址不匹配均返回不可用状态；已提交的切链测试与最终代码一致。
+- 影响范围：钱包切换入口、底部钱包状态和提现弹窗的原生币余额显示；其他资产查询和交易流程不变。
+- 验证结果：钱包链状态定向测试 6/6、TypeScript、相关 ESLint 与 whitespace 检查通过；此前 Web 全量 43/43 个套件共 198/198 项通过。
+- 推送状态：功能提交已创建于本地 `main`；本条记录提交后将全部本地提交 fast-forward 推送至 `origin/main`，禁止 force push。
+- Workflow 状态：功能提交及本条纯工作记录提交均包含 `[skip ci]`，预期不触发 GitHub Actions、Vercel 部署或其他 workflow。
