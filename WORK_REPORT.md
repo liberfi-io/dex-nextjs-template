@@ -980,3 +980,14 @@
 - 验证结果：Web 全量 44/44 个 Jest 套件共 203/203 项、14 项构建契约、TypeScript、ESLint、whitespace 和两轴代码审查通过；本地 SDK 联调服务返回 HTTP 200；GitHub 按 `5307a61` 与 `c6966a1` 查询均无 Actions run。
 - 推送状态：功能提交与提交后记录已从 `574f580` fast-forward 推送到 `origin/main`，未使用 force push；本条最终工作记录将继续以普通 fast-forward 推送。
 - Workflow 状态：所有提交均包含 `[skip ci]`，未触发 GitHub Actions、Vercel 部署、npm 发布或其他 GitHub workflow。
+
+## 2026-09-02：同步快捷交易预设并防止关闭时丢失输入（提交前）
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`，均在当前本地 `main` 上实施；React SDK 中现存的 i18n、portfolio 并行修改不属于本事项，将保持未暂存。
+- 拟用提交标题：React SDK 使用 `fix(ui-trade): preserve and sync preset selection [skip ci]`；模板使用 `fix(toolbar): sync quick trade preset [skip ci]`；提交后工作记录使用 `docs: record quick trade preset fix [skip ci]`。
+- 问题背景：快捷交易设置 Modal 切换当前页面链的预设 Tab 后，底部工具栏仍显示旧预设；表单输入框未失焦时直接点击背景关闭 Modal，最新输入尚未触发失焦提交，重新打开后会丢失。
+- 计划完成事项：为预设表单补充受控默认值同步与预设切换回调；Modal 关闭前主动提交当前焦点字段；通过公开的 `useInstantTradeAmount` 写入能力同步底部预设，仅响应当前页面链，避免编辑其他链时污染底部状态；补充 SDK hook、表单、Modal 与模板集成回归测试。
+- 影响范围：快捷交易预设 Modal、底部 Preset 按钮、即时交易金额状态 hook 及其公开类型；不改变交易提交、预设具体参数结构、K 线、钱包或行情接口。
+- 验证计划：执行 `@liberfi.io/ui-trade` 全量测试、类型检查与 lint，执行模板定向 Jest、Web 类型检查与 lint，并检查 Prettier、whitespace 和调试残留。
+- 预期推送状态：仅精确暂存本事项文件和唯一工作汇报文件，分别在两个仓库创建普通提交；获取远端状态并确认可 fast-forward 后推送 `main`，禁止 force push。
+- Workflow 策略：所有提交标题均包含 `[skip ci]`，跳过 GitHub Actions、Vercel 部署、npm 发布及其他由 push 触发的 workflow。

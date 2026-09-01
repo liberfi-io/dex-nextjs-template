@@ -21,6 +21,14 @@ import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { getNativeToken } from "@liberfi.io/utils";
 import { Chain } from "@liberfi.io/types";
 
+type SelectionAwarePresetFormModalParams = PresetFormModalParams & {
+  onPresetIndexChange?: (chain: Chain, presetIndex: number) => void;
+};
+
+type WritableInstantTradeAmount = ReturnType<typeof useInstantTradeAmount> & {
+  setPreset: (preset: number) => void;
+};
+
 /**
  * Bottom toolbar content for the new Scaffold layout.
  * Uses ScaffoldToolbar from @liberfi.io/ui-scaffold; typically shown on desktop
@@ -33,13 +41,22 @@ export function AppBottomToolbar() {
 
   const nativeToken = useMemo(() => getNativeToken(chain), [chain]);
 
-  const { preset } = useInstantTradeAmount({
+  const { preset, setPreset } = useInstantTradeAmount({
     id: "token-list",
-    chain: chain,
+    chain,
     tokenAddress: nativeToken?.address ?? "",
-  });
+  }) as WritableInstantTradeAmount;
 
-  const { onOpen: openPresetModal } = useAsyncModal<PresetFormModalParams>("preset");
+  const { onOpen: openPresetModal } = useAsyncModal<SelectionAwarePresetFormModalParams>("preset");
+
+  const handleModalPresetIndexChange = useCallback(
+    (presetChain: Chain, nextPreset: number) => {
+      if (presetChain === chain) {
+        setPreset(nextPreset);
+      }
+    },
+    [chain, setPreset],
+  );
 
   const handlePresetClick = useCallback(() => {
     openPresetModal({
@@ -48,9 +65,10 @@ export function AppBottomToolbar() {
         defaultChain: chain,
         defaultDirection: "buy",
         defaultPresetIndex: preset,
+        onPresetIndexChange: handleModalPresetIndexChange,
       },
     });
-  }, [openPresetModal, chain, preset]);
+  }, [openPresetModal, chain, preset, handleModalPresetIndexChange]);
 
   const { onOpen: onOpenMediaTrack } = useDraggableDisclosure("mediaTrack");
   const { onOpen: onOpenAICopilot } = useDraggableDisclosure("aiCopilot");
@@ -64,11 +82,9 @@ export function AppBottomToolbar() {
         onPress={handlePresetClick}
       >
         {t(
-          ([
-            "trade.settings.preset1",
-            "trade.settings.preset2",
-            "trade.settings.preset3",
-          ] as const)[preset],
+          (["trade.settings.preset1", "trade.settings.preset2", "trade.settings.preset3"] as const)[
+            preset
+          ],
         )}
       </Button>
 
