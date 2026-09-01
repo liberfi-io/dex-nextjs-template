@@ -804,3 +804,13 @@
 - 验证计划：React SDK 受影响包测试、类型检查、ESLint、Prettier、`git diff --check` 与全仓 build；模板 Web 全量 Jest/配置契约、TypeScript、ESLint、生产 build；本地 Token 详情页验证工具栏、双窗口同步、标题/关闭策略、快照、全屏及主题色；发布后通过 GitHub workflow、npm 官方 registry 和 Vercel 生产地址确认结果。
 - 预期推送状态：React SDK 功能提交 fast-forward 推送 `origin/main` 并等待自动 release commit；同步本地后将模板 K 线代码、全部新 npm 版本和锁文件一次性 fast-forward 推送 `origin/main`；禁止 force push。
 - Workflow 策略：React SDK 功能提交与模板部署提交不带 `[skip ci]`，分别用于触发 `Release` 和 `Deploy to Vercel`；最终纯工作记录提交使用 `[skip ci]`，避免重复发布或部署。
+
+## 2026-09-02：发布 K 线工具栏完整恢复并部署生产环境（发布完成）
+
+- 实际提交：React SDK 功能提交 `67e50cb9fb839506c4d068f27ff7648f4f863d1b feat(tradingview): restore token chart toolbar`，自动 release commit `cab7c24a4e8327f0f0af71112563e212f28baa99 chore: release packages`；模板提交 `866143b8ac22a46451c9315b09c523c4cabc49b9 feat(tradingview): enable restored token chart toolbar`。
+- 最终完成事项：恢复并跑通 Token 详情页 K 线工具栏、多图表与选币、图表类型、指标、价格/市值、USD/原生币、快照、设置和全屏；统一多窗口 interval、图表类型与计价模式，首窗口保持不可关闭；补齐 native candle REST/WebSocket 参数、市值换算、OHLC 格式化与模板数据适配；模板 24 个 `@liberfi.io/*` 直接依赖全部升级到本次官方 npm latest 并刷新锁文件。
+- npm 发布结果：`Release` run `33550633034`、job `99998914003` 成功；官方 registry 已确认 `@liberfi.io/client@0.3.97`、`@liberfi.io/react@0.3.97`、`@liberfi.io/types@0.4.83`、`@liberfi.io/i18n@0.1.280`、`@liberfi.io/ui-tradingview@0.1.236`，模板引用的 24 个 SDK 包均与 `latest` 一致；发布后的 release commit 已 fast-forward 拉取到本地。
+- 验证结果：React SDK client 216/216、react 228/228、i18n 77/77、ui-tradingview 50/50 测试通过，types contract、受影响包类型检查、lint、Prettier、whitespace 与全仓 build 24/24 通过；模板 K 线定向测试 8/8、TypeScript、ESLint、Prettier 与 whitespace 通过。模板全量 Jest 的 2 个失败来自未纳入本次提交的钱包链状态/原生币报价并行改动；本地 production build 因既有 `next dev` 与 `next build` 共用 `.next` 缓存发生 chunk 竞争，未重启现有服务，最终以 Vercel 干净环境 Build 成功作为生产构建验收。
+- 部署结果：`Deploy to Vercel` run `33552333888`、job `100004552658` 在 6 分 56 秒内成功完成，Build、Deploy 与成功通知全部通过；独立部署地址为 `https://liberfi-lsjz9ersl-sgt-lab.vercel.app`，生产域名 `https://app.liberfi.io` 实测返回 HTTP 200。
+- 推送状态：React SDK 功能提交、release commit 与模板功能/依赖提交均已 fast-forward 推送到各自 `origin/main`，未使用 force push；模板工作区的资产页、钱包链和原生币报价等并行修改保持未提交，未混入本次 K 线发布。
+- Workflow 说明：React SDK Release 与模板 Vercel Deploy 均成功；仅有 GitHub Actions Node.js 20 runtime 弃用提示，不影响发布与部署。本条最终纯工作记录提交使用 `[skip ci]`，不重复触发 Vercel。
