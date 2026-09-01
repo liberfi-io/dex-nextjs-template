@@ -837,3 +837,25 @@
 - 验证结果：Web 42/42 个 Jest 测试套件共 192/192 项、14 项构建配置契约、TypeScript、相关 ESLint 与 whitespace 检查全部通过；本地源码联调已在 Chrome 登录态验证 Solana 资产页能显示正确钱包、原生币余额与 USDC 持仓，冷加载无 hydration 错误。
 - 推送状态：计划与资产页分布图修改拆分为独立提交，精确暂存本事项文件后 fast-forward 推送 `origin/main`，禁止 force push。
 - Workflow 状态：提交标题包含 `[skip ci]`，用于跳过 GitHub Actions、Vercel 部署及其他由 push 触发的 GitHub workflow。
+
+## 2026-09-02：修复多链钱包地址、原生币余额与报价串链（提交后）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 提交：`9af75dd` — `fix(wallet): scope native balances to current chain [skip ci]`。
+- 问题背景：钱包地址与底部报价仍带有 Solana 专用假设，原生币余额又依赖持仓明细中的原生币行，导致切链后地址、余额、报价和提现 USD 估值可能为空或短暂沿用上一条链的数据。
+- 完成事项：钱包地址、原生币余额、底部报价和提现估值均已切换为当前链语义；报价组件与 hook 从 SOL 专用名称升级为通用 primary token 实现；QueryClient 不再全局保留上一 query 数据，链切换期间不会展示旧链钱包结果；对应地址、余额、报价与数据隔离测试已补齐。
+- 影响范围：底部工具栏、钱包地址、资产汇总原生币余额、提现弹窗和 Query 默认展示行为；不改变转账提交协议、持仓接口、资产分布计算、K 线或 React SDK。
+- 验证结果：Web 42/42 个 Jest 测试套件共 192/192 项、14 项配置契约、TypeScript、相关 ESLint 与 whitespace 全部通过；Chrome 登录态 Solana 资产页显示正确钱包、余额和持仓，冷加载无 hydration 错误。
+- 推送状态：功能提交已在本地 `main` 创建，待与资产页布局提交及本工作记录一并 fast-forward 推送，禁止 force push。
+- Workflow 状态：提交包含 `[skip ci]`；推送后应跳过 GitHub Actions、Vercel 部署及其他 push workflow。
+
+## 2026-09-02：优化资产页代币分布图布局（提交后）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 提交：`fb7b656` — `fix(portfolio): compact and center token allocation legend [skip ci]`。
+- 问题背景：Token allocation 图例与条目横向拉满，代币信息和金额分隔过远；环形图与图例没有作为统一组合在卡片内容区居中。
+- 完成事项：环形图与图例已整体居中，小屏自动上下排列；图例收敛至最大 `260px` 并改用紧凑两列网格对齐金额；loading 骨架同步采用相同布局；新增正式态和 loading 态布局契约测试。
+- 影响范围：仅资产页代币分布图展示、loading 骨架和回归测试；持仓查询、分片计算、颜色、金额格式及图表交互保持不变。
+- 验证结果：布局测试 2/2 通过，并包含在 Web 42/42 个测试套件、192/192 项全量通过结果中；TypeScript、ESLint、whitespace 通过；清理 `.next` 缓存并重启 dev server 后，Chrome 登录态资产页真实显示 USDC 分布图、钱包卡片和持仓表，刷新及冷加载均无 hydration 错误。
+- 推送状态：功能提交已在本地 `main` 创建，待与钱包修复及本工作记录一并 fast-forward 推送，禁止 force push。
+- Workflow 状态：提交包含 `[skip ci]`；推送后应跳过 GitHub Actions、Vercel 部署及其他 push workflow。
