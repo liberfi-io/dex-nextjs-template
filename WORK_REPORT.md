@@ -914,3 +914,14 @@
 - 验证结果：Web 43/43 个 Jest 测试套件共 198/198 项、14 项配置契约、TypeScript、相关 ESLint 与 `git diff --check` 全部通过；Chrome 登录态 BSC 页面验证圆环与图例同时可见，SOL 页面可正常退场，未出现可见 hydration 错误。
 - 推送状态：功能提交已创建于本地 `main`；待提交本条纯工作记录后，将两笔提交 fast-forward 推送至 `origin/main`，禁止 force push。
 - Workflow 状态：功能提交及本条工作记录提交均包含 `[skip ci]`，预期跳过 GitHub Actions、Vercel 部署和其他 push workflow。
+
+## 2026-09-02：补齐切链缓存余额身份校验（提交前）
+
+- 仓库与分支：`dex-nextjs-template/main`，基于本地未推送提交 `fcc02ae`，远端 `origin/main` 仍为 `55234e4`。
+- 拟用提交标题：`fix(wallet): hide stale chain balance [skip ci]`。
+- 问题背景：提交过程中工作区补充了余额响应的链与钱包地址校验；若遗漏该修改，切链回归测试只会在脏工作区通过，而已提交代码仍可能短暂展示上一条链的缓存余额。
+- 完成事项：原生币余额 hook 同时校验当前链、当前钱包地址与持仓响应中的 `chain/address`，只有完全匹配且查询未报错时才返回余额。
+- 影响范围：顶部、底部钱包余额与提现弹窗复用的原生币余额来源；不改变余额格式、查询参数或转账逻辑。
+- 验证结果：钱包链状态定向测试 6/6、TypeScript、相关 ESLint 与 `git diff --check` 通过。
+- 推送状态：计划将该防护与本条提交前记录一并提交，随后追加提交后记录，再将全部本地提交 fast-forward 推送至 `origin/main`。
+- Workflow 状态：提交标题包含 `[skip ci]`，跳过 GitHub Actions、Vercel 部署和其他 push workflow。
