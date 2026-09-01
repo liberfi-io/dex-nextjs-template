@@ -622,3 +622,24 @@
 - 验证结果：正式 npm 依赖安装完成；模板 37/37 个 Jest 套件共 181/181 项、14 项配置契约、TypeScript、ESLint 与 `git diff --check` 全部通过。本地开发服务已在 3000 端口重启，日志确认全部 `@liberfi.io/*` 继续 source alias 到同级 `react-sdk`；繁体 Token 详情页确认无 `just now`、简体单位或裸 `24h` 标签。
 - 推送状态：计划先以 `[skip ci]` 推送模板功能提交，再由依赖提交触发一次 Vercel production deploy；禁止 force push。
 - Workflow 状态：功能提交跳过 workflow，依赖提交正常触发目标 Vercel 部署，结果将在部署完成后追加。
+
+## 2026-09-01：模板接入本地化时间格式器（提交后）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 提交：`0053bdf` — `fix(i18n): consume localized time formatting [skip ci]`。
+- 完成事项：模板资产、Token 详情、排行榜、世界杯和交易反馈中的相对时间、周期及倒计时均已切换到 React SDK 统一格式器，Token 详情的 24 小时成交量标签也不再直接拼接英文缩写。
+- 影响范围：仅模板展示层和测试 mock；未包含依赖版本、锁文件以及本地保留的 K 线数据源开发改动。
+- 验证结果：模板全量测试、TypeScript、ESLint、格式检查和本地繁体页面验证均通过。
+- 推送状态：提交将在依赖升级提交完成后一起 fast-forward 推送至 `origin/main`，禁止 force push。
+- Workflow 状态：提交包含 `[skip ci]`，不会在正式 npm 依赖就位前提前触发 Vercel 部署。
+
+## 2026-09-01：升级 React SDK 正式 npm 依赖并部署（提交前）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 拟用提交标题：`chore(deps): bump react sdk packages`。
+- 问题背景：模板功能代码依赖新发布的 `useLocalizedTimeFormatter` 导出，需要将生产构建从上一批 React SDK 版本升级到本次 npm patch release。
+- 完成事项：更新 `apps/web/package.json` 中全部 24 个 `@liberfi.io/*` 依赖并刷新 `pnpm-lock.yaml`；核心版本包括 `@liberfi.io/i18n@0.1.278`、`@liberfi.io/ui-predict@4.0.79`、`@liberfi.io/ui-tokens@3.0.81`、`@liberfi.io/ui-tradingview@0.1.234`，`@chainstream-io/sdk` 继续保持 `2.1.14`。
+- 影响范围：生产环境依赖解析与 Vercel 构建输入；不增加业务代码改动。
+- 验证结果：官方 npm registry 已确认 24 个目标版本全部可下载；正式依赖安装完成，模板 37/37 个 Jest 套件共 181/181 项、14 项配置契约、TypeScript、ESLint 和 `git diff --check` 全部通过。
+- 推送状态：计划 fast-forward 推送到 `origin/main` 并等待目标部署完成，禁止 force push。
+- Workflow 状态：本提交不带 `[skip ci]`，将正常触发 `Deploy to Vercel` production workflow。
