@@ -969,3 +969,14 @@
 - 验证结果：代码审查 Standards 轴除缺少本提交后记录外无代码问题，Spec 轴无缺失、错误或范围扩大；补齐记录后，定向测试 5/5、Web 全量 44/44 个 Jest 套件共 203/203 项、14 项构建契约、TypeScript、ESLint 与 whitespace 均通过；现有本地 SDK 联调服务返回 HTTP 200。
 - 推送状态：功能提交与本条纯工作记录提交均仅保留在本地 `main`，未推送；没有混入 React SDK 工作区的其他未提交修改。
 - Workflow 状态：两笔提交均包含 `[skip ci]`；尚未推送，因此未触发 GitHub Actions、Vercel 部署、npm 发布或其他远端 workflow。
+
+## 2026-09-02：多链主代币价格预热与轮询（推送完成）
+
+- 仓库与分支：`dex-nextjs-template/main`，通过普通 fast-forward 与 `origin/main` 同步。
+- 提交：功能提交 `5307a61` — `perf(market): prefetch primary token prices [skip ci]`；提交后记录 `c6966a1` — `docs: record primary token price polling [skip ci]`；本条最终记录使用 `docs: record primary token price polling push [skip ci]`。
+- 问题背景：底部价格原先只查询当前链，首次切换 SOL、ETH、BSC 时需要等待对应 wrapped native token 的 Chainstream 请求，造成链已变化但价格仍未更新的困惑。
+- 完成事项：页面加载后并行预取 WSOL、WETH、WBNB，并以 60 秒周期刷新；底部展示复用同一 React Query 缓存，切链时直接获得对应链价格；相关运行时挂载、三链地址和轮询参数均已覆盖测试。
+- 影响范围：底部主代币价格的预加载、缓存和轮询时序；不涉及钱包余额、Chainstream 接口变更、React SDK 发布、交易流程或生产部署。
+- 验证结果：Web 全量 44/44 个 Jest 套件共 203/203 项、14 项构建契约、TypeScript、ESLint、whitespace 和两轴代码审查通过；本地 SDK 联调服务返回 HTTP 200；GitHub 按 `5307a61` 与 `c6966a1` 查询均无 Actions run。
+- 推送状态：功能提交与提交后记录已从 `574f580` fast-forward 推送到 `origin/main`，未使用 force push；本条最终工作记录将继续以普通 fast-forward 推送。
+- Workflow 状态：所有提交均包含 `[skip ci]`，未触发 GitHub Actions、Vercel 部署、npm 发布或其他 GitHub workflow。
