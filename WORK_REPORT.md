@@ -991,3 +991,14 @@
 - 验证计划：执行 `@liberfi.io/ui-trade` 全量测试、类型检查与 lint，执行模板定向 Jest、Web 类型检查与 lint，并检查 Prettier、whitespace 和调试残留。
 - 预期推送状态：仅精确暂存本事项文件和唯一工作汇报文件，分别在两个仓库创建普通提交；获取远端状态并确认可 fast-forward 后推送 `main`，禁止 force push。
 - Workflow 策略：所有提交标题均包含 `[skip ci]`，跳过 GitHub Actions、Vercel 部署、npm 发布及其他由 push 触发的 workflow。
+
+## 2026-09-02：同步快捷交易预设并防止关闭时丢失输入（提交后）
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`。
+- 提交：React SDK `4f8b26473` — `fix(ui-trade): preserve and sync preset selection [skip ci]`；模板 `68c9b47` — `fix(toolbar): sync quick trade preset [skip ci]`；本条记录使用 `docs: record quick trade preset fix [skip ci]` 独立提交。
+- 问题背景：快捷交易 Modal 的预设选择与底部工具栏状态互相脱节；输入框尚未失焦时点击背景关闭会在提交输入前卸载表单，造成最新修改丢失。
+- 最终完成事项：Modal 预设 Tab 可响应外部默认值并上报当前链与预设索引；底部工具栏通过 SDK 公开 hook 同步当前页面链的 Preset，编辑其他链不会污染当前显示；关闭 Modal 时先让活动字段失焦并完成保存；相关 SDK 与模板回归测试已补齐。
+- 影响范围：快捷交易预设 Modal、底部 Preset 按钮、即时交易金额状态 hook 和公开类型；没有改动交易提交、钱包、行情或 K 线逻辑，React SDK 中 i18n、portfolio 并行修改未纳入提交。
+- 验证结果：`@liberfi.io/ui-trade` 6/6 个 Jest 套件共 26/26 项通过，SDK 类型检查、lint 与 Prettier 通过；模板定向测试 1/1、Web 类型检查、lint、Prettier、whitespace 与调试残留检查通过；本地页面已验证预设同步及未失焦输入在背景关闭后仍保留。
+- 推送状态：两笔功能提交已创建于本地 `main`；待提交本条工作记录并确认远端无新增提交后，分别以普通 fast-forward 推送至 `origin/main`，禁止 force push。
+- Workflow 状态：两笔功能提交与本条工作记录均包含 `[skip ci]`，预期跳过 GitHub Actions、Vercel 部署、npm 发布及其他 push workflow。
