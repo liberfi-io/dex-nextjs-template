@@ -751,6 +751,17 @@
 - 推送状态：React SDK 功能提交已 fast-forward 推送至 `origin/main`，本地与远端均指向 `28be552f74868caade2c69746da4dfd1a1a521d6`，未使用 force push；未发布 npm、未更新模板 SDK 版本、未部署 Vercel。
 - Workflow 状态：React SDK 功能提交包含 `[skip ci]`，按提交查询 GitHub Actions run 为空；工作记录提交同样使用 `[skip ci]`，不触发 GitHub workflow 或部署。
 
+## 2026-09-02：发布最新 React SDK 并部署模板生产环境（发布前）
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`；发布前两个本地分支均与各自 `origin/main` 无分叉，相关功能基线包含 Twitter 未知链容错、可拖拽面板无障碍标题支持及最新 K 线多图表标题修复。
+- 拟用提交标题：React SDK 使用空提交 `chore(release): publish latest sdk packages` 触发 Release；模板使用 `chore(deps): bump react sdk packages` 触发生产部署；发布完成后另以 `[skip ci]` 文档提交记录结果。
+- 问题背景：已推送的 React SDK 功能提交均使用 `[skip ci]`，尚未发布到 npm；模板生产依赖仍指向上一批 `@liberfi.io/*` 版本，线上无法获得本轮 Twitter 容错、面板标题与 K 线修复。
+- 完成事项：计划通过 React SDK `Release` workflow 对全部公共包执行统一 patch 发布；使用官方 npm registry 核验版本；扫描模板全部 workspace 的 dependencies、devDependencies 与 peerDependencies，将实际引用的 `@liberfi.io/*` 包统一升级并刷新 `pnpm-lock.yaml`；`@chainstream-io/sdk` 保持 `2.1.14` 不变；完成 production build 后推送并等待 `Deploy to Vercel` workflow。
+- 影响范围：React SDK 公共 npm 包版本、模板生产依赖解析、锁文件和 Vercel 生产部署；不将两仓库当前未提交的 K 线开发内容混入发布提交。
+- 验证结果：发布前已确认 React SDK 25 个公共包的本地版本与官方 npm registry 一致，其中 `@liberfi.io/ui-media-track@0.1.276`、`@liberfi.io/ui-scaffold@2.0.80`、`@liberfi.io/ui-tradingview@0.1.234`；Twitter 修复相关测试、类型检查、ESLint、本地订阅联调以及 React SDK 全仓 build 均已通过。
+- 推送状态：计划仅推送发布触发提交、SDK 自动 release commit、模板依赖升级提交与最终工作记录；禁止 force push。
+- Workflow 状态：React SDK 发布触发提交与模板依赖升级提交不使用 `[skip ci]`，分别用于触发 npm Release 与 Vercel production deployment；最终纯文档提交使用 `[skip ci]`，避免重复部署。
+
 ## 2026-09-02：恢复 K 线多窗口标题信息与主题层级（提交前）
 
 - 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`；提交前两个本地分支均与各自 `origin/main` 无分叉，本地其他 K 线工具栏、数据源及价格格式化开发改动继续保留且不纳入本次暂存。
