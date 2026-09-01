@@ -122,7 +122,7 @@ import { SendOutlinedIcon } from "./icons/SendOutlinedIcon";
 // TODO: Re-enable when the Convert (闪兑) flow is ready.
 // import { ConvertOutlinedIcon } from "./icons/ConvertOutlinedIcon";
 import { AppBottomToolbar } from "./AppBottomToolbar";
-import { BottomTweets } from "./BottomTweets";
+import { BottomTweets, BottomTweetsTitle } from "./BottomTweets";
 import { BottomAICopilot } from "./BottomAICopilot";
 import { PredictBalanceIndicator } from "./PredictBalanceIndicator";
 import { FundWalletModal } from "./FundWalletModal";
@@ -204,6 +204,7 @@ function PageShell({ children }: PropsWithChildren) {
   const router = useChainAwareRouter();
   const { chain } = useCurrentChain();
   const { headerVisible, footerVisible } = useShellChrome();
+  const [isMediaTrackPaused, setIsMediaTrackPaused] = useState(false);
   const tokenDetailSource = searchParams.get(TOKEN_DETAIL_SOURCE_QUERY_PARAM);
   const activeNavigationKey = resolveHeaderNavigationKey(
     pathname,
@@ -356,6 +357,21 @@ function PageShell({ children }: PropsWithChildren) {
   const searchLabel = t(
     isPredictPage ? "predict.search.placeholder" : "tokens.search.placeholder",
   ) as string;
+  const mediaTrackTitle = t("extend.toolbar.media_track_tooltip") as string;
+  const mediaTrackContent = {
+    id: "mediaTrack",
+    ariaLabel: mediaTrackTitle,
+    title: (
+      <BottomTweetsTitle isPaused={isMediaTrackPaused}>
+        {mediaTrackTitle}
+      </BottomTweetsTitle>
+    ),
+    children: <BottomTweets onPauseChange={setIsMediaTrackPaused} />,
+    modalMaxWidth: 440,
+    modalMinWidth: 320,
+    panelMinWidth: 320,
+    panelMaxWidth: 440,
+  };
 
   return (
     <PredictWalletProvider enabled={isPredictPage}>
@@ -470,15 +486,7 @@ function PageShell({ children }: PropsWithChildren) {
         >
           <DraggablePanelProvider
             contents={[
-              {
-                id: "mediaTrack",
-                title: t("extend.toolbar.media_track_tooltip"),
-                children: <BottomTweets />,
-                modalMaxWidth: 440,
-                modalMinWidth: 320,
-                panelMinWidth: 320,
-                panelMaxWidth: 440,
-              },
+              mediaTrackContent,
               {
                 id: "aiCopilot",
                 title: t("extend.toolbar.ai_copilot"),

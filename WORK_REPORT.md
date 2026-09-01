@@ -708,3 +708,14 @@
 - 验证结果：Web 39/39 个测试套件共 186/186 项、14 项配置契约、TypeScript、ESLint、本地浏览器验证和双轴代码审查全部通过；悬停前后首条推文位置保持一致。
 - 推送状态：功能与工作记录提交均已 fast-forward 推送至 `origin/main`，远端主分支指向 `ab472048fbbd1d005c6060417d4b063464548441`，未使用 force push；本地其余 K 线开发内容未进入提交。
 - Workflow 状态：两个已推送提交均包含 `[skip ci]`，按 commit 查询 GitHub Actions run 均为空，未触发 Vercel 部署或其他 workflow；本条纯报告提交同样使用 `[skip ci]`。
+
+## 2026-09-02：消除 Twitter 追踪面板顶部留白并优化暂停提示（提交前）
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`；提交前两个本地分支均与各自 `origin/main` 无分叉。
+- 拟用提交标题：React SDK 使用 `fix(scaffold): support accessible custom panel titles [skip ci]`；模板使用 `fix(media-track): move pause state into panel title [skip ci]`。
+- 问题背景：底部 Twitter 追踪面板隐藏钱包胶囊与 Preset 后仍保留固定高度的顶部容器，形成明显空白；暂停提示继续占据内容区，导致面板空间利用和视觉层级不合理。
+- 完成事项：移除内容区固定顶部占位，将推文悬停暂停状态提升到面板容器并在标题旁显示暂停图标；关闭面板时重置暂停状态；为 React SDK 可拖拽面板内容补充自定义标题对应的 `ariaLabel` 类型能力，避免标题改为 React 节点后丢失对话框无障碍名称；新增布局与状态回归测试。
+- 影响范围：底部 Twitter 追踪面板、可拖拽面板标题类型及相关测试；钱包胶囊与 Preset 继续保持隐藏，独立追踪页面、行情数据、交易逻辑和部署配置不受影响。
+- 验证结果：本地浏览器确认首条推文纵向位置由 `y=115` 上移至 `y=57`，悬停后暂停图标仅出现在标题且列表不位移；模板 Web 39/39 个测试套件共 186/186 项、14 项配置契约、TypeScript、ESLint 与格式检查通过；React SDK `ui-scaffold` 14/14 个测试套件共 35/35 项、TypeScript、Lint 与格式检查通过。
+- 推送状态：计划仅精确暂存本事项涉及的 React SDK 类型文件、模板组件、布局、回归测试及本条工作记录，分别 fast-forward 推送至对应 `origin/main`；两仓库其余本地 K 线开发改动保持未暂存。
+- Workflow 状态：所有提交均使用 `[skip ci]`，跳过 GitHub Actions，不触发 Vercel 部署、npm 发布或其他远端 workflow。

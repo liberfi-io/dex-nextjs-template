@@ -1,20 +1,43 @@
 import { PauseIcon } from "@liberfi.io/ui";
 import { TweetsWidget } from "@liberfi.io/ui-media-track";
-import { useState } from "react";
+import { type PropsWithChildren, useEffect } from "react";
 import { TweetsLaunchButton } from "./TweetsLaunchButton";
 
-export function BottomTweets() {
-  const [isPaused, setIsPaused] = useState(false);
+export interface BottomTweetsProps {
+  onPauseChange: (isPaused: boolean) => void;
+}
+
+export function BottomTweets({ onPauseChange }: BottomTweetsProps) {
+  useEffect(
+    () => () => {
+      onPauseChange(false);
+    },
+    [onPauseChange],
+  );
 
   return (
-    <div className="w-full space-y-2.5 px-2 pb-2">
-      <div className="sticky top-0 z-10 flex h-12 w-full items-center justify-end bg-content1">
-        {isPaused && <PauseIcon className="h-5 w-5 text-primary" />}
-      </div>
+    <div className="w-full px-2 pb-2">
       <TweetsWidget
-        onPauseChange={setIsPaused}
+        onPauseChange={onPauseChange}
         customHeaderActions={(item) => <TweetsLaunchButton data={item} />}
       />
     </div>
+  );
+}
+
+export function BottomTweetsTitle({
+  isPaused,
+  children,
+}: PropsWithChildren<{ isPaused: boolean }>) {
+  return (
+    <span className="inline-flex min-w-0 items-center gap-1.5">
+      <span className="truncate">{children}</span>
+      {isPaused && (
+        <PauseIcon
+          aria-hidden="true"
+          className="h-4 w-4 flex-none text-primary"
+        />
+      )}
+    </span>
   );
 }

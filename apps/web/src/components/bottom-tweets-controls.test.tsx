@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { BottomTweets } from "./BottomTweets";
+import { useState } from "react";
+import { BottomTweets, BottomTweetsTitle } from "./BottomTweets";
 
 jest.mock("@liberfi.io/ui", () => ({
   PauseIcon: () => <div data-testid="twitter-panel-paused" />,
@@ -34,11 +35,25 @@ jest.mock("./TweetsLaunchButton", () => ({
 
 describe("bottom Twitter panel controls", () => {
   it("renders tweets without wallet or preset controls", () => {
-    render(<BottomTweets />);
+    function Harness() {
+      const [isPaused, setIsPaused] = useState(false);
+
+      return (
+        <>
+          <BottomTweetsTitle isPaused={isPaused} />
+          <BottomTweets onPauseChange={setIsPaused} />
+        </>
+      );
+    }
+
+    render(<Harness />);
 
     expect(screen.getByTestId("tweets-widget")).toBeTruthy();
     expect(screen.queryByTestId("twitter-panel-wallet")).toBeNull();
     expect(screen.queryByTestId("twitter-panel-preset")).toBeNull();
+    expect(
+      screen.getByTestId("tweets-widget").parentElement?.childElementCount,
+    ).toBe(1);
 
     fireEvent.click(screen.getByTestId("tweets-widget"));
     expect(screen.getByTestId("twitter-panel-paused")).toBeTruthy();
