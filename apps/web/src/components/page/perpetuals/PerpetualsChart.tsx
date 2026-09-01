@@ -23,6 +23,7 @@ import {
   type PerpetualsChartClient,
 } from "../../../application/chart/perpetuals-data-feed";
 import { loadTradingViewWidgetConstructor } from "../../../application/chart/load-tradingview-widget";
+import { TRADING_VIEW_THEME_COLORS } from "../../../application/chart/trading-view-theme";
 
 export type PerpetualsChartProps = {
   symbol: string;
@@ -61,9 +62,9 @@ export const PerpetualsChart = memo(function PerpetualsChart({
       chartType: TvChartType.TradingView,
       kLineStyle: TvChartKlineStyle.Candles,
       theme: TvChartTheme.Dark,
+      ...TRADING_VIEW_THEME_COLORS,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       locale: getTvChartLibraryLocale(i18n.language),
-      backgroundColor: "var(--color-surface-base)",
       chartNames: {
         [TvChartType.TradingView]: t("perpetuals.page.chart.tradingview"),
         [TvChartType.Original]: t("perpetuals.page.chart.original"),

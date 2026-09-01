@@ -4,6 +4,10 @@ import { test } from "node:test";
 
 const globalsCss = readFileSync(new URL("../src/styles/globals.css", import.meta.url), "utf8");
 const rootLayout = readFileSync(new URL("../src/app/(new)/layout.tsx", import.meta.url), "utf8");
+const tradingViewColors = readFileSync(
+  new URL("../public/static/charting_library/colors.css", import.meta.url),
+  "utf8",
+);
 
 const collectSources = (directory) =>
   readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
@@ -45,6 +49,15 @@ test("the consumer exposes the SDK semantic theme contract", () => {
 test("the consumer activates the dark theme at the document root", () => {
   assert.match(rootLayout, /className="dark"/);
   assert.match(rootLayout, /colorScheme:\s*"dark"/);
+});
+
+test("the TradingView iframe uses the shared dark theme palette", () => {
+  const darkTheme = tradingViewColors.match(/:root\.theme-dark\s*\{([\s\S]*?)\}/)?.[1] ?? "";
+
+  assert.match(darkTheme, /--color-layer-2:\s*#050807;/);
+  assert.match(darkTheme, /--color-border:\s*#353f39;/);
+  assert.match(darkTheme, /--color-text-2:\s*#ffffff;/);
+  assert.match(darkTheme, /--color-accent:\s*#c7ff2e60;/);
 });
 
 test("agent widget colors inherit the shared semantic roles", () => {

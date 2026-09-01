@@ -26,6 +26,7 @@ import {
 import {
   loadTradingViewWidgetConstructor,
 } from "../application/chart/load-tradingview-widget";
+import { TRADING_VIEW_THEME_COLORS } from "../application/chart/trading-view-theme";
 
 export type TradingChartProps = {
   chain: Chain;
@@ -68,6 +69,7 @@ export function TradingChart({ chain, address, className }: TradingChartProps) {
       chartType: TvChartType.TradingView,
       kLineStyle: TvChartKlineStyle.Candles,
       theme: TvChartTheme.Dark,
+      ...TRADING_VIEW_THEME_COLORS,
       timezone: "Etc/UTC",
       locale: getTvChartLibraryLocale(i18n.language),
     }),

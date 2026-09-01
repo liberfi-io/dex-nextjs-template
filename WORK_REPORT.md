@@ -544,3 +544,15 @@
 - 线上检查：生产地址返回 Vercel SSO 的 HTTP 302 跳转，确认部署入口已生效但受项目访问保护，未在未授权会话中继续页面级检查。
 - 推送状态：部署结果记录将以 `[skip ci]` 的纯文档提交 fast-forward 推送至 `origin/main`，禁止 force push。
 - Workflow 状态：本次仅手动触发目标 Vercel 部署 workflow；没有发布 React SDK npm 包、没有 bump 模板 SDK 版本。纯文档结果提交使用 `[skip ci]`，避免再次触发部署。
+
+## 2026-09-01：统一 K 线主题并修复图表高度拖拽边界（提交前）
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`；修改前两个仓库均与各自 `origin/main` 无分叉，继续使用模板现有 3000 端口开发服务及本地 SDK source alias 联调。
+- 拟用提交标题：React SDK 使用 `fix(tradingview): apply semantic chart palette [skip ci]`；模板使用 `fix(chart): align theme and resize bounds [skip ci]`。
+- 问题背景：TradingView 图表仍使用旧的固定背景与红绿色，且加载已保存图表后可能覆盖当前主题；Token 详情页的水平分隔条又强制为活动列表保留 200px，导致 K 线高度在约页面三分之二处提前停止。
+- 计划完成事项：为 SDK 增加可配置的背景、涨色与跌色并覆盖蜡烛、柱线、空心 K 线、平均 K 线、折线、面积、基准线和成交量；在图表 ready 及主题变化时重新应用调色板；统一模板 TradingView iframe 的暗色语义色；允许 Token 详情页分隔条拖至外层视口底部，同时保留 200px 的最小图表高度和可滚动访问的底部数据区。
+- 排除事项：本次明确不提交“已恢复并跑通 token 详情页 K 线工具栏”及其多图表、图表类型、指标、价格/市值、USD/原生币切换、数据源扩展和功能开关改动；这些修改继续保留在本地工作区。
+- 影响范围：React SDK 的 `@liberfi.io/ui-tradingview` 主题配置与 TradingView overrides；模板的图表静态主题、永续图表主题接入、Token 详情页桌面布局及对应回归测试。不修改交易接口、行情请求、移动端布局或 npm 依赖版本。
+- 验证计划：运行 `@liberfi.io/ui-tradingview` 全量测试、TypeScript 与 ESLint；运行模板 Web 全量测试、TypeScript、ESLint、主题契约、`git diff --check`，并通过现有本地 Token 详情页核对图表背景和可达拖拽边界。
+- 预期推送状态：仅暂存上述主题与布局修复，以 fast-forward 方式分别推送到两个仓库的 `origin/main`，禁止 force push；工具栏相关文件和混合文件中的工具栏 hunks 保持未暂存。
+- Workflow 策略：两个功能提交及后续纯报告提交均使用 `[skip ci]`；不触发 GitHub Actions Release、npm 发布、Vercel 部署或其他 workflow。

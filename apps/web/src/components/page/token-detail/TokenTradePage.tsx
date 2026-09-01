@@ -19,22 +19,13 @@ import { SidebarTokenAudit } from "./SidebarTokenAudit";
 import { SidebarVolumeStats } from "./SidebarVolumeStats";
 import { TokenDetailHeader } from "./TokenDetailHeader";
 import { TradingPanel } from "./TradingPanel";
-
-/** Minimum chart height — below this TradingView becomes unusable. */
-const MIN_CHART_H = 200;
+import {
+  TOKEN_TRADE_SPLIT_HANDLE_HEIGHT,
+  clampTokenTradeChartHeight,
+} from "./token-trade-layout";
 
 /** Default chart height — matches GMGN's default. */
 const DEFAULT_CHART_H = 448;
-
-/** Visible height of the split handle bar (excludes its invisible grab zone). */
-const SPLIT_HANDLE_H = 4;
-
-/**
- * Minimum height of BottomDataPanel that must remain visible in the initial
- * viewport when the chart is pulled to its maximum size. Acts as the floor
- * when computing the chart's upper drag bound.
- */
-const MIN_BOTTOM_REVEAL = 200;
 
 /** Fallback header height before the ResizeObserver has measured the DOM. */
 const FALLBACK_HEADER_H = 72;
@@ -243,10 +234,12 @@ function TokenTradeDesktopPage({ chain, address }: TokenTradePageProps) {
       if (!outer || !panel) return;
       const outerH = outer.clientHeight;
       const panelH = panel.scrollHeight;
-      const chartScrollBaseline = outerH + chartH + SPLIT_HANDLE_H;
+      const chartScrollBaseline =
+        outerH + chartH + TOKEN_TRADE_SPLIT_HANDLE_HEIGHT;
       const leftColTarget = Math.max(chartScrollBaseline, panelH);
-      const fixedH = headerHRef.current + chartH + SPLIT_HANDLE_H;
-      const target = Math.max(MIN_BOTTOM_REVEAL, leftColTarget - fixedH);
+      const fixedH =
+        headerHRef.current + chartH + TOKEN_TRADE_SPLIT_HANDLE_HEIGHT;
+      const target = Math.max(0, leftColTarget - fixedH);
       setBottomPanelH(target);
     }
     recompute();
@@ -260,17 +253,19 @@ function TokenTradeDesktopPage({ chain, address }: TokenTradePageProps) {
   }, [chartH]);
 
   // Dragging the handle UP (toward chart) → shrinks chart, grows bottom.
-  // Dragging DOWN → grows chart but stops when the bottom panel's initial
-  // viewport reveal drops below MIN_BOTTOM_REVEAL, matching GMGN's hard
-  // drag limit.
+  // Dragging DOWN → grows chart until the split handle reaches the bottom
+  // of the outer viewport. The bottom panel remains available below the
+  // fold through the page-level scroll container.
   const handleDrag = useCallback((delta: number) => {
     setChartH((prev) => {
-      const next = prev + delta;
       const outerH =
         outerRef.current?.getBoundingClientRect().height ?? 800;
-      const maxChart =
-        outerH - headerHRef.current - SPLIT_HANDLE_H - MIN_BOTTOM_REVEAL;
-      return Math.max(MIN_CHART_H, Math.min(next, maxChart));
+      return clampTokenTradeChartHeight({
+        currentHeight: prev,
+        delta,
+        outerHeight: outerH,
+        headerHeight: headerHRef.current,
+      });
     });
   }, []);
 
