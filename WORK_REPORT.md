@@ -793,3 +793,14 @@
 - 验证结果：React SDK 推送钩子全仓构建 24/24 个任务通过，Release workflow 成功且 25 个精确版本及关键 tarball 均经官方 npm registry 验证可用；模板依赖比对 24/24 匹配，Web 38/38 个测试套件共 181/181 项、14 项配置契约、TypeScript 类型检查与生产构建全部通过；Vercel workflow 构建和部署成功，生产域名 `https://app.liberfi.io` 实测返回 HTTP 200，独立部署域名 `https://liberfi-93x5j153n-sgt-lab.vercel.app` 已就绪且受 Vercel SSO 保护。
 - 推送状态：React SDK 发布提交与模板依赖提交均已 fast-forward 推送到各自 `origin/main`，未使用 force push；React SDK 本地与远端指向 `c5face5e2`，模板依赖发布时本地与远端指向 `cbbd490`；本条纯工作记录将独立推送。
 - Workflow 状态：React SDK `Release` run `33547156063` 成功完成并发布 npm；模板 `Deploy to Vercel` run `33548918173`、job `99993232190` 于 6 分 12 秒内成功完成，生产别名已切换；本条报告提交包含 `[skip ci]`，避免再次触发发布或部署。
+
+## 2026-09-02：发布 K 线工具栏完整恢复并部署生产环境（发布前）
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`；两仓库均基于最新远端发布基线，当前版本包括 `@liberfi.io/client@0.3.96`、`@liberfi.io/react@0.3.96`、`@liberfi.io/types@0.4.82`、`@liberfi.io/i18n@0.1.279` 与 `@liberfi.io/ui-tradingview@0.1.235`。
+- 拟用提交标题：React SDK 使用 `feat(tradingview): restore token chart toolbar` 并通过推送 `main` 触发 npm Release；模板使用 `feat(tradingview): enable restored token chart toolbar`，同时升级本次发布的全部 `@liberfi.io/*` 依赖并触发 Vercel production deployment；发布完成后以 `[skip ci]` 文档提交记录结果。
+- 问题背景：Token 详情页重构后原 K 线工具栏交互缺失或不完整，多图表、图表类型、指标、价格/市值、USD/原生币、快照、设置与全屏功能未形成完整闭环；多窗口 interval、图表类型和计价模式需要统一同步，市值与原生币模式还依赖 REST/WebSocket 蜡烛计价参数与 OHLC 格式化支持。
+- 计划完成事项：恢复工具栏全部入口及主题化图标/下拉交互；统一可点击光标、选中态、快照菜单和全屏布局；实现多图表选币并同步 interval、图表类型、价格/市值和 USD/原生币到所有窗口；首窗口保持不可关闭；补齐 native candle REST/WebSocket contract、按供应量计算市值 K 线、OHLC 数值格式化与模板数据适配；补充相应单元、交互和布局测试。
+- 影响范围：React SDK 的 types、client、react hooks、i18n 与 ui-tradingview；模板 Token 详情页 TradingChart、客户端数据源、价格格式化器、依赖版本与锁文件；不修改品牌色、涨跌色、交易表单、Auth0、`@chainstream-io/sdk` 或其他页面业务。
+- 验证计划：React SDK 受影响包测试、类型检查、ESLint、Prettier、`git diff --check` 与全仓 build；模板 Web 全量 Jest/配置契约、TypeScript、ESLint、生产 build；本地 Token 详情页验证工具栏、双窗口同步、标题/关闭策略、快照、全屏及主题色；发布后通过 GitHub workflow、npm 官方 registry 和 Vercel 生产地址确认结果。
+- 预期推送状态：React SDK 功能提交 fast-forward 推送 `origin/main` 并等待自动 release commit；同步本地后将模板 K 线代码、全部新 npm 版本和锁文件一次性 fast-forward 推送 `origin/main`；禁止 force push。
+- Workflow 策略：React SDK 功能提交与模板部署提交不带 `[skip ci]`，分别用于触发 `Release` 和 `Deploy to Vercel`；最终纯工作记录提交使用 `[skip ci]`，避免重复发布或部署。
