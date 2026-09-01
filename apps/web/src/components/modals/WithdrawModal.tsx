@@ -27,6 +27,7 @@ import {
 } from "../../application/server/transferRestClient";
 import { useCreateTransferTransactionMutation } from "../../application/server/useCreateTransferTransactionMutation";
 import { useSendTransferTransactionMutation } from "../../application/server/useSendTransferTransactionMutation";
+import { usePrimaryTokenQuotePrice } from "../../application/usePrimaryTokenQuotePrice";
 
 export const WITHDRAW_MODAL_ID = "withdraw-wallet";
 
@@ -187,17 +188,14 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
   // Portfolio data for balance of the native token.
   const { data: portfolioData } = useWalletPortfolios();
 
-  const nativeBalance = useMemo(
-    () => (portfolioData?.portfolios ?? []).find((p) => p.address === nativeToken?.address),
-    [portfolioData?.portfolios, nativeToken],
-  );
+  const nativeBalanceAmount = portfolioData?.balanceInNative;
+  const nativeQuotePrice = usePrimaryTokenQuotePrice();
 
   const balanceDisplay = useMemo(() => {
-    if (!nativeBalance) return "0";
-    const n = Number(nativeBalance.amount);
+    const n = Number(nativeBalanceAmount);
     if (!n) return "0";
     return formatAmount(n);
-  }, [nativeBalance]);
+  }, [nativeBalanceAmount]);
 
   // -------------------------------------------------------------------------
   // Amount state — responsive inputValue + debounced committedAmount
@@ -221,19 +219,19 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
   );
 
   const handleMax = useCallback(() => {
-    const bal = nativeBalance?.amount;
+    const bal = nativeBalanceAmount;
     if (!bal || bal === "0") return;
     setInputValue(bal);
     setCommittedAmount(bal);
-  }, [nativeBalance?.amount]);
+  }, [nativeBalanceAmount]);
 
   const handleHalf = useCallback(() => {
-    const bal = nativeBalance?.amount;
+    const bal = nativeBalanceAmount;
     if (!bal || bal === "0") return;
     const half = new BigNumber(bal).dividedBy(2).toFixed();
     setInputValue(half);
     setCommittedAmount(half);
-  }, [nativeBalance?.amount]);
+  }, [nativeBalanceAmount]);
 
   // -------------------------------------------------------------------------
   // Address state
@@ -255,10 +253,10 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
     if (!amt) return undefined;
     if (!/^\d+(\.\d+)?$/.test(amt)) return "请输入有效的金额";
     if (Number(amt) <= 0) return "金额必须大于 0";
-    const bal = nativeBalance?.amount;
+    const bal = nativeBalanceAmount;
     if (bal && new BigNumber(amt).gt(new BigNumber(bal))) return "余额不足";
     return undefined;
-  }, [committedAmount, nativeBalance?.amount]);
+  }, [committedAmount, nativeBalanceAmount]);
 
   const addressError = useMemo<string | undefined>(
     () => validateAddress(chain, addressValue),
@@ -274,11 +272,11 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
   }, [committedAmount, amountError, nativeToken]);
 
   const usdValue = useMemo(() => {
-    if (!committedAmount || !nativeBalance?.priceInUsd) return null;
-    const val = new BigNumber(committedAmount).multipliedBy(nativeBalance.priceInUsd);
+    if (!committedAmount || !nativeQuotePrice) return null;
+    const val = new BigNumber(committedAmount).multipliedBy(nativeQuotePrice);
     if (!val.isFinite() || val.isZero()) return null;
     return formatAmountInUsd(val);
-  }, [committedAmount, nativeBalance]);
+  }, [committedAmount, nativeQuotePrice]);
 
   // -------------------------------------------------------------------------
   // Transaction mutations
@@ -510,7 +508,7 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
                         type="button"
                         onClick={handleHalf}
                         disabled={
-                          !nativeBalance?.amount || nativeBalance.amount === "0" || isExecuting
+                          !nativeBalanceAmount || nativeBalanceAmount === "0" || isExecuting
                         }
                         className="cursor-pointer px-2 py-0.5 rounded-md text-[10px] uppercase tracking-wider text-text-secondary bg-surface-interactive/60 hover:bg-surface-strong/80 hover:text-brand-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-surface-interactive/60 disabled:hover:text-text-secondary"
                       >
@@ -520,7 +518,7 @@ function Body({ isOpen, onOpenChange, onClose }: RenderAsyncModalProps) {
                         type="button"
                         onClick={handleMax}
                         disabled={
-                          !nativeBalance?.amount || nativeBalance.amount === "0" || isExecuting
+                          !nativeBalanceAmount || nativeBalanceAmount === "0" || isExecuting
                         }
                         className="cursor-pointer px-2 py-0.5 rounded-md text-[10px] uppercase tracking-wider text-text-secondary bg-surface-interactive/60 hover:bg-surface-strong/80 hover:text-brand-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-surface-interactive/60 disabled:hover:text-text-secondary"
                       >

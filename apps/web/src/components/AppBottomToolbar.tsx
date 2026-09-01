@@ -15,7 +15,7 @@ import { ScaffoldToolbar, useAsyncModal, useDraggableDisclosure } from "@liberfi
 import { useCallback, useMemo } from "react";
 import { BottomToolBarWallet } from "./BottomToolBarWallet";
 import { BottomNetworkStatus } from "./BottomNetworkStatus";
-import { BottomSolPrice } from "./BottomSolPrice";
+import { BottomPrimaryTokenPrice } from "./BottomPrimaryTokenPrice";
 import { PresetFormModalParams, useInstantTradeAmount } from "@liberfi.io/ui-trade";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { getNativeToken } from "@liberfi.io/utils";
@@ -101,7 +101,7 @@ export function AppBottomToolbar() {
       </StyledTooltip>
 
       <Divider orientation="vertical" className="h-6 bg-content3" />
-      <BottomSolPrice />
+      <BottomPrimaryTokenPrice />
     </div>
   );
 

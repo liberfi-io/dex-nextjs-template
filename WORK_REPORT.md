@@ -592,6 +592,7 @@
 - 线上检查：生产地址返回 Vercel SSO 的 HTTP 302 跳转，确认部署入口已生效但受项目访问保护，未在未授权会话中继续页面级检查。
 - 推送状态：React SDK 功能与 release commit、模板功能与依赖提交均已 fast-forward 推送至各自 `origin/main`，未使用 force push；工作区其余未提交的 K 线工具栏与行情切换开发内容保持原状，未进入本次发布。
 - Workflow 说明：React SDK Release 与模板 Vercel Deploy 均成功；两个 workflow 仅有 GitHub Actions Node.js 20 runtime 弃用提示，不影响发布与部署。模板功能提交使用 `[skip ci]` 避免依赖升级前重复部署，本条最终纯文档提交同样使用 `[skip ci]`。
+
 ## 2026-09-01：统一全站时间国际化并发布生产环境（提交前）
 
 - 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`；两个仓库修改前均与各自 `origin/main` 无分叉，模板继续通过本地源码别名联调同级 `react-sdk`。
@@ -805,6 +806,17 @@
 - 预期推送状态：React SDK 功能提交 fast-forward 推送 `origin/main` 并等待自动 release commit；同步本地后将模板 K 线代码、全部新 npm 版本和锁文件一次性 fast-forward 推送 `origin/main`；禁止 force push。
 - Workflow 策略：React SDK 功能提交与模板部署提交不带 `[skip ci]`，分别用于触发 `Release` 和 `Deploy to Vercel`；最终纯工作记录提交使用 `[skip ci]`，避免重复发布或部署。
 
+## 2026-09-02：优化资产页代币分布图布局（本地完成，未提交）
+
+- 仓库与分支：`dex-nextjs-template/main`，修改基于本地提交 `ca51c19`；工作区原有 K 线数据源、价格格式化和钱包链状态等未提交开发内容保持不变。
+- 拟用提交标题：`fix(portfolio): compact and center token allocation legend [skip ci]`。
+- 问题背景：资产页 Token allocation 卡片中的图例列表与单条按钮同时横向拉满，导致代币信息和金额被分隔到卡片两端，视觉关联较弱；环形图与图例也未作为统一组合在卡片内容区居中。
+- 完成事项：将环形图与图例改为整体水平、垂直居中的响应式组合，小屏自动上下排列；图例宽度收敛到最大 `260px`，条目改为紧凑的两列网格，在保留名称截断、百分比与金额对齐的同时消除过度留白；同步调整 loading 骨架布局，并新增正式态与 loading 态布局契约测试。
+- 影响范围：仅资产页 `PortfolioAllocationChart` 的展示布局、loading 骨架和对应回归测试；不改变持仓查询、分片计算、颜色、金额格式、点击/悬停交互、钱包逻辑或 React SDK。
+- 验证结果：定向布局测试 2/2 通过，相关文件 ESLint、Web TypeScript 类型检查与 `git diff --check` 通过；Web 全量 Jest 中本事项测试通过，共 39 个测试套件、188 项测试通过，另有 3 个测试因工作区原有且不属于本事项的钱包链状态/原生币报价开发改动失败。已复用现有 `apps/web` dev server 检查热更新，但服务随后进入 Next.js `webpack-runtime` 模块缓存错误并对请求无响应；遵循本仓库规则未擅自重启现有服务，因此真实持仓页面的最终视觉验收仍需在该服务恢复后补充。
+- 推送状态：本事项仅保留为本地未提交修改，未暂存、未提交、未推送；未混入或覆盖工作区其他开发内容。
+- Workflow 状态：未推送，未触发 GitHub Actions、Vercel 部署、npm 发布或其他远端 workflow。
+
 ## 2026-09-02：发布 K 线工具栏完整恢复并部署生产环境（发布完成）
 
 - 实际提交：React SDK 功能提交 `67e50cb9fb839506c4d068f27ff7648f4f863d1b feat(tradingview): restore token chart toolbar`，自动 release commit `cab7c24a4e8327f0f0af71112563e212f28baa99 chore: release packages`；模板提交 `866143b8ac22a46451c9315b09c523c4cabc49b9 feat(tradingview): enable restored token chart toolbar`。
@@ -814,3 +826,14 @@
 - 部署结果：`Deploy to Vercel` run `33552333888`、job `100004552658` 在 6 分 56 秒内成功完成，Build、Deploy 与成功通知全部通过；独立部署地址为 `https://liberfi-lsjz9ersl-sgt-lab.vercel.app`，生产域名 `https://app.liberfi.io` 实测返回 HTTP 200。
 - 推送状态：React SDK 功能提交、release commit 与模板功能/依赖提交均已 fast-forward 推送到各自 `origin/main`，未使用 force push；模板工作区的资产页、钱包链和原生币报价等并行修改保持未提交，未混入本次 K 线发布。
 - Workflow 说明：React SDK Release 与模板 Vercel Deploy 均成功；仅有 GitHub Actions Node.js 20 runtime 弃用提示，不影响发布与部署。本条最终纯工作记录提交使用 `[skip ci]`，不重复触发 Vercel。
+
+## 2026-09-02：修复多链钱包地址、原生币余额与报价串链（提交前）
+
+- 仓库与分支：`dex-nextjs-template/main`，基于已与 `origin/main` 同步的 `3934f2e`。
+- 拟用提交标题：`fix(wallet): scope native balances to current chain [skip ci]`。
+- 问题背景：钱包地址解析仅支持 Solana，切换至 EVM 链后可能继续缺少正确地址；原生币余额依赖持仓列表中的原生币行，接口仅返回汇总余额时工具栏和提现弹窗会显示空值；全局 Query placeholder 还会在链切换期间短暂暴露上一条链的数据。
+- 完成事项：钱包地址统一通过当前链的 `useConnectedWallet` 获取；原生币余额改用钱包汇总的 `balanceInNative`；SOL 专用报价与底部组件升级为按当前链查询 wrapped native token 的通用实现；提现金额、Half/Max、余额校验和 USD 估值统一复用链级汇总余额与报价；移除全局上一页数据占位并补充链切换数据隔离、钱包地址、余额与报价回归测试。
+- 影响范围：底部原生币报价、钱包地址解析、资产汇总原生币余额、提现弹窗及 React Query 默认缓存展示；不改变转账协议、交易提交、资产分布计算、K 线功能或 React SDK。
+- 验证结果：Web 42/42 个 Jest 测试套件共 192/192 项、14 项构建配置契约、TypeScript、相关 ESLint 与 whitespace 检查全部通过；本地源码联调已在 Chrome 登录态验证 Solana 资产页能显示正确钱包、原生币余额与 USDC 持仓，冷加载无 hydration 错误。
+- 推送状态：计划与资产页分布图修改拆分为独立提交，精确暂存本事项文件后 fast-forward 推送 `origin/main`，禁止 force push。
+- Workflow 状态：提交标题包含 `[skip ci]`，用于跳过 GitHub Actions、Vercel 部署及其他由 push 触发的 GitHub workflow。

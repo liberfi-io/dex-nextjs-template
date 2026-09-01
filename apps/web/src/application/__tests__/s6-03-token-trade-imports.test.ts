@@ -106,7 +106,7 @@ describe("S6-03 token/trade app adapters", () => {
     expect(collectImports("@liberfi/ui-dex")).not.toEqual(
       expect.arrayContaining([
         "components/BottomTweets.tsx",
-        "components/BottomSolPrice.tsx",
+        "components/BottomPrimaryTokenPrice.tsx",
         "components/MediaTrackPage.tsx",
         "components/home/TokenListHeader.tsx",
         "components/home/InstantBuy2.tsx",
@@ -118,12 +118,12 @@ describe("S6-03 token/trade app adapters", () => {
     );
   });
 
-  it("reads the toolbar SOL quote through the SDK token query", () => {
+  it("reads the toolbar native-token quote through the SDK token query", () => {
     expect(collectImports("@liberfi/ui-dex")).not.toEqual(
-      expect.arrayContaining(["components/BottomSolPrice.tsx"]),
+      expect.arrayContaining(["components/BottomPrimaryTokenPrice.tsx"]),
     );
     expect(collectImports("@liberfi.io/react")).toEqual(
-      expect.arrayContaining(["application/useSolQuotePrice.ts"]),
+      expect.arrayContaining(["application/usePrimaryTokenQuotePrice.ts"]),
     );
   });
 
