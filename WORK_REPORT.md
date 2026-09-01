@@ -958,3 +958,14 @@
 - 验证结果：定向价格测试 5/5 通过；Web 全量 44/44 个 Jest 测试套件共 203/203 项、14 项构建配置契约、TypeScript、ESLint 与 `git diff --check` 全部通过；复用现有 3000 端口本地 SDK 联调服务验证页面返回 HTTP 200。
 - 推送状态：计划仅提交本事项的预热器、运行时挂载、回归测试和本条工作记录；不暂存 React SDK 或其他工作区内容，暂不推送远端。
 - Workflow 状态：提交标题包含 `[skip ci]`；本地提交不会触发 GitHub Actions、Vercel 部署、npm 发布或其他远端 workflow。
+
+## 2026-09-02：预热并轮询多链主代币价格（提交后）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 提交：`5307a61` — `perf(market): prefetch primary token prices [skip ci]`；本条记录使用 `docs: record primary token price polling [skip ci]` 独立提交。
+- 问题背景：底部主代币价格原先仅查询当前链，首次切换到其他链时必须等待 Chainstream 返回 WSOL、WETH 或 WBNB 价格，链状态已经切换但价格仍处于等待态。
+- 完成事项：应用加载时并行预取 SOL、ETH、BSC 三条链的 wrapped native token，并每 60 秒轮询刷新；预热器与底部价格展示复用相同 React Query key，切链后直接显示对应缓存价格；三链地址、轮询配置及 Provider 挂载均有自动化测试覆盖。
+- 影响范围：底部主代币价格的预加载、缓存和刷新时序；不改变价格接口与字段、钱包余额、链选择、交易流程或 React SDK。
+- 验证结果：代码审查 Standards 轴除缺少本提交后记录外无代码问题，Spec 轴无缺失、错误或范围扩大；补齐记录后，定向测试 5/5、Web 全量 44/44 个 Jest 套件共 203/203 项、14 项构建契约、TypeScript、ESLint 与 whitespace 均通过；现有本地 SDK 联调服务返回 HTTP 200。
+- 推送状态：功能提交与本条纯工作记录提交均仅保留在本地 `main`，未推送；没有混入 React SDK 工作区的其他未提交修改。
+- Workflow 状态：两笔提交均包含 `[skip ci]`；尚未推送，因此未触发 GitHub Actions、Vercel 部署、npm 发布或其他远端 workflow。
