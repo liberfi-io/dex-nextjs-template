@@ -1188,3 +1188,14 @@
 - 验证结果：3 个新增回归套件完成红绿循环；全仓测试 gate、Web 49/49 个 Jest 套件共 209/209 项与 14 项构建配置契约通过；Web TypeScript、全量及定向 ESLint、whitespace 通过；现有开发服务上的 `/predict/sports?view=live` 返回 HTTP 200。Standards 与 Spec 双轴复审除本条记录外均无实质问题，本条已关闭最后一项 Standards finding。
 - 推送状态：功能提交与本条记录待重新核对 `origin/main` 后普通 fast-forward 推送；用户的并行未提交文件未暂存、未提交，禁止 force push。
 - Workflow 状态：功能提交不含 `[skip ci]`，推送后预计触发仓库既有 workflow；本条纯工作记录包含 `[skip ci]`，不会额外重复触发。
+
+## 2026-09-03：体育实时列表首次加载保护已推送
+
+- 仓库与分支：`dex-nextjs-template/main`，本地与 `origin/main` 已通过普通 fast-forward 推送同步；工作区继续保留 Stage55、ESLint 配置与 `media-track-api` 的用户并行改动。
+- 提交：功能提交 `76991da` — `fix(prediction): recover sports list after SSR timeout`，提交后记录 `5a641a9`；本条最终记录使用 `docs: record sports list recovery push [skip ci]`。
+- 问题背景：dex 模板的体育预测页沿用了旧的 3 秒 SSR deadline 和“超时等于空列表”行为，导致首次打开直播列表为空，并缺少可靠的客户端补偿。
+- 完成事项：5 秒 SSR deadline、degraded 状态与原时间范围传递、权威 hydration 覆盖、客户端恢复及 Strict Mode/卸载/日期切换竞态保护均已进入远端 `main`；无有效价格摘要赛事继续由共享 prediction-server 统一过滤。
+- 影响范围：`/predict/sports` 的首次加载与比赛数据恢复；不涉及电竞、交易、Stage55、媒体跟踪、React SDK 或服务端规则复制。
+- 验证结果：全仓测试 gate、Web 49/49 个 Jest 套件共 209/209 项、14 项构建配置契约、Web TypeScript、ESLint、whitespace 和现有开发服务 HTTP 200 验证全部通过；双轴复审无剩余实质问题。
+- 推送状态：`origin/main` 已包含 `76991da` 与 `5a641a9`，无分叉、未使用 force push；本条记录将继续普通 fast-forward 推送，用户并行改动未进入任何提交。
+- Workflow 状态：截至本条记录生成时，GitHub 未为功能提交创建 workflow run；本条包含 `[skip ci]`，不会触发部署或其他 workflow。
