@@ -1274,3 +1274,14 @@
 - 验证结果：Release run `33671855039`、job `100387126099` 用时 4 分 41 秒成功；发布日志明确列出两个核心包 published successfully，npm 官方 registry 已确认对应版本；本地 `react-sdk/main` 与 `origin/main` 均指向 `3c7521e45`。
 - 推送状态：React SDK 功能提交与 release commit 均已在远端 `main`，未使用 force push。
 - Workflow 状态：npm `Release` 成功；Node 20 弃用 annotation 仅为提示。下一步升级模板依赖并触发 Vercel production 部署。
+
+## 2026-09-03：补齐 React SDK 固定版本组依赖（提交前）
+
+- 仓库与分支：`dex-nextjs-template/main`；首个模板功能提交 `bf0e8d9` 已部署成功，本次补充提交基于该提交继续前进。
+- 拟用提交标题：`chore(deps): complete react sdk version sync`；最终工作记录使用 `[skip ci]` 独立提交。
+- 问题背景：React SDK Release workflow 已发布完整固定版本组，但首次查询 npm 官方 registry 时，`@liberfi.io/ui-perpetuals@1.1.84` 与 `@liberfi.io/ui-tradingview@0.1.240` 尚未可见，因此首个模板提交保留了旧版本；部署完成后 registry 延迟消失，两个新版本均已可安装。
+- 计划完成事项：将最后两个 SDK UI 包升级到本次 Release 版本，刷新 lockfile，确保模板所有 `@liberfi.io/*` 直接依赖均与最新固定版本组同步，并重新执行测试、类型、lint、production build 与 Vercel 部署验证。
+- 影响范围：模板永续合约与 TradingView UI 包的依赖解析；不修改业务源码、Launchpad 交易流程或后端接口。
+- 验证计划：执行 Web 全量测试、typecheck、lint、whitespace；在 Node 20 且 `USE_LOCAL_SDK=false` 的 npm 消费模式运行 `pnpm build:web`；推送后等待 `Deploy to Vercel` 成功并验证生产域名 HTTP 200。
+- 预期推送状态：精确提交 `apps/web/package.json`、`pnpm-lock.yaml` 与本条记录，普通 fast-forward 推送到 `origin/main`，禁止 force push。
+- Workflow 策略：依赖提交不含 `[skip ci]`，触发 Vercel production 部署；最终纯工作记录提交包含 `[skip ci]`，避免重复部署。
