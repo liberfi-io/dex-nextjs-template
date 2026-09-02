@@ -1122,3 +1122,14 @@
 - 验证结果：React SDK build 24/24、TradingView 14/14 套件共 51/51 项、lint 和 whitespace 通过；Release run `33634150910` 用时 5 分 26 秒成功，25 个包均通过 npm 官方 registry 逐包核验。模板 Web 45/45 个测试套件共 204/204 项、14 项配置契约、TypeScript、ESLint、whitespace、本地首页/永续页 HTTP 200 与隔离 npm production build 23/23 个静态页面全部通过；Vercel run `33635709748` 用时 6 分 38 秒成功，`app.liberfi.io` 与 `dex.liberfi.io` 均返回 HTTP 200。
 - 推送状态：React SDK `origin/main` 指向 `f0785a06e`，模板依赖提交已推送且当前 `origin/main` 指向 `8790cce`；均未使用 force push，本条最终记录将继续以普通 fast-forward 推送。React SDK 本地 HEAD 与远端一致，但保留上述用户/并行 Launchpad 未提交改动。
 - Workflow 状态：React SDK `Release` run `33634150910` 和模板 `Deploy to Vercel` run `33635709748` 均成功；本条纯工作记录包含 `[skip ci]`，不会重复发布 npm 或部署 Vercel。
+
+## 2026-09-02：发布 Launchpad 创建与图片上传体验修复（提交前）
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`；执行前分别与各自 `origin/main` 一致，React SDK 基线为 `f0785a06e`，模板基线为 `6f24b4d`。
+- 拟用提交标题：React SDK 使用 `fix(launchpad): improve authenticated creation and image uploads`；模板依赖升级使用 `chore(deps): bump react sdk for launchpad fixes`；纯工作记录提交使用 `[skip ci]`。
+- 问题背景：创建新币 Modal 中，未登录用户点击魔法创建时缺少明确登录门禁，生成失败时界面无反馈；图片/GIF 选择后虽能短暂预览，但上传完成会清空本地预览，且缺少上传中、成功、失败状态和明确的替换图片入口，弱操作按钮的视觉权重也与 Modal 不匹配。
+- 计划完成事项：魔法创建统一经过登录授权并显示失败 toast；图片上传将本地预览与最终提交 URL 分离，支持 GIF/PNG/JPEG/WebP，持续保留预览，呈现国际化上传状态并提供弱化样式的替换入口；补充登录阻断、生成失败、上传状态、预览保留和替换入口回归测试。
+- 影响范围：`@liberfi.io/i18n`、`@liberfi.io/ui-launchpad` 及模板创建新币 Modal；不改变 Launchpad 链上创建协议、交易签名、Pinata 上传接口或后端 meme 生成 contract。当前 `POST /api/x-monitor/v1/meme/generate` 实测仍返回后端 `404 Route Not Found`，本轮前端修复确保该失败可见但不伪造生成结果。
+- 验证计划：React SDK 执行 `ui-launchpad` 与 i18n 全量测试、两包 typecheck/lint、Prettier、whitespace 和全仓 `pnpm build`；npm Release 成功后从官方 registry 核验实际版本并同步 release commit；模板升级全部直接使用的 `@liberfi.io/*` 版本、刷新 lockfile，执行 Web 测试、typecheck、lint、whitespace 与 production build，最后等待 Vercel production workflow 并验证生产域名 HTTP 200。
+- 预期推送状态：两个仓库均通过普通 fast-forward 推送到 `main`，禁止 force push；React SDK 发布完成后执行 `git pull --ff-only` 同步 workflow 自动生成的 release commit。
+- Workflow 策略：React SDK 功能提交与模板依赖提交不使用 `[skip ci]`，分别触发 npm `Release` 与 `Deploy to Vercel`；纯 `WORK_REPORT.md` 记录提交使用 `[skip ci]`，避免重复发布或部署。
