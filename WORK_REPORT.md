@@ -1339,3 +1339,44 @@
 - npm 发布状态：React SDK Release run `33681807112`、job `100419892754` 用时 4 分 59 秒成功；自动版本提交已通过 `git pull --ff-only` 同步；全部直接消费版本已由 npm 官方 registry 复核可安装。
 - Vercel 部署状态：Prediction staging run `33683242554` 成功，URL `https://liberfi-prediction-pjkl4jrq9-sgt-lab.vercel.app`；Prediction production run `33683252522` 成功，URL `https://liberfi-prediction-ljep30im0-sgt-lab.vercel.app`；DEX production run `33683242388` 成功，URL `https://liberfi-lvzctnlik-sgt-lab.vercel.app`。三个部署 URL 以及 `https://predict.liberfi.io`、`https://app.liberfi.io`、`https://dex.liberfi.io` 均返回 HTTP 200。
 - 推送与 Workflow 状态：所有功能、版本与依赖提交均已在远端；本条最终工作记录使用 `docs: record prediction performance release [skip ci]` 独立提交，避免重复触发 Vercel。Actions 中仅有 Node 20 action runtime 弃用提示，不影响发布与部署结论。
+
+## 2026-09-03：预测分类请求失败与空数据状态完善（提交前）
+
+- 仓库与分支：`react-sdk/main`；基线为 `35951415c`。
+- 拟用提交标题：`fix(predict): surface event list failures`。
+- 问题背景：预测市场分类首次请求超过五秒或服务端返回失败后，页面会落入无卡片、无提示的空白状态；切换分类时保留的旧数据也会遮蔽新请求失败。
+- 计划完成事项：区分首次超时、一般加载失败和成功空列表；失败状态提供可操作的重试入口；已有卡片时保留内容并追加紧凑错误提示；补齐英文与繁体中文文案及回归测试。
+- 影响范围：`@liberfi.io/ui-predict` 的分类事件列表和 `@liberfi.io/i18n` 预测文案；不改变五秒请求上限、重试策略、事件数据 contract 或交易流程。
+- 验证计划：运行 `ui-predict` 定向测试、i18n locale 覆盖测试、全仓生产构建和受控并发全量测试；发布后从 npm 官方 registry 校验版本，并在两个消费模板执行生产构建与页面验证。
+- 预期推送状态：功能提交使用普通 fast-forward 推送到 `origin/main`，禁止 force push；发布完成后执行 `git pull --ff-only` 同步自动版本提交。
+- Workflow 策略：提交不包含 `[skip ci]`，推送 `main` 后触发 React SDK `Release` workflow；待 npm 发布成功后再升级 `prediction-nextjs-template` 与 `dex-nextjs-template` 依赖并部署。
+
+## 2026-09-03：React SDK 预测分类状态反馈修复（提交后）
+
+- 仓库与分支：`react-sdk/main`。
+- 提交：`cf275735f` — `fix(predict): surface event list failures`。
+- 最终完成事项：首次请求超时和一般失败均显示明确文案与重试操作；成功返回空列表显示独立空状态；切换分类失败时保留旧卡片并附加紧凑错误提示；新增英文与繁体中文文案。
+- 影响范围：`@liberfi.io/ui-predict` 分类事件列表与 `@liberfi.io/i18n` 文案；不改变请求参数、超时和重试策略。
+- 验证结果：`ui-predict` 定向测试 5/5 通过，i18n locale 覆盖测试 17/17 通过；全仓 production build 24/24 任务通过；全量测试在 `TURBO_CONCURRENCY=2` 下 31/31 任务通过。默认高并发首轮曾因本机内存压力被系统终止，降低并发后无测试失败。
+- 推送状态：本地 `main` 已领先 `origin/main` 1 个提交，待服务端 staging 冷请求验证通过后使用普通 fast-forward 推送。
+- Workflow 状态：尚未触发；推送 `main` 后应触发 `Release` workflow 并发布 npm 包。
+
+## 2026-09-03：React SDK 预测分类状态反馈发布完成
+
+- 仓库与分支：`react-sdk/main`，本地已通过 `git pull --ff-only` 同步自动版本提交。
+- 提交：功能提交 `cf275735f` — `fix(predict): surface event list failures`；release commit `2590109bf` — `chore: release packages`。
+- 完成事项：超时、一般失败、成功空列表与保留旧卡片时的失败提示已进入公开 npm 包；核心版本为 `@liberfi.io/i18n@0.1.286`、`@liberfi.io/ui-predict@4.0.87`。
+- 验证结果：Release 日志明确列出两个包 published successfully；本地 `main` 与 `origin/main` 均指向 `2590109bf`。
+- 推送状态：功能与自动版本提交均已在远端，未使用 force push。
+- Workflow 状态：React SDK `Release` run `33691099381` 成功，用时 5 分 20 秒； npm 官方 registry 的包元数据仍在短暂同步，模板将在 `ui-predict@4.0.87` 可安装后再生成 lockfile。
+
+## 2026-09-03：两个预测模板升级分类状态反馈（提交前）
+
+- 仓库与分支：`prediction-nextjs-template/main` 与 `dex-nextjs-template/main`；基线分别为 `84bfcc3` 与 `cc8b577`。
+- 拟用提交标题：Prediction 模板使用 `chore(deps): update prediction feedback packages`；DEX 模板使用 `chore(deps): update prediction feedback packages`；最终工作记录使用 `[skip ci]` 独立提交。
+- 问题背景：两个线上模板仍锁定上一轮预测 UI 版本，无法展示本次新增的超时、失败、空数据和重试状态。
+- 计划完成事项：从 npm 官方 registry 升级两个模板实际消费的 `@liberfi.io/*` 固定版本组，刷新 lockfile，复查旧版本残留，并使用 npm 消费模式执行生产构建。
+- 影响范围：两个模板的 `@liberfi.io/*` 依赖与 lockfile，以及预测事件列表的失败/空状态展示；不修改模板业务源码、预测 API 参数或 `@chainstream-io/sdk`。
+- 验证计划：两仓库分别执行全量测试、typecheck、lint、whitespace 检查和 production build；推送后等待 Vercel workflow 明确成功，再验证部署 URL 与生产域名。
+- 预期推送状态：两仓库都使用普通 fast-forward 推送 `origin/main`，禁止 force push；Prediction 模板追加下一个 `v*` tag 触发 production。
+- Workflow 策略：Prediction 模板推送 `main` 部署 staging，再以 tag 部署 production；DEX 模板推送 `main` 直接部署 production；最终纯工作记录提交包含 `[skip ci]` 以避免重复部署。
