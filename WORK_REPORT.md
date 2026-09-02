@@ -1285,3 +1285,14 @@
 - 验证计划：执行 Web 全量测试、typecheck、lint、whitespace；在 Node 20 且 `USE_LOCAL_SDK=false` 的 npm 消费模式运行 `pnpm build:web`；推送后等待 `Deploy to Vercel` 成功并验证生产域名 HTTP 200。
 - 预期推送状态：精确提交 `apps/web/package.json`、`pnpm-lock.yaml` 与本条记录，普通 fast-forward 推送到 `origin/main`，禁止 force push。
 - Workflow 策略：依赖提交不含 `[skip ci]`，触发 Vercel production 部署；最终纯工作记录提交包含 `[skip ci]`，避免重复部署。
+
+## 2026-09-03：Launchpad 真实签名链路与 React SDK 版本同步部署完成（提交后）
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`；两仓库功能及依赖提交均已普通 fast-forward 推送，未使用 force push。
+- 提交：React SDK 功能提交 `b268f340d` — `fix(launchpad): complete signed token submission`，自动 release commit `3c7521e45` — `chore: release packages`；模板功能提交 `bf0e8d9` — `fix(launchpad): complete signed token submission`，依赖补齐提交 `6a369a4` — `chore(deps): complete react sdk version sync`。
+- 最终完成事项：创建代币链路已从“把 Base64 待签名交易当作成功结果”改为准备交易、钱包签名、ChainStream 广播、真实 signature 成功收敛；成功后 loading 正常结束；模板删除原始序列化交易 toast；全部 24 个 `@liberfi.io/*` 直接依赖已同步至本次固定版本组的最新可安装版本，其中核心包为 `@liberfi.io/react-launchpad@0.1.14`、`@liberfi.io/ui-launchpad@1.0.14`，延迟可见的 `@liberfi.io/ui-perpetuals@1.1.84` 与 `@liberfi.io/ui-tradingview@0.1.240` 也已补齐。
+- 影响范围：React SDK Launchpad 状态机与创建状态视图、模板钱包签名和广播适配器、模板 SDK 依赖及生产部署；不改变创建代币请求字段、图片上传或 meme 生成 contract。
+- 验证结果：React SDK 全仓 `pnpm build` 24/24 任务通过；模板两轮 Web 验证均为 49/49 个 Jest 套件、210/210 项测试通过，14 项构建配置契约、TypeScript、ESLint 与 whitespace 通过；Node 20、`USE_LOCAL_SDK=false` 的 npm 消费模式 production build 通过，最终复验耗时 1 分 7 秒。
+- npm 发布状态：Release workflow run `33671855039`、job `100387126099` 成功，release commit 已拉取到本地；npm 官方 registry 已确认 `react-launchpad@0.1.14`、`ui-launchpad@1.0.14`、`ui-perpetuals@1.1.84` 与 `ui-tradingview@0.1.240`。
+- Vercel 部署状态：模板功能部署 run `33674601560`、job `100396134635` 成功；完整依赖补齐后的最终部署 run `33675549144`、job `100399213113` 成功，部署 URL 为 `https://liberfi-2qbt53srb-sgt-lab.vercel.app`；`https://app.liberfi.io` 与 `https://dex.liberfi.io` 均返回 HTTP 200。
+- 推送状态：最终工作记录将以 `[skip ci]` 独立提交并推送，避免再次触发 npm Release 或 Vercel；GitHub Actions 的 Node 20 弃用 annotation 仅为提示，不影响本次发布和部署结果。
