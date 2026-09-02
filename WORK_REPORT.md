@@ -1100,3 +1100,14 @@
 - 验证计划：React SDK 执行全仓 `pnpm build`、ui-tradingview 测试/typecheck/lint 和 whitespace；发布后逐包查询 npm 官方 registry；模板执行 Web 全量测试、typecheck、lint、依赖残留扫描、whitespace、本地页面验证与禁用本地 SDK alias 的隔离 production build；部署后等待 GitHub workflow 成功并验证生产域名 HTTP 200。
 - 预期推送状态：两个仓库均只允许普通 fast-forward push，禁止 force push；React SDK 发布后执行 `git pull --ff-only` 同步自动生成的 release commit。
 - Workflow 状态：本条发布前记录使用 `[skip ci]`，不触发部署；React SDK release 触发提交和模板依赖提交不使用 `[skip ci]`，分别允许 npm Release 与 Vercel workflow；最终纯工作记录使用 `[skip ci]`，避免重复发布或部署。
+
+## 2026-09-02：React SDK TradingView 修复发布完成并准备模板部署
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`；React SDK 已同步远端 release commit，模板在 `origin/main` 的发布前记录基线上准备依赖提交。
+- 提交：React SDK release 触发提交 `8641044cb` — `chore(release): publish tradingview cleanup`，自动版本提交 `f0785a06e` — `chore: release packages`；模板拟使用 `chore(deps): bump react sdk for tradingview cleanup`。
+- 问题背景：`@liberfi.io/ui-tradingview` 的 detached widget 清理保护尚未进入 npm 和 Vercel 生产环境，需要完成从 SDK 源码、npm 固定版本组到模板生产依赖的完整发布链路。
+- 完成事项：React SDK Release workflow 已将 25 个公开包统一 patch 发布，其中 `@liberfi.io/ui-tradingview` 从 `0.1.237` 升至 `0.1.238`；模板全部直接使用的 `@liberfi.io/*` dependencies 已同步到同轮版本并刷新 lockfile，旧直接版本均已清除，`@chainstream-io/sdk` 保持 `2.1.14`。
+- 影响范围：代币详情和永续合约 TradingView 的卸载稳定性、React SDK npm 包版本、模板依赖解析及下一步 Vercel 部署；不涉及 HTTP/WebSocket contract、domain type、行情数据和交易流程。React SDK 同步后出现的 4 个 `ui-launchpad` 并行本地改动未进入本次 release，也未被修改或暂存。
+- 验证结果：React SDK 全仓 build 24/24、ui-tradingview 14/14 套件共 51/51 项及 lint 通过，typecheck 仅保留计划内 3 处既有 mock 缺少 `chartIndex`；Release run `33634150910` 成功，25 个版本均由 npm 官方 registry 验证。模板 Web 45/45 个测试套件共 204/204 项、14 项配置契约、TypeScript、ESLint、whitespace 与本地首页/永续页 HTTP 200 均通过；禁用本地 SDK alias 的隔离 production build 成功生成 23/23 个静态页面，仅有既有 Browserslist、postcss-calc 和 Sentry/OpenTelemetry warning。
+- 推送状态：React SDK release 触发提交与自动版本提交均已在 `origin/main`；模板依赖与本条工作记录待精确提交并单独 fast-forward 推送，禁止 force push。
+- Workflow 状态：React SDK `Release` run `33634150910` 成功；模板依赖提交不带 `[skip ci]`，推送后将触发 `Deploy to Vercel`；最终部署记录使用 `[skip ci]`，避免重复部署。
