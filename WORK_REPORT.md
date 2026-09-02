@@ -1067,3 +1067,14 @@
 - 验证结果：回归用例修复前稳定复现相同 TypeError，修复后连续 5/5 次通过；`ui-tradingview` 全量 14/14 个 Jest 套件共 51/51 项、package build、lint、Prettier 与 whitespace 通过。本包完整 typecheck 仍被未修改的 `TradingViewToolbarInteractions.test.tsx` 三处既有 mock 类型错误阻断，本次变更文件不在错误列表且 DTS build 成功。
 - 推送状态：计划精确提交两个 `ui-tradingview` 文件及工作记录，确认远端无新增提交后普通 fast-forward 推送，禁止 force push。
 - Workflow 状态：所有提交标题均包含 `[skip ci]`，按用户要求跳过 GitHub Actions、npm 发布、Vercel 部署及其他由 push 触发的 workflow。
+
+## 2026-09-02：修复 TradingView 卸载阶段偶发空指针（提交后）
+
+- 仓库与分支：`react-sdk/main`。
+- 提交：`25da8d020` — `fix(tradingview): guard detached widget cleanup [skip ci]`；本条记录使用 `docs: record tradingview cleanup fix [skip ci]` 独立提交。
+- 问题背景：TradingView iframe 与 React passive effect 的销毁顺序存在竞态，旧 widget 在 iframe 已解除后继续执行 `unsubscribe`，间歇触发 `doWhenApiIsReady` 空指针并污染首页打开或路由切换体验。
+- 完成事项：清理 `layout_changed` 监听器前校验当前 widget 所有权，避免已销毁实例再次进入 iframe API；保留有效实例的正常退订；新增卸载竞态及正常清理双向断言，防止通过吞异常或完全取消退订掩盖问题。
+- 影响范围：`@liberfi.io/ui-tradingview` 的布局监听器生命周期，以及代币详情、永续合约等 TradingView 使用场景；不影响图表行情、保存、配置和交互功能。
+- 验证结果：精确回归测试由修复前红灯转为绿灯并连续 5/5 次通过；全包 14/14 个测试套件共 51/51 项、build、lint、Prettier 和 whitespace 通过；本地联调首页返回 HTTP 200。
+- 推送状态：React SDK 功能提交已创建，模板提交前记录为 `efe3fc3`；待提交本条记录后分别普通 fast-forward 推送至各自 `origin/main`，禁止 force push。
+- Workflow 状态：功能提交、提交前记录和本条记录均包含 `[skip ci]`，预期不触发 GitHub Actions、npm 发布、Vercel 部署或其他 workflow。
