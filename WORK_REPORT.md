@@ -1222,6 +1222,17 @@
 - 推送状态：模板功能提交已创建；React SDK `7c00a3777` 与模板功能、工作记录提交将分别普通 fast-forward 推送至各自 `origin/main`，禁止 force push。
 - Workflow 状态：React SDK、模板功能和本条工作记录提交均包含 `[skip ci]`，按要求跳过 GitHub Actions、npm Release 与 Vercel 部署。
 
+## 2026-09-03：Launchpad 后续修复推送完成
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`，均已通过普通 fast-forward 推送并与远端一致。
+- 提交：React SDK `7c00a3777` — `fix(launchpad): complete creation flow fixes [skip ci]`；模板 `865121e` — `fix(launchpad): align generation proxy and create token contract [skip ci]`、`a9691fd` — `docs: record launchpad follow-up fixes [skip ci]`；本条记录使用 `docs: record launchpad skipped-workflow push [skip ci]`。
+- 问题背景：需要将建议图片替换、预览尺寸、meme 生成代理稳定性及创建代币 DTO 修复同步到远端代码基线，同时明确禁止触发 npm 发布和 Vercel 部署。
+- 完成事项：React SDK 已包含建议图片统一替换入口、160/176px 响应式预览高度和完整图片展示；模板已包含精确生成代理、瞬时网络重试、当前钱包地址注入，以及符合 ChainStream SDK 2.1.14 的 `dex/userAddress/image` 创建请求映射。
+- 影响范围：Launchpad 创建新币 Modal、meme 生成请求与创建代币预签名请求；npm 包版本、模板依赖和 Vercel 生产环境均未变化。
+- 验证结果：React SDK `ui-launchpad` 11/11 项、typecheck、lint、whitespace 与 push hook 全仓构建通过；模板 Web 209/209 项、14 项 Node 配置测试、typecheck、lint、whitespace 通过；本地真实生成接口返回 HTTP 200，创建代币接口返回 HTTP 201。
+- 推送状态：React SDK 远端 `main` 指向 `7c00a3777`；模板远端 `main` 已包含 `865121e` 与 `a9691fd`；全程未使用 force push。
+- Workflow 状态：按 React SDK 与模板功能/记录提交 SHA 查询，GitHub Actions run 列表均为空；`[skip ci]` 已生效，未触发 npm Release、Vercel 部署或其他 workflow。
+
 ## 2026-09-03：体育实时列表首次加载保护已推送
 
 - 仓库与分支：`dex-nextjs-template/main`，本地与 `origin/main` 已通过普通 fast-forward 推送同步；工作区继续保留 Stage55、ESLint 配置与 `media-track-api` 的用户并行改动。
