@@ -1056,3 +1056,14 @@
 - 验证结果：SDK 定向测试、类型检查、lint 与 24/24 全仓构建通过；模板 45/45 个 Jest 套件共 204/204 项、14 项配置契约、TypeScript、ESLint、whitespace 和隔离 production build 通过；Vercel 生产部署地址 `https://liberfi-qo87m18wm-sgt-lab.vercel.app` 创建成功，`https://app.liberfi.io` 返回 HTTP 200。
 - 推送状态：React SDK `origin/main` 已包含功能与 release commit；模板依赖提交已推送至 `origin/main`，本条及前一条纯工作记录将以普通 fast-forward 补充推送，未使用 force push。
 - Workflow 状态：React SDK `Release` run `33564254356` 成功；模板 `Deploy to Vercel` run `33565711987`、job `100048276622` 在 6 分 40 秒内成功；最终纯工作记录包含 `[skip ci]`，不重复触发 npm 发布或 Vercel 部署。
+
+## 2026-09-02：修复 TradingView 卸载阶段偶发空指针（提交前）
+
+- 仓库与分支：`react-sdk/main`，基于与 `origin/main` 一致的 `fdae9612f`；工作汇报记录维护于 `dex-nextjs-template/main`。
+- 拟用提交标题：React SDK 使用 `fix(tradingview): guard detached widget cleanup [skip ci]`；工作记录使用 `[skip ci]` 独立提交。
+- 问题背景：打开首页或发生页面切换时，旧 K 线组件进入卸载流程；React 先解除 widget ref，随后 `TradingViewLayout` 的 effect cleanup 仍通过闭包中的旧 widget 调用 `unsubscribe`。若 TradingView iframe 已销毁，其内部 window/API 为 `null`，会间歇抛出 `Cannot read properties of null (reading 'doWhenApiIsReady')`。
+- 完成事项：layout 事件清理前校验闭包 widget 是否仍由当前 `chartManager` 持有；有效 widget 继续正常退订，已脱离并进入销毁阶段的旧 widget 不再调用 iframe API；补充与生产异常相同的卸载竞态回归测试，同时断言正常实例仍会执行退订。
+- 影响范围：`@liberfi.io/ui-tradingview` 的 `layout_changed` 监听器卸载流程，以及使用该组件的代币详情和永续合约 K 线；不改变行情数据源、K 线配置、图表交互或业务接口。
+- 验证结果：回归用例修复前稳定复现相同 TypeError，修复后连续 5/5 次通过；`ui-tradingview` 全量 14/14 个 Jest 套件共 51/51 项、package build、lint、Prettier 与 whitespace 通过。本包完整 typecheck 仍被未修改的 `TradingViewToolbarInteractions.test.tsx` 三处既有 mock 类型错误阻断，本次变更文件不在错误列表且 DTS build 成功。
+- 推送状态：计划精确提交两个 `ui-tradingview` 文件及工作记录，确认远端无新增提交后普通 fast-forward 推送，禁止 force push。
+- Workflow 状态：所有提交标题均包含 `[skip ci]`，按用户要求跳过 GitHub Actions、npm 发布、Vercel 部署及其他由 push 触发的 workflow。
