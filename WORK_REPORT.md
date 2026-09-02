@@ -1111,3 +1111,14 @@
 - 验证结果：React SDK 全仓 build 24/24、ui-tradingview 14/14 套件共 51/51 项及 lint 通过，typecheck 仅保留计划内 3 处既有 mock 缺少 `chartIndex`；Release run `33634150910` 成功，25 个版本均由 npm 官方 registry 验证。模板 Web 45/45 个测试套件共 204/204 项、14 项配置契约、TypeScript、ESLint、whitespace 与本地首页/永续页 HTTP 200 均通过；禁用本地 SDK alias 的隔离 production build 成功生成 23/23 个静态页面，仅有既有 Browserslist、postcss-calc 和 Sentry/OpenTelemetry warning。
 - 推送状态：React SDK release 触发提交与自动版本提交均已在 `origin/main`；模板依赖与本条工作记录待精确提交并单独 fast-forward 推送，禁止 force push。
 - Workflow 状态：React SDK `Release` run `33634150910` 成功；模板依赖提交不带 `[skip ci]`，推送后将触发 `Deploy to Vercel`；最终部署记录使用 `[skip ci]`，避免重复部署。
+
+## 2026-09-02：TradingView 修复 npm 发布与 Vercel 生产部署完成
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`；React SDK 远端已包含发布提交，模板依赖提交已通过普通 fast-forward 推送并完成生产部署。
+- 提交：React SDK `8641044cb` — `chore(release): publish tradingview cleanup`、自动版本提交 `f0785a06e` — `chore: release packages`；模板发布前记录 `2c15c79`、依赖升级 `8790cce` — `chore(deps): bump react sdk for tradingview cleanup`；本条记录使用 `docs: record tradingview sdk release and deploy [skip ci]`。
+- 问题背景：TradingView iframe 已销毁后仍可能收到旧 layout listener 的退订调用，造成首页打开或路由切换时偶发 `doWhenApiIsReady` 空指针；修复此前只存在于 React SDK 源码，npm 与生产模板尚未获得。
+- 完成事项：React SDK 25 个公开包已统一 patch 发布，`@liberfi.io/ui-tradingview@0.1.238` 包含 detached widget 所有权保护；模板整组 `@liberfi.io/*` 依赖已升级并清除旧直接版本，`@chainstream-io/sdk` 保持 `2.1.14`；Vercel production 已部署至 `https://liberfi-5wfc7eot7-sgt-lab.vercel.app`，两个生产域名已更新并可访问。
+- 影响范围：代币详情和永续合约 TradingView 卸载生命周期、React SDK npm 固定版本组、模板依赖解析与 Vercel 生产环境；不改变 HTTP/WebSocket contract、domain type、K 线行情和交易业务。React SDK 工作区中并行出现的 `ui-launchpad` 4 个未提交文件保持原样，未纳入本次发布或提交。
+- 验证结果：React SDK build 24/24、TradingView 14/14 套件共 51/51 项、lint 和 whitespace 通过；Release run `33634150910` 用时 5 分 26 秒成功，25 个包均通过 npm 官方 registry 逐包核验。模板 Web 45/45 个测试套件共 204/204 项、14 项配置契约、TypeScript、ESLint、whitespace、本地首页/永续页 HTTP 200 与隔离 npm production build 23/23 个静态页面全部通过；Vercel run `33635709748` 用时 6 分 38 秒成功，`app.liberfi.io` 与 `dex.liberfi.io` 均返回 HTTP 200。
+- 推送状态：React SDK `origin/main` 指向 `f0785a06e`，模板依赖提交已推送且当前 `origin/main` 指向 `8790cce`；均未使用 force push，本条最终记录将继续以普通 fast-forward 推送。React SDK 本地 HEAD 与远端一致，但保留上述用户/并行 Launchpad 未提交改动。
+- Workflow 状态：React SDK `Release` run `33634150910` 和模板 `Deploy to Vercel` run `33635709748` 均成功；本条纯工作记录包含 `[skip ci]`，不会重复发布 npm 或部署 Vercel。
