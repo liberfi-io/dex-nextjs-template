@@ -1133,3 +1133,14 @@
 - 验证计划：React SDK 执行 `ui-launchpad` 与 i18n 全量测试、两包 typecheck/lint、Prettier、whitespace 和全仓 `pnpm build`；npm Release 成功后从官方 registry 核验实际版本并同步 release commit；模板升级全部直接使用的 `@liberfi.io/*` 版本、刷新 lockfile，执行 Web 测试、typecheck、lint、whitespace 与 production build，最后等待 Vercel production workflow 并验证生产域名 HTTP 200。
 - 预期推送状态：两个仓库均通过普通 fast-forward 推送到 `main`，禁止 force push；React SDK 发布完成后执行 `git pull --ff-only` 同步 workflow 自动生成的 release commit。
 - Workflow 策略：React SDK 功能提交与模板依赖提交不使用 `[skip ci]`，分别触发 npm `Release` 与 `Deploy to Vercel`；纯 `WORK_REPORT.md` 记录提交使用 `[skip ci]`，避免重复发布或部署。
+
+## 2026-09-02：完成 Launchpad 创建与图片上传修复提交（提交后）
+
+- 仓库与分支：`react-sdk/main`。
+- 提交：`1c62b4458` — `fix(launchpad): improve authenticated creation and image uploads`。
+- 问题背景：创建新币 Modal 的魔法创建缺少可靠登录门禁和失败反馈；图片上传完成后本地预览消失，用户无法确认上传状态或替换图片，且替换按钮视觉权重过高。
+- 最终完成事项：魔法创建通过统一认证端口执行并显示异常 toast；图片上传新增即时本地预览、GIF 支持、上传中遮罩与加载状态、成功/失败国际化提示、失败保留预览、旧提交 URL 隔离和替换入口；替换入口使用 Modal 弱操作主题样式；新增覆盖认证阻断、生成失败、上传成功/失败、预览保留和替换操作的回归测试。
+- 影响范围：`@liberfi.io/i18n` 与 `@liberfi.io/ui-launchpad`，以及模板创建新币 Modal；不修改后端接口、Pinata contract、链上创建参数与签名流程。
+- 验证结果：`ui-launchpad` 4/4 个测试套件共 10/10 项、i18n 13/13 个套件共 77/77 项通过；两包 typecheck、lint、Prettier、whitespace 通过；React SDK 全仓 `pnpm build` 24/24 个任务成功。
+- 推送状态：功能提交已创建于本地 `react-sdk/main`，工作区干净且领先 `origin/main` 1 个提交；下一步普通 fast-forward 推送，禁止 force push。
+- Workflow 状态：提交未包含 `[skip ci]`，推送后将触发 npm `Release`；发布结果、release commit 与 npm 实际版本将在后续追加记录。
