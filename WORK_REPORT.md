@@ -1296,3 +1296,25 @@
 - npm 发布状态：Release workflow run `33671855039`、job `100387126099` 成功，release commit 已拉取到本地；npm 官方 registry 已确认 `react-launchpad@0.1.14`、`ui-launchpad@1.0.14`、`ui-perpetuals@1.1.84` 与 `ui-tradingview@0.1.240`。
 - Vercel 部署状态：模板功能部署 run `33674601560`、job `100396134635` 成功；完整依赖补齐后的最终部署 run `33675549144`、job `100399213113` 成功，部署 URL 为 `https://liberfi-2qbt53srb-sgt-lab.vercel.app`；`https://app.liberfi.io` 与 `https://dex.liberfi.io` 均返回 HTTP 200。
 - 推送状态：最终工作记录将以 `[skip ci]` 独立提交并推送，避免再次触发 npm Release 或 Vercel；GitHub Actions 的 Node 20 弃用 annotation 仅为提示，不影响本次发布和部署结果。
+
+## 2026-09-03：预测分类首次加载性能优化（提交前）
+
+- 仓库与分支：`prediction-server/fix/sports-sync-obs-verify-metrics`、`react-sdk/main` 与 `prediction-nextjs-template/main`；`dex-nextjs-template/main` 通过本地 SDK 模式验证共享修改。
+- 拟用提交标题：服务端使用 `perf(events): bound category market hydration`；React SDK 使用 `fix(predict): bound category request latency`；Prediction 模板使用 `fix(events): propagate request cancellation`；工作记录使用 `[skip ci]` 独立提交。
+- 问题背景：两个预测市场页面首次点击分类时，事件列表冷查询会先加载并反序列化事件下全部市场，再筛选最多三个摘要市场；短缓存与客户端默认重试把一次慢查询放大为约 20 秒的 502 后重试等待。
+- 计划完成事项：服务端在 PostgreSQL 内按现有摘要资格和排序规则选出每事件最多三个市场后再物化完整记录，恢复并约束 `markets_limit` 参数，将列表缓存延长到约三分钟并增加按 key 抖动；React SDK 为事件列表增加五秒超时、仅一次瞬时错误重试、完整 HTTP 状态和切换分类时保留旧数据；Prediction BFF 传播请求取消信号。
+- 影响范围：通用预测事件列表接口、分类列表 Redis 缓存、`@liberfi.io/react-predict` 事件查询、`@liberfi.io/ui-predict` 列表加载体验及 Prediction 模板事件代理；HTTP 状态保留仅限事件列表调用链，不修改共享 HTTP 工具、交易、实时行情、体育专用接口或 DEX 其他业务模块。
+- 验证结果：提交前已完成服务端全仓 Go 测试；React SDK 全仓测试及三个受影响包的测试、类型、lint 通过，全仓类型检查仅被未修改的 `ui-tradingview` 既有三处测试类型错误阻断；Prediction 模板 43/43 套件共 216/216 项、类型和 lint 通过；DEX Web 49/49 套件共 210/210 项、类型和 lint 通过，本地浏览器验证分类请求在 5.0 秒取消且加载中保留上一分类卡片。
+- 推送状态：本轮仅创建本地提交，不推送、不发布 npm、不部署；后续需用户明确发布或部署后再执行。
+- Workflow 状态：本轮不触发 GitHub Actions；React SDK 发布与两个模板部署将在获得明确授权后分别执行。
+
+## 2026-09-03：预测分类首次加载性能优化（提交后）
+
+- 仓库与分支：`prediction-server/fix/sports-sync-obs-verify-metrics`、`react-sdk/main`、`prediction-nextjs-template/main`；DEX 通过 `main` 的本地 SDK 模式完成消费验证。
+- 提交：服务端 `8f1913d` — `perf(events): bound category market hydration`；React SDK `4808c9167` — `fix(predict): bound category request latency`；Prediction 模板 `010a773` — `fix(events): propagate request cancellation`。
+- 问题背景：分类列表冷缓存时无边界加载全部子市场，叠加 30 秒缓存和客户端默认重试，导致两个预测页面第一次点击分类出现约 20 秒等待与 502。
+- 最终完成事项：事件列表只物化每事件最多三个符合稳定身份和摘要排序规则的市场；`markets_limit` 恢复校验；列表缓存升级版本、延长至约三分钟并分散过期；客户端在事件列表调用链内保留 HTTP 状态、五秒终止慢请求、只重试一次瞬时网关或网络错误，并在分类切换时保留已有卡片；Prediction BFF 同步取消上游请求。双轴复审后收口了共享 HTTP 错误行为，并抽取服务端统一的受限市场加载分支，避免波及其他 SDK 接口或两条列表路径语义漂移。
+- 影响范围：`prediction-server` 通用事件列表、React SDK 三个预测相关包、Prediction 模板 BFF；DEX 无需复制业务代码，通过相同 React SDK 行为获得修复。
+- 验证结果：服务端 `go test ./...` 和本地 `make run` 通过，接口接受 `markets_limit=3` 并拒绝超过上限参数；React SDK 全仓测试与受影响包测试、类型、lint 通过，全仓类型检查仅剩未修改 `ui-tradingview` 的既有三处测试类型错误；Prediction 模板 216/216、DEX Web 210/210 测试及两边类型、lint 通过；浏览器验证慢分类请求约 5.0 秒取消，四秒切换期间旧卡片持续可见且新结果正常替换。
+- 推送状态：三个功能提交均仅在本地创建，尚未推送；React SDK 尚未发布 npm，两个模板尚未升级到发布后的包版本。
+- Workflow 状态：未触发 workflow、npm 发布或部署；后续发布顺序应为服务端部署、React SDK Release、两个模板升级依赖并部署。
