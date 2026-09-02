@@ -70,14 +70,25 @@ describe("createStage55LaunchpadPorts", () => {
     const client = fakeClient({ createToken });
     const ports = createStage55LaunchpadPorts(client);
 
-    const result = await ports.createToken({
-      chain: Chain.SOLANA,
-      name: "Demo",
-      symbol: "DEMO",
-      platform: LaunchPadPlatform.PUMPFUN,
-    });
+    const result = await ports.createToken(
+      {
+        chain: Chain.SOLANA,
+        name: "Demo",
+        symbol: "DEMO",
+        platform: LaunchPadPlatform.PUMPFUN,
+        imageUri: "https://images.example.com/demo.png",
+      },
+      "wallet-address",
+    );
 
     expect(createToken).toHaveBeenCalledTimes(1);
+    expect(createToken).toHaveBeenCalledWith("sol", {
+      dex: "pumpfun",
+      userAddress: "wallet-address",
+      name: "Demo",
+      symbol: "DEMO",
+      image: "https://images.example.com/demo.png",
+    });
     expect(result).toEqual({ serializedTx: "signed-tx" });
   });
 
@@ -86,6 +97,7 @@ describe("createStage55LaunchpadPorts", () => {
     const ports = createStage55LaunchpadPorts(fakeClient({ createToken }));
     const snapshot = await ports.createRuntime({
       signer: { sign: async () => "sig" },
+      userAddress: "wallet-address",
     }).submit({
       chain: Chain.SOLANA,
       name: "Demo",
@@ -96,6 +108,12 @@ describe("createStage55LaunchpadPorts", () => {
     expect(snapshot.status).toBe("succeeded");
     expect(snapshot.txHash).toBe("signed-tx");
     expect(createToken).toHaveBeenCalledTimes(1);
+    expect(createToken).toHaveBeenCalledWith("sol", {
+      dex: "pumpfun",
+      userAddress: "wallet-address",
+      name: "Demo",
+      symbol: "DEMO",
+    });
   });
 });
 

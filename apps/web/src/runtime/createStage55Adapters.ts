@@ -1,4 +1,4 @@
-import type { ChainStreamClient } from "@chainstream-io/sdk";
+import type { ChainStreamClient, CreateTokenInput } from "@chainstream-io/sdk";
 import { Chain } from "@liberfi.io/types";
 import {
   createLaunchpadCreateRuntime,
@@ -38,10 +38,14 @@ export type Stage55SendTxParams = {
 } & Record<string, unknown>;
 
 export type Stage55LaunchpadPorts = {
-  createToken: (intent: CreateTokenIntent) => Promise<{ serializedTx?: string }>;
+  createToken: (
+    intent: CreateTokenIntent,
+    userAddress: string,
+  ) => Promise<{ serializedTx?: string }>;
   createRuntime: (options?: {
     upload?: LaunchpadUploadPort;
     signer?: LaunchpadSignerPort;
+    userAddress?: string;
     onChange?: (snapshot: import("@liberfi.io/react-launchpad").LaunchpadCreateSnapshot) => void;
   }) => LaunchpadCreateRuntime;
 };
@@ -90,12 +94,19 @@ export type Stage55Adapters = {
 export function createStage55LaunchpadPorts(
   client: ChainStreamClient,
 ): Stage55LaunchpadPorts {
-  const createToken = async (intent: CreateTokenIntent) =>
-    client.dex.createToken(chainParam(intent.chain), {
+  const createToken = async (
+    intent: CreateTokenIntent,
+    userAddress: string,
+  ) => {
+    const input: CreateTokenInput = {
+      dex: intent.platform,
+      userAddress,
       name: intent.name,
       symbol: intent.symbol,
-      ...(intent.imageUri ? { imageUri: intent.imageUri } : {}),
-    } as Parameters<ChainStreamClient["dex"]["createToken"]>[1]);
+      ...(intent.imageUri ? { image: intent.imageUri } : {}),
+    };
+    return client.dex.createToken(chainParam(intent.chain), input);
+  };
 
   return {
     createToken,
@@ -107,7 +118,10 @@ export function createStage55LaunchpadPorts(
         execution: {
           async submit(signed, intent) {
             void signed;
-            const result = await createToken(intent);
+            if (!options.userAddress) {
+              throw new Error("missing user address");
+            }
+            const result = await createToken(intent, options.userAddress);
             return { txHash: result.serializedTx ?? "tx" };
           },
         },

@@ -111,5 +111,11 @@ export default [
       },
     },
   },
+  {
+    files: ["src/app/**/route.test.ts"],
+    rules: {
+      "jsdoc/check-tag-names": ["warn", { definedTags: ["jest-environment"] }],
+    },
+  },
   { plugins: { "@next/next": nextPlugin } },
 ];

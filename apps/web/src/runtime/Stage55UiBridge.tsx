@@ -57,6 +57,7 @@ export function LaunchpadUiBridge({ children }: PropsWithChildren) {
       createRuntime: (onChange) =>
         adapters.launchpad.createRuntime({
           onChange,
+          userAddress: wallet?.address,
           upload: {
             upload: async (intent) => intent.imageUri ?? "",
           },

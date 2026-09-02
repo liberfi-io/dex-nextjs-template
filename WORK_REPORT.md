@@ -1189,6 +1189,28 @@
 - 推送状态：功能提交与本条记录待重新核对 `origin/main` 后普通 fast-forward 推送；用户的并行未提交文件未暂存、未提交，禁止 force push。
 - Workflow 状态：功能提交不含 `[skip ci]`，推送后预计触发仓库既有 workflow；本条纯工作记录包含 `[skip ci]`，不会额外重复触发。
 
+## 2026-09-03：完善 Launchpad 生成、图片与创建代币链路（提交前）
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`；React SDK 基于与 `origin/main` 一致的 `bee129361`，模板当前本地 `main` 已包含独立完成的体育列表修复提交，功能文件与本轮 Launchpad 改动互不重叠。
+- 拟用提交标题：React SDK 使用 `fix(launchpad): complete creation flow fixes [skip ci]`；模板使用 `fix(launchpad): align generation proxy and create token contract [skip ci]`；最终工作记录使用 `docs: record launchpad follow-up fixes [skip ci]`。
+- 问题背景：从底部 Twitter 入口带入建议图片时缺少替换入口，图片预览区域仅 112px 且使用裁切展示；meme 生成请求经 Next 外部 rewrite 偶发连接重置或直接返回 404；创建代币 adapter 仍发送旧 DTO `{ name, symbol, imageUri }`，导致 ChainStream 以 40001 拒绝未知 `imageUri` 并提示缺少 `dex`、`userAddress`。
+- 计划完成事项：建议图片与手动上传图片统一提供替换入口；图片区域调整为移动端 160px、桌面端 176px并完整展示图片；为 meme 生成增加精确的应用路由、请求头过滤和一次瞬时网络错误重试；创建代币请求映射为 SDK 2.1.14 的 `{ dex, userAddress, name, symbol, image }`，从当前钱包注入地址并移除掩盖契约错误的强制类型断言；补充上传展示、建议图片替换、生成代理和创建 DTO 回归测试。
+- 影响范围：`@liberfi.io/ui-launchpad` 的图片预览与替换交互，以及模板的 meme 生成代理和 ChainStream 创建代币请求；不发布 npm、不升级依赖、不广播链上交易，也不修改体育预测功能。
+- 验证计划：React SDK 执行 `ui-launchpad` 全量测试、typecheck、lint 与 whitespace；模板执行 Web 全量测试、Node 构建配置测试、typecheck、lint 与 whitespace，并在现有本地开发服务中验证真实 meme 生成成功、Twitter 建议图片可替换及 `/v2/dex/sol/create` 返回 HTTP 201。
+- 预期推送状态：两仓库均只暂存本轮相关文件，保留并不混入其他未提交改动；通过普通 fast-forward 推送各自 `main`，禁止 force push。模板已完成的体育列表提交将作为当前 `main` 的既有祖先同步到远端。
+- Workflow 策略：本轮所有新提交标题均包含 `[skip ci]`，按用户要求跳过 GitHub Actions、React SDK npm Release、模板 Vercel 部署及其他 push workflow。
+
+## 2026-09-03：React SDK Launchpad 图片交互完善（提交后）
+
+- 仓库与分支：`react-sdk/main`。
+- 提交：`7c00a3777` — `fix(launchpad): complete creation flow fixes [skip ci]`。
+- 问题背景：Twitter 入口自动填充的建议图片处于 idle 状态，旧条件只为上传过的图片显示替换入口；同时 112px 的预览高度和 `object-cover` 会把代币图片裁成横幅，影响确认图片内容。
+- 最终完成事项：统一以是否存在预览或最终图片判断替换入口；建议图片、上传成功图片和上传失败后保留的本地预览均可重新选择；上传区域调整为移动端 160px、桌面端 176px，预览改为完整等比展示；补充建议图片替换、响应式高度与展示模式断言。
+- 影响范围：`@liberfi.io/ui-launchpad` 创建新币表单的图片预览和替换操作；不改变图片上传接口、meme 生成 contract、创建代币 DTO 或链上交易流程。
+- 验证结果：`ui-launchpad` 4/4 个测试套件共 11/11 项、typecheck、lint 与 whitespace 全部通过；现有模板本地开发服务热更新后确认上传区域命中 `h-40 sm:h-44`。
+- 推送状态：提交已创建于本地 `react-sdk/main`，领先 `origin/main` 1 个提交；待模板功能与工作记录提交完成后普通 fast-forward 推送，禁止 force push。
+- Workflow 状态：提交标题包含 `[skip ci]`，推送后应跳过 npm Release 及其他 GitHub Actions workflow。
+
 ## 2026-09-03：体育实时列表首次加载保护已推送
 
 - 仓库与分支：`dex-nextjs-template/main`，本地与 `origin/main` 已通过普通 fast-forward 推送同步；工作区继续保留 Stage55、ESLint 配置与 `media-track-api` 的用户并行改动。
