@@ -1211,6 +1211,17 @@
 - 推送状态：提交已创建于本地 `react-sdk/main`，领先 `origin/main` 1 个提交；待模板功能与工作记录提交完成后普通 fast-forward 推送，禁止 force push。
 - Workflow 状态：提交标题包含 `[skip ci]`，推送后应跳过 npm Release 及其他 GitHub Actions workflow。
 
+## 2026-09-03：Launchpad 生成代理与创建代币契约修复（提交后）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 提交：`865121e` — `fix(launchpad): align generation proxy and create token contract [skip ci]`；本条记录使用 `docs: record launchpad follow-up fixes [skip ci]` 独立提交。
+- 问题背景：外部 rewrite 转发 meme 生成接口时出现 404 与 TLS `ECONNRESET`，导致魔法生成失败；创建代币 adapter 使用强制类型断言发送旧字段 `imageUri`，并遗漏 SDK 2.1.14 必填的 `dex` 与 `userAddress`，后端返回 40001 参数校验错误。
+- 最终完成事项：新增精确的 `/media-track-api/meme/generate` Node route，保留认证与请求体、过滤 hop-by-hop/host 请求头，并对瞬时连接错误重试一次；创建代币 DTO 改为 `{ dex, userAddress, name, symbol, image }`，DEX 从 Launchpad 平台映射，钱包地址从当前连接注入，图片 URL 映射到 `image`，同时以 `CreateTokenInput` 静态类型替代强制断言；新增代理转发、重试与创建请求体契约测试。
+- 影响范围：模板的魔法生成入口、ChainStream 创建代币预签名请求和 Stage 55 adapter；不修改 `@chainstream-io/sdk` 版本、不广播链上交易、不发布 npm，也不部署 Vercel。
+- 验证结果：失败回归测试在修复前稳定捕获 `{ name, symbol, imageUri }` 与目标 DTO 的差异，修复后转绿；Web 49/49 个 Jest 套件共 209/209 项、14 项 Node 构建配置测试、TypeScript、ESLint 与 whitespace 全部通过；真实本地代理生成请求返回 HTTP 200，页面魔法生成成功；真实 `/dex-api/v2/dex/sol/create` 返回 HTTP 201，表单成功清空且不再出现 40001。
+- 推送状态：模板功能提交已创建；React SDK `7c00a3777` 与模板功能、工作记录提交将分别普通 fast-forward 推送至各自 `origin/main`，禁止 force push。
+- Workflow 状态：React SDK、模板功能和本条工作记录提交均包含 `[skip ci]`，按要求跳过 GitHub Actions、npm Release 与 Vercel 部署。
+
 ## 2026-09-03：体育实时列表首次加载保护已推送
 
 - 仓库与分支：`dex-nextjs-template/main`，本地与 `origin/main` 已通过普通 fast-forward 推送同步；工作区继续保留 Stage55、ESLint 配置与 `media-track-api` 的用户并行改动。
