@@ -1177,3 +1177,14 @@
 - 验证结果：新增 3 个回归套件完成红绿验证；全仓测试 gate 与 Web 49/49 个 Jest 套件共 209/209 项、14 项构建配置契约通过；Web TypeScript、全量 ESLint、定向 ESLint 与 whitespace 检查通过；复用现有 3000 端口开发服务验证 `/predict/sports?view=live` 返回 HTTP 200。
 - 推送状态：计划仅精确提交本次 8 个预测模块代码/测试文件及本条工作记录，随后普通 fast-forward 推送到 `origin/main`，不包含现有 Stage55、ESLint 配置与 `media-track-api` 未提交改动，禁止 force push。
 - Workflow 状态：功能提交不包含 `[skip ci]`，推送后允许触发仓库既有 workflow；结果将在提交后记录中更新。
+
+## 2026-09-03：体育实时列表首次加载保护迁移完成（提交后）
+
+- 仓库与分支：`dex-nextjs-template/main`，功能提交基于 `e842954`，提交过程中保留 Stage55、ESLint 配置与 `media-track-api` 既有未提交改动。
+- 提交：`76991da` — `fix(prediction): recover sports list after SSR timeout`；本条记录使用 `docs: record sports list recovery migration [skip ci]` 独立提交。
+- 问题背景：预测模块仍将体育比赛 SSR 超时当作空数据，导致首次进入直播列表没有赛事；客户端一次性恢复还需要兼容 React Strict Mode 的 effect 重放与用户主动切换日期的请求竞态。
+- 完成事项：SSR deadline 已从 3 秒提高至 5 秒；比赛预取失败被标记为 degraded 并携带原时间范围；权威 market-data hydration 优先并清除降级状态；客户端仅对需要展示的体育比赛按原请求上下文恢复，并阻止卸载后、用户新请求后或旧响应覆盖当前状态。共享服务端的 canonical summary discoverability 修复继续统一处理无有效价格摘要赛事。
+- 影响范围：`/predict/sports` 的比赛 SSR、客户端恢复与 hydration 合并；电竞、交易、Stage55、媒体跟踪以及 prediction API contract 不变。
+- 验证结果：3 个新增回归套件完成红绿循环；全仓测试 gate、Web 49/49 个 Jest 套件共 209/209 项与 14 项构建配置契约通过；Web TypeScript、全量及定向 ESLint、whitespace 通过；现有开发服务上的 `/predict/sports?view=live` 返回 HTTP 200。Standards 与 Spec 双轴复审除本条记录外均无实质问题，本条已关闭最后一项 Standards finding。
+- 推送状态：功能提交与本条记录待重新核对 `origin/main` 后普通 fast-forward 推送；用户的并行未提交文件未暂存、未提交，禁止 force push。
+- Workflow 状态：功能提交不含 `[skip ci]`，推送后预计触发仓库既有 workflow；本条纯工作记录包含 `[skip ci]`，不会额外重复触发。
