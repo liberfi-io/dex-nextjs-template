@@ -1318,3 +1318,13 @@
 - 验证结果：服务端 `go test ./...` 和本地 `make run` 通过，接口接受 `markets_limit=3` 并拒绝超过上限参数；React SDK 全仓测试与受影响包测试、类型、lint 通过，全仓类型检查仅剩未修改 `ui-tradingview` 的既有三处测试类型错误；Prediction 模板 216/216、DEX Web 210/210 测试及两边类型、lint 通过；浏览器验证慢分类请求约 5.0 秒取消，四秒切换期间旧卡片持续可见且新结果正常替换。
 - 推送状态：三个功能提交均仅在本地创建，尚未推送；React SDK 尚未发布 npm，两个模板尚未升级到发布后的包版本。
 - Workflow 状态：未触发 workflow、npm 发布或部署；后续发布顺序应为服务端部署、React SDK Release、两个模板升级依赖并部署。
+
+## 2026-09-03：预测分类性能优化发布部署（模板依赖提交前）
+
+- 仓库与分支：`prediction-server/main`、`react-sdk/main`、`prediction-nextjs-template/main` 与 `dex-nextjs-template/main`；服务端和 SDK 阶段已完成，两个模板均基于已复核的本地功能提交继续升级依赖。
+- 已完成提交：服务端 `d4ded8f` — `perf(events): bound category market hydration`；React SDK `4808c9167` — `fix(predict): bound category request latency`，自动版本提交 `35951415c` — `chore: release packages`；Prediction 模板已有 `9dc667f` 与 `010a773` 两个待推送修复，DEX 通过新版 SDK 直接消费分类加载优化。
+- 发布状态：服务端 staging run `33680100825` 与 production run `33680106128` 均成功，production tag/Release 为 `v0.0.208`；React SDK Release run `33681807112` 成功，核心预测包发布为 `@liberfi.io/react-predict@0.3.86` 与 `@liberfi.io/ui-predict@4.0.86`。
+- 计划完成事项：Prediction 模板将其 10 个直接 `@liberfi.io/*` 依赖同步到本轮版本并刷新 lockfile；DEX 模板将全部 24 个直接 `@liberfi.io/*` 依赖同步到同轮版本并刷新 lockfile。`@chainstream-io/sdk` 按 `@liberfi.io/client@0.3.102` 的声明继续保持 `2.1.14`。
+- 拟用提交标题：Prediction 模板使用 `chore(deps): update prediction sdk packages`；DEX 模板使用 `chore(deps): update react sdk packages`；最终部署记录使用 `[skip ci]` 独立提交。
+- 验证与部署计划：npm 官方 registry 完全可见后生成 lockfile；两模板分别执行测试、类型、lint、whitespace 与 Node 20 production build；Prediction 推送 `main` 部署 staging，并打下一个 `v*` tag 部署 production；DEX 推送 `main` 部署 production；全程等待 workflow 明确成功并核验部署 URL。
+- 推送约束：只使用普通 fast-forward 推送，禁止 force push；依赖提交不包含 `[skip ci]`，最终纯工作记录包含 `[skip ci]` 以避免重复部署。
