@@ -12,7 +12,6 @@ import {
   RedpacketUiProvider,
   type RedpacketUiPorts,
 } from "@liberfi.io/ui-redpacket";
-import { toast } from "@liberfi.io/ui";
 import { useAuthCallback, useConnectedWallet } from "@liberfi.io/wallet-connector";
 import { asJsx } from "../application/jsx";
 import { useUpload } from "../application/pinata";
@@ -62,15 +61,15 @@ export function LaunchpadUiBridge({ children }: PropsWithChildren) {
             upload: async (intent) => intent.imageUri ?? "",
           },
           signer: {
-            sign: async () => {
+            sign: async (serializedTx) => {
               if (!wallet) throw new Error("missing signer");
-              return "signed";
+              const signed = await wallet.signTransaction(
+                Buffer.from(serializedTx, "base64"),
+              );
+              return Buffer.from(signed).toString("base64");
             },
           },
         }),
-      onCreated: (snapshot) => {
-        if (snapshot.txHash) toast.success(snapshot.txHash);
-      },
     }),
     [adapters.launchpad, chain, generateAsync, requireAuth, upload, wallet],
   );

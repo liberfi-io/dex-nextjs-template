@@ -1243,3 +1243,34 @@
 - 验证结果：全仓测试 gate、Web 49/49 个 Jest 套件共 209/209 项、14 项构建配置契约、Web TypeScript、ESLint、whitespace 和现有开发服务 HTTP 200 验证全部通过；双轴复审无剩余实质问题。
 - 推送状态：`origin/main` 已包含 `76991da` 与 `5a641a9`，无分叉、未使用 force push；本条记录将继续普通 fast-forward 推送，用户并行改动未进入任何提交。
 - Workflow 状态：截至本条记录生成时，GitHub 未为功能提交创建 workflow run；本条包含 `[skip ci]`，不会触发部署或其他 workflow。
+
+## 2026-09-03：修复 Launchpad 交易签名、广播与成功后持续加载（提交前）
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`；执行前分别与各自 `origin/main` 一致，React SDK 基线为 `7c00a3777`，模板基线为 `4791acb`。
+- 拟用提交标题：React SDK 使用 `fix(launchpad): complete signed token submission`；模板在 npm 发布完成并升级依赖后使用 `fix(launchpad): complete signed token submission`；纯工作记录提交使用 `[skip ci]`。
+- 问题背景：ChainStream 创建代币接口返回的是 Base64 编码待签名交易，旧适配器却将其直接当作 `txHash` 展示，并在没有调用钱包交易签名和链上广播的情况下提前进入成功态；同时 UI 将 `succeeded` 错误视为持续 loading 状态，导致成功 toast 后按钮一直转圈且没有真实交易结果。
+- 计划完成事项：React SDK 创建状态机增加兼容旧适配器的可选交易准备阶段，确保顺序为准备交易、钱包签名、提交广播，仅在得到真实交易哈希后进入成功态；终态统一退出 loading；模板删除序列化交易 toast，将 Base64 交易交给当前钱包签名，再通过 ChainStream transaction API 广播并以返回 signature 收敛；补充状态顺序、真实签名参数、广播请求和终态 loading 回归测试。
+- 影响范围：`@liberfi.io/react-launchpad`、`@liberfi.io/ui-launchpad`、模板 Stage 55 Launchpad 应用适配器、模板对应 SDK 依赖版本与 Vercel production；不修改 ChainStream 后端接口、代币参数、图片上传或 meme 生成 contract。
+- 验证计划：React SDK 执行两个 Launchpad 包全量测试、typecheck、lint、whitespace 与全仓 `pnpm build`；Release workflow 成功后执行 `git pull --ff-only` 并从 npm 官方 registry 核验实际版本；模板升级相关 SDK 版本并刷新 lockfile，执行 Web 测试、typecheck、lint、whitespace 和 production build，最后验证 Vercel workflow 与生产域名。
+- 预期推送状态：两个仓库均通过普通 fast-forward 推送到 `main`，禁止 force push；模板功能代码与已发布 SDK 依赖放在同一可部署提交中，避免生产环境短暂运行旧 SDK 状态机。
+- Workflow 策略：React SDK 功能提交不包含 `[skip ci]`，触发 npm `Release`；模板功能与依赖提交不包含 `[skip ci]`，触发 `Deploy to Vercel`；纯工作记录提交包含 `[skip ci]`，避免重复发布或部署。
+
+## 2026-09-03：React SDK Launchpad 完整交易状态机修复（提交后）
+
+- 仓库与分支：`react-sdk/main`。
+- 提交：`b268f340d` — `fix(launchpad): complete signed token submission`。
+- 问题背景：创建代币运行时将图片地址或 symbol 交给 signer，并把后端 `serializedTx` 误当最终交易哈希；成功态又被 UI 视为持续 loading，造成未广播却提示已提交、按钮永久转圈。
+- 最终完成事项：新增兼容旧适配器的 `prepare` 能力与 `preparing` 状态，交易顺序调整为准备、签名、提交；上传后的最终图片 URL 通过 resolved intent 贯穿后续阶段；准备、签名、提交异常分别收敛到 failed 或 rejected；成功、失败、拒签终态均恢复可交互状态；新增顺序与终态回归测试。
+- 影响范围：`@liberfi.io/react-launchpad` 的公开端口和创建状态机、`@liberfi.io/ui-launchpad` 的按钮 loading 语义；旧 execution adapter 未实现 `prepare` 时继续沿用原行为，保持向后兼容。
+- 验证结果：`react-launchpad` 2/2 个套件共 6/6 项、`ui-launchpad` 5/5 个套件共 12/12 项通过；两包 typecheck、lint、whitespace 通过；React SDK 全仓 `pnpm build` 24/24 个任务成功。
+- 推送状态：功能提交已创建于本地 `react-sdk/main`，下一步普通 fast-forward 推送到 `origin/main`，禁止 force push。
+- Workflow 状态：提交不包含 `[skip ci]`，推送后将触发 npm `Release`；最终 run、release commit 与 npm 版本将在发布完成后补充。
+
+## 2026-09-03：React SDK Launchpad 交易状态机发布完成
+
+- 仓库与分支：`react-sdk/main`，本地已通过 `git pull --ff-only` 同步远端自动版本提交。
+- 提交：功能提交 `b268f340d` — `fix(launchpad): complete signed token submission`；release commit `3c7521e45` — `chore: release packages`。
+- 完成事项：固定版本组完成 patch bump 与 npm 发布；核心包为 `@liberfi.io/react-launchpad@0.1.14`、`@liberfi.io/ui-launchpad@1.0.14`，模板所需签名状态机和终态 loading 修复已进入公开 npm 包。
+- 验证结果：Release run `33671855039`、job `100387126099` 用时 4 分 41 秒成功；发布日志明确列出两个核心包 published successfully，npm 官方 registry 已确认对应版本；本地 `react-sdk/main` 与 `origin/main` 均指向 `3c7521e45`。
+- 推送状态：React SDK 功能提交与 release commit 均已在远端 `main`，未使用 force push。
+- Workflow 状态：npm `Release` 成功；Node 20 弃用 annotation 仅为提示。下一步升级模板依赖并触发 Vercel production 部署。

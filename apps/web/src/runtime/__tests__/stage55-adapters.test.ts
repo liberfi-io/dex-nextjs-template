@@ -38,6 +38,7 @@ const PRODUCTION_ENTRIES = [
 
 function fakeClient(overrides: {
   createToken?: jest.Mock;
+  sendTransaction?: jest.Mock;
   createRedpacket?: jest.Mock;
   claimRedpacket?: jest.Mock;
   redpacketSend?: jest.Mock;
@@ -45,6 +46,11 @@ function fakeClient(overrides: {
   return {
     dex: {
       createToken: overrides.createToken ?? jest.fn().mockResolvedValue({ serializedTx: "tx" }),
+    },
+    transaction: {
+      send:
+        overrides.sendTransaction ??
+        jest.fn().mockResolvedValue({ signature: "tx-signature" }),
     },
     redPacket: {
       createRedpacket:
@@ -93,10 +99,19 @@ describe("createStage55LaunchpadPorts", () => {
   });
 
   it("builds the SDK create runtime against ChainStream execution", async () => {
-    const createToken = jest.fn().mockResolvedValue({ serializedTx: "signed-tx" });
-    const ports = createStage55LaunchpadPorts(fakeClient({ createToken }));
+    const createToken = jest.fn().mockResolvedValue({
+      serializedTx: "unsigned-token-transaction",
+      mintAddress: "mint-address",
+    });
+    const sendTransaction = jest.fn().mockResolvedValue({
+      signature: "token-transaction-signature",
+    });
+    const signer = jest.fn().mockResolvedValue("signed-token-transaction");
+    const ports = createStage55LaunchpadPorts(
+      fakeClient({ createToken, sendTransaction }),
+    );
     const snapshot = await ports.createRuntime({
-      signer: { sign: async () => "sig" },
+      signer: { sign: signer },
       userAddress: "wallet-address",
     }).submit({
       chain: Chain.SOLANA,
@@ -106,13 +121,19 @@ describe("createStage55LaunchpadPorts", () => {
     });
 
     expect(snapshot.status).toBe("succeeded");
-    expect(snapshot.txHash).toBe("signed-tx");
+    expect(snapshot.txHash).toBe("token-transaction-signature");
     expect(createToken).toHaveBeenCalledTimes(1);
     expect(createToken).toHaveBeenCalledWith("sol", {
       dex: "pumpfun",
       userAddress: "wallet-address",
       name: "Demo",
       symbol: "DEMO",
+    });
+    expect(signer).toHaveBeenCalledTimes(1);
+    expect(signer).toHaveBeenCalledWith("unsigned-token-transaction");
+    expect(sendTransaction).toHaveBeenCalledTimes(1);
+    expect(sendTransaction).toHaveBeenCalledWith("sol", {
+      signedTx: "signed-token-transaction",
     });
   });
 });
@@ -191,6 +212,12 @@ describe("Stage55AdaptersProvider", () => {
 });
 
 describe("Stage 5.5 production wiring", () => {
+  it("does not expose serialized launchpad transactions in a success toast", () => {
+    expect(readWebSrc("runtime/Stage55UiBridge.tsx")).not.toMatch(
+      /toast\.success\(snapshot\.txHash\)/,
+    );
+  });
+
   it("uploads launchpad images through the application Pinata adapter", () => {
     expect(readWebSrc("runtime/Stage55UiBridge.tsx")).toContain(
       'from "../application/pinata"',

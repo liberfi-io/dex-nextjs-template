@@ -41,7 +41,7 @@ export type Stage55LaunchpadPorts = {
   createToken: (
     intent: CreateTokenIntent,
     userAddress: string,
-  ) => Promise<{ serializedTx?: string }>;
+  ) => Promise<{ serializedTx: string; mintAddress?: string }>;
   createRuntime: (options?: {
     upload?: LaunchpadUploadPort;
     signer?: LaunchpadSignerPort;
@@ -116,13 +116,19 @@ export function createStage55LaunchpadPorts(
         signer: options.signer,
         onChange: options.onChange,
         execution: {
-          async submit(signed, intent) {
-            void signed;
+          async prepare(intent) {
             if (!options.userAddress) {
               throw new Error("missing user address");
             }
             const result = await createToken(intent, options.userAddress);
-            return { txHash: result.serializedTx ?? "tx" };
+            return { serializedTx: result.serializedTx };
+          },
+          async submit(signed, intent) {
+            const result = await client.transaction.send(
+              chainParam(intent.chain),
+              { signedTx: signed },
+            );
+            return { txHash: result.signature };
           },
         },
       }),
