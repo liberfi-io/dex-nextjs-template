@@ -1144,3 +1144,14 @@
 - 验证结果：`ui-launchpad` 4/4 个测试套件共 10/10 项、i18n 13/13 个套件共 77/77 项通过；两包 typecheck、lint、Prettier、whitespace 通过；React SDK 全仓 `pnpm build` 24/24 个任务成功。
 - 推送状态：功能提交已创建于本地 `react-sdk/main`，工作区干净且领先 `origin/main` 1 个提交；下一步普通 fast-forward 推送，禁止 force push。
 - Workflow 状态：提交未包含 `[skip ci]`，推送后将触发 npm `Release`；发布结果、release commit 与 npm 实际版本将在后续追加记录。
+
+## 2026-09-02：Launchpad 修复完成 npm 发布并准备模板部署
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`；React SDK 已同步远端 release commit，模板在已推送的提交前记录基线上准备依赖提交。
+- 提交：React SDK 功能提交 `1c62b4458` — `fix(launchpad): improve authenticated creation and image uploads`，自动版本提交 `bee129361` — `chore: release packages`；模板拟使用 `chore(deps): bump react sdk for launchpad fixes`。
+- 问题背景：创建新币 Modal 的认证、生成失败反馈与图片上传交互修复仅在本地 SDK 源码联调中生效，需要发布 npm 固定版本组并让生产模板消费对应版本。
+- 完成事项：React SDK Release workflow 已统一发布新一轮 patch，核心版本为 `@liberfi.io/i18n@0.1.283`、`@liberfi.io/react-launchpad@0.1.13`、`@liberfi.io/ui-launchpad@1.0.13`；模板 24 个直接使用的 `@liberfi.io/*` dependencies 已同步到同轮版本并刷新 lockfile，`@chainstream-io/sdk` 继续保持 `^2.1.14`。
+- 影响范围：Launchpad 创建新币 Modal、React SDK npm 固定版本组、模板依赖解析及下一步 Vercel production 部署；不修改后端 meme 生成路由、Pinata contract、链上交易与签名逻辑。
+- 验证结果：Release run `33643209724` 用时 5 分 34 秒成功，release commit 已通过 `git pull --ff-only` 同步，全部模板直接依赖版本均由 npm 官方 registry 确认；模板 Web 45/45 个 Jest 套件共 204/204 项、14 项构建配置契约、TypeScript、ESLint、whitespace 和 npm production build 全部通过，成功生成 23/23 个静态页面，仅有既有 Browserslist、postcss-calc 与 Sentry/OpenTelemetry warning。
+- 推送状态：React SDK 功能与 release commit 均已在 `origin/main`；模板依赖与本条工作记录待精确提交后普通 fast-forward 推送，禁止 force push。
+- Workflow 状态：React SDK `Release` run `33643209724` 成功；模板依赖提交不使用 `[skip ci]`，推送后将触发 `Deploy to Vercel`；最终部署记录将使用 `[skip ci]`，避免重复部署。
