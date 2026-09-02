@@ -1155,3 +1155,14 @@
 - 验证结果：Release run `33643209724` 用时 5 分 34 秒成功，release commit 已通过 `git pull --ff-only` 同步，全部模板直接依赖版本均由 npm 官方 registry 确认；模板 Web 45/45 个 Jest 套件共 204/204 项、14 项构建配置契约、TypeScript、ESLint、whitespace 和 npm production build 全部通过，成功生成 23/23 个静态页面，仅有既有 Browserslist、postcss-calc 与 Sentry/OpenTelemetry warning。
 - 推送状态：React SDK 功能与 release commit 均已在 `origin/main`；模板依赖与本条工作记录待精确提交后普通 fast-forward 推送，禁止 force push。
 - Workflow 状态：React SDK `Release` run `33643209724` 成功；模板依赖提交不使用 `[skip ci]`，推送后将触发 `Deploy to Vercel`；最终部署记录将使用 `[skip ci]`，避免重复部署。
+
+## 2026-09-02：Launchpad 创建与图片上传修复发布部署完成
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`；两个仓库均已通过普通 fast-forward 推送并与远端同步。
+- 提交：React SDK `1c62b4458` — `fix(launchpad): improve authenticated creation and image uploads`、release commit `bee129361`；模板 `2b9a008` — `chore(deps): bump react sdk for launchpad fixes`；本条记录使用 `docs: record launchpad sdk release and deploy [skip ci]`。
+- 问题背景：创建新币 Modal 的魔法创建认证与异常反馈不完整，图片/GIF 上传后预览会消失，上传状态与替换入口缺失，弱操作样式不符合 Modal 视觉层级；修复需要完整进入 npm 与 Vercel production。
+- 完成事项：魔法创建接入登录门禁并显示失败信息；图片上传实现稳定即时预览、上传中/成功/失败国际化反馈、失败保留预览、GIF 支持、旧 URL 隔离和弱化替换入口；React SDK 固定版本组已发布，模板 24 个直接 `@liberfi.io/*` 依赖全部升级到同轮版本并刷新 lockfile，`@chainstream-io/sdk` 保持 `2.1.14`。
+- 影响范围：`@liberfi.io/i18n@0.1.283`、`@liberfi.io/react-launchpad@0.1.13`、`@liberfi.io/ui-launchpad@1.0.13`、相关固定版本组、模板创建新币 Modal 和 Vercel 生产环境；不变更后端 meme 路由、Pinata contract、链上创建参数与签名流程。
+- 验证结果：React SDK Launchpad 10/10、i18n 77/77 测试，两包 typecheck/lint、Prettier、whitespace 与全仓 build 24/24 通过；模板 Web 45/45 个 Jest 套件共 204/204 项、14 项配置契约、TypeScript、ESLint、whitespace 和 production build 23/23 个静态页面通过；部署地址 `https://liberfi-ciazun12v-sgt-lab.vercel.app` 创建成功，`app.liberfi.io` 与 `dex.liberfi.io` 均返回 HTTP 200。
+- 推送状态：React SDK `origin/main` 指向 `bee129361`；模板依赖提交已推送到 `origin/main`，本条最终记录将继续普通 fast-forward 推送；全程未使用 force push。
+- Workflow 状态：React SDK `Release` run `33643209724` 用时 5 分 34 秒成功；模板 `Deploy to Vercel` run `33645032176`、job `100297439066` 用时 6 分 02 秒成功；两处 Node 20 弃用 annotation 仅为提示。最终纯工作记录包含 `[skip ci]`，不会重复发布或部署。
