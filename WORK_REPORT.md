@@ -1089,3 +1089,14 @@
 - 验证结果：全包 14/14 个测试套件共 51/51 项、5 轮竞态回归、package build、push hook 全仓 24/24 构建、lint、Prettier 与 whitespace 均通过；两个仓库提交推送后无分叉。
 - 推送状态：React SDK 远端 `main` 指向 `25da8d020`；模板远端 `main` 已包含 `efe3fc3` 与 `6bcbd09`；均未使用 force push，本条记录将继续普通 fast-forward 推送。
 - Workflow 状态：按三个已推送 commit 查询 GitHub Actions run 均为空，`[skip ci]` 已生效；本条最终记录同样使用 `[skip ci]`，不触发 npm 发布、Vercel 部署或其他 workflow。
+
+## 2026-09-02：发布 TradingView 卸载竞态修复并升级生产依赖（提交前）
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`，执行前分别与各自 `origin/main` 一致，React SDK 指向 `25da8d020`，模板指向 `a391b51`。
+- 拟用提交标题：模板发布前记录使用 `docs: record tradingview sdk release plan [skip ci]`；React SDK 使用 `chore(release): publish tradingview cleanup` 触发 Release；模板依赖升级使用 `chore(deps): bump react sdk for tradingview cleanup`。
+- 问题背景：TradingView iframe 卸载竞态修复已经合并并推送到 React SDK，但上一笔功能提交包含 `[skip ci]`，npm 仍停留在 `@liberfi.io/ui-tradingview@0.1.237`，生产模板尚未获得该修复。
+- 计划完成事项：先完成 React SDK 全仓发布构建、TradingView 回归测试与静态检查，再通过明确的 release 触发提交执行 GitHub Release workflow；发布成功后从 npm 官方 registry 核验整组 patch 版本并同步 release commit；模板统一升级实际依赖的 `@liberfi.io/*` 包、刷新 lockfile、完成本地与隔离 production build 验证，最后触发并等待 Vercel 生产部署。
+- 影响范围：`@liberfi.io/ui-tradingview` 的布局监听器卸载稳定性、React SDK npm 固定版本组、模板依赖解析以及代币详情和永续合约图表的生产运行；不改变 HTTP/WebSocket contract、domain type、图表行情和交易逻辑，`@chainstream-io/sdk` 保持 `^2.1.14` 不变。
+- 验证计划：React SDK 执行全仓 `pnpm build`、ui-tradingview 测试/typecheck/lint 和 whitespace；发布后逐包查询 npm 官方 registry；模板执行 Web 全量测试、typecheck、lint、依赖残留扫描、whitespace、本地页面验证与禁用本地 SDK alias 的隔离 production build；部署后等待 GitHub workflow 成功并验证生产域名 HTTP 200。
+- 预期推送状态：两个仓库均只允许普通 fast-forward push，禁止 force push；React SDK 发布后执行 `git pull --ff-only` 同步自动生成的 release commit。
+- Workflow 状态：本条发布前记录使用 `[skip ci]`，不触发部署；React SDK release 触发提交和模板依赖提交不使用 `[skip ci]`，分别允许 npm Release 与 Vercel workflow；最终纯工作记录使用 `[skip ci]`，避免重复发布或部署。
