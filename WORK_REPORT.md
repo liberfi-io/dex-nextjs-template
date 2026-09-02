@@ -1078,3 +1078,14 @@
 - 验证结果：精确回归测试由修复前红灯转为绿灯并连续 5/5 次通过；全包 14/14 个测试套件共 51/51 项、build、lint、Prettier 和 whitespace 通过；本地联调首页返回 HTTP 200。
 - 推送状态：React SDK 功能提交已创建，模板提交前记录为 `efe3fc3`；待提交本条记录后分别普通 fast-forward 推送至各自 `origin/main`，禁止 force push。
 - Workflow 状态：功能提交、提交前记录和本条记录均包含 `[skip ci]`，预期不触发 GitHub Actions、npm 发布、Vercel 部署或其他 workflow。
+
+## 2026-09-02：TradingView 卸载竞态修复推送完成
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`，均以普通 fast-forward 推送。
+- 提交：React SDK `25da8d020` — `fix(tradingview): guard detached widget cleanup [skip ci]`；模板记录 `efe3fc3` 与 `6bcbd09`；本条最终记录使用 `docs: record tradingview cleanup push [skip ci]`。
+- 问题背景：页面切换时已解除的 TradingView iframe 仍可能收到旧 layout listener 的退订调用，造成间歇性 `doWhenApiIsReady` 空指针。
+- 完成事项：已上线远端代码基线的修复通过 widget 所有权判断阻止失效实例调用 iframe API，同时保留有效实例正常退订，并用双向回归测试锁定销毁时序。
+- 影响范围：React SDK TradingView 布局监听器的卸载稳定性；模板依赖版本、npm 发布版本和 Vercel 生产环境均未变化。
+- 验证结果：全包 14/14 个测试套件共 51/51 项、5 轮竞态回归、package build、push hook 全仓 24/24 构建、lint、Prettier 与 whitespace 均通过；两个仓库提交推送后无分叉。
+- 推送状态：React SDK 远端 `main` 指向 `25da8d020`；模板远端 `main` 已包含 `efe3fc3` 与 `6bcbd09`；均未使用 force push，本条记录将继续普通 fast-forward 推送。
+- Workflow 状态：按三个已推送 commit 查询 GitHub Actions run 均为空，`[skip ci]` 已生效；本条最终记录同样使用 `[skip ci]`，不触发 npm 发布、Vercel 部署或其他 workflow。
