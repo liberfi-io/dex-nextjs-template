@@ -1166,3 +1166,14 @@
 - 验证结果：React SDK Launchpad 10/10、i18n 77/77 测试，两包 typecheck/lint、Prettier、whitespace 与全仓 build 24/24 通过；模板 Web 45/45 个 Jest 套件共 204/204 项、14 项配置契约、TypeScript、ESLint、whitespace 和 production build 23/23 个静态页面通过；部署地址 `https://liberfi-ciazun12v-sgt-lab.vercel.app` 创建成功，`app.liberfi.io` 与 `dex.liberfi.io` 均返回 HTTP 200。
 - 推送状态：React SDK `origin/main` 指向 `bee129361`；模板依赖提交已推送到 `origin/main`，本条最终记录将继续普通 fast-forward 推送；全程未使用 force push。
 - Workflow 状态：React SDK `Release` run `33643209724` 用时 5 分 34 秒成功；模板 `Deploy to Vercel` run `33645032176`、job `100297439066` 用时 6 分 02 秒成功；两处 Node 20 弃用 annotation 仅为提示。最终纯工作记录包含 `[skip ci]`，不会重复发布或部署。
+
+## 2026-09-03：迁移体育实时列表首次加载保护（提交前）
+
+- 仓库与分支：`dex-nextjs-template/main`，基于与 `origin/main` 一致的 `e842954`；保留 Stage55 与 `media-track-api` 相关既有未提交改动，不纳入本次提交。
+- 拟用提交标题：`fix(prediction): recover sports list after SSR timeout`。
+- 问题背景：本仓预测模块由 `prediction-nextjs-template` 迁移而来，仍保留 3 秒 SSR 共享 deadline；体育比赛请求超时会被当作权威空列表，首次进入页面无数据，刷新后才恢复。React Strict Mode 还可能取消并阻断一次性客户端补偿请求。
+- 完成事项：体育预测页 SSR deadline 提升到 5 秒；比赛预取失败时携带降级标记和原始请求时间范围；若 market-data hydration 已返回权威比赛页则清除降级状态，否则客户端按原 section、view、taxonomy、时间范围、limit 与语言自动恢复；补齐 Strict Mode、真实卸载及用户切换日期时的取消和过期请求保护。无价格赛事继续由共享 prediction-server 的 canonical summary discoverability 修复统一过滤，本仓不复制服务端规则。
+- 影响范围：`/predict/sports` 的首次 SSR 数据获取、体育比赛客户端恢复请求及 market-data hydration 合并；不改变电竞列表、预测 API contract、交易流程、Stage55 或媒体跟踪功能。
+- 验证结果：新增 3 个回归套件完成红绿验证；全仓测试 gate 与 Web 49/49 个 Jest 套件共 209/209 项、14 项构建配置契约通过；Web TypeScript、全量 ESLint、定向 ESLint 与 whitespace 检查通过；复用现有 3000 端口开发服务验证 `/predict/sports?view=live` 返回 HTTP 200。
+- 推送状态：计划仅精确提交本次 8 个预测模块代码/测试文件及本条工作记录，随后普通 fast-forward 推送到 `origin/main`，不包含现有 Stage55、ESLint 配置与 `media-track-api` 未提交改动，禁止 force push。
+- Workflow 状态：功能提交不包含 `[skip ci]`，推送后允许触发仓库既有 workflow；结果将在提交后记录中更新。
