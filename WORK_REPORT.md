@@ -1328,3 +1328,14 @@
 - 拟用提交标题：Prediction 模板使用 `chore(deps): update prediction sdk packages`；DEX 模板使用 `chore(deps): update react sdk packages`；最终部署记录使用 `[skip ci]` 独立提交。
 - 验证与部署计划：npm 官方 registry 完全可见后生成 lockfile；两模板分别执行测试、类型、lint、whitespace 与 Node 20 production build；Prediction 推送 `main` 部署 staging，并打下一个 `v*` tag 部署 production；DEX 推送 `main` 部署 production；全程等待 workflow 明确成功并核验部署 URL。
 - 推送约束：只使用普通 fast-forward 推送，禁止 force push；依赖提交不包含 `[skip ci]`，最终纯工作记录包含 `[skip ci]` 以避免重复部署。
+
+## 2026-09-03：预测分类性能优化发布部署完成
+
+- 仓库与分支：`prediction-server/main`、`react-sdk/main`、`prediction-nextjs-template/main` 与 `dex-nextjs-template/main`；各仓库均通过普通 fast-forward 推送，未使用 force push。
+- 提交与版本：服务端 `d4ded8f`，production tag `v0.0.208`；React SDK 功能提交 `4808c9167`、自动版本提交 `35951415c`；Prediction 模板最终提交 `84bfcc3`，production tag `v0.1.150`；DEX 模板依赖提交 `4d5526b`。
+- 最终完成事项：服务端已在数据库层将分类事件摘要市场物化限制为每事件最多三个，并延长、分散列表缓存；React SDK 已发布五秒超时、一次瞬时错误重试和切换分类保留旧列表；Prediction BFF 已传播取消信号；两个模板均已消费本轮公开 npm 版本。Prediction 的 10 个、DEX 的 24 个直接 `@liberfi.io/*` 依赖均同步到本轮版本，核心包为 `@liberfi.io/react-predict@0.3.86` 与 `@liberfi.io/ui-predict@4.0.86`；`@chainstream-io/sdk` 按新版 client contract 保持 `2.1.14`。
+- 验证结果：服务端 release 前 `make generate`、lint、全量测试通过；React SDK Node 20 全仓 build 24/24 成功；Prediction 43/43 套件共 216/216 项、类型、lint、whitespace 与 production build 21/21 页面通过；DEX 49/49 套件共 210/210 项、14 项配置契约、类型、零 warning lint baseline、whitespace 与 npm 消费模式 production build 23/23 页面通过。Prediction 因 i18n 从旧版本跨轮升级而暴露的 sports 测试 key 断言已改为真实英文文案。
+- 服务端部署状态：staging run `33680100825` 与 production run `33680106128` 均成功，两个 ECS rolling deployment 均完成稳定性等待，production GitHub Release `v0.0.208` 已创建。
+- npm 发布状态：React SDK Release run `33681807112`、job `100419892754` 用时 4 分 59 秒成功；自动版本提交已通过 `git pull --ff-only` 同步；全部直接消费版本已由 npm 官方 registry 复核可安装。
+- Vercel 部署状态：Prediction staging run `33683242554` 成功，URL `https://liberfi-prediction-pjkl4jrq9-sgt-lab.vercel.app`；Prediction production run `33683252522` 成功，URL `https://liberfi-prediction-ljep30im0-sgt-lab.vercel.app`；DEX production run `33683242388` 成功，URL `https://liberfi-lvzctnlik-sgt-lab.vercel.app`。三个部署 URL 以及 `https://predict.liberfi.io`、`https://app.liberfi.io`、`https://dex.liberfi.io` 均返回 HTTP 200。
+- 推送与 Workflow 状态：所有功能、版本与依赖提交均已在远端；本条最终工作记录使用 `docs: record prediction performance release [skip ci]` 独立提交，避免重复触发 Vercel。Actions 中仅有 Node 20 action runtime 弃用提示，不影响发布与部署结论。
