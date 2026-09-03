@@ -1380,3 +1380,35 @@
 - 验证计划：两仓库分别执行全量测试、typecheck、lint、whitespace 检查和 production build；推送后等待 Vercel workflow 明确成功，再验证部署 URL 与生产域名。
 - 预期推送状态：两仓库都使用普通 fast-forward 推送 `origin/main`，禁止 force push；Prediction 模板追加下一个 `v*` tag 触发 production。
 - Workflow 策略：Prediction 模板推送 `main` 部署 staging，再以 tag 部署 production；DEX 模板推送 `main` 直接部署 production；最终纯工作记录提交包含 `[skip ci]` 以避免重复部署。
+
+## 2026-09-03：预测列表失败提示体验调整（React SDK 提交前）
+
+- 仓库与分支：`react-sdk/main`；基线为自动发布提交 `2590109bf`。
+- 拟用提交标题：`fix(predict): simplify event list failure feedback`。
+- 问题背景：事件列表请求超过五秒时显示“加载时间过长，请重试”，把内部超时机制直接暴露给用户，且与普通加载失败形成无业务价值的技术性区分。
+- 计划完成事项：移除 UI 对 `TimeoutError` 的专门文案分支，让超时和其他加载失败统一显示通用失败提示并保留重试按钮；保留旧 i18n key 作为兼容别名，避免旧消费者直接读取该 key 时继续看到不友好的提示；补齐超时与普通错误的一致性测试。
+- 影响范围：`@liberfi.io/ui-predict` 事件列表失败状态与 `@liberfi.io/i18n` 英文、繁体中文文案；不改变五秒超时、瞬时网络错误重试、请求参数、成功空列表或交易逻辑。
+- 验证计划：运行 `ui-predict`、`i18n` 测试、typecheck、lint、whitespace 与全仓 `pnpm build`；推送后等待 npm `Release` workflow 成功并从官方 registry 核验版本。
+- 预期推送状态：只提交本次四个 SDK 文件，普通 fast-forward 推送 `origin/main`，禁止 force push；workflow 完成后执行 `git pull --ff-only` 同步自动版本提交。
+- Workflow 策略：功能提交不包含 `[skip ci]`，触发 React SDK `Release`；随后升级两个模板公开 npm 版本并部署。
+
+## 2026-09-03：预测列表失败提示体验调整（React SDK 提交后）
+
+- 仓库与分支：`react-sdk/main`。
+- 提交：`a41c4c60c` — `fix(predict): simplify event list failure feedback`。
+- 最终完成事项：事件列表超时与普通失败统一为通用可操作提示，移除 UI 的 `TimeoutError` 专门展示逻辑；旧 `loadTimedOut` 翻译 key 继续存在但映射到相同通用文案，兼容旧消费者；两种失败均保留重试按钮并有独立回归用例。
+- 影响范围：`@liberfi.io/ui-predict` 与 `@liberfi.io/i18n`；请求的五秒 deadline、网络与 502/503/504 的一次重试策略、空列表和交易行为不变。
+- 验证结果：`ui-predict` 12/12 套件共 43/43 项、`i18n` 13/13 套件共 77/77 项通过；两包 typecheck、lint 和 whitespace 通过；React SDK 全仓 production build 24/24 任务成功。
+- 推送状态：功能提交已创建于本地 `main`，下一步普通 fast-forward 推送 `origin/main`，禁止 force push。
+- Workflow 状态：推送后触发 npm `Release`，run、自动版本提交和官方 npm 版本将在发布成功后补充。
+
+## 2026-09-03：预测失败提示与列表摘要投影发布部署（模板提交前）
+
+- 仓库与分支：`prediction-server/fix/sports-sync-obs-verify-metrics`、`react-sdk/main`、`prediction-nextjs-template/main` 与 `dex-nextjs-template/main`；服务端和 SDK 功能提交已推送，模板等待公开 npm 版本完成同步。
+- 已完成提交：服务端 `8f47efd` — `perf(events): project compact list records`；React SDK `a41c4c60c` — `fix(predict): simplify event list failure feedback`，自动 release commit `e56120318`。
+- 问题背景：事件列表超时提示暴露“加载时间过长”的内部技术状态，体验不佳；同时通用事件列表携带卡片不用的大段事件/市场描述、结算规则与 provider metadata，增加 PostgreSQL 解码、JSON 序列化、网络传输及浏览器解析成本。
+- 计划完成事项：两个模板同步本轮 `@liberfi.io/*` 公开版本并刷新 lockfile；DEX 同步完整固定版本组，Prediction 同步其 10 个直接依赖。服务端列表仅返回卡片需要的摘要字段，市场 provider metadata 只保留从卡片直接发起 Polymarket/DFlow 交易所需键；事件详情和市场详情继续返回完整字段。
+- 影响范围：两个模板预测列表失败文案与 SDK 依赖，服务端 `/api/v1/events` 列表投影和 Redis v5 列表缓存；不改变五秒超时、瞬时错误重试、详情接口、交易参数、实时服务或 DEX 其他业务模块。
+- 验证计划：模板分别执行全量测试、typecheck、lint、whitespace 与 Node 20、`USE_LOCAL_SDK=false` production build；服务端等待 staging/production workflow、ECS 稳定、精确版本 ping，并验证线上列表字段与响应体积；模板推送后等待 Vercel workflow 成功并验证线上页面。
+- 预期推送状态：Prediction 推送 `main` 并打下一个 `v*` tag，DEX 普通 fast-forward 推送 `main`；禁止 force push。DEX 的本次业务提交包含依赖、lockfile 与截至提交时的工作记录，最终状态再用 `[skip ci]` 独立补充。
+- Workflow 策略：Prediction `main` 部署 staging、tag 部署 production；DEX `main` 部署 production；最终纯工作记录使用 `[skip ci]`，避免重复部署。
