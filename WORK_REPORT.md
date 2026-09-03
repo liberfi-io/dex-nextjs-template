@@ -1412,3 +1412,26 @@
 - 验证计划：模板分别执行全量测试、typecheck、lint、whitespace 与 Node 20、`USE_LOCAL_SDK=false` production build；服务端等待 staging/production workflow、ECS 稳定、精确版本 ping，并验证线上列表字段与响应体积；模板推送后等待 Vercel workflow 成功并验证线上页面。
 - 预期推送状态：Prediction 推送 `main` 并打下一个 `v*` tag，DEX 普通 fast-forward 推送 `main`；禁止 force push。DEX 的本次业务提交包含依赖、lockfile 与截至提交时的工作记录，最终状态再用 `[skip ci]` 独立补充。
 - Workflow 策略：Prediction `main` 部署 staging、tag 部署 production；DEX `main` 部署 production；最终纯工作记录使用 `[skip ci]`，避免重复部署。
+
+## 2026-09-03：DEX 同步预测失败提示版本（提交后）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 提交：`a35b746` — `chore(deps): update prediction feedback packages`。
+- 最终完成事项：24 个直接 `@liberfi.io/*` 依赖全部同步到 React SDK release commit `e56120318` 对应固定版本组并刷新 lockfile；预测核心版本为 `i18n@0.1.287`、`react-predict@0.3.88`、`ui-predict@4.0.88`，从而消费统一通用失败提示。
+- 影响范围：DEX Web 的 SDK 依赖解析和预测事件列表失败反馈；未修改业务源码、API 参数、超时和重试策略。
+- 验证结果：Web 49/49 套件共 210/210 项、14 项构建配置契约、TypeScript、零 warning lint baseline、whitespace 均通过；`USE_LOCAL_SDK=false` 的 npm 消费模式 production build 23/23 页面成功（本机 Node 24）。构建仅出现项目既有的 browserslist、postcss-calc 与动态 require warning。
+- 推送状态：依赖提交已创建于本地 `main`，下一步普通 fast-forward 推送 `origin/main`，禁止 force push。
+- Workflow 状态：推送后触发 `Deploy to Vercel`，run 与线上验证结果将在最终工作记录中补充。
+
+## 2026-09-03：预测失败提示与列表摘要投影发布部署完成
+
+- 仓库与分支：`prediction-server/main`、`react-sdk/main`、`prediction-nextjs-template/main` 与 `dex-nextjs-template/main`；功能、版本及依赖提交均已普通 fast-forward 推送，未使用 force push。
+- 提交与版本：服务端 `8f47efd` — `perf(events): project compact list records`，production tag `v0.0.216`；React SDK 功能提交 `a41c4c60c`、自动 release commit `e56120318`；Prediction 模板 `385e1ad`、tag `v0.1.152`；DEX 模板 `a35b746`。
+- 最终完成事项：超时和普通列表失败统一显示通用“事件載入失敗，請重試”提示，旧超时文案已从两套线上静态资源移除，仍保留重试操作；`/api/v1/events` 的事件 description、settlement_sources、event provider_meta 及市场 description、rules 不再进入列表查询和响应，市场 provider_meta 仅保留卡片直接交易必需键；详情读取路径保持完整数据；Redis 列表缓存升级为 v5，隔离旧宽响应。
+- 服务端验证：本地 `make generate`、lint、race 全量测试和重启服务均通过；仓储集成测试验证列表瘦身、交易键保留以及 `GetEventBySlug` 详情字段完整。线上 Politics 24 条响应不再包含上述无关字段，实际约 96.9 KB、gzip 约 21.2 KB；因保留卡片直接交易所需的 Polymarket/DFlow metadata，体积高于“删除全部 provider_meta”的 83 KB 估算，但避免破坏交易入口。一次公网实测 TTFB 1.65 秒、总耗时 1.84 秒。
+- 服务端部署：staging run `33709372301` 与 production run `33709375585` 成功；staging 精确版本 `sha-8f47efd`，production 与 DEX BFF 均为 `v0.0.216`；ECS staging task definition `prediction-server-staging:622` 为 1/1 running，production `prediction-server-prod:598` 为 2/2 running，均单一 COMPLETED deployment、0 failed。Indexer `33710396968`、Matcher `33710396985`、Rebate Indexer `33710397062`、Search Indexer `33710397067` 均成功；Realtime 未触碰。
+- npm 发布：React SDK Release run `33709337166` 成功，自动版本提交已通过 `git pull --ff-only` 同步；官方 npm registry 已确认 `@liberfi.io/i18n@0.1.287`、`@liberfi.io/react-predict@0.3.88`、`@liberfi.io/ui-predict@4.0.88` 以及模板消费的完整固定版本组。
+- 模板验证：Prediction 43/43 套件共 216/216 项、typecheck、lint、冻结 lockfile、Node 20 npm 消费模式 build 与 whitespace 通过；DEX 49/49 套件共 210/210 项、14 项配置契约、typecheck、零 warning lint gate、Node 24 npm 消费模式 23/23 页面 build 与 whitespace 通过。Prediction 首轮已有 sports deadline 时间敏感用例瞬时失败，单测连续两次及全量复跑均通过。
+- Vercel 部署：Prediction staging run `33710064132`、URL `https://liberfi-prediction-qnvx3oqr0-sgt-lab.vercel.app` 与 production run `33710093027`、URL `https://liberfi-prediction-2047jc58p-sgt-lab.vercel.app` 均成功；DEX production run `33710073817`、URL `https://liberfi-5dhi61wcb-sgt-lab.vercel.app` 成功。部署 URL 受 Vercel SSO 保护，公开 `predict.liberfi.io/events`、`app.liberfi.io/predict/events` 与 `dex.liberfi.io/predict/events` 均返回 HTTP 200。
+- 线上页面验收：DEX 预测市场页能正常显示事件与价格，切换体育分类约 312 ms 即进入分类状态，等待两秒后首卡为 F1 市场；页面无失败或旧超时提示。两套线上 chunks 均检出新英文/中文通用失败文案，未检出旧“Loading took too long”或“載入時間過長”文本。
+- 推送与 Workflow 状态：所有业务部署均成功；本条记录使用 `[skip ci]` 独立提交并推送，避免再次触发 DEX Vercel。GitHub Actions 的 Node runtime 弃用 annotation 及项目既有构建 warnings 不影响发布结论。
