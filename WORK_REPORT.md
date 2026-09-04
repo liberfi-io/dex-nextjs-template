@@ -1561,3 +1561,13 @@
 - 验证计划：以红绿测试证明初次高度为空时数据 owner 已挂载且收到 600px，更新到 640px 时同一 owner 不卸载且 query effect 仍为 1 次；运行 Web 全量测试、typecheck、lint、whitespace并观察现有本地 dev server 热更新。
 - 预期推送状态：创建本地 DEX 提交，暂不推送；禁止 force push。
 - Workflow 策略：本地提交不会触发 `Deploy to Vercel`；未获推送授权前不触发 GitHub Actions。
+
+## 2026-09-05：首页列表请求与高度测量并行化（提交后）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 提交：`d36eeef` — `perf(web): start homepage data fetch before size measurement`。
+- 最终完成事项：首页首次渲染立即挂载当前 tab 的真实 Token 列表数据 owner，并在 ResizeObserver 尚未给出高度时使用 600px 稳定 viewport；测得高度后只更新同一 widget 的 height prop，不再以独立 skeleton 替换整棵列表组件树。loading UI 继续由列表自身状态控制。
+- 影响范围：首页与发现页列表请求启动时序和可视区域尺寸更新；chain/tab/resolution、query key、请求数量、排序筛选及交易操作保持不变。
+- 验证结果：新测试先在旧 gate 上稳定失败，改动后证明初次未测量状态即挂载、获得 600px，更新为 640px 后数据 owner 未卸载且 query effect 仍只执行 1 次；Web 50/50 套件共 213/213 项及 14 项构建配置契约通过，typecheck、lint、whitespace 通过；现有本地 dev server 热更新成功。
+- 推送状态：功能提交已创建于本地 `main`，当前尚未推送。
+- Workflow 状态：未触发；未执行 Vercel 部署。
