@@ -67,8 +67,8 @@ importers:
         specifier: ^0.0.3
         version: 0.0.3(@types/react@18.3.23)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@chainstream-io/sdk':
-        specifier: ^2.1.14
-        version: 2.1.14
+        specifier: ^2.1.28
+        version: 2.1.28(bufferutil@4.0.9)(encoding@0.1.13)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@4.5.4)
       '@heroui/react':
         specifier: ^2.8.10
         version: 2.8.10(@types/react@18.3.23)(framer-motion@12.38.0(@emotion/is-prop-valid@1.4.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.11)
@@ -1203,6 +1203,9 @@ packages:
 
   '@chainstream-io/sdk@2.1.14':
     resolution: {integrity: sha512-b2Q1CWzQZ3DqFH9fsJunQILLpJ2rBvKESxfGHMnGTsYIU0tC3wFrwgCwLvz6VUYt376jcQOEKyLbchEOEpahcg==}
+
+  '@chainstream-io/sdk@2.1.28':
+    resolution: {integrity: sha512-qhoUFianGAeLVz5rndIJWUZRxfm0h+ZnqkLubryhLFkwW3dWo1cdkhqyVYoJa+UsStDFXyP6VzmTCQJ1iKrW4Q==}
 
   '@coinbase/cdp-sdk@1.45.0':
     resolution: {integrity: sha512-4fgGOhyN9g/pTDE9NtsKUapwFsubrk9wafz8ltmBqSwWqLZWfWxXkVmzMYYFAf+qeGf/X9JqJtmvDVaHFlXWlw==}
@@ -12771,6 +12774,25 @@ snapshots:
     transitivePeerDependencies:
       - debug
       - supports-color
+
+  '@chainstream-io/sdk@2.1.28(bufferutil@4.0.9)(encoding@0.1.13)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@4.5.4)':
+    dependencies:
+      '@chainstream-io/centrifuge': 1.0.8
+      '@solana/web3.js': 1.98.4(bufferutil@4.0.9)(encoding@0.1.13)(typescript@5.8.3)(utf-8-validate@5.0.10)
+      abitype: 1.2.3(typescript@5.8.3)(zod@4.5.4)
+      axios: 1.20.0
+      axios-retry: 4.5.0(axios@1.20.0)
+      bs58: 6.0.0
+      event-source-polyfill: 1.0.31
+      viem: 2.46.3(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@4.5.4)
+    transitivePeerDependencies:
+      - bufferutil
+      - debug
+      - encoding
+      - supports-color
+      - typescript
+      - utf-8-validate
+      - zod
 
   '@coinbase/cdp-sdk@1.45.0(bufferutil@4.0.9)(encoding@0.1.13)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)':
     dependencies:
