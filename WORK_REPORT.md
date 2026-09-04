@@ -1592,3 +1592,45 @@
 - 验证结果：Web 52/52 套件共 220/220 项及 14/14 项 Node 构建配置契约通过，typecheck、lint、whitespace 通过；本地首页、Predict 与 Perpetuals 路由均可访问。开发态 layout manifest 由约 98.36 MB 降至约 76.18 MB（未压缩、包含开发辅助代码，仅用于拆包归属对照），并确认 Predict/Perpetuals Provider、LaunchPad、Hyperliquid 入金及预测钱包分别进入独立异步 chunk。按项目规则未执行 production build，生产首开压缩 JS 与 unused JS 门禁留待发布阶段验证。
 - 推送状态：功能提交已创建于本地 `main`，当前尚未推送。
 - Workflow 状态：未触发；未执行 Vercel 部署。
+
+## 2026-09-05：热门列表接入 ChainStream summary 视图（提交前）
+
+- 仓库与分支：`react-sdk/main`；当前分支包含此前三项本地首页性能提交，尚未推送。
+- 拟用提交标题：`perf(client): use summary hot-token projection`。
+- 问题背景：热门列表接口此前返回约 1.66 MB 的完整 Token DTO，包含首页不消费的多周期统计和详情字段；后端已经按既定优化方案提供等条数的 `view=summary` 投影，需要升级 `@chainstream-io/sdk` 到 `2.1.28` 才能通过正式类型安全 API 调用。
+- 计划完成事项：将 Client 包 SDK 精确升级到 `2.1.28`；仅在 `getTrendingTokens` 调用 `getHotTokens` 时增加 `RankingView.summary`，不向 public domain API 暴露 transport 参数；覆盖 `1m/5m/1h/4h/24h` 五周期、稀疏 summary DTO 映射以及非热门 ranking 接口不携带 `view` 的契约测试。
+- 影响范围：`@liberfi.io/client` 热门列表 HTTP 载荷与 `@liberfi.io/react` 热门 query 周期透传；domain type、WebSocket、详情接口、新币/迁移/股票列表及排序筛选行为不变。
+- 验证计划：运行 Client、React、UI Tokens 全量测试及 typecheck/lint；使用本地 DEX 页面和代理接口逐周期对比 full/summary 条数、顺序、统计周期、体积与 UI 切换；执行 frozen lockfile 安装和 whitespace 检查。
+- 预期推送状态：创建本地 React SDK 提交，暂不推送；禁止 force push。
+- Workflow 策略：本地提交不会触发 React SDK `Release`；本轮不发布 npm，不触发 GitHub Actions。
+
+## 2026-09-05：DEX 直连 ChainStream SDK 升级至 2.1.28（提交前）
+
+- 仓库与分支：`dex-nextjs-template/main`；当前分支包含此前九项本地提交，尚未推送。
+- 拟用提交标题：`chore(web): upgrade chainstream sdk to 2.1.28`。
+- 问题背景：DEX Web 的运行时与 Launchpad 等模块直接依赖 ChainStream SDK；为避免本地源码联调和后续发布版本出现 SDK 类型或运行时不一致，需要与 react-sdk 的 summary 接口升级同步到 `2.1.28`。
+- 计划完成事项：将 Web 直接依赖与 lockfile 升级到 `@chainstream-io/sdk@2.1.28`，保留已发布 `@liberfi.io/client@0.3.104` 所需的旧 SDK 快照，等待 react-sdk 后续发布后再单独 bump LiberFi 包版本。
+- 影响范围：DEX Web 直接使用的 ChainStream SDK 依赖解析；不修改页面业务源码、路由、接口参数或部署配置。
+- 验证计划：执行 frozen lockfile 安装、Web 全量测试、typecheck、lint 与 whitespace；重启本地 dev，验证首页可渲染、五个 interval 可切换且实际热门请求均携带 `view=summary`。
+- 预期推送状态：创建本地 DEX 提交，暂不推送；禁止 force push。
+- Workflow 策略：本地提交不会触发 `Deploy to Vercel`；本轮不推送、不部署。
+
+## 2026-09-05：热门列表接入 ChainStream summary 视图（提交后）
+
+- 仓库与分支：`react-sdk/main`。
+- 提交：`b6cc92334` — `perf(client): use summary hot-token projection`。
+- 最终完成事项：`@liberfi.io/client` 已精确升级到 ChainStream SDK `2.1.28`，热门列表统一通过正式枚举请求 summary 投影；public API、domain type 与其他 ranking 方法保持原 contract。五个周期均覆盖调用、query key、fetch 透传和稀疏 DTO 映射，缺少非当前周期或详情字段时仍能安全转换。
+- 影响范围：首页热门榜 HTTP payload；不影响 Token 详情、新币、迁移、股票、WebSocket、排序筛选或行情更新策略。
+- 验证结果：Client 10/10 套件 226/226 项、React 56/56 套件 236/236 项、UI Tokens 17/17 套件 73/73 项全部通过；三包 typecheck、Client lint、frozen lockfile 安装与 whitespace 检查通过。真实接口五周期 full/summary 均为 100 条且地址顺序一致，summary 约 176–182 KB、每条约 1.76–1.82 KB，相对 full 约 1.66 MB 减少 89.09%–89.45%；仅保留当前请求周期。
+- 推送状态：功能提交已创建于本地 `main`，当前未推送。
+- Workflow 状态：未触发；未执行 npm 发布。
+
+## 2026-09-05：DEX 直连 ChainStream SDK 升级至 2.1.28（提交后）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 提交：`216e635` — `chore(web): upgrade chainstream sdk to 2.1.28`。
+- 最终完成事项：DEX Web 的 ChainStream SDK 直接依赖已升级到 `2.1.28`，lockfile 仅新增必要的新版 SDK 解析并继续保留已发布 LiberFi Client 所需的 `2.1.14` 快照；本地源码联调已实际使用 react-sdk 新实现。
+- 影响范围：Web 直接 SDK 依赖及后续与新版 react-sdk 的版本兼容；未修改页面业务逻辑或部署配置。正式依赖树仍需在 react-sdk 发布后 bump `@liberfi.io/client` 才能移除旧 SDK 快照。
+- 验证结果：Web 52/52 套件 220/220 项及 14/14 项构建配置契约通过，typecheck、lint、frozen lockfile 安装和 whitespace 检查通过；本地 dev 已重启，首页成功渲染热门列表。页面实际依次切换 `1m/5m/1h/4h/24h` 均正确高亮且无控制台错误，服务端日志确认五次请求全部携带 `view=summary`，热请求约 419–710 ms。
+- 推送状态：功能提交已创建于本地 `main`，当前未推送。
+- Workflow 状态：未触发；未执行 Vercel 部署。
