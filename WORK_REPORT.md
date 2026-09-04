@@ -1466,3 +1466,14 @@
 - 验证结果：Vercel deployment URL 为 `https://liberfi-r1krfpuwh-sgt-lab.vercel.app`；公开域名 `dex.liberfi.io` 的两种旧前缀、根路径、子路径及带查询参数详情链接均返回 HTTP 308，跟随后最终落到 `/predict/sports` 并返回 HTTP 200。
 - 推送状态：业务提交已普通 fast-forward 推送至 `origin/main`，未使用 force push；本条工作记录提交后将继续普通推送。
 - Workflow 状态：`Deploy to Vercel` run `33877890750` 成功，用时 6 分 10 秒；仅有 GitHub Actions Node.js 20 runtime 弃用提示，不影响部署。
+
+## 2026-09-05：首页 DEX 鉴权 token 缓存与并发去重（提交前）
+
+- 仓库与分支：`dex-nextjs-template/main`；基线与 `origin/main` 一致。
+- 拟用提交标题：`perf(web): deduplicate dex client credential grants`。
+- 问题背景：首页缺少 `dex-token` Cookie 时，`useDexTokenProvider.getToken()` 会等待 `/api/auth/dex` 完成后才向 DEX client 提供 token，ranking 请求因此位于 Auth0 client-credentials grant 之后；本地冷请求还观测到 `/api/auth/dex` 20 秒无响应，重复 grant 会放大首页等待和 Auth0 压力。
+- 计划完成事项：在单个服务实例内按 Auth0 `expires_in` 或 JWT `exp` 缓存 access token，提前 5 分钟失效；并发请求复用同一个 in-flight grant，失败后清理状态并允许重试；保持 API 响应和浏览器 Cookie contract 不变。
+- 影响范围：仅影响 `POST /api/auth/dex` 的服务端 token 获取频率和并发行为；不跨 Vercel 实例共享缓存，不改变 Auth0 audience、DEX client、浏览器 token 保存方式或 ranking 数据 contract。
+- 验证计划：运行 route 定向测试，覆盖 10 路并发去重、缓存复用、安全窗口、JWT 过期回退和失败重试；运行 Web typecheck、相关 ESLint、whitespace；复用现有本地 dev server 验证首页与鉴权接口时序。
+- 预期推送状态：先创建本地提交，暂不推送；后续是否推送由用户另行确认，禁止 force push。
+- Workflow 策略：本地提交不会触发 GitHub Actions；未获推送授权前不触发 `Deploy to Vercel`。
