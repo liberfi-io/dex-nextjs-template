@@ -1529,3 +1529,24 @@
 - 验证结果：旧实现按新契约运行时稳定暴露 100 次详情调用；改动后热门、股票、新币共 3 套件 6/6 项通过，其中热门/股票 100 条场景的详情 query/subscription 均为 0、列表订阅各 1 路，30 秒仅新增一次列表请求；`@liberfi.io/ui-tokens` typecheck、lint 和 whitespace 通过。
 - 推送状态：功能提交已创建于本地 `main`，当前尚未推送。
 - Workflow 状态：未触发；未执行 React SDK npm 发布。
+
+## 2026-09-05：移动端列表虚拟化与新币可见行订阅（提交前）
+
+- 仓库与分支：`react-sdk/main`；当前分支包含前两项本地性能提交，尚未推送。
+- 拟用提交标题：`perf(ui-tokens): virtualize mobile list and reduce new-token fan-out`。
+- 问题背景：移动端 Token 列表此前仍渲染完整 100 行，DOM 约 1.18 万节点；纵向与横向滚动分属不同容器，无法直接启用 HeroUI 虚拟化。新币列表若沿用全量逐 token retain，会继续产生最高 80 个详情 query/subscription；而实测新池列表 DTO 不包含 `marketData/tvlInUsd`，不能用单纯 30 秒列表 refetch 替代详情订阅。
+- 计划完成事项：将移动端滚动所有权统一到 HeroUI wrapper 的双轴 scrollport，启用 `isVirtualized` 并保留 sticky 表头、左右 sticky 列和 1510/1582px 固定表宽；移除 100 行显示截断并为头像、协议图标启用原生懒加载；新增可见 token 回调，使用 3 行 overscan，滚动停止 180ms 后再结算；新币只 retain 可见集合，链切换、loading、empty 和卸载时立即释放。
+- 影响范围：`@liberfi.io/ui-tokens` 的移动端 TokenList DOM、滚动容器、图片加载与新币逐项详情订阅；热门/股票数据 contract、桌面虚拟列表、排序筛选和列表级实时订阅不变。
+- 验证计划：运行移动端结构与 180ms settle 测试、新币 80 条可见集合 retain/release 契约、头像 lazy/async 测试及 `ui-tokens` 全量测试、typecheck、lint、whitespace；用本地页面在 390/435px 检查双轴滚动、sticky 边界、末行可达和 DOM 数量。
+- 预期推送状态：创建本地 React SDK 提交，暂不推送；禁止 force push。
+- Workflow 策略：本地提交不会触发 React SDK `Release`；未获发布授权前不推送 `main`。
+
+## 2026-09-05：移动端列表虚拟化与新币可见行订阅（提交后）
+
+- 仓库与分支：`react-sdk/main`。
+- 提交：`923d0ded2` — `perf(ui-tokens): virtualize mobile list and reduce new-token fan-out`。
+- 最终完成事项：移动端 TokenList 已由 HeroUI wrapper 统一承担横纵双轴滚动并启用虚拟化，完整数据不再被截断为 100 行；固定表宽、sticky 表头及左右列保持。Token 与协议图片启用 lazy/async。新币列表新增“可见区 + 3 行 overscan”订阅窗口，滚动中冻结更新，停止 180ms 后一次性切换详情 retain/release，避免快速滚动放大请求；链切换和卸载释放旧集合。
+- 路线决策证据：新池列表 10 分钟 20 次采样每次均返回 100 条，p50 568ms、p95 789ms，累计压缩 287,273 bytes、解压 1,517,966 bytes，并有 9 次可见前十变化；更关键的是实际列表条目不含 token 行情和 `tvlInUsd`，因此放弃“仅 30 秒 refetch”路线，采用可见行订阅以保留流动性实时性。
+- 验证结果：`@liberfi.io/ui-tokens` 17/17 套件共 73/73 项通过，覆盖 80 条新币仅 retain 12 条可见候选、集合移动时只新增 6 条并释放离场 6 条、180ms 滚动 settle、移动端不截断和图片懒加载；typecheck、lint、whitespace 通过。本地 390/435px 实测单一双轴 scrollport、1510/1582px 表宽、末行可达，sticky 表头/左右列边界正确；390px DOM 约 1,994 节点、实际行约 15 条，相比线上基线约 11,836 节点/100 行显著下降。
+- 推送状态：功能提交已创建于本地 `main`，当前尚未推送。
+- Workflow 状态：未触发；未执行 React SDK npm 发布。
