@@ -1550,3 +1550,14 @@
 - 验证结果：`@liberfi.io/ui-tokens` 17/17 套件共 73/73 项通过，覆盖 80 条新币仅 retain 12 条可见候选、集合移动时只新增 6 条并释放离场 6 条、180ms 滚动 settle、移动端不截断和图片懒加载；typecheck、lint、whitespace 通过。本地 390/435px 实测单一双轴 scrollport、1510/1582px 表宽、末行可达，sticky 表头/左右列边界正确；390px DOM 约 1,994 节点、实际行约 15 条，相比线上基线约 11,836 节点/100 行显著下降。
 - 推送状态：功能提交已创建于本地 `main`，当前尚未推送。
 - Workflow 状态：未触发；未执行 React SDK npm 发布。
+
+## 2026-09-05：首页列表请求与高度测量并行化（提交前）
+
+- 仓库与分支：`dex-nextjs-template/main`；当前分支包含本轮已完成的本地性能与工作记录提交，尚未推送。
+- 拟用提交标题：`perf(web): start homepage data fetch before size measurement`。
+- 问题背景：首页 Token 列表 widget 只有在 ResizeObserver 返回大于 0 的高度后才挂载，数据 query 因此无条件晚于首次布局测量；独立 skeleton 会先挂载再替换为真实 widget，延长请求启动时间并增加一次组件树切换。
+- 计划完成事项：首次 render 立即挂载当前 tab 的真实 widget；未测得高度时使用稳定 600px viewport，测量完成后只更新 height prop；继续由 widget 的 `isLoading` 渲染 skeleton，避免高度变化重建数据 owner 或重复 query。
+- 影响范围：DEX 首页/发现页热门、股票、新币列表的首次挂载和 viewport 高度更新；不改变 query key、tab/chain/resolution、排序筛选、请求参数或列表 UI contract。
+- 验证计划：以红绿测试证明初次高度为空时数据 owner 已挂载且收到 600px，更新到 640px 时同一 owner 不卸载且 query effect 仍为 1 次；运行 Web 全量测试、typecheck、lint、whitespace并观察现有本地 dev server 热更新。
+- 预期推送状态：创建本地 DEX 提交，暂不推送；禁止 force push。
+- Workflow 策略：本地提交不会触发 `Deploy to Vercel`；未获推送授权前不触发 GitHub Actions。

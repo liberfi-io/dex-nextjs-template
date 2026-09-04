@@ -1,8 +1,6 @@
+import { useEffect } from "react";
 import { render, screen } from "@testing-library/react";
-import {
-  DiscoverTokenListMeasurementGate,
-  DiscoverTokenListSkeleton,
-} from "./DiscoverTokenListSkeleton";
+import { DiscoverTokenListMeasurementGate } from "./DiscoverTokenListSkeleton";
 
 beforeAll(() => {
   Object.defineProperty(window, "matchMedia", {
@@ -21,30 +19,40 @@ beforeAll(() => {
 });
 
 describe("discover loading skeletons", () => {
-  it("keeps the skeleton visible until the token list has a measured height", () => {
+  it("mounts the data owner immediately with a stable fallback height", () => {
+    const onQuery = jest.fn();
+    const onUnmount = jest.fn();
+
+    function DataOwner({ height }: { height: number }) {
+      useEffect(() => {
+        onQuery();
+        return onUnmount;
+      }, []);
+
+      return <div data-testid="token-list" data-height={height} />;
+    }
+
     const { rerender } = render(
       <DiscoverTokenListMeasurementGate>
-        <div data-testid="measured-token-list" />
+        {(height) => <DataOwner height={height} />}
       </DiscoverTokenListMeasurementGate>,
     );
 
-    expect(screen.getByTestId("discover-token-list-skeleton")).not.toBeNull();
-    expect(screen.queryByTestId("measured-token-list")).toBeNull();
+    expect(screen.getByTestId("token-list").getAttribute("data-height")).toBe(
+      "600",
+    );
+    expect(onQuery).toHaveBeenCalledTimes(1);
 
     rerender(
       <DiscoverTokenListMeasurementGate height={640}>
-        <div data-testid="measured-token-list" />
+        {(height) => <DataOwner height={height} />}
       </DiscoverTokenListMeasurementGate>,
     );
 
-    expect(screen.queryByTestId("discover-token-list-skeleton")).toBeNull();
-    expect(screen.getByTestId("measured-token-list")).not.toBeNull();
-  });
-
-  it("renders a stable initial table body before the measured widget is available", () => {
-    render(<DiscoverTokenListSkeleton />);
-
-    expect(screen.getByTestId("discover-token-list-skeleton")).not.toBeNull();
-    expect(screen.getByRole("grid", { hidden: true }).getAttribute("aria-label")).toBe("Tokens");
+    expect(screen.getByTestId("token-list").getAttribute("data-height")).toBe(
+      "640",
+    );
+    expect(onQuery).toHaveBeenCalledTimes(1);
+    expect(onUnmount).not.toHaveBeenCalled();
   });
 });

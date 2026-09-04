@@ -166,78 +166,88 @@ export function CombinedTokenList() {
     [router, chain],
   );
 
-  const tokenListContent = useMemo(() => {
-    const commonProps = { chain, resolution, filters, height };
+  const renderTokenListContent = useCallback(
+    (listHeight: number) => {
+      const commonProps = { chain, resolution, filters, height: listHeight };
 
-    switch (activeTab) {
-      case "trending":
-        return (
-          <TrendingTokenListWidget
-            {...commonProps}
-            onSelectToken={handleSelectToken}
-            ActionsComponent={({ token }) => (
-              <div className="w-full h-full flex items-center justify-end">
-                {nativeToken && (
-                  <InstantTradeListButton
-                    id="token-list"
-                    chain={chain}
-                    token={nativeToken}
-                    output={token.address}
-                    size="sm"
-                    radius="full"
-                    className="w-auto"
-                  />
-                )}
-              </div>
-            )}
-          />
-        );
-      case "stocks":
-        return (
-          <StockTokenListWidget
-            {...commonProps}
-            onSelectToken={handleSelectToken}
-            ActionsComponent={({ token }) => (
-              <div className="w-full h-full flex items-center justify-end">
-                {nativeToken && (
-                  <InstantTradeListButton
-                    id="token-list"
-                    chain={chain}
-                    token={nativeToken}
-                    output={token.address}
-                    size="sm"
-                    radius="full"
-                    className="w-auto"
-                  />
-                )}
-              </div>
-            )}
-          />
-        );
-      case "new":
-        return (
-          <NewTokenListWidget
-            {...commonProps}
-            onSelectToken={handleSelectToken}
-            ActionsComponent={({ token }) => (
-              <div className="w-full h-full flex items-center justify-end">
-                {nativeToken && (
-                  <InstantTradeListButton
-                    id="token-list"
-                    chain={chain}
-                    token={nativeToken}
-                    output={token.address}
-                    size="sm"
-                    radius="full"
-                    className="w-auto"
-                  />
-                )}
-              </div>
-            )}
-          />
-        );
-    }
-  }, [activeTab, chain, resolution, filters, height, nativeToken, handleSelectToken]);
+      switch (activeTab) {
+        case "trending":
+          return (
+            <TrendingTokenListWidget
+              {...commonProps}
+              onSelectToken={handleSelectToken}
+              ActionsComponent={({ token }) => (
+                <div className="w-full h-full flex items-center justify-end">
+                  {nativeToken && (
+                    <InstantTradeListButton
+                      id="token-list"
+                      chain={chain}
+                      token={nativeToken}
+                      output={token.address}
+                      size="sm"
+                      radius="full"
+                      className="w-auto"
+                    />
+                  )}
+                </div>
+              )}
+            />
+          );
+        case "stocks":
+          return (
+            <StockTokenListWidget
+              {...commonProps}
+              onSelectToken={handleSelectToken}
+              ActionsComponent={({ token }) => (
+                <div className="w-full h-full flex items-center justify-end">
+                  {nativeToken && (
+                    <InstantTradeListButton
+                      id="token-list"
+                      chain={chain}
+                      token={nativeToken}
+                      output={token.address}
+                      size="sm"
+                      radius="full"
+                      className="w-auto"
+                    />
+                  )}
+                </div>
+              )}
+            />
+          );
+        case "new":
+          return (
+            <NewTokenListWidget
+              {...commonProps}
+              onSelectToken={handleSelectToken}
+              ActionsComponent={({ token }) => (
+                <div className="w-full h-full flex items-center justify-end">
+                  {nativeToken && (
+                    <InstantTradeListButton
+                      id="token-list"
+                      chain={chain}
+                      token={nativeToken}
+                      output={token.address}
+                      size="sm"
+                      radius="full"
+                      className="w-auto"
+                    />
+                  )}
+                </div>
+              )}
+            />
+          );
+      }
+    },
+    [
+      activeTab,
+      chain,
+      filters,
+      handleSelectToken,
+      nativeToken,
+      resolution,
+    ],
+  );
 
   return (
     <InstantTradeSwapProvider
@@ -351,7 +361,7 @@ export function CombinedTokenList() {
 
           <div className="w-full flex-auto flex flex-col min-h-0" ref={ref}>
             <DiscoverTokenListMeasurementGate height={height}>
-              {tokenListContent}
+              {renderTokenListContent}
             </DiscoverTokenListMeasurementGate>
           </div>
         </div>

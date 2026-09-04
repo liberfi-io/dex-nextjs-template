@@ -1,23 +1,17 @@
-import type { PropsWithChildren } from "react";
-import { TokenList, type TokenListActionsComponent } from "@liberfi.io/ui-tokens";
+import type { ReactNode } from "react";
 
-const InitialTokenListActions: TokenListActionsComponent = () => null;
+export const DEFAULT_DISCOVER_TOKEN_LIST_HEIGHT = 600;
 
-export function DiscoverTokenListSkeleton() {
-  return (
-    <div
-      data-testid="discover-token-list-skeleton"
-      aria-hidden="true"
-      className="h-full min-h-0 w-full overflow-hidden"
-    >
-      <TokenList tokens={[]} isLoading ActionsComponent={InitialTokenListActions} />
-    </div>
-  );
+function resolveTokenListHeight(height?: number): number {
+  return height && height > 0 ? height : DEFAULT_DISCOVER_TOKEN_LIST_HEIGHT;
 }
 
 export function DiscoverTokenListMeasurementGate({
   height,
   children,
-}: PropsWithChildren<{ height?: number }>) {
-  return (height ?? 0) > 0 ? children : <DiscoverTokenListSkeleton />;
+}: {
+  height?: number;
+  children: (height: number) => ReactNode;
+}) {
+  return children(resolveTokenListHeight(height));
 }
