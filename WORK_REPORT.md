@@ -1435,3 +1435,14 @@
 - Vercel 部署：Prediction staging run `33710064132`、URL `https://liberfi-prediction-qnvx3oqr0-sgt-lab.vercel.app` 与 production run `33710093027`、URL `https://liberfi-prediction-2047jc58p-sgt-lab.vercel.app` 均成功；DEX production run `33710073817`、URL `https://liberfi-5dhi61wcb-sgt-lab.vercel.app` 成功。部署 URL 受 Vercel SSO 保护，公开 `predict.liberfi.io/events`、`app.liberfi.io/predict/events` 与 `dex.liberfi.io/predict/events` 均返回 HTTP 200。
 - 线上页面验收：DEX 预测市场页能正常显示事件与价格，切换体育分类约 312 ms 即进入分类状态，等待两秒后首卡为 F1 市场；页面无失败或旧超时提示。两套线上 chunks 均检出新英文/中文通用失败文案，未检出旧“Loading took too long”或“載入時間過長”文本。
 - 推送与 Workflow 状态：所有业务部署均成功；本条记录使用 `[skip ci]` 独立提交并推送，避免再次触发 DEX Vercel。GitHub Actions 的 Node runtime 弃用 annotation 及项目既有构建 warnings 不影响发布结论。
+
+## 2026-09-04：过期世界杯链接重定向（提交前）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 拟用提交标题：`fix(predict): redirect expired world cup links`。
+- 问题背景：部分合作方仍在使用已经过期的世界杯入口；DEX 当前未注册 `/world-cup` 或 `/predict/world-cup` 路由，访问后直接返回 404，无法引导用户进入仍有效的预测体育页面。
+- 完成事项：为 `/world-cup`、`/predict/world-cup` 及其任意层级子路径增加到 `/predict/sports` 的永久重定向，并扩展现有预测重定向配置契约测试。
+- 影响范围：仅影响 DEX Web 对过期世界杯路径的入口兼容；体育页、事件详情、交易流程、API 与其他预测导航行为不变。
+- 验证结果：重定向配置契约测试通过；全量测试 49/49 套件共 210/210 项及 14 项构建配置契约通过；全仓 typecheck、零 warning lint baseline、whitespace 检查通过；现有 dev server 实测两种旧前缀的根路径、子路径和带查询参数详情链接均返回 HTTP 308，并指向 `/predict/sports`。
+- 推送状态：待创建本地提交，未推送。
+- Workflow 状态：尚未触发；本地提交不会触发远端 workflow。

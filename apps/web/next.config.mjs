@@ -20,6 +20,7 @@ const nextConfig = {
   reactStrictMode: false,
   output: "standalone",
   async redirects() {
+    // Keep redirect definitions in focused modules with contract tests.
     return [...PREDICTION_REDIRECTS, ...LEGACY_REDIRECTS];
   },
   async rewrites() {

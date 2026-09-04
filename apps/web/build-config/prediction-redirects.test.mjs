@@ -14,5 +14,15 @@ test("redirects prediction entry points outside the six-module navigation", () =
       destination: "/predict/sports",
       permanent: false,
     },
+    {
+      source: "/world-cup/:path*",
+      destination: "/predict/sports",
+      permanent: true,
+    },
+    {
+      source: "/predict/world-cup/:path*",
+      destination: "/predict/sports",
+      permanent: true,
+    },
   ]);
 });
