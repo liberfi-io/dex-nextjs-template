@@ -1582,3 +1582,13 @@
 - 验证计划：运行 Web 全量测试、typecheck、lint 和 whitespace；以路由边界测试确认首页共享源码不再引用业务专属 Provider，以 Modal 集成测试确认首次点击前 loader 调用为 0、首次点击后正常注册打开且后续复用；清理异常膨胀的可再生 `.next` 缓存并重启本地 dev，实测首页、Predict 和 Perpetuals 路由；记录开发态 chunk 归属。按项目规则，本阶段不执行 production build，首开压缩 JS 与 unused JS 的生产门禁留到发布阶段验证。
 - 预期推送状态：创建本地提交，暂不推送；禁止 force push。
 - Workflow 策略：本地提交不会触发 `Deploy to Vercel`；未获推送授权前不触发 GitHub Actions。
+
+## 2026-09-05：首页非核心运行时与重型弹窗拆包（提交后）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 提交：`55bdeaa` — `perf(web): defer non-home providers and modal bundles`。
+- 最终完成事项：Predict 与 Perpetuals 客户端及 Provider 已从全局运行时拆至对应路由按需加载，Hyperliquid Header 状态通过轻量桥接提供；移除无消费方的 PortfolioClientProvider，并保留 Header 账户摘要依赖的共享 PortfolioProvider。LaunchPad、Hyperliquid 入金、收款、提现、Token/预测搜索、快捷交易设置和预测钱包弹窗均改为首次打开时加载，入口仅依赖轻量 contract，首次加载完成后复用已注册实例。
+- 影响范围：首页共享布局不再同步引入预测、永续及上述重型弹窗实现；Predict/Perpetuals 页面仍在自身路由边界内获得完整上下文，弹窗 ID、参数和 Promise contract 保持不变。
+- 验证结果：Web 52/52 套件共 220/220 项及 14/14 项 Node 构建配置契约通过，typecheck、lint、whitespace 通过；本地首页、Predict 与 Perpetuals 路由均可访问。开发态 layout manifest 由约 98.36 MB 降至约 76.18 MB（未压缩、包含开发辅助代码，仅用于拆包归属对照），并确认 Predict/Perpetuals Provider、LaunchPad、Hyperliquid 入金及预测钱包分别进入独立异步 chunk。按项目规则未执行 production build，生产首开压缩 JS 与 unused JS 门禁留待发布阶段验证。
+- 推送状态：功能提交已创建于本地 `main`，当前尚未推送。
+- Workflow 状态：未触发；未执行 Vercel 部署。
