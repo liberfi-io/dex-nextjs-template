@@ -1634,3 +1634,27 @@
 - 验证结果：Web 52/52 套件 220/220 项及 14/14 项构建配置契约通过，typecheck、lint、frozen lockfile 安装和 whitespace 检查通过；本地 dev 已重启，首页成功渲染热门列表。页面实际依次切换 `1m/5m/1h/4h/24h` 均正确高亮且无控制台错误，服务端日志确认五次请求全部携带 `view=summary`，热请求约 419–710 ms。
 - 推送状态：功能提交已创建于本地 `main`，当前未推送。
 - Workflow 状态：未触发；未执行 Vercel 部署。
+
+## 2026-09-05：首页性能优化 SDK 发布与 DEX 上线（提交前）
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`；React SDK 本轮四项首页性能提交已推送，DEX 当前包含十一项待推送本地提交。
+- 拟用提交标题：`chore(deps): adopt homepage performance sdk release`。
+- 问题背景：summary 热门列表、列表 N+1 移除和移动端虚拟化已经在 React SDK 本地完成验证，但 DEX 正式依赖仍指向上一批 npm 包；必须先完成 npm 发布，再把消费端全部 LiberFi 依赖锁定到同一 release 批次，才能在线上实际获得 `@chainstream-io/sdk@2.1.28` 与首页性能收益。
+- 计划完成事项：推送 react-sdk `main` 触发 Release；确认 release commit、workflow 与 npm 官方 registry；将 DEX 所有 `@liberfi.io/*` 依赖同步到本次 release 版本，并确认 `@liberfi.io/client` 的 ChainStream SDK 依赖为 `2.1.28`；执行生产构建、提交并推送 DEX `main`，跟踪 `Deploy to Vercel` 到 production 完成。
+- 影响范围：React SDK npm 全量 patch release、DEX Web 依赖树、首页热门/股票/新币列表请求与渲染性能，以及生产部署；不改变业务接口 contract、品牌/行情主题或交易逻辑。
+- 验证计划：React SDK 发布前全量 build；npm registry 与 workflow 日志双重确认；DEX frozen install、`pnpm why` 依赖收敛、全量 test/typecheck/lint、production build 与 whitespace；Vercel workflow 成功后验证 production URL 和公开首页 HTTP 状态。
+- 预期推送状态：React SDK 与 DEX 均普通 fast-forward 推送到 `origin/main`，禁止 force push。
+- Workflow 策略：React SDK 触发 `Release` 发布 npm；DEX 最终业务/依赖提交触发一次 `Deploy to Vercel`，工作记录提交使用 `[skip ci]` 避免重复部署。
+
+## 2026-09-05：首页性能优化 SDK 发布与 DEX 上线（提交后）
+
+- 仓库与分支：`react-sdk/main` 与 `dex-nextjs-template/main`。
+- React SDK 功能提交：`b6cc92334` — `perf(client): use summary hot-token projection`；连同首页 N+1 移除、移动端虚拟化与测试基建提交一并发布。
+- React SDK 发布提交：`5889e0cdd` — `chore: release packages`；GitHub `Release` workflow `33917021260` 成功，发布流程完成后已执行 fast-forward 拉取并与远端 `main` 同步。
+- npm 发布结果：官方 registry 已确认 `@liberfi.io/client@0.3.105`、`@liberfi.io/react@0.3.105`、`@liberfi.io/ui-tokens@3.0.91`，其余 DEX 使用的 LiberFi 包也均升级到同一轮 patch release；所有目标 tarball 均已可下载。
+- DEX 依赖提交：`9f36caa` — `chore(deps): adopt homepage performance sdk release`。
+- 最终完成事项：DEX Web 的全部 `@liberfi.io/*` 依赖已同步到本次 React SDK release，直接依赖与 `@liberfi.io/client` 的传递依赖均解析到 `@chainstream-io/sdk@2.1.28`，lockfile 不再残留旧版 ChainStream SDK；首页热门列表正式使用等数量的 summary 投影。
+- 验证结果：DEX Web 52/52 套件共 220/220 项及 14/14 项构建配置契约通过，typecheck、lint、whitespace 与 production build 通过；本地服务重启后日志确认热门请求携带 `view=summary`。npm 官方 registry 确认 Client、React、UI Tokens 与 ChainStream SDK 目标版本。
+- 推送状态：React SDK 与 DEX 功能/依赖提交均已普通 fast-forward 推送到 `origin/main`，未使用 force push。
+- Vercel 结果：`Deploy to Vercel` workflow `33918443527` 成功，job `101170939096` 用时 5 分 57 秒；production deployment 为 `https://liberfi-nzsn2cx6c-sgt-lab.vercel.app`。部署地址与 `https://app.liberfi.io/` 均返回 HTTP 200。
+- Workflow 说明：Release 与 Vercel workflow 均只有 GitHub Actions Node.js 20 弃用提示，不影响发布结果；本次工作记录提交使用 `[skip ci]`，避免再次触发部署。
