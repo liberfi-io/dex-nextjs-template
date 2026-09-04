@@ -1446,3 +1446,13 @@
 - 验证结果：重定向配置契约测试通过；全量测试 49/49 套件共 210/210 项及 14 项构建配置契约通过；全仓 typecheck、零 warning lint baseline、whitespace 检查通过；现有 dev server 实测两种旧前缀的根路径、子路径和带查询参数详情链接均返回 HTTP 308，并指向 `/predict/sports`。
 - 推送状态：待创建本地提交，未推送。
 - Workflow 状态：尚未触发；本地提交不会触发远端 workflow。
+
+## 2026-09-04：过期世界杯链接重定向（提交后）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 提交：`7416853` — `fix(predict): redirect expired world cup links`。
+- 最终完成事项：DEX 现已将 `/world-cup`、`/predict/world-cup` 以及两者的所有子路径永久重定向到 `/predict/sports`；合作方历史链接不再进入 404，并有配置契约测试防止兼容规则回退。
+- 影响范围：仅改变过期世界杯 URL 的服务器入口响应；现有体育页、事件详情、查询参数传递、交易和 API 行为保持不变。
+- 验证结果：全量测试 49/49 套件共 210/210 项及 14 项构建配置契约通过；全仓 typecheck、零 warning lint baseline、whitespace 检查通过；dev server 对根路径、深层路径和带查询参数链接均实测返回 HTTP 308，目标为 `/predict/sports`。
+- 推送状态：业务提交与本工作记录提交均保留在本地，未推送。
+- Workflow 状态：未触发；尚未进行线上部署验证。
