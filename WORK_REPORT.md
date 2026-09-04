@@ -1456,3 +1456,13 @@
 - 验证结果：全量测试 49/49 套件共 210/210 项及 14 项构建配置契约通过；全仓 typecheck、零 warning lint baseline、whitespace 检查通过；dev server 对根路径、深层路径和带查询参数链接均实测返回 HTTP 308，目标为 `/predict/sports`。
 - 推送状态：业务提交与本工作记录提交均保留在本地，未推送。
 - Workflow 状态：未触发；尚未进行线上部署验证。
+
+## 2026-09-04：过期世界杯链接重定向部署完成
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 提交：业务提交 `7416853` — `fix(predict): redirect expired world cup links`；工作记录提交 `7a1f8d0` — `docs: record world cup redirects [skip ci]`。
+- 最终完成事项：过期的 `/world-cup/**` 与 `/predict/world-cup/**` 已在 DEX production 永久重定向到 `/predict/sports`，合作方历史链接的查询参数会继续传递，旧路径本身不再进入 404。
+- 影响范围：DEX Web 过期世界杯入口兼容；未改变体育列表、预测事件详情、交易或 API 行为。
+- 验证结果：Vercel deployment URL 为 `https://liberfi-r1krfpuwh-sgt-lab.vercel.app`；公开域名 `dex.liberfi.io` 的两种旧前缀、根路径、子路径及带查询参数详情链接均返回 HTTP 308，跟随后最终落到 `/predict/sports` 并返回 HTTP 200。
+- 推送状态：业务提交已普通 fast-forward 推送至 `origin/main`，未使用 force push；本条工作记录提交后将继续普通推送。
+- Workflow 状态：`Deploy to Vercel` run `33877890750` 成功，用时 6 分 10 秒；仅有 GitHub Actions Node.js 20 runtime 弃用提示，不影响部署。
