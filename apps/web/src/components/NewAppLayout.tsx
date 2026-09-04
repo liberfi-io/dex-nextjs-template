@@ -23,6 +23,7 @@ import {
   type ComponentType,
 } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
+import dynamic from "next/dynamic";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Chain, Token } from "@liberfi.io/types";
 import {
@@ -37,16 +38,9 @@ import {
 import {
   useAuth,
   useSwitchEvmWalletsToChain,
-  useWallets,
-  type EvmWalletAdapter,
 } from "@liberfi.io/wallet-connector";
 import { useCurrentChain, useSelectChain } from "@liberfi.io/ui-chain-select";
 import type { PredictEvent } from "@liberfi.io/react-predict";
-import {
-  PredictSearchModal,
-  PREDICT_SEARCH_MODAL_ID,
-  PredictWalletProvider,
-} from "@liberfi.io/ui-predict";
 import { predictEventHref } from "./page/predict-source";
 
 const NoPrefetchLink: LinkComponentType = (props) => <ChainAwareLink prefetch={false} {...props} />;
@@ -77,7 +71,10 @@ import {
   type LinkComponentType,
 } from "@liberfi.io/ui";
 import * as UiScaffold from "@liberfi.io/ui-scaffold";
-import { SEARCH_MODAL_ID, SearchModal } from "@liberfi.io/ui-tokens";
+import {
+  SEARCH_MODAL_ID,
+  type SearchModalParams,
+} from "@liberfi.io/ui-tokens";
 import {
   chainDisplayName,
   formatAmount,
@@ -104,17 +101,26 @@ import {
   applicationLocaleProviderProps,
   createApplicationLocaleRuntime,
 } from "../runtime/createApplicationLocaleRuntime";
-import { PresetFormModal } from "@liberfi.io/ui-trade";
 import { useAccountInfo } from "@liberfi.io/ui-portfolio";
-import { LaunchPadModal, LAUNCHPAD_MODAL_ID } from "./modals/LaunchPadModal";
 import {
   DEPOSIT_HL_USDC_MODAL_ID,
-  DepositHyperliquidUsdcModal,
-} from "./modals/DepositHyperliquidUsdcModal";
-import { ReceiveModal, RECEIVE_MODAL_ID } from "./modals/ReceiveModal";
-import { WebviewModal } from "./modals/WebviewModal";
-import { WithdrawModal, WITHDRAW_MODAL_ID } from "./modals/WithdrawModal";
-import { useHyperliquidBalances } from "../hooks/useHyperliquidBalances";
+  LAUNCHPAD_MODAL_ID,
+  PREDICT_SEARCH_MODAL_ID,
+  RECEIVE_MODAL_ID,
+  WITHDRAW_MODAL_ID,
+} from "./modals/modal-contracts";
+import {
+  DeferredAsyncModalHost,
+  useDeferredAsyncModal,
+} from "./modals/DeferredAsyncModalHost";
+import {
+  loadDepositHyperliquidUsdcModal,
+  loadLaunchPadModal,
+  loadPredictSearchModal,
+  loadReceiveModal,
+  loadTokenSearchModal,
+  loadWithdrawModal,
+} from "./modals/modal-loaders";
 import { HyperliquidUsdcIcon } from "./icons/HyperliquidUsdcIcon";
 import { CashInOutlinedIcon } from "./icons/CashInOutlinedIcon";
 import { ReceiveOutlinedIcon } from "./icons/ReceiveOutlinedIcon";
@@ -123,9 +129,6 @@ import { SendOutlinedIcon } from "./icons/SendOutlinedIcon";
 // import { ConvertOutlinedIcon } from "./icons/ConvertOutlinedIcon";
 import { AppBottomToolbar } from "./AppBottomToolbar";
 import { BottomTweets, BottomTweetsTitle } from "./BottomTweets";
-import { BottomAICopilot } from "./BottomAICopilot";
-import { PredictBalanceIndicator } from "./PredictBalanceIndicator";
-import { FundWalletModal } from "./FundWalletModal";
 import { isPulseSupportedChain } from "../lib/pulse";
 import { AppRuntimeProviders } from "../runtime/AppRuntimeProviders";
 import {
@@ -134,6 +137,7 @@ import {
   HEADER_ICON_CONTROL_CLASS,
 } from "./header-control-theme";
 import { resolveHeaderLanguageOption } from "./header-language-selection";
+import { useHyperliquidHeaderState } from "../runtime/HyperliquidHeaderContext";
 
 const { Scaffold, ScaffoldHeader, ScaffoldFooter, Logo, DraggablePanelProvider } = UiScaffold;
 type NavItem = UiScaffold.NavItem;
@@ -145,7 +149,35 @@ const UnpublishedScaffold = UiScaffold as typeof UiScaffold & {
 };
 const ModalCoordinatorProvider = UnpublishedScaffold.ModalCoordinatorProvider;
 const DraggableStateProvider = UnpublishedScaffold.DraggableStateProvider;
-const useAsyncModal = UiScaffold.useAsyncModal;
+const WebviewModal = dynamic(
+  () => import("./modals/WebviewModal").then((module) => module.WebviewModal),
+  { ssr: false },
+);
+const PredictBalanceIndicator = dynamic(
+  () =>
+    import("./PredictBalanceIndicator").then(
+      (module) => module.PredictBalanceIndicator,
+    ),
+  { ssr: false },
+);
+const BottomAICopilot = dynamic(
+  () => import("./BottomAICopilot").then((module) => module.BottomAICopilot),
+  { ssr: false },
+);
+const PredictRuntimeProviders = dynamic(
+  () =>
+    import("../runtime/PredictRuntimeProviders").then(
+      (module) => module.PredictRuntimeProviders,
+    ),
+  { ssr: false },
+);
+const PerpetualsRuntimeProviders = dynamic(
+  () =>
+    import("../runtime/PerpetualsRuntimeProviders").then(
+      (module) => module.PerpetualsRuntimeProviders,
+    ),
+  { ssr: false },
+);
 
 const navItemsConfig: Omit<NavItem, "label">[] = [
   { key: "discover", href: "/", icon: <HomeIcon width={20} height={20} /> },
@@ -173,16 +205,13 @@ export function NewAppLayout({ children, locale }: PropsWithChildren<{ locale: L
           >
             <ResolvedLocaleProvider locale={locale}>
               <AppRuntimeProviders>
-                <PageShell>{children}</PageShell>
-                <LaunchPadModal />
-                <DepositHyperliquidUsdcModal />
-                <ReceiveModal />
-                <WithdrawModal />
-                <WebviewModal />
-                <StyledToaster />
-                <SearchModal />
-                <PredictSearchModal />
-                <PresetFormModal />
+                <DeferredAsyncModalHost>
+                  <RouteRuntimeProviders>
+                    <PageShell>{children}</PageShell>
+                  </RouteRuntimeProviders>
+                  <WebviewModal />
+                  <StyledToaster />
+                </DeferredAsyncModalHost>
               </AppRuntimeProviders>
             </ResolvedLocaleProvider>
           </RuntimeLocaleProvider>
@@ -190,6 +219,18 @@ export function NewAppLayout({ children, locale }: PropsWithChildren<{ locale: L
       </QueryClientProvider>
     </ModalCoordinatorProvider>
   );
+}
+
+function RouteRuntimeProviders({ children }: PropsWithChildren) {
+  const pathname = usePathname();
+
+  if (pathname.startsWith("/predict")) {
+    return <PredictRuntimeProviders>{children}</PredictRuntimeProviders>;
+  }
+  if (pathname.startsWith("/perpetuals")) {
+    return <PerpetualsRuntimeProviders>{children}</PerpetualsRuntimeProviders>;
+  }
+  return children;
 }
 
 // ---------------------------------------------------------------------------
@@ -241,8 +282,12 @@ function PageShell({ children }: PropsWithChildren) {
   const isAuthenticated = authStatus === "authenticated";
 
   const { onOpen: openPredictSearch, onClose: closePredictSearch } =
-    useAsyncModal(PREDICT_SEARCH_MODAL_ID);
-  const { onOpen: openTokenSearch, onClose: dismissTokenSearch } = useAsyncModal(SEARCH_MODAL_ID);
+    useDeferredAsyncModal(PREDICT_SEARCH_MODAL_ID, loadPredictSearchModal);
+  const { onOpen: openTokenSearch, onClose: dismissTokenSearch } =
+    useDeferredAsyncModal<SearchModalParams, Token>(
+      SEARCH_MODAL_ID,
+      loadTokenSearchModal,
+    );
 
   const handlePredictHover = useCallback(
     (event: PredictEvent) => {
@@ -374,13 +419,6 @@ function PageShell({ children }: PropsWithChildren) {
   };
 
   return (
-    <PredictWalletProvider enabled={isPredictPage}>
-      {/* FundWalletModal must live INSIDE PredictWalletProvider because it
-          calls usePredictWallet() during render. Rendering it as a sibling of
-          PageShell (outside the provider) would crash with "usePredictWallet
-          must be used within a PredictWalletProvider" the moment the user
-          opens the deposit dialog. */}
-      <FundWalletModal />
       <DraggableStateProvider>
         <Scaffold
           pathname={pathname}
@@ -502,7 +540,6 @@ function PageShell({ children }: PropsWithChildren) {
           </DraggablePanelProvider>
         </Scaffold>
       </DraggableStateProvider>
-    </PredictWalletProvider>
   );
 }
 
@@ -598,7 +635,10 @@ const DROPDOWN_STYLE: React.CSSProperties = {
 
 function LaunchPadButton() {
   const { t } = useTranslation();
-  const { onOpen } = useAsyncModal(LAUNCHPAD_MODAL_ID);
+  const { onOpen } = useDeferredAsyncModal(
+    LAUNCHPAD_MODAL_ID,
+    loadLaunchPadModal,
+  );
 
   return (
     <button
@@ -1049,13 +1089,8 @@ function HyperliquidBalanceButton() {
   const { isMobile } = useScreen();
   const { status } = useAccountInfo();
 
-  const wallets = useWallets();
-  const evmWallet = useMemo(
-    () => wallets.find((w) => w.chainNamespace === "EVM") as EvmWalletAdapter | undefined,
-    [wallets],
-  );
-  const evmAddress = evmWallet?.address;
-  const hlBalances = useHyperliquidBalances(evmAddress);
+  const hlBalances = useHyperliquidHeaderState();
+  const evmAddress = hlBalances.evmAddress;
 
   const [isOpen, setIsOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -1087,7 +1122,10 @@ function HyperliquidBalanceButton() {
     };
   }, []);
 
-  const { onOpen: openHlDeposit } = useAsyncModal(DEPOSIT_HL_USDC_MODAL_ID);
+  const { onOpen: openHlDeposit } = useDeferredAsyncModal(
+    DEPOSIT_HL_USDC_MODAL_ID,
+    loadDepositHyperliquidUsdcModal,
+  );
   const handleDeposit = useCallback(() => {
     setIsOpen(false);
     void openHlDeposit();
@@ -1322,8 +1360,14 @@ function DexAccountMenuContent({
 }) {
   const { t } = useTranslation();
   const { chain } = useCurrentChain();
-  const { onOpen: openReceiveModal } = useAsyncModal(RECEIVE_MODAL_ID);
-  const { onOpen: openWithdrawModal } = useAsyncModal(WITHDRAW_MODAL_ID);
+  const { onOpen: openReceiveModal } = useDeferredAsyncModal(
+    RECEIVE_MODAL_ID,
+    loadReceiveModal,
+  );
+  const { onOpen: openWithdrawModal } = useDeferredAsyncModal(
+    WITHDRAW_MODAL_ID,
+    loadWithdrawModal,
+  );
   const { mutate: createOnrampWidgetUrl, isPending: isCreatingOnramp } =
     useCreateOnrampWidgetUrlMutation();
 

@@ -26,7 +26,9 @@ import { useConnectedWallet } from "@liberfi.io/wallet-connector";
 import {
   FUND_WALLET_MODAL_ID,
   type FundWalletParams,
-} from "../FundWalletModal";
+} from "../fund-wallet-modal.contract";
+import { useDeferredAsyncModal } from "../modals/DeferredAsyncModalHost";
+import { loadFundWalletModal } from "../modals/modal-loaders";
 import { SETUP_WALLET_MODAL_ID } from "../SetupWalletModal";
 import { trackMatchDetailView } from "../../lib/analytics";
 import { useResolvedApiLang } from "../../i18n/ResolvedLocaleProvider";
@@ -54,7 +56,10 @@ export function PredictDetailPage({
   const { t } = useTranslation();
   const lang = useResolvedApiLang();
   const { onOpen: openFundWallet } =
-    useAsyncModal<FundWalletParams>(FUND_WALLET_MODAL_ID);
+    useDeferredAsyncModal<FundWalletParams>(
+      FUND_WALLET_MODAL_ID,
+      loadFundWalletModal,
+    );
   const { onOpen: openSetupWallet } = useAsyncModal(SETUP_WALLET_MODAL_ID);
 
   const solanaWallet = useConnectedWallet(Chain.SOLANA);

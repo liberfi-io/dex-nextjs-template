@@ -225,14 +225,16 @@ describe("Stage 5.5 production wiring", () => {
     expect(readWebSrc("runtime/Stage55UiBridge.tsx")).not.toContain("@liberfi/ui-base");
   });
 
-  it("nests Stage55AdaptersProvider inside Stage54AdaptersProvider", () => {
-    const source = readWebSrc("runtime/AppRuntimeProviders.tsx");
-    const stage54 = source.indexOf("<Stage54AdaptersProvider");
-    const stage55 = source.indexOf("<Stage55AdaptersProvider");
-    const stage54Close = source.indexOf("</Stage54AdaptersProvider>");
-    expect(stage54).toBeGreaterThan(-1);
-    expect(stage55).toBeGreaterThan(stage54);
-    expect(stage55).toBeLessThan(stage54Close);
+  it("keeps Stage55 shared while Stage54 is isolated to Predict routes", () => {
+    expect(readWebSrc("runtime/AppRuntimeProviders.tsx")).toContain(
+      "<Stage55AdaptersProvider",
+    );
+    expect(readWebSrc("runtime/AppRuntimeProviders.tsx")).not.toContain(
+      "Stage54AdaptersProvider",
+    );
+    expect(readWebSrc("runtime/PredictRuntimeProviders.tsx")).toContain(
+      "<Stage54AdaptersProvider",
+    );
   });
 
   it("keeps production launchpad/redpacket entries on published SDK UI", () => {

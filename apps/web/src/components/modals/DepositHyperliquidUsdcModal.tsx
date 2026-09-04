@@ -54,8 +54,9 @@ import { HyperliquidUsdcIcon } from "../icons/HyperliquidUsdcIcon";
 import { useSolBalance } from "../../hooks/useSolBalance";
 import { useEvmNativeBalance, type EvmNativeChain } from "../../hooks/useEvmNativeBalance";
 import { useHyperliquidBalances } from "../../hooks/useHyperliquidBalances";
+import { DEPOSIT_HL_USDC_MODAL_ID } from "./modal-contracts";
 
-export const DEPOSIT_HL_USDC_MODAL_ID = "deposit-hyperliquid-usdc";
+export { DEPOSIT_HL_USDC_MODAL_ID } from "./modal-contracts";
 
 const HL_SCAN_TX = "https://app.hyperliquid.xyz/explorer/tx";
 const DEPOSIT_SOURCE: DepositSource = "dex";

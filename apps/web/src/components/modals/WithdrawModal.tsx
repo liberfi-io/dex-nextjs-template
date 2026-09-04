@@ -31,8 +31,9 @@ import {
   formatWalletPrimaryTokenBalance,
   useWalletPrimaryTokenNetWorth,
 } from "../../application/useWalletPrimaryTokenNetWorth";
+import { WITHDRAW_MODAL_ID } from "./modal-contracts";
 
-export const WITHDRAW_MODAL_ID = "withdraw-wallet";
+export { WITHDRAW_MODAL_ID } from "./modal-contracts";
 
 // ---------------------------------------------------------------------------
 // Confirmation polling

@@ -116,7 +116,7 @@ describe("application client lifecycle policy", () => {
   });
 
   it.each([
-    ["dexAggregatorUrl", ["chainStream", "api", "portfolio"]],
+    ["dexAggregatorUrl", ["chainStream", "api"]],
     ["mediaTrackUrl", ["mediaTrack"]],
     ["mediaTrackStreamUrl", ["mediaTrack"]],
     ["channelsUrl", ["channels"]],

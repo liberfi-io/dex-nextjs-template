@@ -9,10 +9,12 @@ import {
   type PresetFormModalParams,
   usePresetValues,
 } from "@liberfi.io/ui-trade";
-import { useAsyncModal } from "@liberfi.io/ui-scaffold";
 import { getNativeToken } from "@liberfi.io/utils";
 import { pulseSettingsAtom } from "../../states/pulse";
 import { QuickAmountPresetInputUI } from "../QuickAmountPresetInput";
+import { useDeferredAsyncModal } from "../modals/DeferredAsyncModalHost";
+import { loadPresetFormModal } from "../modals/modal-loaders";
+import { PRESET_FORM_MODAL_ID } from "../modals/modal-contracts";
 
 export type PulseInstantBuyAmountInputProps = {
   type: PulseListType;
@@ -31,7 +33,11 @@ export function PulseInstantBuyAmountInput({
   const preset1 = usePresetValues({ chain, direction: "buy", presetIndex: 1 });
   const preset2 = usePresetValues({ chain, direction: "buy", presetIndex: 2 });
   const presetValues = useMemo(() => [preset0, preset1, preset2], [preset0, preset1, preset2]);
-  const { onOpen: openPresetModal } = useAsyncModal<PresetFormModalParams>("preset");
+  const { onOpen: openPresetModal } =
+    useDeferredAsyncModal<PresetFormModalParams>(
+      PRESET_FORM_MODAL_ID,
+      loadPresetFormModal,
+    );
 
   const handlePresetClick = useCallback(
     (preset: number) => {

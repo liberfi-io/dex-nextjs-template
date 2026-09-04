@@ -6,13 +6,12 @@ import { ModalBody, ModalContent, StyledModal, useScreen, XCloseIcon } from "@li
 import { AsyncModal, type RenderAsyncModalProps } from "@liberfi.io/ui-scaffold";
 import { LaunchPadHome } from "@liberfi.io/ui-launchpad";
 import { LaunchpadUiBridge } from "../../runtime/Stage55UiBridge";
+import {
+  LAUNCHPAD_MODAL_ID,
+  type LaunchPadModalParams,
+} from "./modal-contracts";
 
-export type LaunchPadModalParams = {
-  prompt?: string;
-  image?: string;
-};
-
-export const LAUNCHPAD_MODAL_ID = "launchpad";
+export { LAUNCHPAD_MODAL_ID, type LaunchPadModalParams } from "./modal-contracts";
 
 export function LaunchPadModal({ id = LAUNCHPAD_MODAL_ID }: { id?: string }) {
   return (

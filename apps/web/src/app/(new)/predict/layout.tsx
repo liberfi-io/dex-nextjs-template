@@ -9,8 +9,8 @@ import { usePredictWsRouteLifecycle } from "../../../runtime/usePredictWsRouteLi
  * and disconnects when they leave. This keeps the WS connection scoped to
  * the predict section instead of being open on every page.
  *
- * Note: PredictWalletProvider lives in the root layout below AppRuntimeProviders,
- * so the header's PredictBalanceIndicator dropdown
+ * Note: PredictWalletProvider is installed by the route-aware runtime wrapper
+ * above PageShell, so the header's PredictBalanceIndicator dropdown
  * (which surfaces addresses, KYC / Setup status, and sign-out) can also
  * access it.
  */

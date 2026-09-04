@@ -20,10 +20,17 @@ export const APP_RUNTIME_PROVIDER_ORDER: readonly RuntimeProviderKey[] = [
   "api-client",
   "media-track",
   "channels",
+  "portfolio-account",
+  "application-shell",
+];
+
+export const PREDICT_RUNTIME_PROVIDER_ORDER: readonly RuntimeProviderKey[] = [
   "predict",
   "polymarket",
-  "portfolio-client",
-  "portfolio-account",
+  "application-shell",
+];
+
+export const PERPETUALS_RUNTIME_PROVIDER_ORDER: readonly RuntimeProviderKey[] = [
   "perpetuals",
   "application-shell",
 ];
@@ -132,7 +139,6 @@ export function getChangedRuntimeClients(
     ],
     ["predict", configChanged("predictUrl")],
     ["predictWs", configChanged("predictWsEnabled") || configChanged("predictWsUrl")],
-    ["portfolio", configChanged("dexAggregatorUrl")],
     ["perpetuals", configChanged("perpetualsEnvironment")],
     ["perpetualDeposit", configChanged("perpetualsApiUrl")],
   ];

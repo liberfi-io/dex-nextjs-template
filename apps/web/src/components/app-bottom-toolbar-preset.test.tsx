@@ -24,8 +24,11 @@ jest.mock("@liberfi.io/ui", () => ({
 
 jest.mock("@liberfi.io/ui-scaffold", () => ({
   ScaffoldToolbar: ({ left }: { left: React.ReactNode }) => <div>{left}</div>,
-  useAsyncModal: () => ({ onOpen: openPresetModal }),
   useDraggableDisclosure: () => ({ onOpen: jest.fn() }),
+}));
+
+jest.mock("./modals/DeferredAsyncModalHost", () => ({
+  useDeferredAsyncModal: () => ({ onOpen: openPresetModal }),
 }));
 
 jest.mock("@liberfi.io/ui-chain-select", () => ({

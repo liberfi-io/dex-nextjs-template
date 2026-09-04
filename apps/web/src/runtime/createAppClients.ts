@@ -1,17 +1,9 @@
 import { ChainStreamClient } from "@chainstream-io/sdk";
 import { Client } from "@liberfi.io/client";
-import {
-  createPredictWsClient,
-  PredictClient,
-  PredictWsClient,
-  PredictWsClientConfig,
-} from "@liberfi.io/react-predict";
 import { ChannelsClient } from "@liberfi.io/ui-channels/client";
 import { MediaTrackClient } from "@liberfi.io/ui-media-track/client";
-import { HyperliquidPerpetualsClient, LiberFiPerpDepositClient } from "@liberfi.io/ui-perpetuals";
-import { PortfolioClient } from "@liberfi.io/ui-portfolio/client";
 import {
-  AppClientBundle,
+  CoreAppClientBundle,
   CapabilityBundleV1,
   RuntimeConfig,
 } from "./app-runtime.types";
@@ -33,7 +25,7 @@ export function createDexClients(
   config: DexRuntimeConfig,
   dexTokenProvider: DexTokenProvider,
   factories: DexClientFactories = DEFAULT_DEX_CLIENT_FACTORIES,
-): Pick<AppClientBundle, "chainStream" | "api"> {
+): Pick<CoreAppClientBundle, "chainStream" | "api"> {
   return {
     chainStream: factories.createChainStream(dexTokenProvider, {
       serverUrl: config.dexAggregatorUrl,
@@ -88,89 +80,7 @@ export function createChannelsClient(
   });
 }
 
-export interface PortfolioClientFactories {
-  createPortfolio(...args: ConstructorParameters<typeof PortfolioClient>): PortfolioClient;
-}
-
-export type PortfolioRuntimeConfig = Pick<RuntimeConfig, "dexAggregatorUrl">;
-
-const DEFAULT_PORTFOLIO_CLIENT_FACTORIES: PortfolioClientFactories = {
-  createPortfolio: (...args) => new PortfolioClient(...args),
-};
-
-export function createPortfolioClient(
-  config: PortfolioRuntimeConfig,
-  factories: PortfolioClientFactories = DEFAULT_PORTFOLIO_CLIENT_FACTORIES,
-): PortfolioClient {
-  return factories.createPortfolio(config.dexAggregatorUrl);
-}
-
-export interface PerpetualsClientFactories {
-  createPerpetuals(
-    ...args: ConstructorParameters<typeof HyperliquidPerpetualsClient>
-  ): HyperliquidPerpetualsClient;
-  createPerpetualDeposit(
-    ...args: ConstructorParameters<typeof LiberFiPerpDepositClient>
-  ): LiberFiPerpDepositClient;
-}
-
-export type PerpetualsRuntimeConfig = Pick<
-  RuntimeConfig,
-  "perpetualsApiUrl" | "perpetualsEnvironment"
->;
-
-const DEFAULT_PERPETUALS_CLIENT_FACTORIES: PerpetualsClientFactories = {
-  createPerpetuals: (...args) => new HyperliquidPerpetualsClient(...args),
-  createPerpetualDeposit: (...args) => new LiberFiPerpDepositClient(...args),
-};
-
-export function createPerpetualsClients(
-  config: PerpetualsRuntimeConfig,
-  factories: PerpetualsClientFactories = DEFAULT_PERPETUALS_CLIENT_FACTORIES,
-): Pick<AppClientBundle, "perpetuals" | "perpetualDeposit"> {
-  return {
-    perpetuals: factories.createPerpetuals({
-      environment: config.perpetualsEnvironment,
-    }),
-    perpetualDeposit: config.perpetualsApiUrl
-      ? factories.createPerpetualDeposit({ baseUrl: config.perpetualsApiUrl })
-      : undefined,
-  };
-}
-
-export interface PredictClientFactories {
-  createPredict(endpoint: string): PredictClient;
-  createPredictWs(config: PredictWsClientConfig): PredictWsClient;
-}
-
-export type PredictRuntimeConfig = Pick<
-  RuntimeConfig,
-  "predictUrl" | "predictWsEnabled" | "predictWsUrl"
->;
-
-const DEFAULT_PREDICT_CLIENT_FACTORIES: PredictClientFactories = {
-  createPredict: (endpoint) => new PredictClient(endpoint),
-  createPredictWs: createPredictWsClient,
-};
-
-export function createPredictClients(
-  config: PredictRuntimeConfig,
-  factories: PredictClientFactories = DEFAULT_PREDICT_CLIENT_FACTORIES,
-): Pick<AppClientBundle, "predict" | "predictWs"> {
-  return {
-    predict: factories.createPredict(config.predictUrl),
-    predictWs:
-      config.predictWsEnabled && config.predictWsUrl
-        ? factories.createPredictWs({
-            wsUrl: config.predictWsUrl,
-            autoConnect: false,
-            autoReconnect: true,
-          })
-        : null,
-  };
-}
-
-type AppClientMembers = Omit<AppClientBundle, "capabilities">;
+type AppClientMembers = Omit<CoreAppClientBundle, "capabilities">;
 
 export function createCapabilityBundle(api: Client): CapabilityBundleV1 {
   return {
@@ -187,15 +97,12 @@ export function createCapabilityBundle(api: Client): CapabilityBundleV1 {
 export function createAppClients(
   members: AppClientMembers,
   capabilities = createCapabilityBundle(members.api),
-): AppClientBundle {
+): CoreAppClientBundle {
   const requiredMembers: Array<keyof AppClientMembers> = [
     "chainStream",
     "api",
     "mediaTrack",
     "channels",
-    "predict",
-    "portfolio",
-    "perpetuals",
   ];
   for (const member of requiredMembers) {
     if (!members[member]) {

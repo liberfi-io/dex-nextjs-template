@@ -20,7 +20,6 @@ import {
 import { chainDisplayName, getNativeToken, txExplorerUrl } from "@liberfi.io/utils";
 import { useSwitchEvmWalletsToChain } from "@liberfi.io/wallet-connector";
 import { useChainSwitchUrlHandler } from "../../hooks/useChainSwitchUrlHandler";
-import { useAsyncModal } from "@liberfi.io/ui-scaffold";
 import {
   AmountPresetInputWidget,
   InstantTradeSwapProvider,
@@ -33,6 +32,9 @@ import { QuickAmountPresetInputWidget } from "../QuickAmountPresetInput";
 import { InstantTradeListButton } from "./InstantTradeListButton";
 import { getTradeErrorToastMessage } from "../../application/trade-error-toast";
 import { DiscoverTokenListMeasurementGate } from "./DiscoverTokenListSkeleton";
+import { useDeferredAsyncModal } from "../modals/DeferredAsyncModalHost";
+import { loadPresetFormModal } from "../modals/modal-loaders";
+import { PRESET_FORM_MODAL_ID } from "../modals/modal-contracts";
 
 type ListTab = "trending" | "stocks" | "new";
 
@@ -78,7 +80,11 @@ export function CombinedTokenList() {
   const { tabs, activeTab, setActiveTab } = useTabs(chain);
   const nativeToken = useMemo(() => getNativeToken(chain), [chain]);
 
-  const { onOpen: openPresetModal } = useAsyncModal<PresetFormModalParams>("preset");
+  const { onOpen: openPresetModal } =
+    useDeferredAsyncModal<PresetFormModalParams>(
+      PRESET_FORM_MODAL_ID,
+      loadPresetFormModal,
+    );
   const handlePresetClick = useCallback(
     (preset: number) => {
       openPresetModal({

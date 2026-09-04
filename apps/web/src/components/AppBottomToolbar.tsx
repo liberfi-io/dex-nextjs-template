@@ -11,7 +11,7 @@ import {
   TwitterIcon,
   UserGuideIcon,
 } from "@liberfi.io/ui";
-import { ScaffoldToolbar, useAsyncModal, useDraggableDisclosure } from "@liberfi.io/ui-scaffold";
+import { ScaffoldToolbar, useDraggableDisclosure } from "@liberfi.io/ui-scaffold";
 import { useCallback, useMemo } from "react";
 import { BottomToolBarWallet } from "./BottomToolBarWallet";
 import { BottomNetworkStatus } from "./BottomNetworkStatus";
@@ -20,6 +20,9 @@ import { PresetFormModalParams, useInstantTradeAmount } from "@liberfi.io/ui-tra
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { getNativeToken } from "@liberfi.io/utils";
 import { Chain } from "@liberfi.io/types";
+import { useDeferredAsyncModal } from "./modals/DeferredAsyncModalHost";
+import { loadPresetFormModal } from "./modals/modal-loaders";
+import { PRESET_FORM_MODAL_ID } from "./modals/modal-contracts";
 
 type SelectionAwarePresetFormModalParams = PresetFormModalParams & {
   onPresetIndexChange?: (chain: Chain, presetIndex: number) => void;
@@ -47,7 +50,11 @@ export function AppBottomToolbar() {
     tokenAddress: nativeToken?.address ?? "",
   }) as WritableInstantTradeAmount;
 
-  const { onOpen: openPresetModal } = useAsyncModal<SelectionAwarePresetFormModalParams>("preset");
+  const { onOpen: openPresetModal } =
+    useDeferredAsyncModal<SelectionAwarePresetFormModalParams>(
+      PRESET_FORM_MODAL_ID,
+      loadPresetFormModal,
+    );
 
   const handleModalPresetIndexChange = useCallback(
     (presetChain: Chain, nextPreset: number) => {

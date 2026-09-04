@@ -72,8 +72,15 @@ import {
 } from "../lib/polymarket-deposit-chains";
 import { polymarketAutoSetupPendingAtom } from "../lib/polymarketAutoSetupState";
 import { polymarketSetupQueryKey } from "@liberfi.io/react-predict";
+import {
+  FUND_WALLET_MODAL_ID,
+  type FundWalletParams,
+} from "./fund-wallet-modal.contract";
 
-export const FUND_WALLET_MODAL_ID = "fund-prediction-wallet";
+export {
+  FUND_WALLET_MODAL_ID,
+  type FundWalletParams,
+} from "./fund-wallet-modal.contract";
 
 type WalletSource = "solana" | "evm";
 type Screen = "main" | "deposit" | "withdraw";
@@ -85,12 +92,6 @@ const DEFAULT_DEPOSIT_CHAIN_KEY: DepositChainKey = "tron";
  * screen with a specific wallet (e.g. "evm" for Polymarket, "solana" for
  * Kalshi) preselected, instead of always landing on the Main choice screen.
  */
-export type FundWalletParams = {
-  initialScreen?: Screen;
-  initialWallet?: WalletSource;
-  lockWallet?: boolean;
-};
-
 // ---------------------------------------------------------------------------
 // Modal shell
 // ---------------------------------------------------------------------------

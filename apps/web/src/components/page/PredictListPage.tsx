@@ -18,7 +18,9 @@ import {
 import {
   FUND_WALLET_MODAL_ID,
   type FundWalletParams,
-} from "../FundWalletModal";
+} from "../fund-wallet-modal.contract";
+import { useDeferredAsyncModal } from "../modals/DeferredAsyncModalHost";
+import { loadFundWalletModal } from "../modals/modal-loaders";
 import { SETUP_WALLET_MODAL_ID } from "../SetupWalletModal";
 import { ENABLE_KALSHI } from "../../libs/featureFlags";
 import {
@@ -46,7 +48,10 @@ export function PredictListPage({
   const { t } = useTranslation();
   const lang = useResolvedApiLang();
   const { onOpen: openFundWallet } =
-    useAsyncModal<FundWalletParams>(FUND_WALLET_MODAL_ID);
+    useDeferredAsyncModal<FundWalletParams>(
+      FUND_WALLET_MODAL_ID,
+      loadFundWalletModal,
+    );
   const { onOpen: openSetupWallet } = useAsyncModal(SETUP_WALLET_MODAL_ID);
   const { polymarketSetupVerified, kalshiKycVerified } = usePredictWallet();
   const marketDataState = useMarketDataResource(

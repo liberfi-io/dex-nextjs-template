@@ -8,8 +8,9 @@ import { AsyncModal, type RenderAsyncModalProps } from "@liberfi.io/ui-scaffold"
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { useAccountInfo } from "@liberfi.io/ui-portfolio";
 import { chainDisplayName, type PredefinedToken } from "@liberfi.io/utils";
+import { RECEIVE_MODAL_ID } from "./modal-contracts";
 
-export const RECEIVE_MODAL_ID = "receive-wallet";
+export { RECEIVE_MODAL_ID } from "./modal-contracts";
 
 export function ReceiveModal() {
   return <AsyncModal id={RECEIVE_MODAL_ID}>{(props) => <Body {...props} />}</AsyncModal>;

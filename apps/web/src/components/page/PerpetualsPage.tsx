@@ -16,15 +16,16 @@ import {
   type UniverseSnapshot,
 } from "@liberfi.io/ui-perpetuals";
 import { cn, useScreen } from "@liberfi.io/ui";
-import { useAsyncModal } from "@liberfi.io/ui-scaffold";
 import { useAuthCallback, useWallets, type EvmWalletAdapter } from "@liberfi.io/wallet-connector";
 import { useHideBottomNavigationBar, useHideHeader } from "../../application/layout-chrome";
 import { useTranslation } from "@liberfi.io/i18n";
-import { DEPOSIT_HL_USDC_MODAL_ID } from "../modals/DepositHyperliquidUsdcModal";
+import { DEPOSIT_HL_USDC_MODAL_ID } from "../modals/modal-contracts";
 import { useHyperliquidUpdateLeverage } from "../../hooks/useHyperliquidUpdateLeverage";
 import { useHyperliquidPlaceOrder } from "../../hooks/useHyperliquidPlaceOrder";
 import { useHyperliquidCancelOrder } from "../../hooks/useHyperliquidCancelOrder";
 import { PerpetualsChart } from "./perpetuals/PerpetualsChart";
+import { useDeferredAsyncModal } from "../modals/DeferredAsyncModalHost";
+import { loadDepositHyperliquidUsdcModal } from "../modals/modal-loaders";
 
 type BottomTab = "positions" | "openOrders" | "tradeHistory";
 type MiddleTab = "orderBook" | "trades";
@@ -87,7 +88,10 @@ export function PerpetualsPage() {
   // after signing in" even on a successful Privy login. The SDK's
   // `useAuthCallback` doesn't try to chain post-auth work, so it
   // sidesteps the race entirely.
-  const { onOpen: openHlUsdcDeposit } = useAsyncModal(DEPOSIT_HL_USDC_MODAL_ID);
+  const { onOpen: openHlUsdcDeposit } = useDeferredAsyncModal(
+    DEPOSIT_HL_USDC_MODAL_ID,
+    loadDepositHyperliquidUsdcModal,
+  );
   const handleAddFunds = useAuthCallback(
     useCallback(() => {
       void openHlUsdcDeposit();

@@ -29,7 +29,9 @@ import { useAsyncModal } from "@liberfi.io/ui-scaffold";
 import {
   FUND_WALLET_MODAL_ID,
   type FundWalletParams,
-} from "src/components/FundWalletModal";
+} from "src/components/fund-wallet-modal.contract";
+import { useDeferredAsyncModal } from "src/components/modals/DeferredAsyncModalHost";
+import { loadFundWalletModal } from "src/components/modals/modal-loaders";
 import { SETUP_WALLET_MODAL_ID } from "src/components/SetupWalletModal";
 import { PortfolioActivitySection } from "src/components/page/PortfolioActivitySection";
 import {
@@ -252,7 +254,10 @@ export function WorldCupDetailPage({
   const [oddsFormat] = useOddsFormat();
   const { isDesktop } = useScreen();
   const { onOpen: openFundWallet } =
-    useAsyncModal<FundWalletParams>(FUND_WALLET_MODAL_ID);
+    useDeferredAsyncModal<FundWalletParams>(
+      FUND_WALLET_MODAL_ID,
+      loadFundWalletModal,
+    );
   const { onOpen: openSetupWallet } = useAsyncModal(SETUP_WALLET_MODAL_ID);
   const { polymarketSetupVerified, kalshiKycVerified } = usePredictWallet();
 

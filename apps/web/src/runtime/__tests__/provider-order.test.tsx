@@ -2,6 +2,8 @@ import fs from "node:fs";
 import path from "node:path";
 import {
   APP_RUNTIME_PROVIDER_ORDER,
+  PERPETUALS_RUNTIME_PROVIDER_ORDER,
+  PREDICT_RUNTIME_PROVIDER_ORDER,
   validateRuntimeProviderOrder,
 } from "../runtime-lifecycle-policy";
 
@@ -18,14 +20,31 @@ describe("application provider order policy", () => {
       "api-client",
       "media-track",
       "channels",
-      "predict",
-      "polymarket",
-      "portfolio-client",
       "portfolio-account",
-      "perpetuals",
       "application-shell",
     ]);
     expect(validateRuntimeProviderOrder(APP_RUNTIME_PROVIDER_ORDER)).toBe(true);
+  });
+
+  it("keeps route-only providers outside the shared homepage runtime", () => {
+    expect(PREDICT_RUNTIME_PROVIDER_ORDER).toEqual([
+      "predict",
+      "polymarket",
+      "application-shell",
+    ]);
+    expect(PERPETUALS_RUNTIME_PROVIDER_ORDER).toEqual([
+      "perpetuals",
+      "application-shell",
+    ]);
+
+    const source = fs.readFileSync(
+      path.resolve(process.cwd(), "src/runtime/AppRuntimeProviders.tsx"),
+      "utf8",
+    );
+    expect(source).not.toContain("Stage54AdaptersProvider");
+    expect(source).not.toContain("PolymarketProvider");
+    expect(source).not.toContain("PerpetualsProvider");
+    expect(source).not.toContain("PortfolioClientProvider");
   });
 
   it("rejects a permuted provider order", () => {

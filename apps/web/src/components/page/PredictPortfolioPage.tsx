@@ -15,8 +15,12 @@ import {
 import { usePositionsMulti } from "@liberfi.io/react-predict";
 import { ENABLE_KALSHI } from "../../libs/featureFlags";
 import { cn } from "@liberfi.io/ui";
-import { useAsyncModal } from "@liberfi.io/ui-scaffold";
-import { FUND_WALLET_MODAL_ID, type FundWalletParams } from "../FundWalletModal";
+import {
+  FUND_WALLET_MODAL_ID,
+  type FundWalletParams,
+} from "../fund-wallet-modal.contract";
+import { useDeferredAsyncModal } from "../modals/DeferredAsyncModalHost";
+import { loadFundWalletModal } from "../modals/modal-loaders";
 import { usePortfolioPnl } from "../../features/leaderboard/data/queries";
 import {
   PerformanceBiasCard,
@@ -82,11 +86,14 @@ function PortfolioContent() {
   const solanaAddr = solanaWallet?.address ?? "";
   const evmAddr = evmWallet?.address ?? "";
 
-  // Open the shared FundWalletModal (mounted once in AppLayout). Default to the
+  // Load the shared FundWalletModal on first use. Default to the
   // Polymarket (EVM) venue when connected — the portfolio is Polymarket-centric
   // — otherwise fall back to the Kalshi (Solana) wallet.
   const { onOpen: openFundWallet } =
-    useAsyncModal<FundWalletParams>(FUND_WALLET_MODAL_ID);
+    useDeferredAsyncModal<FundWalletParams>(
+      FUND_WALLET_MODAL_ID,
+      loadFundWalletModal,
+    );
   const fundWallet = (initialScreen: "deposit" | "withdraw") => {
     void openFundWallet({
       params: { initialScreen, initialWallet: evmAddr ? "evm" : "solana" },

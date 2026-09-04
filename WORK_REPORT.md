@@ -1571,3 +1571,14 @@
 - 验证结果：新测试先在旧 gate 上稳定失败，改动后证明初次未测量状态即挂载、获得 600px，更新为 640px 后数据 owner 未卸载且 query effect 仍只执行 1 次；Web 50/50 套件共 213/213 项及 14 项构建配置契约通过，typecheck、lint、whitespace 通过；现有本地 dev server 热更新成功。
 - 推送状态：功能提交已创建于本地 `main`，当前尚未推送。
 - Workflow 状态：未触发；未执行 Vercel 部署。
+
+## 2026-09-05：首页非核心运行时与重型弹窗拆包（提交前）
+
+- 仓库与分支：`dex-nextjs-template/main`；当前分支包含本轮已完成的本地性能提交，尚未推送。
+- 拟用提交标题：`perf(web): defer non-home providers and modal bundles`。
+- 问题背景：首页共享布局此前同步创建 Predict、Perpetuals、Portfolio 专用客户端并挂载对应 Provider，同时在根布局注册 LaunchPad、充值/收款/提现、预测搜索、快捷交易设置及预测钱包等重型弹窗；即使用户只打开首页，也会承担无关模块的解析、初始化和客户端代码成本。
+- 计划完成事项：把 Predict 与 Perpetuals 客户端、Provider、同步桥及对应 Header 状态下沉到按路由加载的运行时边界；移除无实际消费方的 PortfolioClientProvider，同时保留 Header/账户摘要确实依赖的 PortfolioProvider；新增首次打开才加载并注册的异步 Modal 宿主，覆盖 LaunchPad、Hyperliquid 入金、收款、提现、Token/预测搜索、快捷交易设置及预测钱包；补齐轻量 Modal contract，避免入口按钮反向静态引用重型实现。
+- 影响范围：DEX 首页初始客户端 chunk、Predict/Perpetuals 路由 Provider 生命周期、全局及路由弹窗加载时机；不改变弹窗 ID/参数/Promise contract、DEX/行情 API、登录入口、Header 账户余额或页面导航。
+- 验证计划：运行 Web 全量测试、typecheck、lint 和 whitespace；以路由边界测试确认首页共享源码不再引用业务专属 Provider，以 Modal 集成测试确认首次点击前 loader 调用为 0、首次点击后正常注册打开且后续复用；清理异常膨胀的可再生 `.next` 缓存并重启本地 dev，实测首页、Predict 和 Perpetuals 路由；记录开发态 chunk 归属。按项目规则，本阶段不执行 production build，首开压缩 JS 与 unused JS 的生产门禁留到发布阶段验证。
+- 预期推送状态：创建本地提交，暂不推送；禁止 force push。
+- Workflow 策略：本地提交不会触发 `Deploy to Vercel`；未获推送授权前不触发 GitHub Actions。

@@ -2,11 +2,13 @@
 
 import { RocketIcon, Button, StyledTooltip } from "@liberfi.io/ui";
 import { useTranslation } from "@liberfi.io/i18n";
-import * as UiScaffold from "@liberfi.io/ui-scaffold";
 import { useCallback } from "react";
-import { LAUNCHPAD_MODAL_ID, type LaunchPadModalParams } from "./modals/LaunchPadModal";
-
-const useAsyncModal = UiScaffold.useAsyncModal;
+import {
+  LAUNCHPAD_MODAL_ID,
+  type LaunchPadModalParams,
+} from "./modals/modal-contracts";
+import { useDeferredAsyncModal } from "./modals/DeferredAsyncModalHost";
+import { loadLaunchPadModal } from "./modals/modal-loaders";
 
 interface TweetMediaData {
   tweet: {
@@ -21,7 +23,10 @@ export type TweetsLaunchButtonProps = {
 
 export function TweetsLaunchButton({ data }: TweetsLaunchButtonProps) {
   const { t } = useTranslation();
-  const { onOpen } = useAsyncModal<LaunchPadModalParams>(LAUNCHPAD_MODAL_ID);
+  const { onOpen } = useDeferredAsyncModal<LaunchPadModalParams>(
+    LAUNCHPAD_MODAL_ID,
+    loadLaunchPadModal,
+  );
 
   const handleLaunch = useCallback(() => {
     void onOpen({

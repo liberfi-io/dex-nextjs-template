@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDexClient } from "@liberfi.io/react";
 import { useTranslation } from "@liberfi.io/i18n";
 import { Chain, type Token } from "@liberfi.io/types";
-import * as UiScaffold from "@liberfi.io/ui-scaffold";
 import { SEARCH_MODAL_ID } from "@liberfi.io/ui-tokens";
 import {
   TradingView,
@@ -24,6 +23,8 @@ import {
 } from "@liberfi.io/ui-tradingview";
 import { asJsx } from "../application/jsx";
 import { tokenDetailChainSegment } from "../application/routes";
+import { useDeferredAsyncModal } from "./modals/DeferredAsyncModalHost";
+import { loadTokenSearchModal } from "./modals/modal-loaders";
 
 const TradingViewChart = asJsx<TradingViewProps>(TradingView);
 import {
@@ -54,7 +55,10 @@ function getNativeQuote(chain: Chain): TvChartQuoteType {
 export function TradingChart({ chain, address, className }: TradingChartProps) {
   const { client, subscribeClient } = useDexClient();
   const { i18n } = useTranslation();
-  const { onOpen: openTokenSearch } = UiScaffold.useAsyncModal(SEARCH_MODAL_ID);
+  const { onOpen: openTokenSearch } = useDeferredAsyncModal(
+    SEARCH_MODAL_ID,
+    loadTokenSearchModal,
+  );
   const [widgetConstructor, setWidgetConstructor] = useState<WidgetConstructor | null>(null);
 
   useEffect(() => {

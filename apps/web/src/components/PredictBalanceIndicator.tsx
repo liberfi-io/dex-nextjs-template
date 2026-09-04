@@ -12,7 +12,6 @@ import { useTranslation } from "@liberfi.io/i18n";
 import { formatAmount, formatAmountInUsd, truncateAddress } from "@liberfi.io/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { ChartLineIcon, KalshiIcon, PolymarketIcon, cn, useScreen } from "@liberfi.io/ui";
-import { useAsyncModal } from "@liberfi.io/ui-scaffold";
 import { createWalletClient, custom, type Hex } from "viem";
 import { polygon } from "viem/chains";
 import {
@@ -22,7 +21,12 @@ import {
   pollTransaction,
   type PolymarketRelayConfig,
 } from "../lib/polymarket-relay";
-import { FUND_WALLET_MODAL_ID, type FundWalletParams } from "./FundWalletModal";
+import {
+  FUND_WALLET_MODAL_ID,
+  type FundWalletParams,
+} from "./fund-wallet-modal.contract";
+import { useDeferredAsyncModal } from "./modals/DeferredAsyncModalHost";
+import { loadFundWalletModal } from "./modals/modal-loaders";
 import { ReceiveOutlinedIcon } from "./icons/ReceiveOutlinedIcon";
 import { SendOutlinedIcon } from "./icons/SendOutlinedIcon";
 
@@ -546,15 +550,19 @@ export function PredictBalanceIndicator() {
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const ref = useRef<HTMLDivElement>(null);
 
-  // Open the shared `FundWalletModal` (mounted once at the
-  // NewAppLayout level alongside this component). The
+  // Load the shared `FundWalletModal` on first use, then reuse the registered
+  // instance for later opens. The
   // `initialScreen` + `initialWallet` params jump straight to the
   // deposit / withdraw screen for the specific venue, and
   // `lockWallet` additionally hides the in-modal wallet selector +
   // back button — the user already picked the venue one click ago, so
   // re-presenting a picker would just ask them to re-confirm the same
   // choice.
-  const { onOpen: openFundWallet } = useAsyncModal<FundWalletParams>(FUND_WALLET_MODAL_ID);
+  const { onOpen: openFundWallet } =
+    useDeferredAsyncModal<FundWalletParams>(
+      FUND_WALLET_MODAL_ID,
+      loadFundWalletModal,
+    );
 
   // Each handler closes the dropdown first (the modal will own the
   // user's focus next) and then opens the fund-wallet flow with the

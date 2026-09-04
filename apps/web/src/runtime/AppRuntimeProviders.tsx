@@ -1,31 +1,31 @@
 "use client";
 
-import { type ComponentType, PropsWithChildren, useMemo } from "react";
+import {
+  createContext,
+  type ComponentType,
+  PropsWithChildren,
+  useContext,
+  useMemo,
+} from "react";
 import Cookies from "js-cookie";
 import { DexClientProvider as ApiClientProvider } from "@liberfi.io/react";
-import { PolymarketProvider } from "@liberfi.io/react-predict";
 import { ChannelsProvider } from "@liberfi.io/ui-channels";
 import { MediaTrackProvider } from "@liberfi.io/ui-media-track";
-import { PerpetualsProvider } from "@liberfi.io/ui-perpetuals";
-import { PortfolioClientProvider, PortfolioProvider } from "@liberfi.io/ui-portfolio";
+import { PortfolioProvider } from "@liberfi.io/ui-portfolio";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { useAuth, useConnectedWallet } from "@liberfi.io/wallet-connector";
 import { PinataProvider } from "../application/pinata";
 import { PrimaryTokenPricePoller } from "../application/PrimaryTokenPricePoller";
 import { useDexTokenProvider } from "../application/useDexTokenProvider";
-import { HyperliquidAccountStateSync } from "../components/HyperliquidAccountStateSync";
-import { MARKET_DATA_FEATURE_CAPABILITY } from "../libs/featureFlags";
-import { createMarketDataCentrifugoTransportFactory } from "../libs/marketDataCentrifugoClient";
 import { pinata } from "../libs/pinata";
 import {
-  type AppClientBundle,
   type CapabilityBundleV1,
+  type CoreAppClientBundle,
   RuntimeConfig,
 } from "./app-runtime.types";
 import { readRuntimeConfig } from "./readRuntimeConfig";
 import { Stage51AdaptersProvider } from "./Stage51AdaptersProvider";
 import { Stage53AdaptersProvider } from "./Stage53AdaptersProvider";
-import { Stage54AdaptersProvider } from "./Stage54AdaptersProvider";
 import { Stage55AdaptersProvider } from "./Stage55AdaptersProvider";
 import { useAppClientBundle } from "./useAppClientBundle";
 
@@ -47,11 +47,21 @@ type ReactCapabilityInput = {
 
 const CapabilityClientProvider = ApiClientProvider as ComponentType<
   PropsWithChildren<{
-    client: AppClientBundle["api"];
-    subscribeClient: AppClientBundle["api"];
+    client: CoreAppClientBundle["api"];
+    subscribeClient: CoreAppClientBundle["api"];
     capabilities: ReactCapabilityInput;
   }>
 >;
+
+const AppRuntimeConfigContext = createContext<RuntimeConfig | null>(null);
+
+export function useAppRuntimeConfig(): RuntimeConfig {
+  const config = useContext(AppRuntimeConfigContext);
+  if (!config) {
+    throw new Error("useAppRuntimeConfig must be used within AppRuntimeProviders");
+  }
+  return config;
+}
 
 function projectReactCapabilities(
   bundle: CapabilityBundleV1,
@@ -107,54 +117,31 @@ export function AppRuntimeProviders({
   );
   const { chain } = useCurrentChain();
   const wallet = useConnectedWallet(chain);
-  const marketDataTransportFactory = useMemo(() => {
-    const endpoint = process.env.NEXT_PUBLIC_CENTRIFUGO_WS_URL;
-    if (!MARKET_DATA_FEATURE_CAPABILITY.enabled || !endpoint) {
-      return undefined;
-    }
-    return createMarketDataCentrifugoTransportFactory({ endpoint });
-  }, []);
 
   return (
-    <PinataProvider client={pinata}>
-      <CapabilityClientProvider
-        client={clients.api}
-        subscribeClient={clients.api}
-        capabilities={reactCapabilities}
-      >
-        <PrimaryTokenPricePoller />
-        <Stage51AdaptersProvider api={clients.api}>
-          <Stage53AdaptersProvider>
-            <Stage54AdaptersProvider
-              client={clients.predict}
-              wsClient={clients.predictWs}
-              wsEnabled={config.predictWsEnabled}
-              marketDataCapability={MARKET_DATA_FEATURE_CAPABILITY}
-              marketDataTransportFactory={marketDataTransportFactory}
-            >
+    <AppRuntimeConfigContext.Provider value={config}>
+      <PinataProvider client={pinata}>
+        <CapabilityClientProvider
+          client={clients.api}
+          subscribeClient={clients.api}
+          capabilities={reactCapabilities}
+        >
+          <PrimaryTokenPricePoller />
+          <Stage51AdaptersProvider api={clients.api}>
+            <Stage53AdaptersProvider>
               <Stage55AdaptersProvider client={clients.chainStream} origin={config.origin}>
                 <MediaTrackProvider client={clients.mediaTrack}>
                   <ChannelsProvider client={clients.channels}>
-                    <PolymarketProvider>
-                      <PortfolioClientProvider client={clients.portfolio}>
-                        <PortfolioProvider chain={chain} address={wallet?.address ?? ""}>
-                          <PerpetualsProvider
-                            client={clients.perpetuals}
-                            depositClient={clients.perpetualDeposit}
-                          >
-                            <HyperliquidAccountStateSync />
-                            {children}
-                          </PerpetualsProvider>
-                        </PortfolioProvider>
-                      </PortfolioClientProvider>
-                    </PolymarketProvider>
+                    <PortfolioProvider chain={chain} address={wallet?.address ?? ""}>
+                      {children}
+                    </PortfolioProvider>
                   </ChannelsProvider>
                 </MediaTrackProvider>
               </Stage55AdaptersProvider>
-            </Stage54AdaptersProvider>
-          </Stage53AdaptersProvider>
-        </Stage51AdaptersProvider>
-      </CapabilityClientProvider>
-    </PinataProvider>
+            </Stage53AdaptersProvider>
+          </Stage51AdaptersProvider>
+        </CapabilityClientProvider>
+      </PinataProvider>
+    </AppRuntimeConfigContext.Provider>
   );
 }

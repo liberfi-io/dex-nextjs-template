@@ -18,17 +18,22 @@ export interface RuntimeConfigPolicyInput {
   origin: string;
 }
 
-export interface AppClientBundle {
+export interface CoreAppClientBundle {
   chainStream: ChainStreamClient;
   api: Client;
   mediaTrack: MediaTrackClient;
   channels: ChannelsClient;
+  capabilities: CapabilityBundleV1;
+}
+
+export interface PredictAppClientBundle {
   predict: PredictClient;
   predictWs: PredictWsClient | null;
-  portfolio: PortfolioClient;
+}
+
+export interface PerpetualsAppClientBundle {
   perpetuals: HyperliquidPerpetualsClient;
   perpetualDeposit: LiberFiPerpDepositClient | undefined;
-  capabilities: CapabilityBundleV1;
 }
 
 type TokenDataCapability = Pick<
@@ -128,7 +133,6 @@ export type RuntimeClientKey =
   | "channels"
   | "predict"
   | "predictWs"
-  | "portfolio"
   | "perpetuals"
   | "perpetualDeposit";
 
@@ -145,7 +149,6 @@ export type RuntimeProviderKey =
   | "channels"
   | "predict"
   | "polymarket"
-  | "portfolio-client"
   | "portfolio-account"
   | "perpetuals"
   | "application-shell";
@@ -168,4 +171,3 @@ import type {
   HyperliquidPerpetualsClient,
   LiberFiPerpDepositClient,
 } from "@liberfi.io/ui-perpetuals";
-import type { PortfolioClient } from "@liberfi.io/ui-portfolio/client";

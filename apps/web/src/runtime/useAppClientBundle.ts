@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { AppClientBundle, RuntimeConfig } from "./app-runtime.types";
+import { CoreAppClientBundle, RuntimeConfig } from "./app-runtime.types";
 import {
   ChannelsTokenProvider,
   createAppClients,
@@ -7,9 +7,6 @@ import {
   createChannelsClient,
   createDexClients,
   createMediaTrackClient,
-  createPerpetualsClients,
-  createPortfolioClient,
-  createPredictClients,
   DexTokenProvider,
 } from "./createAppClients";
 
@@ -23,7 +20,7 @@ export function useAppClientBundle({
   config,
   dexTokenProvider,
   channelsTokenProvider,
-}: UseAppClientBundleInput): AppClientBundle {
+}: UseAppClientBundleInput): CoreAppClientBundle {
   const dex = useMemo(
     () => createDexClients({ dexAggregatorUrl: config.dexAggregatorUrl }, dexTokenProvider),
     [config.dexAggregatorUrl, dexTokenProvider],
@@ -47,28 +44,6 @@ export function useAppClientBundle({
     () => createChannelsClient({ channelsUrl: config.channelsUrl }, channelsTokenProvider),
     [channelsTokenProvider, config.channelsUrl],
   );
-  const predict = useMemo(
-    () =>
-      createPredictClients({
-        predictUrl: config.predictUrl,
-        predictWsEnabled: config.predictWsEnabled,
-        predictWsUrl: config.predictWsUrl,
-      }),
-    [config.predictUrl, config.predictWsEnabled, config.predictWsUrl],
-  );
-  const portfolio = useMemo(
-    () => createPortfolioClient({ dexAggregatorUrl: config.dexAggregatorUrl }),
-    [config.dexAggregatorUrl],
-  );
-  const perpetuals = useMemo(
-    () =>
-      createPerpetualsClients({
-        perpetualsApiUrl: config.perpetualsApiUrl,
-        perpetualsEnvironment: config.perpetualsEnvironment,
-      }),
-    [config.perpetualsApiUrl, config.perpetualsEnvironment],
-  );
-
   return useMemo(
     () =>
       createAppClients(
@@ -76,12 +51,9 @@ export function useAppClientBundle({
           ...dex,
           mediaTrack,
           channels,
-          ...predict,
-          portfolio,
-          ...perpetuals,
         },
         capabilities,
       ),
-    [capabilities, channels, dex, mediaTrack, perpetuals, portfolio, predict],
+    [capabilities, channels, dex, mediaTrack],
   );
 }

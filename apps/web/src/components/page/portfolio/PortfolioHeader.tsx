@@ -4,7 +4,6 @@ import { useCallback, useState } from "react";
 import { Tooltip } from "@heroui/react";
 import { useTranslation } from "@liberfi.io/i18n";
 import { cn, RefreshIcon, toast, TriangleDownIcon, TriangleUpIcon } from "@liberfi.io/ui";
-import { useAsyncModal } from "@liberfi.io/ui-scaffold";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
   useAccountInfo,
@@ -16,9 +15,16 @@ import { useCreateOnrampWidgetUrlMutation } from "../../../application/server/us
 import { CashInOutlinedIcon } from "../../icons/CashInOutlinedIcon";
 import { ReceiveOutlinedIcon } from "../../icons/ReceiveOutlinedIcon";
 import { SendOutlinedIcon } from "../../icons/SendOutlinedIcon";
-import { RECEIVE_MODAL_ID } from "../../modals/ReceiveModal";
-import { WITHDRAW_MODAL_ID } from "../../modals/WithdrawModal";
+import {
+  RECEIVE_MODAL_ID,
+  WITHDRAW_MODAL_ID,
+} from "../../modals/modal-contracts";
 import { PortfolioGradientAvatar } from "./PortfolioGradientAvatar";
+import { useDeferredAsyncModal } from "../../modals/DeferredAsyncModalHost";
+import {
+  loadReceiveModal,
+  loadWithdrawModal,
+} from "../../modals/modal-loaders";
 
 /**
  * Portfolio page header — wallet identity + balance + PnL + action cluster.
@@ -56,8 +62,14 @@ export function PortfolioHeader() {
   const bullish = totalProfitInUsd >= 0;
 
   // Modal openers
-  const { onOpen: openReceive } = useAsyncModal(RECEIVE_MODAL_ID);
-  const { onOpen: openWithdraw } = useAsyncModal(WITHDRAW_MODAL_ID);
+  const { onOpen: openReceive } = useDeferredAsyncModal(
+    RECEIVE_MODAL_ID,
+    loadReceiveModal,
+  );
+  const { onOpen: openWithdraw } = useDeferredAsyncModal(
+    WITHDRAW_MODAL_ID,
+    loadWithdrawModal,
+  );
   const { mutate: createOnrampWidgetUrl, isPending: isCreatingOnramp } =
     useCreateOnrampWidgetUrlMutation();
 
