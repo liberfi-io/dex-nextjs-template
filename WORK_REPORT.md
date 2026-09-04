@@ -1508,3 +1508,24 @@
 - 验证结果：3 个新增测试套件共 4/4 项通过；`@liberfi.io/ui-tokens` typecheck、lint 和 whitespace 检查通过；测试使用隔离 runtime 且不访问真实网络。
 - 推送状态：功能提交已创建于本地 `main`，当前尚未推送。
 - Workflow 状态：未触发；未执行 React SDK npm 发布。
+
+## 2026-09-05：移除热门与股票列表逐 Token fan-out（提交前）
+
+- 仓库与分支：`react-sdk/main`；当前分支包含上一项本地测试基建提交，尚未推送。
+- 拟用提交标题：`fix(ui-tokens): remove ranking token detail fan-out`。
+- 问题背景：首页热门榜和股票榜在取得约 100 条列表数据后，仍为每个 token 发起详情查询并建立逐 token 行情订阅，形成 1 个列表接口外加 100 个详情接口和大量 WebSocket channel 的 N+1 放大；列表级行情订阅本身已覆盖价格、交易数、交易者、成交量和涨跌幅。
+- 计划完成事项：只从热门和股票 script 移除逐 token retain/query/subscription；保留列表 query、列表级 subscription、本地排序筛选和 30 秒 HTTP refetch；新增契约断言，确认 100 条数据下详情调用为 0，并确认轮询只重拉一份列表且更新流动性。
+- 影响范围：`@liberfi.io/ui-tokens` 的热门和股票列表数据获取；价格及交易统计继续实时更新，`tvlInUsd`/`tvl` 明确降级为最多 30 秒 HTTP 更新。新币、Pulse 和公共详情订阅 helper 不在本次修改范围。
+- 验证计划：先用旧实现运行目标契约并确认因 100 次详情调用而失败，再实施最小删除；运行热门、股票、新币 script 测试、`ui-tokens` typecheck、lint 与 whitespace，并复核 30 秒轮询和卸载行为。
+- 预期推送状态：创建本地提交，暂不推送；禁止 force push。
+- Workflow 策略：本地提交不会触发 React SDK `Release`；未获发布授权前不推送 `main`。
+
+## 2026-09-05：移除热门与股票列表逐 Token fan-out（提交后）
+
+- 仓库与分支：`react-sdk/main`。
+- 提交：`3f7e7fddd` — `fix(ui-tokens): remove ranking token detail fan-out`。
+- 最终完成事项：热门榜和股票榜不再为列表中的每个 token 调用详情接口或建立逐 token subscription；两者继续使用单份列表 query、单路列表级实时订阅以及现有 30 秒列表 refetch。契约测试同时证明列表级消息可以独立更新价格、交易数、交易者、成交量和涨跌幅，HTTP refetch 可以更新流动性。
+- 影响范围：100 条热门或股票数据由“1 个列表请求 + 100 个详情请求”收敛为“1 个列表请求”，并移除对应逐 token WebSocket fan-out；`tvlInUsd`/`tvl` 最多 30 秒陈旧的取舍已显式保留。新币和 Pulse 继续维持原实现。
+- 验证结果：旧实现按新契约运行时稳定暴露 100 次详情调用；改动后热门、股票、新币共 3 套件 6/6 项通过，其中热门/股票 100 条场景的详情 query/subscription 均为 0、列表订阅各 1 路，30 秒仅新增一次列表请求；`@liberfi.io/ui-tokens` typecheck、lint 和 whitespace 通过。
+- 推送状态：功能提交已创建于本地 `main`，当前尚未推送。
+- Workflow 状态：未触发；未执行 React SDK npm 发布。
