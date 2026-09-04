@@ -1487,3 +1487,24 @@
 - 验证结果：route 定向测试 4/4 通过，覆盖 10 路并发、安全窗口、JWT fallback 和失败重试；`@liberfi/web` TypeScript 与相关 ESLint 通过，whitespace 检查通过；首页 HTML 本地返回约 5.51 秒，冷鉴权请求在 20 秒超时边界未返回。
 - 推送状态：功能提交已创建于本地 `main`，当前尚未推送。
 - Workflow 状态：未触发；未执行 Vercel 部署。
+
+## 2026-09-05：Token 列表请求与订阅集成测试基建（提交前）
+
+- 仓库与分支：`react-sdk/main`；基线与 `origin/main` 一致。
+- 拟用提交标题：`test(ui-tokens): add token list runtime contract harness`。
+- 问题背景：`ui-tokens` 只有筛选、排序和 skeleton 测试，缺少 script/hook 层环境，无法稳定断言首页列表 query、列表订阅、逐 token 详情查询及 retain/release 数量，N+1 修复没有可靠回归门禁。
+- 计划完成事项：新增隔离的 React Query、DEX client/provider 与 TokenMarketRuntime 测试 harness；构造 100 条热门、100 条股票和 80 条新币 fixture；记录当前 fan-out characterization，验证列表级 stats merge、订阅数量及卸载释放；显式声明测试使用的 TanStack Query devDependency，避免跨 workspace React 实例错配。
+- 影响范围：仅影响 `@liberfi.io/ui-tokens` 测试基础设施、测试依赖和 lockfile；不修改生产列表、请求、订阅、排序筛选或 UI 行为。
+- 验证计划：运行三个新增 script 测试、`ui-tokens` typecheck、lint 与 whitespace；确认测试不访问真实网络且每个 case 使用独立 QueryClient/runtime。
+- 预期推送状态：创建本地 React SDK 提交，暂不推送；禁止 force push。
+- Workflow 策略：本地提交不会触发 React SDK `Release`；未获发布授权前不推送 `main`。
+
+## 2026-09-05：Token 列表请求与订阅集成测试基建（提交后）
+
+- 仓库与分支：`react-sdk/main`。
+- 提交：`02b481cc8` — `test(ui-tokens): add token list runtime contract harness`。
+- 最终完成事项：为热门、股票和新币列表建立可复用的 React Query、DEX client/provider 与 TokenMarketRuntime 集成测试环境；以 100/100/80 条数据固化当前列表请求、列表级订阅、逐 token 查询与订阅的调用数量，并覆盖热门列表实时 stats 合并和卸载清理。新增依赖及 lockfile 已收敛为最小变更，未接受安装过程产生的无关 peer 快照更新。
+- 影响范围：仅新增 `@liberfi.io/ui-tokens` 的测试 fixture、mock、render helper 和测试开发依赖；生产代码与页面行为未改变。
+- 验证结果：3 个新增测试套件共 4/4 项通过；`@liberfi.io/ui-tokens` typecheck、lint 和 whitespace 检查通过；测试使用隔离 runtime 且不访问真实网络。
+- 推送状态：功能提交已创建于本地 `main`，当前尚未推送。
+- Workflow 状态：未触发；未执行 React SDK npm 发布。
