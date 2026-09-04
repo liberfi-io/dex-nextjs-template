@@ -1477,3 +1477,13 @@
 - 验证计划：运行 route 定向测试，覆盖 10 路并发去重、缓存复用、安全窗口、JWT 过期回退和失败重试；运行 Web typecheck、相关 ESLint、whitespace；复用现有本地 dev server 验证首页与鉴权接口时序。
 - 预期推送状态：先创建本地提交，暂不推送；后续是否推送由用户另行确认，禁止 force push。
 - Workflow 策略：本地提交不会触发 GitHub Actions；未获推送授权前不触发 `Deploy to Vercel`。
+
+## 2026-09-05：首页 DEX 鉴权 token 缓存与并发去重（提交后）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 提交：`53238fe` — `perf(web): deduplicate dex client credential grants`。
+- 最终完成事项：DEX access token 现在按 `expires_in` 或 JWT `exp` 在单个服务实例内复用并提前 5 分钟失效；并发请求共享一次 Auth0 grant，失败不会污染缓存且后续可以恢复；公开响应仍为 `{ accessToken }`。
+- 影响范围：仅减少服务端重复 Auth0 client-credentials 请求；浏览器 Cookie、DEX client 接口和跨实例行为不变。静态调用链确认缺 Cookie 时 ranking 鉴权会等待 token；现有本地 dev server 的冷 `/api/auth/dex` 请求 20 秒未返回，说明首次 Auth0 超时仍需外部服务侧排查，缓存只优化首次成功后的热实例。
+- 验证结果：route 定向测试 4/4 通过，覆盖 10 路并发、安全窗口、JWT fallback 和失败重试；`@liberfi/web` TypeScript 与相关 ESLint 通过，whitespace 检查通过；首页 HTML 本地返回约 5.51 秒，冷鉴权请求在 20 秒超时边界未返回。
+- 推送状态：功能提交已创建于本地 `main`，当前尚未推送。
+- Workflow 状态：未触发；未执行 Vercel 部署。
