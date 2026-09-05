@@ -1772,3 +1772,24 @@
 - 验证结果：决策文件覆盖时间、commit、环境、样本、门禁、清理和下一步；DEX Web 业务源码已恢复，未新增依赖、环境变量或部署状态。
 - 推送状态：React SDK 文档提交已创建于本地 `main`，当前连同 L2 决策共领先 `origin/main` 2 个提交，尚未推送。
 - Workflow 状态：未触发 React SDK `Release`、npm 发布或 Vercel 部署。
+
+## 2026-09-05：首页首屏 Bundle E0 归因与 subpath 门禁（提交前）
+
+- 仓库与分支：`react-sdk/main`；DEX 仅使用隔离临时 worktree 运行受控构建，不修改主工作区业务代码。
+- 拟用提交标题：`docs(perf): record homepage bundle attribution gate`。
+- 问题背景：优化计划要求先按首页实际 initial graph 和 Brotli 体积确定可移除字节 R，再决定是否值得新增并发布 SDK subpath，避免按源码体积或共享 chunk 总大小高估收益。
+- 计划完成事项：保存两次 clean baseline、Pinata 单候选和两次高置信度组合变体的 Webpack stats、构建日志与模块归因；核对 token-detail/Kline/Pulse 是否进入首屏；识别 UI 根入口的剩余共享引用方；计算 B、Ball、R 和乐观上界，并按 `R < 200 KB` 门禁形成暂停决策。
+- 影响范围：仅性能测量和计划审计材料；不保留 analyzer、Pinata lazy、SDK subpath、应用 import、依赖或运行时修改。
+- 验证计划：确认 baseline/组合重复构建差异不超过 5%，检查原始证据不含 token/Cookie/环境变量值，验证两个主工作区无实验业务差异并运行 whitespace 检查。
+- 预期推送状态：创建本地 React SDK 文档/证据提交，暂不推送；禁止 force push。
+- Workflow 策略：本地提交不触发 React SDK `Release`、npm 发布、GitHub Actions 或 Vercel 部署。
+
+## 2026-09-05：首页首屏 Bundle E0 归因与 subpath 门禁（提交后）
+
+- 仓库与分支：`react-sdk/main`。
+- 提交：`dc9de3876` — `docs(perf): record homepage bundle attribution gate`。
+- 最终完成事项：保存 baseline 与组合变体的压缩 Webpack 原始 stats、首页 initial chunk 提取结果、构建日志和只追加决策记录；确认首页 initial JS 基线为 1,263,620 Brotli bytes，Pinata lazy 仅减少 7,356 bytes，token-detail/Kline 与 Pulse 功能实现已不在首屏；识别出 UI 根入口仍被多个共享 SDK 包引用，当前范围 subpath 无法移除 Calendar/DatePicker chunk。
+- 门禁结论：高置信度组合 `Ball = 1,256,264 bytes`、`R = 7,356 bytes`，重复构建差异 0%；即使按无替代成本移除 ui-tokens/ui-trade 根 chunk 的极端乐观上界也只有 48,905 bytes。已命中 `R < 200 KB` 暂停门，未继续 E1/E2，等待重新评审投入价值。
+- 验证结果：baseline 与组合各两次 clean build 的业务 JS 稳定，只有 Next build id manifest 的预期差异；压缩 stats 通过 gzip 完整性检查，敏感模式扫描未发现 JWT/access token/Authorization；两个主工作区均无 analyzer、Pinata lazy、subpath 或依赖业务改动，whitespace 检查通过。
+- 推送状态：React SDK 文档/证据提交已创建于本地 `main`，当前领先 `origin/main` 3 个提交，尚未推送。
+- Workflow 状态：未触发 React SDK `Release`、npm 发布、GitHub Actions 或 Vercel 部署。
