@@ -1880,3 +1880,15 @@
 - 代码审查：按已确认 §8 规格与仓库规则完成 Standards/Spec 双轴本地审查，无阻塞问题；审查中主动撤回了会改变公共 Jotai store 的 Provider 外移方案，最终保持原 Draggable 状态边界，仅由 PageShell 上报 MediaTrack 激活信号。
 - 推送状态：功能提交已创建于本地 `main`，尚未推送；React SDK 与 DEX 均未 force push。
 - Workflow 状态：未触发 React SDK Release、npm 发布、GitHub Actions 或 Vercel 部署；按开发阶段规则未运行 production build。
+
+## 2026-09-06：运行时优化 SDK 发布与 DEX 生产收尾（提交前）
+
+- 仓库与分支：`react-sdk/main`、`dex-nextjs-template/main`。
+- 拟用提交标题：`chore(deps): adopt runtime optimization sdk release`。
+- 问题背景：§8 的 MediaTrack 按需连接能力已在 React SDK 完成，DEX 的延迟加载媒体/上传、Channels 路由隔离和当前链价格轮询也已完成本地验证；生产环境尚未安装包含该能力的新 SDK 版本，因此运行时优化还没有完整上线。
+- 已完成发布：React SDK 业务提交 `49e66dc5e5` 已推送到 `main`；Release workflow `33981925186` 成功，release commit 为 `0c8641296`。npm 官方 registry 已确认 `@liberfi.io/ui-media-track@0.1.287`、`@liberfi.io/react@0.3.106` 及本次全量 patch 包可用。
+- 计划完成事项：将 DEX 所有 `@liberfi.io/*` 依赖同步到本次 release 版本并刷新 lockfile；确认运行时实际解析到新版本；执行全量测试、typecheck、lint、production build 与 whitespace 检查；提交并 fast-forward 推送 `main`，触发一次 Production Vercel 部署。
+- 影响范围：DEX Web 的 LiberFi 依赖树及首页/媒体面板/Channels/发币上传/当前链价格轮询运行时；不引入 L2、服务端 Token 注入、SDK subpath 或 ranking SSR 实验。
+- 验证计划：核对 package.json 与 lockfile 版本收敛；运行 Web 全量测试、typecheck、lint、production build、`git diff --check`；部署后检查首页、Discover、Pulse、Token 详情、MediaTrack、Channels 与发币入口，并对首页文档与首行可用时间做一次性采样。
+- 预期推送状态：提交后推送 `dex-nextjs-template/main`，禁止 force push。
+- Workflow 策略：本次业务/依赖提交允许触发一次 `Deploy to Vercel`；部署结果记录使用 `[skip ci]` 单独提交，避免重复部署。
