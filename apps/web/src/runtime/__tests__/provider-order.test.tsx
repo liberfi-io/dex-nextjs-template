@@ -18,7 +18,6 @@ describe("application provider order policy", () => {
       "application-adapters",
       "api-client",
       "media-track",
-      "channels",
       "portfolio-account",
       "application-shell",
     ]);

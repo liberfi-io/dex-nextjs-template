@@ -166,6 +166,13 @@ const PerpetualsRuntimeProviders = dynamic(
     ),
   { ssr: false },
 );
+const ChannelsRuntimeProviders = dynamic(
+  () =>
+    import("../runtime/ChannelsRuntimeProviders").then(
+      (module) => module.ChannelsRuntimeProviders,
+    ),
+  { ssr: false },
+);
 const navItemsConfig: Omit<NavItem, "label">[] = [
   { key: "discover", href: "/", icon: <HomeIcon width={20} height={20} /> },
   { key: "pulse", href: "/pulse", icon: <PulseIcon width={20} height={20} /> },
@@ -216,6 +223,9 @@ function RouteRuntimeProviders({ children }: PropsWithChildren) {
   }
   if (pathname.startsWith("/perpetuals")) {
     return <PerpetualsRuntimeProviders>{children}</PerpetualsRuntimeProviders>;
+  }
+  if (pathname.startsWith("/channels")) {
+    return <ChannelsRuntimeProviders>{children}</ChannelsRuntimeProviders>;
   }
   return children;
 }

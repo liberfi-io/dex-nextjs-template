@@ -2,11 +2,7 @@ import { ChainStreamClient } from "@chainstream-io/sdk";
 import { Client } from "@liberfi.io/client";
 import { ChannelsClient } from "@liberfi.io/ui-channels/client";
 import { MediaTrackClient } from "@liberfi.io/ui-media-track/client";
-import {
-  CoreAppClientBundle,
-  CapabilityBundleV1,
-  RuntimeConfig,
-} from "./app-runtime.types";
+import { CoreAppClientBundle, CapabilityBundleV1, RuntimeConfig } from "./app-runtime.types";
 
 export type DexTokenProvider = ConstructorParameters<typeof ChainStreamClient>[0];
 export type DexRuntimeConfig = Pick<RuntimeConfig, "dexAggregatorUrl">;
@@ -98,12 +94,7 @@ export function createAppClients(
   members: AppClientMembers,
   capabilities = createCapabilityBundle(members.api),
 ): CoreAppClientBundle {
-  const requiredMembers: Array<keyof AppClientMembers> = [
-    "chainStream",
-    "api",
-    "mediaTrack",
-    "channels",
-  ];
+  const requiredMembers: Array<keyof AppClientMembers> = ["chainStream", "api", "mediaTrack"];
   for (const member of requiredMembers) {
     if (!members[member]) {
       throw new Error(`Missing required application client: ${member}`);

@@ -130,11 +130,9 @@ describe("application client factory", () => {
 
   it("assembles one bundle without copying client instances", () => {
     const dexTokenProvider = { getToken: async () => "dex-token" };
-    const channelsTokenProvider = { getToken: async () => "channels-token" };
     const members = {
       ...createDexClients(CONFIG, dexTokenProvider),
       mediaTrack: createMediaTrackClient(CONFIG, dexTokenProvider),
-      channels: createChannelsClient(CONFIG, channelsTokenProvider),
     };
 
     const bundle = createAppClients(members);

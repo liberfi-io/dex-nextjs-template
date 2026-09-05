@@ -30,6 +30,18 @@ describe("route-owned runtime boundaries", () => {
     expect(source).toContain("<DeferredAsyncModalHost>");
   });
 
+  it("installs Channels only inside channels routes", () => {
+    const routeRuntime = readSource("runtime/ChannelsRuntimeProviders.tsx");
+    const sharedRuntime = readSource("runtime/AppRuntimeProviders.tsx");
+    const shell = readSource("components/NewAppLayout.tsx");
+
+    expect(routeRuntime).toContain("createChannelsClient");
+    expect(routeRuntime).toContain("<ChannelsProvider");
+    expect(sharedRuntime).not.toContain("ChannelsProvider");
+    expect(shell).toContain('import("../runtime/ChannelsRuntimeProviders")');
+    expect(shell).toContain('pathname.startsWith("/channels")');
+  });
+
   it("loads route runtimes through dynamic boundaries in the application shell", () => {
     const source = readSource("components/NewAppLayout.tsx");
     expect(source).toContain('import("../runtime/PredictRuntimeProviders")');

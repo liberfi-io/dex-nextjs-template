@@ -22,7 +22,6 @@ export interface CoreAppClientBundle {
   chainStream: ChainStreamClient;
   api: Client;
   mediaTrack: MediaTrackClient;
-  channels: ChannelsClient;
   capabilities: CapabilityBundleV1;
 }
 
@@ -137,7 +136,6 @@ export type RuntimeProviderKey =
   | "application-adapters"
   | "api-client"
   | "media-track"
-  | "channels"
   | "predict"
   | "polymarket"
   | "portfolio-account"
@@ -156,7 +154,6 @@ export interface PredictWsRouteLifecycle {
 import type { ChainStreamClient } from "@chainstream-io/sdk";
 import type { Client } from "@liberfi.io/client";
 import type { PredictClient, PredictWsClient } from "@liberfi.io/react-predict";
-import type { ChannelsClient } from "@liberfi.io/ui-channels/client";
 import type { MediaTrackClient } from "@liberfi.io/ui-media-track/client";
 import type {
   HyperliquidPerpetualsClient,

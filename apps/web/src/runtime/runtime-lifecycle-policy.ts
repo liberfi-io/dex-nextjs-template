@@ -18,7 +18,6 @@ export const APP_RUNTIME_PROVIDER_ORDER: readonly RuntimeProviderKey[] = [
   "application-adapters",
   "api-client",
   "media-track",
-  "channels",
   "portfolio-account",
   "application-shell",
 ];

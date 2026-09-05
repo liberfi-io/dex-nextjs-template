@@ -1848,3 +1848,13 @@
 - 验证计划：以公开 Hook 边界断言初始只请求一条链、切链后只请求新链；运行 Web 全量测试、typecheck、lint、whitespace，并通过现有本地服务检查 Header 主币价格。
 - 预期推送状态：创建本地提交，§8 全部完成并复核前不推送；禁止 force push。
 - Workflow 策略：本地提交不触发 GitHub Actions、Vercel 或 npm 发布。
+
+## 2026-09-05：延迟首页媒体与上传运行时（提交后）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 提交：`5dffbffe5a` — `perf(web): defer media and upload runtimes`。
+- 最终完成事项：首页默认不再启动 MediaTrack 实时订阅；只有直接进入 `/media-track` 或打开底部媒体 panel/modal 时才激活，关闭时完整 teardown。Pinata 全局 Provider 与静态 client 已移除，上传 SDK 改为首次真实图片上传才动态加载，并对并发上传复用同一加载 Promise；加载失败后允许下次重试。为避免扩大影响，Draggable/Jotai Provider 保持原边界，由 PageShell 内部上报激活状态。
+- 影响范围：MediaTrack 连接启动时机与 Launchpad 图片上传 SDK 加载时机；媒体 HTTP 生成、图片预览/进度/替换、上传接口及其他页面 Provider 边界保持不变。
+- 验证结果：SDK MediaTrack 4/4 套件共 12/12 项通过；DEX activity、Pinata、Provider 边界等定向测试通过，Web 全量 56/56 套件共 251/251 项及 14/14 项构建契约通过，typecheck、lint、whitespace 通过。现有 dev server 热响应：首页约 0.40 秒、Pulse 约 0.31 秒、MediaTrack 约 0.07 秒；受控浏览器因本地 webview 无法附着，未取得可见 UI/网络面板证据，未用其他浏览器绕过该限制。
+- 推送状态：功能提交已创建于本地 `main`，尚未推送；禁止 force push。
+- Workflow 状态：未触发 GitHub Actions、Vercel 或 npm 发布。

@@ -12,11 +12,10 @@ import {
 } from "react";
 import Cookies from "js-cookie";
 import { DexClientProvider as ApiClientProvider } from "@liberfi.io/react";
-import { ChannelsProvider } from "@liberfi.io/ui-channels";
 import { MediaTrackProvider } from "@liberfi.io/ui-media-track";
 import { PortfolioProvider } from "@liberfi.io/ui-portfolio";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
-import { useAuth, useConnectedWallet } from "@liberfi.io/wallet-connector";
+import { useConnectedWallet } from "@liberfi.io/wallet-connector";
 import { PrimaryTokenPricePoller } from "../application/PrimaryTokenPricePoller";
 import { useDexTokenProvider } from "../application/useDexTokenProvider";
 import {
@@ -117,16 +116,9 @@ export function AppRuntimeProviders({
     [],
   );
   const dexTokenProvider = useDexTokenProvider(dexTokenLoader);
-  const { user } = useAuth();
-  const channelsAccessToken = user?.accessToken ?? null;
-  const channelsTokenProvider = useMemo(
-    () => ({ getToken: async () => channelsAccessToken }),
-    [channelsAccessToken],
-  );
   const clients = useAppClientBundle({
     config,
     dexTokenProvider,
-    channelsTokenProvider,
   });
   const reactCapabilities = useMemo(
     () => projectReactCapabilities(clients.capabilities),
@@ -152,11 +144,9 @@ export function AppRuntimeProviders({
                   client={clients.mediaTrack}
                   active={mediaTrackActive}
                 >
-                  <ChannelsProvider client={clients.channels}>
-                    <PortfolioProvider chain={chain} address={wallet?.address ?? ""}>
-                      {children}
-                    </PortfolioProvider>
-                  </ChannelsProvider>
+                  <PortfolioProvider chain={chain} address={wallet?.address ?? ""}>
+                    {children}
+                  </PortfolioProvider>
                 </ActivatableMediaTrackProvider>
               </Stage55AdaptersProvider>
             </Stage53AdaptersProvider>
