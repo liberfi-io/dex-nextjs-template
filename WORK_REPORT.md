@@ -1669,3 +1669,13 @@
 - 验证计划：运行 token fetch/provider 定向测试、Web 全量测试、typecheck、lint、whitespace，并使用现有本地 dev server 验证首页可渲染热门数据；确认错误对象和测试输出不包含 token 或上游私密 message。
 - 预期推送状态：先创建本地 `main` 提交；提交 B 及 Preview 观测准备完成前暂不推送，禁止 force push。
 - Workflow 策略：本地提交不触发 `Deploy to Vercel`；本提交不发布 npm、不触发 GitHub Actions。
+
+## 2026-09-05：修复 DEX Token 请求永久等待（提交后）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 提交：`586bbfa` — `fix(web): reject stalled dex token requests`。
+- 最终完成事项：token HTTP 客户端已校验 HTTP status、JSON 和非空 access token，并接受 AbortSignal；provider 已使用单份共享请求同时结算所有调用方，失败或三秒超时会 reject，下一次调用可重新请求。无效、已过期或进入五分钟安全窗口的 Cookie 会先清理；最后一个 provider 卸载时会 abort 请求并清除 timer。
+- 影响范围：DEX token 获取可靠性、Cookie 有效期和依赖 ChainStream token 的数据请求；服务端 grant、页面业务 contract 和实时订阅保持不变。原先可能永久 loading 的失败路径现在会在最多约三秒内进入可重试错误态。
+- 验证结果：新增 2 套件 13 项 token contract 测试全部通过；Web 全量 54/54 套件、233/233 项 Jest 测试与 14/14 项构建配置契约通过，typecheck、lint、whitespace 均通过。现有 `localhost:3000` 开发服务热更新后首页成功渲染热门列表；浏览器仅出现既有钱包扩展和受控状态警告，无新增 token provider uncaught error。
+- 推送状态：功能提交已创建于本地 `main`，相对 `origin/main` ahead 1；提交 B 与 Preview 观测准备完成前暂不推送。
+- Workflow 状态：未触发；未执行 Vercel 部署或 npm 发布。
