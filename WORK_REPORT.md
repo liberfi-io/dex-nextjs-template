@@ -1658,3 +1658,14 @@
 - 推送状态：React SDK 与 DEX 功能/依赖提交均已普通 fast-forward 推送到 `origin/main`，未使用 force push。
 - Vercel 结果：`Deploy to Vercel` workflow `33918443527` 成功，job `101170939096` 用时 5 分 57 秒；production deployment 为 `https://liberfi-nzsn2cx6c-sgt-lab.vercel.app`。部署地址与 `https://app.liberfi.io/` 均返回 HTTP 200。
 - Workflow 说明：Release 与 Vercel workflow 均只有 GitHub Actions Node.js 20 弃用提示，不影响发布结果；本次工作记录提交使用 `[skip ci]`，避免再次触发部署。
+
+## 2026-09-05：修复 DEX Token 请求永久等待（提交前）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 拟用提交标题：`fix(web): reject stalled dex token requests`。
+- 问题背景：客户端此前把 `/api/auth/dex` 的任何响应强制当作 access token；请求失败时 token provider 只记录错误，等待 token 的 Promise 不会 reject，导致首页 ranking 等依赖链可能永久停留在 skeleton/loading。存量 Cookie 也没有验证 JWT 到期时间或五分钟安全窗口。
+- 计划完成事项：为 token HTTP 请求增加 status、JSON 和非空 token 校验并透传 AbortSignal；把 listener Set 改为共享 single-flight Promise，使成功和失败都能结算全部等待者；增加三秒超时、卸载 abort、失败后重试，以及无效/临期 Cookie 清理；保持现有 `dex-token` Cookie 名称和持久化范围。
+- 影响范围：DEX 客户端 token 获取、Cookie 生命周期和所有依赖 ChainStream token provider 的 query；不修改服务端 Auth0 grant、热门列表 contract、WebSocket、交易或页面 UI。
+- 验证计划：运行 token fetch/provider 定向测试、Web 全量测试、typecheck、lint、whitespace，并使用现有本地 dev server 验证首页可渲染热门数据；确认错误对象和测试输出不包含 token 或上游私密 message。
+- 预期推送状态：先创建本地 `main` 提交；提交 B 及 Preview 观测准备完成前暂不推送，禁止 force push。
+- Workflow 策略：本地提交不触发 `Deploy to Vercel`；本提交不发布 npm、不触发 GitHub Actions。

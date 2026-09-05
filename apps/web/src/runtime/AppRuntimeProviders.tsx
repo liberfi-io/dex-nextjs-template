@@ -96,6 +96,12 @@ export function AppRuntimeProviders({
       async get() {
         return Cookies.get("dex-token") ?? null;
       },
+      async remove() {
+        Cookies.remove("dex-token", {
+          secure: true,
+          sameSite: "strict",
+        });
+      },
     }),
     [],
   );

@@ -1,62 +1,122 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { fetchDexToken } from "./auth/fetchDexToken";
 
 interface DexTokenLoader {
   set(token: string, expiresAt: Date): Promise<void>;
   get(): Promise<string | null>;
+  remove(): Promise<void>;
 }
 
-type TokenListener = (token: string) => void;
+const TOKEN_REQUEST_TIMEOUT_MS = 3_000;
+const TOKEN_EXPIRY_SAFETY_MS = 300_000;
 
-const tokenListeners = new Set<TokenListener>();
-let currentDexToken: string | null = null;
+interface InFlightTokenRequest {
+  controller: AbortController;
+  promise: Promise<string>;
+}
 
-function publishDexToken(token: string) {
-  currentDexToken = token;
-  for (const listener of tokenListeners) {
-    listener(token);
+let inFlightTokenRequest: InFlightTokenRequest | null = null;
+let mountedProviderCount = 0;
+
+function clearInFlightRequest(controller: AbortController) {
+  if (inFlightTokenRequest?.controller === controller) {
+    inFlightTokenRequest = null;
   }
 }
 
-function jwtExpiryMs(token: string): number {
+function readJwtExpiryMs(token: string): number | null {
   try {
-    const payload = JSON.parse(atob(token.split(".")[1] ?? "")) as { exp?: number };
-    return payload.exp ? payload.exp * 1000 : Date.now() + 3_600_000;
+    const payloadSegment = token.split(".")[1];
+    if (!payloadSegment) return null;
+    const normalized = payloadSegment.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(
+      normalized.length + ((4 - (normalized.length % 4)) % 4),
+      "=",
+    );
+    const payload = JSON.parse(atob(padded)) as { exp?: unknown };
+    return typeof payload.exp === "number" && Number.isFinite(payload.exp)
+      ? payload.exp * 1000
+      : null;
   } catch {
-    return Date.now() + 3_600_000;
+    return null;
   }
+}
+
+async function readStoredToken(loader: DexTokenLoader): Promise<string | null> {
+  const token = await loader.get();
+  if (!token) return null;
+
+  const expiresAtMs = readJwtExpiryMs(token);
+  if (
+    expiresAtMs === null ||
+    expiresAtMs - TOKEN_EXPIRY_SAFETY_MS <= Date.now()
+  ) {
+    await loader.remove();
+    return null;
+  }
+
+  return token;
 }
 
 export function useDexTokenProvider(loader: DexTokenLoader) {
-  const renewRef = useRef(false);
+  const renewDexToken = useCallback(() => {
+    if (inFlightTokenRequest) return inFlightTokenRequest.promise;
 
-  const renewDexToken = useCallback(async () => {
-    if (typeof window === "undefined") return;
-    if (renewRef.current) return;
-    renewRef.current = true;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort(
+        new DOMException("Dex token request timed out", "AbortError"),
+      );
+    }, TOKEN_REQUEST_TIMEOUT_MS);
+    const aborted = new Promise<never>((_resolve, reject) => {
+      controller.signal.addEventListener(
+        "abort",
+        () => reject(controller.signal.reason),
+        { once: true },
+      );
+    });
+    const request = (async () => {
+      try {
+        const token = await Promise.race([
+          fetchDexToken(controller.signal),
+          aborted,
+        ]);
+        const expiresAt =
+          (readJwtExpiryMs(token) ?? Date.now() + 3_600_000) -
+          TOKEN_EXPIRY_SAFETY_MS;
+        if (expiresAt <= Date.now()) {
+          throw new Error("DEX_TOKEN_EXPIRES_TOO_SOON");
+        }
+        await loader.set(token, new Date(expiresAt));
+        return token;
+      } finally {
+        clearTimeout(timeoutId);
+        clearInFlightRequest(controller);
+      }
+    })();
 
-    try {
-      const token = await fetchDexToken();
-      const expiresAt = jwtExpiryMs(token) - 300_000;
-      await loader.set(token, new Date(expiresAt));
-      publishDexToken(token);
-    } catch (error) {
-      console.error("useDexTokenProvider renew error", error);
-    } finally {
-      renewRef.current = false;
-    }
+    inFlightTokenRequest = { controller, promise: request };
+    return request;
   }, [loader]);
 
   useEffect(() => {
-    void loader.get().then((token) => {
-      if (token) {
-        publishDexToken(token);
-      } else {
-        void renewDexToken();
+    mountedProviderCount += 1;
+    void readStoredToken(loader)
+      .then((token) => (token ? undefined : renewDexToken()))
+      .catch((error) => {
+        console.error("useDexTokenProvider renew error", error);
+      });
+
+    return () => {
+      mountedProviderCount = Math.max(0, mountedProviderCount - 1);
+      if (mountedProviderCount === 0 && inFlightTokenRequest) {
+        inFlightTokenRequest.controller.abort(
+          new DOMException("Dex token provider unmounted", "AbortError"),
+        );
       }
-    });
+    };
   }, [loader, renewDexToken]);
 
   return useMemo(
@@ -64,22 +124,9 @@ export function useDexTokenProvider(loader: DexTokenLoader) {
       getToken: async () => {
         if (typeof window === "undefined") return "";
 
-        const dexToken = await loader.get();
+        const dexToken = await readStoredToken(loader);
         if (dexToken) return dexToken;
-
-        const promise = new Promise<string>((resolve) => {
-          const listener: TokenListener = (token) => {
-            setTimeout(() => {
-              resolve(token);
-              tokenListeners.delete(listener);
-            });
-          };
-          tokenListeners.add(listener);
-          if (currentDexToken) listener(currentDexToken);
-        });
-
-        void renewDexToken();
-        return promise;
+        return renewDexToken();
       },
     }),
     [loader, renewDexToken],
