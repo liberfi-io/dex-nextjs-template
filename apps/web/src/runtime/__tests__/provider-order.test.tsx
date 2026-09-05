@@ -15,7 +15,6 @@ describe("application provider order policy", () => {
       "auth",
       "locale",
       "app-runtime",
-      "pinata",
       "application-adapters",
       "api-client",
       "media-track",
@@ -27,15 +26,8 @@ describe("application provider order policy", () => {
   });
 
   it("keeps route-only providers outside the shared homepage runtime", () => {
-    expect(PREDICT_RUNTIME_PROVIDER_ORDER).toEqual([
-      "predict",
-      "polymarket",
-      "application-shell",
-    ]);
-    expect(PERPETUALS_RUNTIME_PROVIDER_ORDER).toEqual([
-      "perpetuals",
-      "application-shell",
-    ]);
+    expect(PREDICT_RUNTIME_PROVIDER_ORDER).toEqual(["predict", "polymarket", "application-shell"]);
+    expect(PERPETUALS_RUNTIME_PROVIDER_ORDER).toEqual(["perpetuals", "application-shell"]);
 
     const source = fs.readFileSync(
       path.resolve(process.cwd(), "src/runtime/AppRuntimeProviders.tsx"),
@@ -49,11 +41,11 @@ describe("application provider order policy", () => {
 
   it("rejects a permuted provider order", () => {
     const invalidOrder = [...APP_RUNTIME_PROVIDER_ORDER];
-    const pinataIndex = invalidOrder.indexOf("pinata");
+    const adapterIndex = invalidOrder.indexOf("application-adapters");
     const apiIndex = invalidOrder.indexOf("api-client");
-    [invalidOrder[pinataIndex], invalidOrder[apiIndex]] = [
+    [invalidOrder[adapterIndex], invalidOrder[apiIndex]] = [
       invalidOrder[apiIndex],
-      invalidOrder[pinataIndex],
+      invalidOrder[adapterIndex],
     ];
 
     expect(validateRuntimeProviderOrder(invalidOrder)).toBe(false);
@@ -67,14 +59,13 @@ describe("application provider order policy", () => {
     expect(source).not.toContain("DexDataRuntimeProvider");
     expect(source).not.toContain("DexDataProvider");
     expect(source).not.toContain("@liberfi/ui-dex");
-    expect(source).toContain('from "../application/pinata"');
+    expect(source).not.toContain("PinataProvider");
+    expect(source).not.toContain('from "../libs/pinata"');
     expect(source).not.toContain("@liberfi/react-dex");
   });
 
   it("removes the leftover legacy AppLayout after option-A redirects", () => {
-    expect(fs.existsSync(path.resolve(process.cwd(), "src/components/AppLayout.tsx"))).toBe(
-      false,
-    );
+    expect(fs.existsSync(path.resolve(process.cwd(), "src/components/AppLayout.tsx"))).toBe(false);
     expect(fs.existsSync(path.resolve(process.cwd(), "src/app/(legacy)"))).toBe(false);
   });
 });

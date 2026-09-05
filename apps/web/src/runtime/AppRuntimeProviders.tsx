@@ -2,10 +2,13 @@
 
 import {
   createContext,
+  type ComponentProps,
   type ComponentType,
   PropsWithChildren,
   useContext,
+  useEffect,
   useMemo,
+  useState,
 } from "react";
 import Cookies from "js-cookie";
 import { DexClientProvider as ApiClientProvider } from "@liberfi.io/react";
@@ -14,10 +17,8 @@ import { MediaTrackProvider } from "@liberfi.io/ui-media-track";
 import { PortfolioProvider } from "@liberfi.io/ui-portfolio";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { useAuth, useConnectedWallet } from "@liberfi.io/wallet-connector";
-import { PinataProvider } from "../application/pinata";
 import { PrimaryTokenPricePoller } from "../application/PrimaryTokenPricePoller";
 import { useDexTokenProvider } from "../application/useDexTokenProvider";
-import { pinata } from "../libs/pinata";
 import {
   type CapabilityBundleV1,
   type CoreAppClientBundle,
@@ -52,8 +53,12 @@ const CapabilityClientProvider = ApiClientProvider as ComponentType<
     capabilities: ReactCapabilityInput;
   }>
 >;
+const ActivatableMediaTrackProvider = MediaTrackProvider as ComponentType<
+  ComponentProps<typeof MediaTrackProvider> & { active?: boolean }
+>;
 
 const AppRuntimeConfigContext = createContext<RuntimeConfig | null>(null);
+const MediaTrackRuntimeActivityContext = createContext<((active: boolean) => void) | null>(null);
 
 export function useAppRuntimeConfig(): RuntimeConfig {
   const config = useContext(AppRuntimeConfigContext);
@@ -63,9 +68,15 @@ export function useAppRuntimeConfig(): RuntimeConfig {
   return config;
 }
 
-function projectReactCapabilities(
-  bundle: CapabilityBundleV1,
-): ReactCapabilityInput {
+export function useMediaTrackRuntimeActivity(active: boolean) {
+  const setActive = useContext(MediaTrackRuntimeActivityContext);
+  useEffect(() => {
+    setActive?.(active);
+    return () => setActive?.(false);
+  }, [active, setActive]);
+}
+
+function projectReactCapabilities(bundle: CapabilityBundleV1): ReactCapabilityInput {
   return {
     token: bundle.token,
     wallet: bundle.wallet,
@@ -121,12 +132,13 @@ export function AppRuntimeProviders({
     () => projectReactCapabilities(clients.capabilities),
     [clients.capabilities],
   );
+  const [mediaTrackActive, setMediaTrackActive] = useState(false);
   const { chain } = useCurrentChain();
   const wallet = useConnectedWallet(chain);
 
   return (
     <AppRuntimeConfigContext.Provider value={config}>
-      <PinataProvider client={pinata}>
+      <MediaTrackRuntimeActivityContext.Provider value={setMediaTrackActive}>
         <CapabilityClientProvider
           client={clients.api}
           subscribeClient={clients.api}
@@ -136,18 +148,21 @@ export function AppRuntimeProviders({
           <Stage51AdaptersProvider api={clients.api}>
             <Stage53AdaptersProvider>
               <Stage55AdaptersProvider client={clients.chainStream} origin={config.origin}>
-                <MediaTrackProvider client={clients.mediaTrack}>
+                <ActivatableMediaTrackProvider
+                  client={clients.mediaTrack}
+                  active={mediaTrackActive}
+                >
                   <ChannelsProvider client={clients.channels}>
                     <PortfolioProvider chain={chain} address={wallet?.address ?? ""}>
                       {children}
                     </PortfolioProvider>
                   </ChannelsProvider>
-                </MediaTrackProvider>
+                </ActivatableMediaTrackProvider>
               </Stage55AdaptersProvider>
             </Stage53AdaptersProvider>
           </Stage51AdaptersProvider>
         </CapabilityClientProvider>
-      </PinataProvider>
+      </MediaTrackRuntimeActivityContext.Provider>
     </AppRuntimeConfigContext.Provider>
   );
 }

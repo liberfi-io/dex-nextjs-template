@@ -34,9 +34,7 @@ describe("route-owned runtime boundaries", () => {
     const source = readSource("components/NewAppLayout.tsx");
     expect(source).toContain('import("../runtime/PredictRuntimeProviders")');
     expect(source).toContain('import("../runtime/PerpetualsRuntimeProviders")');
-    expect(source).not.toContain(
-      'import { PredictWalletProvider } from "@liberfi.io/ui-predict"',
-    );
+    expect(source).not.toContain('import { PredictWalletProvider } from "@liberfi.io/ui-predict"');
     expect(source).toContain("<DeferredAsyncModalHost>");
     expect(source).not.toContain('from "./modals/LaunchPadModal"');
     expect(source).not.toContain('from "./modals/ReceiveModal"');
@@ -50,5 +48,14 @@ describe("route-owned runtime boundaries", () => {
     expect(source).toContain('import("../FundWalletModal")');
     expect(source).toContain('import("@liberfi.io/ui-predict")');
     expect(source).toContain('import("@liberfi.io/ui-trade")');
+  });
+
+  it("keeps Pinata out of the shared runtime until an upload starts", () => {
+    const runtime = readSource("runtime/AppRuntimeProviders.tsx");
+    const uploadAdapter = readSource("application/pinata.tsx");
+
+    expect(runtime).not.toContain("PinataProvider");
+    expect(runtime).not.toContain('from "../libs/pinata"');
+    expect(uploadAdapter).toContain('import("pinata")');
   });
 });

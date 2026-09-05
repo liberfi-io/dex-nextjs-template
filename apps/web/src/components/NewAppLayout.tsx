@@ -35,10 +35,7 @@ import {
   useLocaleContext,
   type LocaleProviderProps,
 } from "@liberfi.io/i18n";
-import {
-  useAuth,
-  useSwitchEvmWalletsToChain,
-} from "@liberfi.io/wallet-connector";
+import { useAuth, useSwitchEvmWalletsToChain } from "@liberfi.io/wallet-connector";
 import { useCurrentChain, useSelectChain } from "@liberfi.io/ui-chain-select";
 import type { PredictEvent } from "@liberfi.io/react-predict";
 import { predictEventHref } from "./page/predict-source";
@@ -71,24 +68,15 @@ import {
   type LinkComponentType,
 } from "@liberfi.io/ui";
 import * as UiScaffold from "@liberfi.io/ui-scaffold";
-import {
-  SEARCH_MODAL_ID,
-  type SearchModalParams,
-} from "@liberfi.io/ui-tokens";
+import { SEARCH_MODAL_ID, type SearchModalParams } from "@liberfi.io/ui-tokens";
 import {
   chainDisplayName,
   formatAmount,
   truncateAddress,
   type PredefinedToken,
 } from "@liberfi.io/utils";
-import {
-  resolveHeaderNavigationKey,
-  useShellChrome,
-} from "../application/layout-chrome";
-import {
-  TOKEN_DETAIL_SOURCE_QUERY_PARAM,
-  tokenDetailRoute,
-} from "../application/routes";
+import { resolveHeaderNavigationKey, useShellChrome } from "../application/layout-chrome";
+import { TOKEN_DETAIL_SOURCE_QUERY_PARAM, tokenDetailRoute } from "../application/routes";
 import { useCreateOnrampWidgetUrlMutation } from "../application/server/useCreateOnrampWidgetUrlMutation";
 import { queryClient } from "../libs/queryClient";
 import { ResolvedLocaleProvider } from "../i18n/ResolvedLocaleProvider";
@@ -109,10 +97,7 @@ import {
   RECEIVE_MODAL_ID,
   WITHDRAW_MODAL_ID,
 } from "./modals/modal-contracts";
-import {
-  DeferredAsyncModalHost,
-  useDeferredAsyncModal,
-} from "./modals/DeferredAsyncModalHost";
+import { DeferredAsyncModalHost, useDeferredAsyncModal } from "./modals/DeferredAsyncModalHost";
 import {
   loadDepositHyperliquidUsdcModal,
   loadLaunchPadModal,
@@ -130,7 +115,7 @@ import { SendOutlinedIcon } from "./icons/SendOutlinedIcon";
 import { AppBottomToolbar } from "./AppBottomToolbar";
 import { BottomTweets, BottomTweetsTitle } from "./BottomTweets";
 import { isPulseSupportedChain } from "../lib/pulse";
-import { AppRuntimeProviders } from "../runtime/AppRuntimeProviders";
+import { AppRuntimeProviders, useMediaTrackRuntimeActivity } from "../runtime/AppRuntimeProviders";
 import {
   HEADER_CONTROL_CLASS,
   HEADER_CONTROL_SURFACE_CLASS,
@@ -138,8 +123,16 @@ import {
 } from "./header-control-theme";
 import { resolveHeaderLanguageOption } from "./header-language-selection";
 import { useHyperliquidHeaderState } from "../runtime/HyperliquidHeaderContext";
+import { isMediaTrackRuntimeActive } from "../runtime/media-track-activity";
 
-const { Scaffold, ScaffoldHeader, ScaffoldFooter, Logo, DraggablePanelProvider } = UiScaffold;
+const {
+  Scaffold,
+  ScaffoldHeader,
+  ScaffoldFooter,
+  Logo,
+  DraggablePanelProvider,
+  useDraggableDisclosure,
+} = UiScaffold;
 type NavItem = UiScaffold.NavItem;
 
 const RuntimeLocaleProvider = LocaleProvider as ComponentType<LocaleProviderProps>;
@@ -154,10 +147,7 @@ const WebviewModal = dynamic(
   { ssr: false },
 );
 const PredictBalanceIndicator = dynamic(
-  () =>
-    import("./PredictBalanceIndicator").then(
-      (module) => module.PredictBalanceIndicator,
-    ),
+  () => import("./PredictBalanceIndicator").then((module) => module.PredictBalanceIndicator),
   { ssr: false },
 );
 const BottomAICopilot = dynamic(
@@ -166,9 +156,7 @@ const BottomAICopilot = dynamic(
 );
 const PredictRuntimeProviders = dynamic(
   () =>
-    import("../runtime/PredictRuntimeProviders").then(
-      (module) => module.PredictRuntimeProviders,
-    ),
+    import("../runtime/PredictRuntimeProviders").then((module) => module.PredictRuntimeProviders),
   { ssr: false },
 );
 const PerpetualsRuntimeProviders = dynamic(
@@ -178,7 +166,6 @@ const PerpetualsRuntimeProviders = dynamic(
     ),
   { ssr: false },
 );
-
 const navItemsConfig: Omit<NavItem, "label">[] = [
   { key: "discover", href: "/", icon: <HomeIcon width={20} height={20} /> },
   { key: "pulse", href: "/pulse", icon: <PulseIcon width={20} height={20} /> },
@@ -238,6 +225,14 @@ function RouteRuntimeProviders({ children }: PropsWithChildren) {
 // ---------------------------------------------------------------------------
 
 function PageShell({ children }: PropsWithChildren) {
+  return (
+    <DraggableStateProvider>
+      <PageShellContent>{children}</PageShellContent>
+    </DraggableStateProvider>
+  );
+}
+
+function PageShellContent({ children }: PropsWithChildren) {
   useChainUrlSync();
   const { t } = useTranslation();
   const pathname = usePathname();
@@ -245,12 +240,11 @@ function PageShell({ children }: PropsWithChildren) {
   const router = useChainAwareRouter();
   const { chain } = useCurrentChain();
   const { headerVisible, footerVisible } = useShellChrome();
+  const { isOpen: isMediaTrackOpen } = useDraggableDisclosure("mediaTrack");
+  useMediaTrackRuntimeActivity(isMediaTrackRuntimeActive(pathname, isMediaTrackOpen));
   const [isMediaTrackPaused, setIsMediaTrackPaused] = useState(false);
   const tokenDetailSource = searchParams.get(TOKEN_DETAIL_SOURCE_QUERY_PARAM);
-  const activeNavigationKey = resolveHeaderNavigationKey(
-    pathname,
-    tokenDetailSource,
-  );
+  const activeNavigationKey = resolveHeaderNavigationKey(pathname, tokenDetailSource);
 
   const navItems: NavItem[] = useMemo(
     () =>
@@ -281,13 +275,14 @@ function PageShell({ children }: PropsWithChildren) {
   const isPerpetualsPage = pathname.startsWith("/perpetuals");
   const isAuthenticated = authStatus === "authenticated";
 
-  const { onOpen: openPredictSearch, onClose: closePredictSearch } =
-    useDeferredAsyncModal(PREDICT_SEARCH_MODAL_ID, loadPredictSearchModal);
-  const { onOpen: openTokenSearch, onClose: dismissTokenSearch } =
-    useDeferredAsyncModal<SearchModalParams, Token>(
-      SEARCH_MODAL_ID,
-      loadTokenSearchModal,
-    );
+  const { onOpen: openPredictSearch, onClose: closePredictSearch } = useDeferredAsyncModal(
+    PREDICT_SEARCH_MODAL_ID,
+    loadPredictSearchModal,
+  );
+  const { onOpen: openTokenSearch, onClose: dismissTokenSearch } = useDeferredAsyncModal<
+    SearchModalParams,
+    Token
+  >(SEARCH_MODAL_ID, loadTokenSearchModal);
 
   const handlePredictHover = useCallback(
     (event: PredictEvent) => {
@@ -406,11 +401,7 @@ function PageShell({ children }: PropsWithChildren) {
   const mediaTrackContent = {
     id: "mediaTrack",
     ariaLabel: mediaTrackTitle,
-    title: (
-      <BottomTweetsTitle isPaused={isMediaTrackPaused}>
-        {mediaTrackTitle}
-      </BottomTweetsTitle>
-    ),
+    title: <BottomTweetsTitle isPaused={isMediaTrackPaused}>{mediaTrackTitle}</BottomTweetsTitle>,
     children: <BottomTweets onPauseChange={setIsMediaTrackPaused} />,
     modalMaxWidth: 440,
     modalMinWidth: 320,
@@ -419,88 +410,82 @@ function PageShell({ children }: PropsWithChildren) {
   };
 
   return (
-      <DraggableStateProvider>
-        <Scaffold
-          pathname={pathname}
-          onNavigate={onNavigate}
-          headerVisible={headerVisible}
-          footerVisible={footerVisible}
-          toolbar={<AppBottomToolbar />}
-          toolbarVisible={["desktop"]}
-          header={
-            <ScaffoldHeader>
-              <div className="w-full h-full px-6 max-lg:px-4 max-sm:px-3 flex items-center gap-6 max-lg:gap-4 max-sm:gap-2">
-                {/* Left: Logo + desktop nav tabs */}
-                <div className="shrink-0 flex items-center gap-1">
-                  <Logo icon={<LogoIcon />} miniIcon={<MiniLogoIcon />} />
-                  <div className="hidden sm:flex items-center gap-1 ml-2">
-                    {navItems.map((item) => {
-                      const active = item.key === activeNavigationKey;
-                      return (
-                        <NavTab
-                          key={item.key}
-                          item={item}
-                          active={active}
-                          onNavigate={onNavigate}
-                        />
-                      );
-                    })}
-                  </div>
-                </div>
+    <Scaffold
+      pathname={pathname}
+      onNavigate={onNavigate}
+      headerVisible={headerVisible}
+      footerVisible={footerVisible}
+      toolbar={<AppBottomToolbar />}
+      toolbarVisible={["desktop"]}
+      header={
+        <ScaffoldHeader>
+          <div className="w-full h-full px-6 max-lg:px-4 max-sm:px-3 flex items-center gap-6 max-lg:gap-4 max-sm:gap-2">
+            {/* Left: Logo + desktop nav tabs */}
+            <div className="shrink-0 flex items-center gap-1">
+              <Logo icon={<LogoIcon />} miniIcon={<MiniLogoIcon />} />
+              <div className="hidden sm:flex items-center gap-1 ml-2">
+                {navItems.map((item) => {
+                  const active = item.key === activeNavigationKey;
+                  return (
+                    <NavTab key={item.key} item={item} active={active} onNavigate={onNavigate} />
+                  );
+                })}
+              </div>
+            </div>
 
-                {/* Center: Search bar — desktop only */}
-                <div className="hidden lg:flex flex-1 min-w-0 justify-center">
-                  <HeaderSearchButton
-                    variant="desktop"
-                    label={searchLabel}
-                    onPress={openActiveSearch}
-                    className="max-lg:hidden"
-                  />
-                </div>
+            {/* Center: Search bar — desktop only */}
+            <div className="hidden lg:flex flex-1 min-w-0 justify-center">
+              <HeaderSearchButton
+                variant="desktop"
+                label={searchLabel}
+                onPress={openActiveSearch}
+                className="max-lg:hidden"
+              />
+            </div>
 
-                {/* Right: search icon (tablet/mobile) + chain select + launchpad + language + account */}
-                <div className="shrink-0 ml-auto flex items-center gap-2">
-                  <HeaderSearchButton
-                    variant="mobile"
-                    label={searchLabel}
-                    onPress={openActiveSearch}
-                    className="lg:hidden"
-                  />
+            {/* Right: search icon (tablet/mobile) + chain select + launchpad + language + account */}
+            <div className="shrink-0 ml-auto flex items-center gap-2">
+              <HeaderSearchButton
+                variant="mobile"
+                label={searchLabel}
+                onPress={openActiveSearch}
+                className="lg:hidden"
+              />
 
-                  {/* Chain selector is always shown — including on the predict
+              {/* Chain selector is always shown — including on the predict
                     module — so users can manage their underlying on-chain
                     wallet (which funds Polymarket / Kalshi deposits) without
                     leaving the predict experience. */}
-                  <ChainSelectDropdown
-                    candidates={[Chain.SOLANA, Chain.ETHEREUM, Chain.BINANCE]}
-                    onSwitchChain={switchChain}
-                    onSelectChain={handleHeaderSelectChain}
-                    onSuccess={(c) => {
-                      onChainSwitchedUrl(c);
-                      toast.success(
-                        t("common.chainSwitched", {
-                          chain: chainDisplayName(c),
-                        }),
-                      );
-                    }}
-                    onError={(e) =>
-                      toast.error(e instanceof Error ? e.message : t("common.chainSwitchFailed"))
-                    }
-                  />
+              <ChainSelectDropdown
+                candidates={[Chain.SOLANA, Chain.ETHEREUM, Chain.BINANCE]}
+                onSwitchChain={switchChain}
+                onSelectChain={handleHeaderSelectChain}
+                onSuccess={(c) => {
+                  onChainSwitchedUrl(c);
+                  toast.success(
+                    t("common.chainSwitched", {
+                      chain: chainDisplayName(c),
+                    }),
+                  );
+                }}
+                onError={(e) =>
+                  toast.error(e instanceof Error ? e.message : t("common.chainSwitchFailed"))
+                }
+              />
 
-                  {/* Global utility cluster — chain switch, launchpad
+              {/* Global utility cluster — chain switch, launchpad
                     entry, language switch — stays together on the left
                     of the right-hand action group on every page,
                     including the predict module. Page-specific actions
                     (predict balance / deposit, perpetuals HL balance,
                     wallet account) come after this cluster. */}
-                  <LaunchPadButton />
+              <LaunchPadButton />
 
-                  <div className="hidden sm:block">
-                    <LanguageButton />
-                  </div>
+              <div className="hidden sm:block">
+                <LanguageButton />
+              </div>
 
-                  {/* On the predict module the balance indicator is the
+              {/* On the predict module the balance indicator is the
                     single header entry for prediction-market wallets:
                     its dropdown carries per-venue deposit / withdraw
                     actions inline, so a standalone header deposit
@@ -513,33 +498,32 @@ function PageShell({ children }: PropsWithChildren) {
                     here — the on-chain wallet trigger (DexAccountButton)
                     below covers funding the underlying chain wallet,
                     same as every other module. */}
-                  {isPredictPage && isAuthenticated && <PredictBalanceIndicator />}
-                  {!isPredictPage && isPerpetualsPage && <HyperliquidBalanceButton />}
-                  <DexAccountButton />
-                </div>
-              </div>
-            </ScaffoldHeader>
-          }
-          footer={<ScaffoldFooter navItems={navItems} />}
-        >
-          <DraggablePanelProvider
-            contents={[
-              mediaTrackContent,
-              {
-                id: "aiCopilot",
-                title: t("extend.toolbar.ai_copilot"),
-                children: <BottomAICopilot />,
-                modalMaxWidth: 440,
-                modalMinWidth: 320,
-                panelMinWidth: 320,
-                panelMaxWidth: 440,
-              },
-            ]}
-          >
-            {children}
-          </DraggablePanelProvider>
-        </Scaffold>
-      </DraggableStateProvider>
+              {isPredictPage && isAuthenticated && <PredictBalanceIndicator />}
+              {!isPredictPage && isPerpetualsPage && <HyperliquidBalanceButton />}
+              <DexAccountButton />
+            </div>
+          </div>
+        </ScaffoldHeader>
+      }
+      footer={<ScaffoldFooter navItems={navItems} />}
+    >
+      <DraggablePanelProvider
+        contents={[
+          mediaTrackContent,
+          {
+            id: "aiCopilot",
+            title: t("extend.toolbar.ai_copilot"),
+            children: <BottomAICopilot />,
+            modalMaxWidth: 440,
+            modalMinWidth: 320,
+            panelMinWidth: 320,
+            panelMaxWidth: 440,
+          },
+        ]}
+      >
+        {children}
+      </DraggablePanelProvider>
+    </Scaffold>
   );
 }
 
@@ -600,11 +584,7 @@ function HeaderSearchButton({
             /
           </Kbd>
         }
-        className={cn(
-          HEADER_CONTROL_CLASS,
-          "w-56 min-w-0 pl-3 pr-1.5",
-          className,
-        )}
+        className={cn(HEADER_CONTROL_CLASS, "w-56 min-w-0 pl-3 pr-1.5", className)}
       >
         {label}
       </Button>
@@ -635,10 +615,7 @@ const DROPDOWN_STYLE: React.CSSProperties = {
 
 function LaunchPadButton() {
   const { t } = useTranslation();
-  const { onOpen } = useDeferredAsyncModal(
-    LAUNCHPAD_MODAL_ID,
-    loadLaunchPadModal,
-  );
+  const { onOpen } = useDeferredAsyncModal(LAUNCHPAD_MODAL_ID, loadLaunchPadModal);
 
   return (
     <button
@@ -885,7 +862,9 @@ function ChainIcon({ chain, size }: { chain: Chain; size: number }) {
   if (chain === Chain.SOLANA) return <SolanaIcon width={size} height={size} />;
   if (chain === Chain.ETHEREUM) return <EthereumIcon width={size} height={size} />;
   if (chain === Chain.BINANCE) return <BinanceIcon width={size} height={size} />;
-  return <div style={{ width: size, height: size }} className="rounded-full bg-surface-interactive" />;
+  return (
+    <div style={{ width: size, height: size }} className="rounded-full bg-surface-interactive" />
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -1360,14 +1339,8 @@ function DexAccountMenuContent({
 }) {
   const { t } = useTranslation();
   const { chain } = useCurrentChain();
-  const { onOpen: openReceiveModal } = useDeferredAsyncModal(
-    RECEIVE_MODAL_ID,
-    loadReceiveModal,
-  );
-  const { onOpen: openWithdrawModal } = useDeferredAsyncModal(
-    WITHDRAW_MODAL_ID,
-    loadWithdrawModal,
-  );
+  const { onOpen: openReceiveModal } = useDeferredAsyncModal(RECEIVE_MODAL_ID, loadReceiveModal);
+  const { onOpen: openWithdrawModal } = useDeferredAsyncModal(WITHDRAW_MODAL_ID, loadWithdrawModal);
   const { mutate: createOnrampWidgetUrl, isPending: isCreatingOnramp } =
     useCreateOnrampWidgetUrlMutation();
 

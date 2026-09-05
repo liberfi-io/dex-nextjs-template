@@ -15,7 +15,6 @@ export const APP_RUNTIME_PROVIDER_ORDER: readonly RuntimeProviderKey[] = [
   "auth",
   "locale",
   "app-runtime",
-  "pinata",
   "application-adapters",
   "api-client",
   "media-track",

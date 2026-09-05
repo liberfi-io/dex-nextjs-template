@@ -66,16 +66,10 @@ type WalletDataCapability = Pick<
 >;
 type ActivityDataCapability = Pick<
   Client,
-  | "getWalletTrades"
-  | "getTokenTrades"
-  | "getWalletActivities"
-  | "getTokenActivities"
+  "getWalletTrades" | "getTokenTrades" | "getWalletActivities" | "getTokenActivities"
 >;
 type TradeCapability = Pick<Client, "swapRoute">;
-type TransactionCapability = Pick<
-  Client,
-  "getLatestBlock" | "sendTx" | "checkTxSuccess"
->;
+type TransactionCapability = Pick<Client, "getLatestBlock" | "sendTx" | "checkTxSuccess">;
 type MediaCapability = Pick<Client, "getPresignedUploadUrl">;
 type TokenSubscriptionCapability = Pick<
   Client,
@@ -92,9 +86,7 @@ type TokenSubscriptionCapability = Pick<
 >;
 type WalletSubscriptionCapability = Pick<
   Client,
-  | "subscribeWalletPnl"
-  | "subscribeWalletPortfolios"
-  | "subscribeWalletPortfolioPnls"
+  "subscribeWalletPnl" | "subscribeWalletPortfolios" | "subscribeWalletPortfolioPnls"
 >;
 type ActivitySubscriptionCapability = Pick<
   Client,
@@ -142,7 +134,6 @@ export type RuntimeProviderKey =
   | "auth"
   | "locale"
   | "app-runtime"
-  | "pinata"
   | "application-adapters"
   | "api-client"
   | "media-track"

@@ -1710,6 +1710,7 @@
 - 线上验证：正式首页、`/pulse` 和指定 Token 详情均返回 HTTP 200；真实浏览器首页渲染 13 条虚拟行，Token 详情显示目标代币和 K 线工具栏，Pulse 显示新币内容。三次 cache-busting 首页导航到首条数据行可见分别约 893ms、1,277ms、1,491ms，均低于 15 秒门禁。
 - Token Route 验证：线上 `POST /api/auth/dex` 返回 HTTP 200，响应包含 `Cache-Control: private, no-store`、`Server-Timing: dex-token;desc="grant";dur=1505` 和 `X-Dex-Token-Source: grant`；响应 body 全程丢弃，未读取或记录 access token。
 - 推送与 Workflow：功能及观测提交已普通 fast-forward 推送至 `origin/main`，未使用 force push；手动 Production workflow 成功。Node.js 20 弃用 annotation 仅为现有提示，不影响部署；本条工作记录使用 `[skip ci]` 推送，避免重复部署。
+
 ## 2026-09-05：DEX Token L2 缓存延后决策（提交前）
 
 - 仓库与分支：`react-sdk/main`；当前分支与远端一致，拟新增首页性能计划的决策证据。
@@ -1793,3 +1794,57 @@
 - 验证结果：baseline 与组合各两次 clean build 的业务 JS 稳定，只有 Next build id manifest 的预期差异；压缩 stats 通过 gzip 完整性检查，敏感模式扫描未发现 JWT/access token/Authorization；两个主工作区均无 analyzer、Pinata lazy、subpath 或依赖业务改动，whitespace 检查通过。
 - 推送状态：React SDK 文档/证据提交已创建于本地 `main`，当前领先 `origin/main` 3 个提交，尚未推送。
 - Workflow 状态：未触发 React SDK `Release`、npm 发布、GitHub Actions 或 Vercel 部署。
+
+## 2026-09-05：MediaTrack 按需实时连接能力（提交前）
+
+- 仓库与分支：`react-sdk/main`；当前分支包含三项尚未推送的性能决策/证据提交。
+- 拟用提交标题：`perf(media-track): support inactive runtime`。
+- 问题背景：MediaTrack client 目前在创建时立即请求凭证并建立连接，Provider 挂载后始终订阅两路推送，导致未打开媒体面板的首页也承担连接和订阅成本。
+- 计划完成事项：为 `MediaTrackProvider` 增加默认兼容的 `active?: boolean`；inactive 时保留 Context/runtime 但不连接、不订阅；切为 active 时恰好建立 basic/token 两路订阅，停用或卸载时解除两路订阅并断开；MediaTrackClient 改为首次真实订阅时才请求凭证和初始化连接。
+- 影响范围：`@liberfi.io/ui-media-track` 的 Provider 生命周期和 client 初始化时机；默认 `active=true` 保持旧行为，不修改 HTTP 翻译、生成接口、payload 或公共订阅方法。
+- 验证计划：运行公开 Provider active contract 和 client lazy lifecycle 测试，以及 ui-media-track 全量 test、typecheck、lint、whitespace；后续在 DEX 本地开发环境验证首页 0 路、面板/`/media-track` 2 路和反复开关不累计。
+- 预期推送状态：创建本地 React SDK 提交，等待 DEX 消费侧与完整 §8 验证完成后再决定是否发布；禁止 force push。
+- Workflow 策略：本地提交不触发 React SDK `Release`、npm 发布、GitHub Actions 或 Vercel 部署。
+
+## 2026-09-05：MediaTrack 按需实时连接能力（提交后）
+
+- 仓库与分支：`react-sdk/main`。
+- 提交：`49e66dc5e5` — `perf(media-track): support inactive runtime`。
+- 最终完成事项：`MediaTrackProvider` 已支持默认值为 true 的 active 状态；inactive 时 Context/runtime 仍可用但不会建立两路订阅，激活时只建立 basic/token 两路，停用或卸载会分别 unsubscribe 并断开 client。MediaTrackClient 不再在构造时主动请求凭证，首次真实订阅才初始化实时连接；快速关闭发生在凭证初始化完成前时也会取消旧代连接，避免面板关闭后重新连上或累积订阅。
+- 影响范围：仅 MediaTrack 实时连接生命周期；默认 Provider 用法保持兼容，HTTP 翻译、meme 生成、订阅 payload 和公共方法未改变。
+- 验证结果：新增 Provider 三项公开生命周期 contract、client lazy credential contract 与初始化竞态 contract；ui-media-track 4/4 套件共 12/12 项通过，typecheck、lint、whitespace 和提交钩子通过。
+- 推送状态：React SDK 功能提交已创建于本地 `main`，当前领先 `origin/main` 4 个提交，尚未推送。
+- Workflow 状态：未触发 React SDK `Release`、npm 发布、GitHub Actions 或 Vercel 部署。
+
+## 2026-09-05：延迟首页媒体与上传运行时（提交前）
+
+- 仓库与分支：`dex-nextjs-template/main`；当前分支领先远端 3 个既有工作记录提交。
+- 拟用提交标题：`perf(web): defer media and upload runtimes`。
+- 问题背景：首页公共 Provider 当前会无条件启动 MediaTrack 两路实时订阅，并通过 Pinata Provider 静态加载上传 SDK；绝大多数未打开媒体面板、未执行图片上传的首页访问不需要承担这些运行时成本。
+- 计划完成事项：根据 `/media-track` 路由或底部媒体面板开关驱动 MediaTrack active 状态，未激活时保持 Context 可用但不连接；移除全局 Pinata Provider，首次真实上传时动态加载并复用单份上传 client；保留失败后的重新加载能力和既有上传 contract。
+- 影响范围：首页公共 Provider 结构、MediaTrack 面板生命周期和发币图片上传的 SDK 加载时机；不修改媒体 payload、图片上传接口、交易、ranking 或其他页面业务 contract。
+- 验证计划：运行 activity、Provider 边界、Pinata lazy/upload、runtime order 定向测试及 Web 全量测试、typecheck、lint、whitespace；使用现有本地开发服务验证首页、媒体路由和发币入口。
+- 预期推送状态：创建本地提交，§8 全部完成并复核前不推送；禁止 force push。
+- Workflow 策略：本地提交不触发 GitHub Actions、Vercel 或 npm 发布。
+
+## 2026-09-05：Channels 运行时路由隔离（提交前）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 拟用提交标题：`perf(web): scope channels runtime`。
+- 问题背景：Channels client 与 Provider 目前位于所有 `(new)` 页面共享运行时，首页、Pulse 和 Token 详情即使不进入 Channels 也会创建对应 client 和认证依赖。
+- 计划完成事项：从公共 App Runtime 移除 Channels client/Provider，把 client、用户 token provider 和 ChannelsProvider 收口到 `/channels` 路由专属动态 Provider；保持 Channels 工厂、鉴权语义及页面消费接口不变。
+- 影响范围：运行时 Provider 所有权、共享 client bundle 类型和 `/channels` 路由；不改变 Channels API、其他业务 client、导航或页面 UI。
+- 验证计划：运行 route boundary、provider order、client factory/lifecycle 定向测试以及 Web 全量测试、typecheck、lint、whitespace；现有本地服务验证首页与 `/channels` 直达不报 Provider 错误。
+- 预期推送状态：创建本地提交，§8 全部完成并复核前不推送；禁止 force push。
+- Workflow 策略：本地提交不触发 GitHub Actions、Vercel 或 npm 发布。
+
+## 2026-09-05：主币价格仅轮询当前链（提交前）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 拟用提交标题：`perf(web): poll only the active chain price`。
+- 问题背景：公共运行时当前每 60 秒固定轮询 SOL、ETH、BSC 三条链的主币价格，但 Header 同一时刻只消费当前链价格，产生两条不必要请求。
+- 计划完成事项：轮询器改为读取当前选择链，只挂载该链的一份 `useTokenQuery`；切链时停止旧链轮询并启动新链，继续复用现有 query key、缓存和 60 秒刷新策略。
+- 影响范围：公共主币价格轮询数量及切链行为；不修改 Header 展示、价格接口、缓存结构或当前链状态。
+- 验证计划：以公开 Hook 边界断言初始只请求一条链、切链后只请求新链；运行 Web 全量测试、typecheck、lint、whitespace，并通过现有本地服务检查 Header 主币价格。
+- 预期推送状态：创建本地提交，§8 全部完成并复核前不推送；禁止 force push。
+- Workflow 策略：本地提交不触发 GitHub Actions、Vercel 或 npm 发布。
