@@ -1700,3 +1700,13 @@
 - 验证结果：Web 全量 55/55 套件共 244/244 项 Jest 测试及 14/14 项构建配置契约通过，typecheck、lint、whitespace 均通过；9 项 route 测试覆盖 L1/grant、429/502/401、缺失配置与非法 payload，反向断言响应体和日志均不含注入的 domain、audience、伪 token 或原始 message；本地现有开发服务仍能渲染热门列表，受控浏览器不提供 Performance Timeline 时页面保持正常。
 - 推送状态：功能提交已创建于本地 `main`，连同前置可靠性提交当前尚未推送；下一步先部署 Preview 验证响应 header 和日志安全性。
 - Workflow 状态：尚未触发 Production workflow；npm 发布不涉及本提交。
+
+## 2026-09-05：DEX Token 可靠性与观测直接上线验证
+
+- 仓库与分支：`dex-nextjs-template/main`；`react-sdk/main` 未修改，仍为 `5889e0cdd` 且与远端一致。
+- 上线提交：`294242c`，包含 `586bbfa`（修复 Token 请求永久等待）、`e05798f`（DEX Token 与首页关键路径观测）及对应工作记录。
+- 执行背景：演示时间紧迫，经明确授权跳过 Vercel Preview，直接将已完成全量自动化验证的提交 fast-forward 推送到 `main`。由于 HEAD 工作记录包含 `[skip ci]`，push 未自动创建 workflow，随后通过 `workflow_dispatch` 手动触发同一 `main` 提交的 Production 部署。
+- 部署结果：`Deploy to Vercel` workflow `33940294993`、job `101236253014` 成功，总用时 5 分 52 秒；Production deployment 为 `https://liberfi-ci9zatqdr-sgt-lab.vercel.app`，正式域名 `https://app.liberfi.io/` 已切换并返回 HTTP 200。
+- 线上验证：正式首页、`/pulse` 和指定 Token 详情均返回 HTTP 200；真实浏览器首页渲染 13 条虚拟行，Token 详情显示目标代币和 K 线工具栏，Pulse 显示新币内容。三次 cache-busting 首页导航到首条数据行可见分别约 893ms、1,277ms、1,491ms，均低于 15 秒门禁。
+- Token Route 验证：线上 `POST /api/auth/dex` 返回 HTTP 200，响应包含 `Cache-Control: private, no-store`、`Server-Timing: dex-token;desc="grant";dur=1505` 和 `X-Dex-Token-Source: grant`；响应 body 全程丢弃，未读取或记录 access token。
+- 推送与 Workflow：功能及观测提交已普通 fast-forward 推送至 `origin/main`，未使用 force push；手动 Production workflow 成功。Node.js 20 弃用 annotation 仅为现有提示，不影响部署；本条工作记录使用 `[skip ci]` 推送，避免重复部署。
