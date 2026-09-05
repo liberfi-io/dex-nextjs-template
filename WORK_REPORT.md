@@ -1868,3 +1868,15 @@
 - 验证结果：route boundary、provider order、client factory/lifecycle 测试通过，Web 全量 56/56 套件共 251/251 项及 14/14 项构建契约通过，typecheck、lint、whitespace 通过；现有 dev server 首次编译 `/channels` 约 16.7 秒，热响应约 0.11 秒，首页、Pulse 与其他已采样路由均返回 HTTP 200。
 - 推送状态：功能提交已创建于本地 `main`，尚未推送；禁止 force push。
 - Workflow 状态：未触发 GitHub Actions、Vercel 或 npm 发布。
+
+## 2026-09-05：主币价格仅轮询当前链（提交后）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 提交：`1f189f839e` — `perf(web): poll only the active chain price`。
+- 最终完成事项：公共主币价格轮询器从固定同时查询 SOL、ETH、BSC 改为只查询当前选择链；切链后旧链组件卸载、新链查询接管，继续复用原 `useTokenQuery` key、缓存和 60 秒刷新策略，因此 Header 与底部价格消费不会产生第二份重复请求。
+- 影响范围：主币价格后台轮询数量由三路降为一路，切链行为与当前链一致；未修改价格 API、展示格式、链选择状态或其他 token 请求。
+- 验证结果：轮询 contract 覆盖 SOL 初始状态及切换 ETH 后每次仅一次查询；DEX Web 56/56 套件共 251/251 项、14/14 项构建配置契约、typecheck、lint、whitespace 全部通过。现有 dev server 对首页、Discover、Pulse、Channels 四类路由、MediaTrack、Token 详情、Portfolio、Predict 与 Perpetuals 的最终直达均返回 HTTP 200；预热后的非首页路由约 0.04～1.09 秒，首页样本受本地后端波动影响为约 1.88～3.61 秒。
+- 额外门禁：React SDK MediaTrack 4/4 套件共 12/12 项、25/25 项仓库 gate 与目标包 typecheck/lint 通过；React SDK 全仓 typecheck 被本次 diff 之外的 `ui-tradingview` 三处既有测试 fixture 缺少 `chartIndex` 拦住，未扩大 §8 范围修改 K 线测试。
+- 代码审查：按已确认 §8 规格与仓库规则完成 Standards/Spec 双轴本地审查，无阻塞问题；审查中主动撤回了会改变公共 Jotai store 的 Provider 外移方案，最终保持原 Draggable 状态边界，仅由 PageShell 上报 MediaTrack 激活信号。
+- 推送状态：功能提交已创建于本地 `main`，尚未推送；React SDK 与 DEX 均未 force push。
+- Workflow 状态：未触发 React SDK Release、npm 发布、GitHub Actions 或 Vercel 部署；按开发阶段规则未运行 production build。
