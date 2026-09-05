@@ -1892,3 +1892,16 @@
 - 验证计划：核对 package.json 与 lockfile 版本收敛；运行 Web 全量测试、typecheck、lint、production build、`git diff --check`；部署后检查首页、Discover、Pulse、Token 详情、MediaTrack、Channels 与发币入口，并对首页文档与首行可用时间做一次性采样。
 - 预期推送状态：提交后推送 `dex-nextjs-template/main`，禁止 force push。
 - Workflow 策略：本次业务/依赖提交允许触发一次 `Deploy to Vercel`；部署结果记录使用 `[skip ci]` 单独提交，避免重复部署。
+
+## 2026-09-06：运行时优化 SDK 发布与 DEX 生产收尾（提交后）
+
+- 仓库与分支：`react-sdk/main`、`dex-nextjs-template/main`。
+- React SDK 发布：业务提交 `49e66dc5e5` 已推送；Release workflow `33981925186` 成功，release commit 为 `0c8641296`。npm 官方 registry 确认 `@liberfi.io/ui-media-track@0.1.287`、`@liberfi.io/react@0.3.106` 及本次全量 patch 包均可安装。
+- DEX 提交：`63ba22dc36` — `chore(deps): adopt runtime optimization sdk release`。
+- 最终完成事项：DEX 全部 `@liberfi.io/*` 依赖已同步到本次 release，lockfile 已刷新并通过 frozen install；`@chainstream-io/sdk` 的直接依赖与 `@liberfi.io/client` 间接依赖均收敛到 `2.1.28`。此前完成的 MediaTrack/Pinata 延迟启动、Channels 路由隔离和当前链价格轮询已随正式依赖发布到生产。
+- 验证结果：Web 全量 56/56 套件共 251/251 项、14/14 项构建配置契约、typecheck、lint、whitespace、frozen install 与 production build 全部通过。构建仅保留既有 Browserslist、PostCSS calc、Sentry/OpenTelemetry 静态分析警告，没有阻塞错误。
+- Vercel 结果：`Deploy to Vercel` workflow `33982659404`、job `101350545336` 成功，总用时 6 分 26 秒；Production deployment 为 `https://liberfi-f4zbw2hyh-sgt-lab.vercel.app`，正式域名 `https://app.liberfi.io/` 已切换并返回 HTTP 200。
+- 线上路由验收：首页、Discover、Pulse、Token 详情、MediaTrack 与 Channels 均返回 HTTP 200。首页运行 5 秒未发现 MediaTrack、Channels、Pinata 或 Centrifuge 的请求，说明无关运行时未在首页提前启动。
+- 首页线上采样：3 次文档请求均为 HTTP 200，总体 TTFB 中位数约 0.755 秒，后两次热样本为 0.656～0.755 秒；同一浏览器会话禁用缓存的 3 次首行可见为 4.088、2.704、2.547 秒，中位数约 2.704 秒。热门接口始终携带 `view=summary`，每次只出现 1 个主币详情请求，没有恢复列表级 N+1；可见行数为 14，虚拟化未一次性渲染全部约 100 行。
+- 推送状态：React SDK 与 DEX 业务提交均已 fast-forward 推送到远端 `main`，未使用 force push。
+- Workflow 说明：React SDK Release 与 Vercel Production workflow 均成功；Node.js 20 弃用 annotation 仅为现有提示，不影响发布。本条报告提交使用 `[skip ci]`，避免重复触发 Vercel。
