@@ -1730,3 +1730,45 @@
 - 验证结果：决策文件包含时间、两个仓库基线、样本范围、证据来源、门禁判断、清理结果和下一步；`git diff --check` 与提交钩子通过。
 - 推送状态：React SDK 文档提交已创建于本地 `main`，当前领先 `origin/main` 1 个提交，尚未推送。
 - Workflow 状态：未触发 React SDK `Release`、npm 发布或 Vercel 部署。
+
+## 2026-09-05：服务端初始 DEX Token 注入本地 Spike（提交前）
+
+- 仓库与分支：`dex-nextjs-template/main`；当前分支仅包含上一项工作报告提交，业务代码仍与远端一致。
+- 拟用提交标题：`perf(web): seed dex token during server render`；只有本地功能、性能和安全门禁满足时才保留并提交，失败则删除 Spike 代码。
+- 问题背景：首页浏览器当前可能需要等待 `/api/auth/dex` 完成后才能启动热门 ranking；本实验验证服务端渲染阶段复用现有 L1/grant 能否让首次 `getToken()` 同步可用，而不是把 Auth0 等待简单转移到 HTML TTFB。
+- 计划完成事项：抽取只有 `getToken()` 运行时能力的服务端 Token 模块并保持 Route Handler contract；布局以 650ms deadline 获取可选初始 Token，超时或错误回退客户端 POST且页面不 500；Provider 优先消费初始 Token并继续写入现有 Cookie；增加 layout source 的非敏感观测和三条回退路径测试。
+- 影响范围：`(new)` 路由组的服务端布局、DEX Token Route Handler、共享 App Runtime Provider 和 Token Provider；不修改 L2、Auth0 配置、ranking contract、交易、WebSocket 或 React SDK。
+- 验证计划：按 `getToken()`、Route Handler、Provider 公共边界进行红绿测试；运行 Web 全量测试、typecheck、lint、whitespace；使用本地开发环境验证首页、token、pulse、portfolio、media-track、channels、Predict 与 perpetuals 的直达和软导航，比较 HTML/首行时序并验证 650ms timeout/fallback。Vercel CDN、`x-vercel-cache`、region 与跨实例行为明确保留为本地不可验证门禁。
+- 预期推送状态：本轮仅创建通过门禁的本地提交，暂不推送；禁止 force push。
+- Workflow 策略：本地实现和测试不触发 GitHub Actions、Vercel 或 npm 发布。
+
+## 2026-09-05：服务端初始 DEX Token 注入 Spike 门禁决策（提交前）
+
+- 仓库与分支：`react-sdk/main`；当前分支仅包含上一项 L2 延后决策提交。
+- 拟用提交标题：`docs(plan): record rejected server token seed spike`。
+- 问题背景：本地 Spike 已验证成功、超时和错误回退 contract，但 650ms deadline 会在冷 grant 时直接进入公共布局 HTML 关键路径；既有 Production grant 样本约 1.1～1.5 秒，超过计划允许的全路由 TTFB P95 增幅 200ms。
+- 计划完成事项：追加只读决策记录，保存本地热路径、首行和冷路径推导证据，将失败原因归类为“延迟转移”，并确认全部业务 Spike 代码已经删除、现有客户端 POST/L1 方案保持不变。
+- 影响范围：仅计划审计材料；不保留服务端 Token 注入、公共布局、Provider 或 Route Handler 的业务改动。
+- 验证计划：确认 DEX Web 的 `apps/web/src` 与 Spike 前 HEAD 无差异；运行原 Token 定向测试、typecheck、lint 和 whitespace；核对决策记录包含门禁、证据和清理结果。
+- 预期推送状态：创建本地 React SDK 文档提交，暂不推送；禁止 force push。
+- Workflow 策略：本地提交不触发 React SDK `Release`、npm 发布或 Vercel 部署。
+
+## 2026-09-05：服务端初始 DEX Token 注入本地 Spike（门禁结论）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 业务提交：无；Spike 因硬门禁失败，所有业务源码和测试改动已删除。
+- 最终完成事项：完成 Token 服务抽取、公共布局 650ms deadline、Provider 初始 Token及成功/超时/错误三条路径的本地实验；确认 L1 热路径可运行，但冷 grant 会把至少 650ms Auth0 等待转移到所有 `(new)` 路由的 HTML TTFB，因此按计划归类为“延迟转移”并回退。
+- 性能证据：本地 warm HTML 无 Cookie TTFB 中位数约 141ms，带 Cookie约 86ms；本地浏览器 5 次 navigation→首行中位数约 593ms、稳定后仅渲染 13 行。冷路径 contract 明确等待 650ms；既有 Production grant 样本约 1.1～1.5 秒，超过全路由 TTFB P95 增幅 200ms门禁。
+- 验证结果：实验期间 5 个相关 suite 共 29 项通过；清理后原 Token、Route、Provider 与首页观测 4 个 suite 共 28 项通过，Web typecheck、lint、whitespace 通过；`git diff -- apps/web/src` 为空，确认业务源码已恢复至 Spike 前状态。
+- 推送状态：没有业务提交或推送；现有客户端 POST、L1 缓存、三秒超时和安全错误 contract 保持不变。
+- Workflow 状态：未触发 GitHub Actions、Vercel 或 npm 发布。
+
+## 2026-09-05：服务端初始 DEX Token 注入 Spike 门禁决策（提交后）
+
+- 仓库与分支：`react-sdk/main`。
+- 提交：`a2f85e6ba` — `docs(plan): record rejected server token seed spike`。
+- 最终完成事项：新增只追加决策记录，保存本地 warm TTFB、浏览器首行、650ms 冷路径与既有 Production grant 证据；将失败原因固定为“延迟转移”，记录实际删除文件和恢复验证，并把下一步切换为 Bundle 字节归因 E0。
+- 影响范围：仅计划审计材料；未保留服务端初始 Token 注入、公共布局或 Provider 业务改动。
+- 验证结果：决策文件覆盖时间、commit、环境、样本、门禁、清理和下一步；DEX Web 业务源码已恢复，未新增依赖、环境变量或部署状态。
+- 推送状态：React SDK 文档提交已创建于本地 `main`，当前连同 L2 决策共领先 `origin/main` 2 个提交，尚未推送。
+- Workflow 状态：未触发 React SDK `Release`、npm 发布或 Vercel 部署。
