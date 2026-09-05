@@ -1710,3 +1710,23 @@
 - 线上验证：正式首页、`/pulse` 和指定 Token 详情均返回 HTTP 200；真实浏览器首页渲染 13 条虚拟行，Token 详情显示目标代币和 K 线工具栏，Pulse 显示新币内容。三次 cache-busting 首页导航到首条数据行可见分别约 893ms、1,277ms、1,491ms，均低于 15 秒门禁。
 - Token Route 验证：线上 `POST /api/auth/dex` 返回 HTTP 200，响应包含 `Cache-Control: private, no-store`、`Server-Timing: dex-token;desc="grant";dur=1505` 和 `X-Dex-Token-Source: grant`；响应 body 全程丢弃，未读取或记录 access token。
 - 推送与 Workflow：功能及观测提交已普通 fast-forward 推送至 `origin/main`，未使用 force push；手动 Production workflow 成功。Node.js 20 弃用 annotation 仅为现有提示，不影响部署；本条工作记录使用 `[skip ci]` 推送，避免重复部署。
+## 2026-09-05：DEX Token L2 缓存延后决策（提交前）
+
+- 仓库与分支：`react-sdk/main`；当前分支与远端一致，拟新增首页性能计划的决策证据。
+- 拟用提交标题：`docs(plan): record deferred dex token l2 cache`。
+- 问题背景：原计划要求完成 72 小时且 1,000 次 `/api/auth/dex` 观测后再判断 L2；用户已经取消持续监测，并明确判断当前 L2 缓存没有必要。现有有限样本不足以证明 §4.3 任一门禁成立，不能把产品判断误记为完整数据门禁通过。
+- 计划完成事项：在计划 artifacts 中追加只读决策记录，明确“现有 L1 足够，L2 延后”、原观测样本不足、自动化已删除、未新增 L2 代码或依赖，以及后续仅继续服务端初始 Token 注入本地 Spike。
+- 影响范围：仅计划审计记录；不修改 React SDK、DEX Web 运行时、依赖、接口、缓存或部署配置。
+- 验证计划：检查 Markdown 内容、路径、commit 基线和 whitespace；确认两个仓库在记录前均无用户未提交改动。
+- 预期推送状态：创建本地 React SDK 文档提交，暂不推送；禁止 force push。
+- Workflow 策略：本地提交不触发 React SDK `Release` 或 DEX `Deploy to Vercel`。
+
+## 2026-09-05：DEX Token L2 缓存延后决策（提交后）
+
+- 仓库与分支：`react-sdk/main`。
+- 提交：`9175464ff` — `docs(plan): record deferred dex token l2 cache`。
+- 最终完成事项：新增只追加的 L2 决策记录，明确持续观测由用户提前取消、样本未达到 72 小时且 1,000 次门禁，当前不实施跨实例共享缓存；结论固定为“现有 L1 足够，L2 延后”，并保留本地 Spike 无法覆盖的 Vercel 缓存与跨实例风险说明。
+- 影响范围：仅计划审计材料；React SDK 与 DEX Web 运行时、依赖、Token contract 和生产部署均未改变。
+- 验证结果：决策文件包含时间、两个仓库基线、样本范围、证据来源、门禁判断、清理结果和下一步；`git diff --check` 与提交钩子通过。
+- 推送状态：React SDK 文档提交已创建于本地 `main`，当前领先 `origin/main` 1 个提交，尚未推送。
+- Workflow 状态：未触发 React SDK `Release`、npm 发布或 Vercel 部署。
