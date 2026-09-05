@@ -1858,3 +1858,13 @@
 - 验证结果：SDK MediaTrack 4/4 套件共 12/12 项通过；DEX activity、Pinata、Provider 边界等定向测试通过，Web 全量 56/56 套件共 251/251 项及 14/14 项构建契约通过，typecheck、lint、whitespace 通过。现有 dev server 热响应：首页约 0.40 秒、Pulse 约 0.31 秒、MediaTrack 约 0.07 秒；受控浏览器因本地 webview 无法附着，未取得可见 UI/网络面板证据，未用其他浏览器绕过该限制。
 - 推送状态：功能提交已创建于本地 `main`，尚未推送；禁止 force push。
 - Workflow 状态：未触发 GitHub Actions、Vercel 或 npm 发布。
+
+## 2026-09-05：Channels 运行时路由隔离（提交后）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 提交：`fade6572f8` — `perf(web): scope channels runtime`。
+- 最终完成事项：Channels client、用户 access-token provider 与 ChannelsProvider 已从所有页面共享的 App Runtime 移出，改由 `/channels` 路由动态加载的专属 Provider 创建；首页、Pulse、Token 详情和其他路由不再实例化 Channels，原 Channels client 工厂及鉴权 contract 保持不变。
+- 影响范围：共享 client bundle 和 Provider 顺序收窄，Channels 首页、create、detail、update 四类路由继续继承同一个 route-scoped Provider；未修改 Channels API、页面 UI 或导航。
+- 验证结果：route boundary、provider order、client factory/lifecycle 测试通过，Web 全量 56/56 套件共 251/251 项及 14/14 项构建契约通过，typecheck、lint、whitespace 通过；现有 dev server 首次编译 `/channels` 约 16.7 秒，热响应约 0.11 秒，首页、Pulse 与其他已采样路由均返回 HTTP 200。
+- 推送状态：功能提交已创建于本地 `main`，尚未推送；禁止 force push。
+- Workflow 状态：未触发 GitHub Actions、Vercel 或 npm 发布。

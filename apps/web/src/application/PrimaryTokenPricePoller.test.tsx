@@ -8,21 +8,26 @@ import {
 } from "./PrimaryTokenPricePoller";
 
 const mockUseTokenQuery = jest.fn();
+let currentChain = Chain.SOLANA;
 
 jest.mock("@liberfi.io/react", () => ({
   useTokenQuery: (...args: unknown[]) => mockUseTokenQuery(...args),
+}));
+jest.mock("@liberfi.io/ui-chain-select", () => ({
+  useCurrentChain: () => ({ chain: currentChain }),
 }));
 
 describe("PrimaryTokenPricePoller", () => {
   beforeEach(() => {
     mockUseTokenQuery.mockReset();
     mockUseTokenQuery.mockReturnValue({ data: undefined });
+    currentChain = Chain.SOLANA;
   });
 
-  it("preloads and polls the wrapped native token price for every selectable chain", () => {
-    render(<PrimaryTokenPricePoller />);
+  it("polls only the wrapped native token for the current chain", () => {
+    const { rerender } = render(<PrimaryTokenPricePoller />);
 
-    expect(mockUseTokenQuery).toHaveBeenCalledTimes(3);
+    expect(mockUseTokenQuery).toHaveBeenCalledTimes(1);
     expect(mockUseTokenQuery).toHaveBeenCalledWith(
       {
         chain: Chain.SOLANA,
@@ -33,20 +38,16 @@ describe("PrimaryTokenPricePoller", () => {
         refetchInterval: PRIMARY_TOKEN_PRICE_POLL_INTERVAL_MS,
       }),
     );
+
+    mockUseTokenQuery.mockClear();
+    currentChain = Chain.ETHEREUM;
+    rerender(<PrimaryTokenPricePoller />);
+
+    expect(mockUseTokenQuery).toHaveBeenCalledTimes(1);
     expect(mockUseTokenQuery).toHaveBeenCalledWith(
       {
         chain: Chain.ETHEREUM,
         address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-      },
-      expect.objectContaining({
-        enabled: true,
-        refetchInterval: PRIMARY_TOKEN_PRICE_POLL_INTERVAL_MS,
-      }),
-    );
-    expect(mockUseTokenQuery).toHaveBeenCalledWith(
-      {
-        chain: Chain.BINANCE,
-        address: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
       },
       expect.objectContaining({
         enabled: true,
