@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo } from "react";
 import { fetchDexToken } from "./auth/fetchDexToken";
+import { markHomepageCriticalPath } from "./performance/homepageCriticalPath";
 
 interface DexTokenLoader {
   set(token: string, expiresAt: Date): Promise<void>;
@@ -124,9 +125,29 @@ export function useDexTokenProvider(loader: DexTokenLoader) {
       getToken: async () => {
         if (typeof window === "undefined") return "";
 
-        const dexToken = await readStoredToken(loader);
-        if (dexToken) return dexToken;
-        return renewDexToken();
+        const startedAt = Date.now();
+        try {
+          const dexToken = await readStoredToken(loader);
+          if (dexToken) {
+            markHomepageCriticalPath("get_token_resolve", {
+              source: "cookie",
+              durationMs: Date.now() - startedAt,
+            });
+            return dexToken;
+          }
+          const renewedToken = await renewDexToken();
+          markHomepageCriticalPath("get_token_resolve", {
+            source: "unknown",
+            durationMs: Date.now() - startedAt,
+          });
+          return renewedToken;
+        } catch (error: unknown) {
+          markHomepageCriticalPath("get_token_reject", {
+            source: "unknown",
+            durationMs: Date.now() - startedAt,
+          });
+          throw error;
+        }
       },
     }),
     [loader, renewDexToken],

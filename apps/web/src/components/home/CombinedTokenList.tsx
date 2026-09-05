@@ -35,6 +35,11 @@ import { DiscoverTokenListMeasurementGate } from "./DiscoverTokenListSkeleton";
 import { useDeferredAsyncModal } from "../modals/DeferredAsyncModalHost";
 import { loadPresetFormModal } from "../modals/modal-loaders";
 import { PRESET_FORM_MODAL_ID } from "../modals/modal-contracts";
+import {
+  markHomepageCriticalPath,
+  observeHomepageFirstTokenRow,
+  observeHomepageRankingResources,
+} from "../../application/performance/homepageCriticalPath";
 
 type ListTab = "trending" | "stocks" | "new";
 
@@ -73,6 +78,16 @@ export function CombinedTokenList() {
 
   const ref = useRef<HTMLDivElement>(null);
   const { height } = useResizeObserver<HTMLDivElement>({ ref });
+
+  useEffect(() => {
+    markHomepageCriticalPath("hydration_executable");
+    const stopRankingObserver = observeHomepageRankingResources();
+    const stopFirstRowObserver = observeHomepageFirstTokenRow(ref.current);
+    return () => {
+      stopRankingObserver();
+      stopFirstRowObserver();
+    };
+  }, []);
 
   const [filters, setFilters] = useState<TokenListFiltersType | undefined>();
   const [resolution, setResolution] = useState<TokenListResolution>("24h");

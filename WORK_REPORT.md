@@ -1679,3 +1679,14 @@
 - 验证结果：新增 2 套件 13 项 token contract 测试全部通过；Web 全量 54/54 套件、233/233 项 Jest 测试与 14/14 项构建配置契约通过，typecheck、lint、whitespace 均通过。现有 `localhost:3000` 开发服务热更新后首页成功渲染热门列表；浏览器仅出现既有钱包扩展和受控状态警告，无新增 token provider uncaught error。
 - 推送状态：功能提交已创建于本地 `main`，相对 `origin/main` ahead 1；提交 B 与 Preview 观测准备完成前暂不推送。
 - Workflow 状态：未触发；未执行 Vercel 部署或 npm 发布。
+
+## 2026-09-05：DEX Token 与首页关键路径观测（提交前）
+
+- 仓库与分支：`dex-nextjs-template/main`；当前分支包含已完成但尚未推送的 Token 可靠性提交及其工作记录。
+- 拟用提交标题：`chore(web): trace dex token critical path`。
+- 问题背景：首页性能后续优化需要先区分服务端 L1 命中、Auth0 grant 冷路径、客户端 Token 等待及热门 ranking 请求的先后关系；现有 `/api/auth/dex` 还会把 Auth0 原始错误 message 返回浏览器，存在诊断信息外泄风险。
+- 计划完成事项：为 `/api/auth/dex` 增加 `l1|grant` 来源、route/grant 耗时、Token 剩余有效期、region、boot id 与 request id 的服务端 allowlist 日志，并返回 `Server-Timing`、`X-Dex-Token-Source` 和 `private, no-store`；将上游可重试错误收敛为 503 `DEX_TOKEN_UNAVAILABLE`，配置或内部不变量错误收敛为 500 `DEX_TOKEN_INTERNAL`；在首页同一次导航中记录 hydration、DEX Token、getToken、ranking 与首条数据行时序，采集事件只允许状态、来源、耗时和行数。
+- 影响范围：DEX Token Route Handler 的公开错误 contract、非敏感日志与响应 header，以及首页/发现页匿名性能观测；不修改 Token 内容、Auth0 配置、ranking 参数、排序筛选、交易或其他页面业务逻辑。
+- 验证计划：以注入 domain、audience、伪 token 的反向测试验证响应及日志零泄漏，覆盖 429/5xx/401、无效 grant payload、L1/grant source 和缓存 header；运行 Web 全量测试、typecheck、lint、whitespace，并用现有本地 dev 服务确认首页列表可用。提交后先部署 Preview 核对 header/日志，再进入 Production 的 72 小时且至少 1,000 样本观测暂停门。
+- 预期推送状态：本地提交后先执行 Preview 验证；通过后普通 fast-forward 推送 `main` 以启动生产观测，禁止 force push。
+- Workflow 策略：Preview 通过前不触发 Production workflow；推送 `main` 时允许触发一次 `Deploy to Vercel`，后续仅工作记录提交使用 `[skip ci]` 避免重复部署。

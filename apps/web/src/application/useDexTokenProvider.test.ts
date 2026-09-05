@@ -2,10 +2,16 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { useDexTokenProvider } from "./useDexTokenProvider";
 
 const fetchDexTokenMock = jest.fn();
+const markHomepageCriticalPathMock = jest.fn();
 
 jest.mock("./auth/fetchDexToken", () => ({
   ...jest.requireActual("./auth/fetchDexToken"),
   fetchDexToken: (...args: unknown[]) => fetchDexTokenMock(...args),
+}));
+
+jest.mock("./performance/homepageCriticalPath", () => ({
+  markHomepageCriticalPath: (...args: unknown[]) =>
+    markHomepageCriticalPathMock(...args),
 }));
 
 function createLoader(token: string | null = null) {
@@ -31,6 +37,7 @@ function createJwt(expiresAtSeconds: number) {
 describe("useDexTokenProvider", () => {
   beforeEach(() => {
     fetchDexTokenMock.mockReset();
+    markHomepageCriticalPathMock.mockReset();
   });
 
   it("rejects every waiter when the shared token request fails", async () => {
@@ -54,6 +61,10 @@ describe("useDexTokenProvider", () => {
     rejectRequest?.(new Error("Auth0 unavailable"));
 
     await rejection;
+    expect(markHomepageCriticalPathMock).toHaveBeenCalledWith(
+      "get_token_reject",
+      expect.objectContaining({ source: "unknown" }),
+    );
     unmount();
     consoleSpy.mockRestore();
   });
@@ -233,6 +244,10 @@ describe("useDexTokenProvider", () => {
 
     expect(fetchDexTokenMock).not.toHaveBeenCalled();
     expect(loader.remove).not.toHaveBeenCalled();
+    expect(markHomepageCriticalPathMock).toHaveBeenCalledWith(
+      "get_token_resolve",
+      expect.objectContaining({ source: "cookie" }),
+    );
     unmount();
   });
 

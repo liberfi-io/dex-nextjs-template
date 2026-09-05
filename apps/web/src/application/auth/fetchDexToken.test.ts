@@ -1,15 +1,44 @@
 import { fetchDexToken } from "./fetchDexToken";
 
+const markHomepageCriticalPathMock = jest.fn();
+
+jest.mock("../performance/homepageCriticalPath", () => ({
+  markHomepageCriticalPath: (...args: unknown[]) =>
+    markHomepageCriticalPathMock(...args),
+}));
+
 describe("fetchDexToken", () => {
   const fetchMock = jest.fn();
 
   beforeEach(() => {
     fetchMock.mockReset();
+    markHomepageCriticalPathMock.mockReset();
     Object.defineProperty(globalThis, "fetch", {
       configurable: true,
       writable: true,
       value: fetchMock,
     });
+  });
+
+  it("records the request boundary and the allowlisted server source", async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: new Headers({ "X-Dex-Token-Source": "l1" }),
+      json: async () => ({ accessToken: "opaque-token" }),
+    });
+
+    await expect(fetchDexToken()).resolves.toBe("opaque-token");
+
+    expect(markHomepageCriticalPathMock).toHaveBeenNthCalledWith(
+      1,
+      "dex_request_start",
+    );
+    expect(markHomepageCriticalPathMock).toHaveBeenNthCalledWith(
+      2,
+      "dex_request_end",
+      expect.objectContaining({ source: "l1", status: 200 }),
+    );
   });
 
   it("rejects a non-success response without exposing the server message", async () => {

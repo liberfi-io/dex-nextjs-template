@@ -1,9 +1,14 @@
 const mockClientCredentialsGrant = jest.fn();
+const originalDexAudience = process.env.DEX_AUTH0_AUDIENCE;
 
 jest.mock("next/server", () => ({
   NextResponse: {
-    json: (body: unknown, init?: { status?: number }) => ({
+    json: (
+      body: unknown,
+      init?: { status?: number; headers?: Record<string, string> },
+    ) => ({
       status: init?.status ?? 200,
+      headers: new Headers(init?.headers),
       json: async () => body,
     }),
   },
@@ -26,7 +31,7 @@ async function loadPost() {
 async function readJson(response: { json(): Promise<unknown> }) {
   return (await response.json()) as {
     accessToken?: string;
-    error?: string;
+    error?: { code: string };
   };
 }
 
@@ -36,10 +41,19 @@ describe("POST /api/auth/dex", () => {
     jest.useFakeTimers();
     jest.setSystemTime(new Date("2026-09-05T00:00:00.000Z"));
     mockClientCredentialsGrant.mockReset();
+    process.env.DEX_AUTH0_AUDIENCE = "https://dex.test.example";
+    jest.spyOn(console, "info").mockImplementation(() => undefined);
+    jest.spyOn(console, "error").mockImplementation(() => undefined);
   });
 
   afterEach(() => {
     jest.useRealTimers();
+    jest.restoreAllMocks();
+    if (originalDexAudience === undefined) {
+      Reflect.deleteProperty(process.env, "DEX_AUTH0_AUDIENCE");
+    } else {
+      process.env.DEX_AUTH0_AUDIENCE = originalDexAudience;
+    }
   });
 
   it("shares one grant across concurrent requests", async () => {
@@ -76,31 +90,61 @@ describe("POST /api/auth/dex", () => {
       });
     const POST = await loadPost();
 
-    expect(await readJson(await POST({} as never))).toEqual({
+    const first = await POST({} as never);
+    expect(await readJson(first)).toEqual({
       accessToken: "first-token",
     });
+    expect(first.headers.get("x-dex-token-source")).toBe("grant");
     jest.advanceTimersByTime(299_999);
-    expect(await readJson(await POST({} as never))).toEqual({
+    const cached = await POST({} as never);
+    expect(await readJson(cached)).toEqual({
       accessToken: "first-token",
     });
+    expect(cached.headers.get("x-dex-token-source")).toBe("l1");
+    expect(cached.headers.get("server-timing")).toContain(
+      'dex-token;desc="l1"',
+    );
     jest.advanceTimersByTime(1);
-    expect(await readJson(await POST({} as never))).toEqual({
+    const refreshed = await POST({} as never);
+    expect(await readJson(refreshed)).toEqual({
       accessToken: "second-token",
     });
+    expect(refreshed.headers.get("cache-control")).toBe("private, no-store");
+    expect(refreshed.headers.get("server-timing")).toContain(
+      'dex-token;desc="grant"',
+    );
+    expect(refreshed.headers.get("x-dex-token-source")).toBe("grant");
     expect(mockClientCredentialsGrant).toHaveBeenCalledTimes(2);
   });
 
-  it("does not cache a failed grant", async () => {
+  it("returns a retryable fixed error without leaking upstream details", async () => {
+    const sensitiveError =
+      "Auth0 unavailable at tenant.example.com for https://dex.example.com with fake-token-value";
     mockClientCredentialsGrant
-      .mockRejectedValueOnce(new Error("Auth0 unavailable"))
+      .mockRejectedValueOnce(new Error(sensitiveError))
       .mockResolvedValueOnce({
         data: { access_token: "recovered-token", expires_in: 3600 },
       });
     const POST = await loadPost();
 
     const failed = await POST({} as never);
-    expect(failed.status).toBe(500);
-    expect(await readJson(failed)).toEqual({ error: "Auth0 unavailable" });
+    expect(failed.status).toBe(503);
+    const failedBody = await readJson(failed);
+    expect(failedBody).toEqual({
+      error: { code: "DEX_TOKEN_UNAVAILABLE" },
+    });
+    expect(JSON.stringify(failedBody)).not.toContain(sensitiveError);
+    expect(JSON.stringify(failedBody)).not.toContain("tenant.example.com");
+    expect(JSON.stringify(failedBody)).not.toContain("https://dex.example.com");
+    expect(JSON.stringify(failedBody)).not.toContain("fake-token-value");
+    const serializedLogs = JSON.stringify(
+      (console.error as jest.Mock).mock.calls,
+    );
+    expect(serializedLogs).toContain("DEX_TOKEN_UNAVAILABLE");
+    expect(serializedLogs).not.toContain(sensitiveError);
+    expect(serializedLogs).not.toContain("tenant.example.com");
+    expect(serializedLogs).not.toContain("https://dex.example.com");
+    expect(serializedLogs).not.toContain("fake-token-value");
 
     const recovered = await POST({} as never);
     expect(recovered.status).toBe(200);
@@ -108,6 +152,61 @@ describe("POST /api/auth/dex", () => {
       accessToken: "recovered-token",
     });
     expect(mockClientCredentialsGrant).toHaveBeenCalledTimes(2);
+  });
+
+  it("returns a non-retryable fixed error for an invalid grant payload", async () => {
+    mockClientCredentialsGrant.mockResolvedValueOnce({
+      data: { access_token: "", expires_in: 3600 },
+    });
+    const POST = await loadPost();
+
+    const failed = await POST({} as never);
+
+    expect(failed.status).toBe(500);
+    expect(await readJson(failed)).toEqual({
+      error: { code: "DEX_TOKEN_INTERNAL" },
+    });
+  });
+
+  it.each([
+    [429, 503, "DEX_TOKEN_UNAVAILABLE"],
+    [502, 503, "DEX_TOKEN_UNAVAILABLE"],
+    [401, 500, "DEX_TOKEN_INTERNAL"],
+  ] as const)(
+    "maps upstream status %s to HTTP %s and %s",
+    async (upstreamStatus, expectedStatus, expectedCode) => {
+      mockClientCredentialsGrant.mockRejectedValueOnce(
+        Object.assign(new Error("private upstream diagnostics"), {
+          statusCode: upstreamStatus,
+        }),
+      );
+      const POST = await loadPost();
+
+      const failed = await POST({} as never);
+
+      expect(failed.status).toBe(expectedStatus);
+      expect(await readJson(failed)).toEqual({
+        error: { code: expectedCode },
+      });
+      expect((console.error as jest.Mock).mock.calls.at(-1)?.[1]).toMatchObject({
+        errorCategory: expectedCode,
+        upstreamStatus,
+        status: expectedStatus,
+      });
+    },
+  );
+
+  it("returns an internal error when the audience configuration is missing", async () => {
+    Reflect.deleteProperty(process.env, "DEX_AUTH0_AUDIENCE");
+    const POST = await loadPost();
+
+    const failed = await POST({} as never);
+
+    expect(failed.status).toBe(500);
+    expect(await readJson(failed)).toEqual({
+      error: { code: "DEX_TOKEN_INTERNAL" },
+    });
+    expect(mockClientCredentialsGrant).not.toHaveBeenCalled();
   });
 
   it("uses the JWT expiry when expires_in is absent", async () => {
