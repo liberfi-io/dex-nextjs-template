@@ -1926,3 +1926,15 @@
 - 验证结果：React SDK 全仓 31/31 测试任务通过；Token 可见订阅 5 个 suite 共 13 项、红包 2 个 suite 共 5 项通过；`ui-tokens`、`ui-redpacket`、Storybook typecheck 通过，目标包 lint、whitespace、敏感信息扫描通过。全仓 typecheck 仍被本次 diff 之外的 `ui-tradingview` 三处既有测试 fixture 缺少 `chartIndex` 拦住。代码 Standards/Spec 双轴复查无阻塞问题。Chrome 已用于生产问题复现；本地整站首次编译两次超过 5 分钟且持续高资源占用，已安全停止，未把未完成的浏览器回归计为通过。
 - 推送状态：React SDK 与本工作记录均仅创建本地提交，尚未推送；未发布 npm、未更新 DEX 依赖、未部署 Vercel，未使用 force push。
 - Workflow 状态：未触发 GitHub Actions、React SDK `Release` 或 Vercel workflow。
+
+## 2026-09-06：首页实时行情与红包国际化正式发布（提交前）
+
+- 仓库与分支：`react-sdk/main`、`dex-nextjs-template/main`。
+- 拟用提交标题：`chore(deps): adopt realtime list and redpacket sdk release`。
+- 问题背景：首页热门与股票列表的榜单级 WebSocket 在生产环境没有推送，现网只能等待 30 秒 HTTP 轮询；红包页面仍可能显示原始翻译键。React SDK 修复已完成本地验证，但 DEX 尚未安装发布后的 npm 版本，因此生产环境还未生效。
+- 已完成发布：React SDK 业务提交 `8c980d37e` 已推送到 `main`；Release workflow `34002612555` 成功，release commit 为 `0e137f495`。npm 官方 registry 已确认 `@liberfi.io/ui-tokens@3.0.93`、`@liberfi.io/ui-redpacket@1.0.20`、`@liberfi.io/react-redpacket@0.1.20`、`@liberfi.io/i18n@0.1.290` 可安装。
+- 计划完成事项：将 DEX 全部 `@liberfi.io/*` 直接依赖同步到本次 release 版本并刷新 lockfile；确认关键包及 `@chainstream-io/sdk@2.1.28` 解析版本；执行测试、typecheck、lint、production build、frozen install 与 whitespace 检查；提交并 fast-forward 推送 `main`，触发一次 Production Vercel 部署。
+- 影响范围：DEX 的 LiberFi npm 依赖树，以及首页热门/股票实时刷新和红包相关页面国际化；不修改 DEX 业务源码、后端 contract、K 线、Portfolio、Channels 或 Predict 逻辑。
+- 验证计划：核对 package.json 与 lockfile 版本；运行 Web 全量测试、typecheck、lint、production build、`pnpm install --frozen-lockfile` 和 `git diff --check`；部署后检查首页、Pulse、Token 详情、红包入口等核心路由，并确认首页可见列表订阅与渲染正常。
+- 预期推送状态：提交后推送 `dex-nextjs-template/main`，禁止 force push。
+- Workflow 策略：本次依赖提交允许触发一次 `Deploy to Vercel`；部署结果后续使用 `[skip ci]` 单独记录，避免重复部署。
