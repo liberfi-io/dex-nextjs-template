@@ -1938,3 +1938,14 @@
 - 验证计划：核对 package.json 与 lockfile 版本；运行 Web 全量测试、typecheck、lint、production build、`pnpm install --frozen-lockfile` 和 `git diff --check`；部署后检查首页、Pulse、Token 详情、红包入口等核心路由，并确认首页可见列表订阅与渲染正常。
 - 预期推送状态：提交后推送 `dex-nextjs-template/main`，禁止 force push。
 - Workflow 策略：本次依赖提交允许触发一次 `Deploy to Vercel`；部署结果后续使用 `[skip ci]` 单独记录，避免重复部署。
+
+## 2026-09-06：补齐延迟传播的 MediaTrack release 版本（提交前）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 拟用提交标题：`chore(deps): complete liberfi release version sync`。
+- 问题背景：首轮依赖刷新时 npm 官方 registry 尚未暴露刚发布的 `@liberfi.io/ui-media-track@0.1.288`，消费端为保证可安装性暂时保留 `0.1.287`；首轮 Vercel 部署完成后 registry 已传播该版本。
+- 计划完成事项：将 `@liberfi.io/ui-media-track` 补齐到 `0.1.288` 并刷新 lockfile，使 DEX 的全部 LiberFi 直接依赖与 Release workflow `34002612555` 产物一致；重新执行 frozen install、测试、typecheck、lint、production build 和 whitespace 检查。
+- 影响范围：仅 MediaTrack npm 包版本与 lockfile；该包相对上一发布没有本轮业务源码变更，首页实时列表与红包修复仍由已部署的 `ui-tokens`、`ui-redpacket` 等包提供。
+- 验证计划：确认实际解析到 `ui-media-track@0.1.288`，并复跑 DEX 完整发布门禁；推送后以第二次 Vercel Production 成功结果作为最终部署基线。
+- 预期推送状态：提交后 fast-forward 推送 `main`，禁止 force push。
+- Workflow 策略：允许触发一次最终 `Deploy to Vercel`；最终部署报告使用 `[skip ci]` 提交。
