@@ -1905,3 +1905,24 @@
 - 首页线上采样：3 次文档请求均为 HTTP 200，总体 TTFB 中位数约 0.755 秒，后两次热样本为 0.656～0.755 秒；同一浏览器会话禁用缓存的 3 次首行可见为 4.088、2.704、2.547 秒，中位数约 2.704 秒。热门接口始终携带 `view=summary`，每次只出现 1 个主币详情请求，没有恢复列表级 N+1；可见行数为 14，虚拟化未一次性渲染全部约 100 行。
 - 推送状态：React SDK 与 DEX 业务提交均已 fast-forward 推送到远端 `main`，未使用 force push。
 - Workflow 说明：React SDK Release 与 Vercel Production workflow 均成功；Node.js 20 弃用 annotation 仅为现有提示，不影响发布。本条报告提交使用 `[skip ci]`，避免重复触发 Vercel。
+
+## 2026-09-06：首页可见行情实时刷新与红包国际化修复（提交前）
+
+- 仓库与分支：`react-sdk/main`；`dex-nextjs-template/main` 仅追加本工作记录。
+- 拟用提交标题：`fix(ui): restore realtime lists and redpacket translations`。
+- 问题背景：生产环境实测热门、股票榜单级 WebSocket 虽已订阅但持续无消息，前端移除全量逐币订阅后只能等待 30 秒 HTTP 轮询；同时红包首页、创建页和历史页仍调用已迁移的旧翻译键，页面直接显示 `extend.redpacket.*`。
+- 计划完成事项：热门与股票列表仅对已结算的可见行恢复实时详情订阅，继续保留榜单级订阅和 30 秒兜底轮询；滚动期间复用既有 180ms 延迟结算，切换周期时保持当前可见集合；将红包页面、Modal、Toast 和 Storybook 交互统一迁移到 `redpacket.*` 正式翻译键。
+- 影响范围：`@liberfi.io/ui-tokens` 的热门、股票及新币 Widget 可见行生命周期，`@liberfi.io/ui-redpacket` 的展示文案键，以及对应测试和 Storybook；不修改 Portfolio、Channels、Predict、K 线、后端接口或应用路由。
+- 验证计划：覆盖 100 条列表仅订阅 12 条可见行、滚动后释放离场 6 条并新增 6 条、1m 实时价格/交易数/涨跌幅合并、24h→1m 周期切换保持订阅、红包 canonical key；运行目标包 test/typecheck/lint、Storybook test/typecheck、全仓 test、whitespace 和敏感信息扫描。
+- 预期推送状态：先创建 React SDK 本地提交和 DEX 工作记录提交，暂不推送、不发布 npm、不部署 Vercel；禁止 force push。
+- Workflow 策略：本轮本地提交不触发 GitHub Actions、React SDK `Release` 或 Vercel workflow。
+
+## 2026-09-06：首页可见行情实时刷新与红包国际化修复（提交后）
+
+- 仓库与分支：`react-sdk/main`、`dex-nextjs-template/main`。
+- React SDK 提交：`8c980d37e` — `fix(ui): restore realtime lists and redpacket translations`。
+- 最终完成事项：热门与股票列表在榜单级 WebSocket 无消息时，改由当前可见行的 Token runtime 补充实时价格与统计更新；100 条列表测试只保留 12 条可见订阅，滚动换区时释放离场 6 条并新增 6 条。周期切换不再清空已结算可见集合，新币、股票、热门三类 Widget 均覆盖 24h→1m 后继续订阅。红包首页、创建、历史、Modal、Toast、单测与 Storybook 已全部改用 `redpacket.*` 正式翻译键。
+- 影响范围：只涉及 React SDK 的 Token 列表可见行生命周期与红包展示文案；未修改 DEX 应用源码、Portfolio、Channels、Predict、K 线、后端 contract 或路由。
+- 验证结果：React SDK 全仓 31/31 测试任务通过；Token 可见订阅 5 个 suite 共 13 项、红包 2 个 suite 共 5 项通过；`ui-tokens`、`ui-redpacket`、Storybook typecheck 通过，目标包 lint、whitespace、敏感信息扫描通过。全仓 typecheck 仍被本次 diff 之外的 `ui-tradingview` 三处既有测试 fixture 缺少 `chartIndex` 拦住。代码 Standards/Spec 双轴复查无阻塞问题。Chrome 已用于生产问题复现；本地整站首次编译两次超过 5 分钟且持续高资源占用，已安全停止，未把未完成的浏览器回归计为通过。
+- 推送状态：React SDK 与本工作记录均仅创建本地提交，尚未推送；未发布 npm、未更新 DEX 依赖、未部署 Vercel，未使用 force push。
+- Workflow 状态：未触发 GitHub Actions、React SDK `Release` 或 Vercel workflow。
