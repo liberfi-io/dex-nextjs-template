@@ -1949,3 +1949,17 @@
 - 验证计划：确认实际解析到 `ui-media-track@0.1.288`，并复跑 DEX 完整发布门禁；推送后以第二次 Vercel Production 成功结果作为最终部署基线。
 - 预期推送状态：提交后 fast-forward 推送 `main`，禁止 force push。
 - Workflow 策略：允许触发一次最终 `Deploy to Vercel`；最终部署报告使用 `[skip ci]` 提交。
+
+## 2026-09-06：首页实时行情与红包国际化正式发布（提交后）
+
+- 仓库与分支：`react-sdk/main`、`dex-nextjs-template/main`。
+- React SDK 发布：业务提交 `8c980d37e` — `fix(ui): restore realtime lists and redpacket translations` 已推送到 `main`；Release workflow `34002612555`、job `101404067144` 成功，release commit 为 `0e137f495`。
+- npm 发布结果：npm 官方 registry 已确认 `@liberfi.io/ui-tokens@3.0.93`、`@liberfi.io/ui-redpacket@1.0.20`、`@liberfi.io/react-redpacket@0.1.20`、`@liberfi.io/i18n@0.1.290`、`@liberfi.io/ui-media-track@0.1.288` 可安装；React SDK 本地已拉取 release commit 并与远端 `main` 对齐。
+- DEX 提交：`6890436` — `chore(deps): adopt realtime list and redpacket sdk release`；`0220689` — `chore(deps): complete liberfi release version sync`。全部 LiberFi 直接依赖已同步到本次 release，`@chainstream-io/sdk` 保持收敛在 `2.1.28`。
+- 最终完成事项：首页热门与股票列表获得可见行实时刷新能力，同时继续保留列表级订阅和 30 秒 HTTP 兜底；红包页面、创建、历史、Modal 与 Toast 使用正式国际化键；延迟传播的 MediaTrack 版本也已完整同步到消费端。
+- 本地验证结果：DEX frozen install、Web 全量 56/56 套件共 251/251 项、14/14 项构建 contract、typecheck、lint、production build 与 whitespace 检查全部通过。构建仅保留既有 Browserslist、PostCSS calc、Sentry/OpenTelemetry 静态分析提示，没有阻塞错误。
+- Vercel 结果：最终 `Deploy to Vercel` workflow `34003576399`、job `101406645318` 成功，总用时 6 分 23 秒；最终 Production deployment 为 `https://liberfi-ccewj64h4-sgt-lab.vercel.app`，正式域名 `https://app.liberfi.io/` 已返回最新版本。
+- 线上路由验收：首页、Discover、Pulse、Token 详情、红包首页与创建页、Portfolio、Perpetuals、Channels、MediaTrack、Predict Events 均返回 HTTP 200。
+- Chrome 交互验收：首页实际渲染 15 条可见行，连续观察 12 秒有 6 条可见行发生行情变化，确认实时刷新恢复；红包页显示“紅包”“創建紅包”“領取紅包”等国际化文案，未发现 `extend.redpacket.*` 或 `redpacket.*` 原始键。
+- 推送状态：React SDK 与 DEX 业务提交均已 fast-forward 推送到远端 `main`，未使用 force push。
+- Workflow 说明：React SDK Release 与最终 Vercel Production workflow 均成功；Node.js 20 弃用 annotation 为现有非阻塞提示。本条报告提交使用 `[skip ci]`，避免重复触发 Vercel。
