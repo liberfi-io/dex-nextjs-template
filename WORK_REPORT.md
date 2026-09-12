@@ -1997,3 +1997,24 @@
 - Workflow 策略：push main 触发一次 `Deploy to Vercel` Production；部署成功后以 `[skip ci]` 提交追加最终工作记录，避免重复部署。Release 的 Node.js deprecation annotation 仅记录为提示。
 - 发布构建最终结果：正式 npm 依赖下 `USE_LOCAL_SDK=false pnpm build` 通过（1/1 任务，1 分 16 秒）；临时目录最初使用外部 node_modules 软链接导致 standalone trace 路径错误，改用独立依赖副本并清理该临时目录失败产物后通过，未修改生产配置。更新依赖后的 265 项测试、14 项构建契约、typecheck 与 frozen install 均通过。
 - 构建隔离恢复记录：临时 standalone 产物清理经 pnpm workspace 链接意外删除原 `apps/web` 内容，提交前 Git 检查及时发现，未提交任何删除。已从保留完整修改的临时镜像恢复全部源码、环境文件和新增测试，重装 frozen 依赖；复核 Git 仅有本次预期变更，恢复后的 265 项测试、14 项构建契约与 typecheck 再次通过。后续不再使用该临时产物触发清理或构建。
+
+## 2026-09-12：BSC 单链网站部署（提交后）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 实际提交：`d92ca3e` — `fix(chains): deploy BSC-only market experience`。
+- 完成事项：BSC 链入口、旧缓存/URL/环境默认兼容及全部 24 个 LiberFi 发布依赖已提交，提交内容无无关删除。
+- 验证结果：生产构建通过；265 项测试、14 项构建契约、typecheck、lint、frozen install、whitespace 通过；工作区恢复后测试和类型检查再次通过。
+- 推送状态：即将 fast-forward 推送 main，禁止 force push。
+- Workflow 结果：等待 push 触发 `Deploy to Vercel`，将在完成后追加部署 URL、run id 与线上验收结果。
+
+## 2026-09-12：BSC 单链正式上线（最终结果）
+
+- 仓库与分支：`react-sdk/main`、`dex-nextjs-template/main`，业务提交均已 fast-forward 推送，未使用 force push。
+- React SDK：`993ca737a` — `fix(chains): default market selection to BSC`；Release `34659735461`、job `103459548368` 成功；release commit `51c619cda` — `chore: release packages` 已拉取到本地。
+- npm 结果：全部 24 个消费者包已同步，关键版本 `@liberfi.io/ui-chain-select@2.0.93`、`@liberfi.io/ui-tokens@3.0.94`、`@liberfi.io/ui-trade@3.0.94`、`@liberfi.io/ui-launchpad@1.0.21`、`@liberfi.io/types@0.4.94`、`@liberfi.io/client@0.3.108`、`@liberfi.io/react@0.3.108` 经官方 registry 确认且安装成功；Chainstream 保持 `2.1.28`。
+- DEX：`d92ca3e` — `fix(chains): deploy BSC-only market experience`。网站仅提供 BSC 行情链；旧缓存与 URL 回退，默认详情兼容旧环境变量并进入 WBNB，避免打开页面无数据。
+- 验证结果：SDK 发布构建 24/24 任务通过；网站正式 npm 依赖生产构建通过；网站 265 项测试、14 项构建配置检查、typecheck、lint、frozen install、whitespace 通过。构建镜像误删事故已完整恢复并复验，Git 无意外删除；本地开发服务恢复，首页 HTTP 200。
+- Vercel：`Deploy to Vercel` workflow `34660745253` 第 2 次运行、job `103463631215` 成功。第 1 次 job `103462536700` 构建成功但上传 73MB 产物时出现 `fetch failed / Upload aborted`，重跑同一提交后上传及 Production 部署成功。
+- Production URL：`https://liberfi-8p55aypmn-sgt-lab.vercel.app`；正式域名 `https://app.liberfi.io/`。
+- 线上验收：首页默认 BSC，展开链菜单仅显示 BSC，WBNB/USDT/USDC 等行情已渲染；`?chain=sol` 自动规范化为 `?chain=bsc`；`/tokens` 自动跳转 BSC/WBNB；首页、Pulse 和 BSC 详情路由均 HTTP 200。
+- Workflow 状态：Release 与最终 Vercel 部署均成功；Node.js deprecation annotation 为非阻塞提示。本条报告使用 `[skip ci]` 单独提交，不重复触发部署。
