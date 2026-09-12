@@ -1,5 +1,5 @@
 import { Chain } from "@liberfi.io/types";
-import { chainIdBySlug } from "@liberfi.io/utils";
+import { chainIdBySlug, getWrappedToken } from "@liberfi.io/utils";
 
 export enum AppRoute {
   home = "/",
@@ -54,7 +54,18 @@ export function tokenDetailRoute(
   return `${pathname}?${searchParams.toString()}`;
 }
 
-/** Parse `/tokens/[[...slug]]`. Empty or unknown chain is null so the page can redirect. */
+/** Resolve legacy default-token settings to an available BSC token. */
+export function defaultTokenDetailRoute(chain?: string, address?: string): string {
+  const configuredBscToken = tokenDetailChainSegment(chain) === "bsc"
+    && typeof address === "string"
+    && /^0x[0-9a-fA-F]{40}$/.test(address);
+  return tokenDetailRoute(
+    Chain.BINANCE,
+    configuredBscToken ? address : getWrappedToken(Chain.BINANCE)!.address,
+  );
+}
+
+/** Parse `/tokens/[[...slug]]`. Unsupported chains redirect to the BSC default. */
 export function resolveTokenRouteSlug(
   slug: unknown,
 ): { chainId: Chain; address: string } | null {
@@ -64,6 +75,6 @@ export function resolveTokenRouteSlug(
   if (typeof chain !== "string" || chain.length === 0) return null;
   if (typeof address !== "string" || address.length === 0) return null;
   const chainId = chainIdBySlug(chain);
-  if (!chainId) return null;
+  if (chainId !== Chain.BINANCE) return null;
   return { chainId, address };
 }

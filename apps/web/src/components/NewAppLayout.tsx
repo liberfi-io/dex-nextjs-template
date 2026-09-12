@@ -467,7 +467,7 @@ function PageShellContent({ children }: PropsWithChildren) {
                     wallet (which funds Polymarket / Kalshi deposits) without
                     leaving the predict experience. */}
               <ChainSelectDropdown
-                candidates={[Chain.SOLANA, Chain.ETHEREUM, Chain.BINANCE]}
+                candidates={[Chain.BINANCE]}
                 onSwitchChain={switchChain}
                 onSelectChain={handleHeaderSelectChain}
                 onSuccess={(c) => {

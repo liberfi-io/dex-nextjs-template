@@ -49,8 +49,9 @@ describe("S6-03 token/trade app adapters", () => {
     expect(resolveTokenRouteSlug([])).toBeNull();
     expect(resolveTokenRouteSlug(["sol"])).toBeNull();
     expect(resolveTokenRouteSlug(["not-a-chain", "mint"])).toBeNull();
-    expect(resolveTokenRouteSlug(["sol", "mint"])).toEqual({
-      chainId: Chain.SOLANA,
+    expect(resolveTokenRouteSlug(["sol", "mint"])).toBeNull();
+    expect(resolveTokenRouteSlug(["bsc", "mint"])).toEqual({
+      chainId: Chain.BINANCE,
       address: "mint",
     });
   });

@@ -1963,3 +1963,37 @@
 - Chrome 交互验收：首页实际渲染 15 条可见行，连续观察 12 秒有 6 条可见行发生行情变化，确认实时刷新恢复；红包页显示“紅包”“創建紅包”“領取紅包”等国际化文案，未发现 `extend.redpacket.*` 或 `redpacket.*` 原始键。
 - 推送状态：React SDK 与 DEX 业务提交均已 fast-forward 推送到远端 `main`，未使用 force push。
 - Workflow 说明：React SDK Release 与最终 Vercel Production workflow 均成功；Node.js 20 弃用 annotation 为现有非阻塞提示。本条报告提交使用 `[skip ci]`，避免重复触发 Vercel。
+
+## 2026-09-12：BSC 单链行情发布（React SDK 提交前）
+
+- 仓库与分支：`react-sdk/main`；工作记录统一保存在 `dex-nextjs-template/main`。
+- 拟用提交标题：`fix(chains): default market selection to BSC`。
+- 问题背景：Chainstream 目前仅保留 BSC 行情，旧默认链及浏览器保存的 Solana/Ethereum 选择会使用户打开页面无数据。
+- 计划完成事项：链选择默认候选项、搜索热门与交易预设统一使用 BSC；旧链缓存回退为 BSC/EVM；同步 Storybook 链选择示例和默认钱包网络。
+- 影响范围：链选择状态、行情搜索默认链、交易预设、Launchpad 内存默认链与演示入口，不升级 Chainstream 依赖。
+- 验证结果与计划：链选择 38 项测试、typecheck、lint 已通过；DEX 联调首页、Pulse、WBNB 详情及旧链 URL 回退通过；发布前 `pnpm build` 24/24 任务通过，whitespace 检查通过。发布后核对官方 npm registry 及消费者 production build。
+- 预期推送状态：提交并 fast-forward 推送 `main`，禁止 force push；发布成功后执行 git pull 同步 release commit。
+- Workflow 策略：push main 触发 React SDK `Release`，成功后同步本次 npm 产物至 DEX 并触发 Vercel Production 部署。
+
+## 2026-09-12：BSC 单链行情发布（React SDK 提交后）
+
+- 仓库与分支：`react-sdk/main`。
+- 实际提交：`993ca737a` — `fix(chains): default market selection to BSC`。
+- 完成事项：BSC 默认行情链、单链候选项、旧链缓存回退与演示配置已提交；两个 Storybook 文件为开发说明文案添加国际化 lint 例外，生产代码规则保持启用。
+- 验证结果：发布构建 24/24 任务通过，目标测试 38 项通过，typecheck/lint/whitespace 通过，提交钩子通过；提交内容已复核。
+- 推送状态：提交完成，随后推送远端 main。
+- Workflow 结果：等待 push 触发 `Release`，npm 与 release commit 将在成功后补充。
+
+## 2026-09-12：BSC 单链网站部署（提交前）
+
+- 仓库与分支：`dex-nextjs-template/main`。
+- 拟用提交标题：`fix(chains): deploy BSC-only market experience`。
+- 问题背景：Chainstream 仅保留 BSC 数据，需要网站链选择、URL、默认详情与正式 npm 依赖同步生效，避免新用户和保留旧链设置的用户进入空行情页。
+- 已完成 SDK 发布：业务提交 `993ca737a`；Release workflow `34659735461`、job `103459548368` 成功；release commit `51c619cda` 已通过 git pull 同步本地。官方 npm registry 已核对全部 24 个消费者包；关键版本为 `ui-chain-select@2.0.93`、`ui-tokens@3.0.94`、`ui-trade@3.0.94`、`types@0.4.94`、`client@0.3.108`、`react@0.3.108`、`ui-launchpad@1.0.21`。registry 元数据与 tarball 的短暂传播延迟已恢复，正式依赖安装及 frozen install 成功。
+- 计划完成事项：首页、Pulse、交易预设仅提供 BSC；钱包默认网络使用 BSC；旧链 URL 规范化为 BSC，旧链详情入口与旧环境默认代币回退 BSC/WBNB；同步 24 个 LiberFi 依赖版本与 lockfile。补齐原有 Solana 路由测试的新契约。
+- 影响范围：DEX 行情入口、默认网络、链选择与依赖树；`@chainstream-io/sdk` 保持 `2.1.28`。
+- 验证结果与计划：本地源码联调首页、Pulse、WBNB 详情显示实际数据，旧链 URL 回退正常；265 项测试及 14 项构建契约、typecheck、lint 通过；正式 npm 依赖下再次运行测试/typecheck，并在临时镜像目录以 `USE_LOCAL_SDK=false pnpm build` 验证发布构建，避免干扰现有 dev server；提交前检查 whitespace，部署后验证正式首页链选择与行情。
+- 预期推送状态：提交完成后 fast-forward 推送 main，不使用 force push。
+- Workflow 策略：push main 触发一次 `Deploy to Vercel` Production；部署成功后以 `[skip ci]` 提交追加最终工作记录，避免重复部署。Release 的 Node.js deprecation annotation 仅记录为提示。
+- 发布构建最终结果：正式 npm 依赖下 `USE_LOCAL_SDK=false pnpm build` 通过（1/1 任务，1 分 16 秒）；临时目录最初使用外部 node_modules 软链接导致 standalone trace 路径错误，改用独立依赖副本并清理该临时目录失败产物后通过，未修改生产配置。更新依赖后的 265 项测试、14 项构建契约、typecheck 与 frozen install 均通过。
+- 构建隔离恢复记录：临时 standalone 产物清理经 pnpm workspace 链接意外删除原 `apps/web` 内容，提交前 Git 检查及时发现，未提交任何删除。已从保留完整修改的临时镜像恢复全部源码、环境文件和新增测试，重装 frozen 依赖；复核 Git 仅有本次预期变更，恢复后的 265 项测试、14 项构建契约与 typecheck 再次通过。后续不再使用该临时产物触发清理或构建。
