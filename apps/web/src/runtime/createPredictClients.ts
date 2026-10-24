@@ -19,7 +19,10 @@ export type PredictRuntimeConfig = Pick<
 
 const DEFAULT_PREDICT_CLIENT_FACTORIES: PredictClientFactories = {
   createPredict: (endpoint) => new PredictClient(endpoint, { headers: () => predictApiHeaders() }),
-  createPredictWs: (config) => createPredictWsClient({ ...config, apiKey: () => process.env.NEXT_PUBLIC_PREDICT_API_KEY ?? "" }),
+  createPredictWs: (config) => {
+    const authenticatedConfig = { ...config, apiKey: () => process.env.NEXT_PUBLIC_PREDICT_API_KEY ?? "" };
+    return createPredictWsClient(authenticatedConfig);
+  },
 };
 
 export function createPredictClients(
