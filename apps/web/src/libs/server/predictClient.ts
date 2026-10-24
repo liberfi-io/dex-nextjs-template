@@ -1,3 +1,4 @@
+import { predictApiHeaders } from "src/libs/predictApiHeaders";
 import { createPredictClient } from "@liberfi.io/react-predict/server";
 
 /**
@@ -8,5 +9,5 @@ import { createPredictClient } from "@liberfi.io/react-predict/server";
  * `NEXT_PUBLIC_PREDICT_URL`.
  */
 export function getServerPredictClient() {
-  return createPredictClient(process.env.PREDICT_URL!);
+  return createPredictClient(process.env.PREDICT_URL!, { headers: () => predictApiHeaders() });
 }
