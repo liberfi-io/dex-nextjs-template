@@ -2052,3 +2052,23 @@
 - 完成事项与范围：部署前只读检查已配置团队/项目的 API 访问，失败时输出错误类别和该团队可见项目清单，不输出部署令牌或业务凭证。
 - 验证计划：检查workflow格式、推送并查看只读诊断；生产prediction-server强制鉴权暂缓，待客户端部署完成。
 - 推送状态与workflow：本次推送功能分支及main，触发既有Vercel流程；后续追加诊断和发布结果。
+
+## 2026-10-24：发布状态与本地部署切换（提交后）
+
+- 仓库与分支：SDK及DEX / codex/unified-prediction-api-auth。SDK发布提交 b82582de6、react-predict@0.3.93及workflow40075742268已确认成功。DEX a673470 锁定SDK并通过生产构建，f5f3b73增加只读访问诊断，均已推送功能分支及main。
+- DEX生产workflow40076307163、40076418353均未部署成功：Vercel API明确403，现有Token无sgt-lab团队权限，线上仍为原版本。
+- 用户要求改为本地部署；本机Vercel CLI65.2.0已准备，缺少有效Vercel认证，已创建权限0600的本地空凭证模板并请用户填写；报告不保存原始Token/API Key。
+- Prediction模板新版本生产workflow40076306091成功，但主服务暂缓强制鉴权以保护现有DEX调用；为保持旧钱包Relayer兼容，原版本恢复workflow40076698135正在运行。服务主版本仍v0.0.232；内部openapi-server v0.0.36已成功发布。
+- 服务端功能CI40075851533成功，staging40076109569仍在执行。生产迁移79和两条独立摘要凭证已配置；文档包已校验，不含真实凭证。真实资金联调未执行。
+
+## 2026-10-24：Prediction 统一 API 生产发布完成
+
+- 仓库与分支：react-sdk、dex-nextjs-template / codex/unified-prediction-api-auth；服务端 / codex/prediction-partner-api；所有业务源码已推送对应功能分支和main。
+- SDK：react-predict@0.3.93 官方 npm 已验证；Release workflow 40075742268 成功；release commit b82582de6 已拉取。SDK 87测试及24项构建通过。
+- 自有前端按用户要求改为本地 Vercel 发布。Prediction 生产部署 dpl_F4PoQ9E2iyGFEmBSUhPaETpc5z41；DEX 生产部署 dpl_GPZ88YZz6WGiHnU4bek87Ga86Hnx；正式域名分别为 predict.liberfi.io 和 app.liberfi.io。两者生产构建、正式首页和 BFF 调用通过，已配置自有 API Key。
+- 本地 DEX 构建修正：原 .env.local 被文件追踪列为依赖而触发上传拒绝。最终构建临时隔离开发环境，仅使用拉取的生产配置；发布后原文件恢复，两个应用的生产函数输出均不含 .env 文件。没有把本地环境文件或原始凭证提交仓库。
+- 主服务：代码70f62ce、文档35729b9，生产v0.0.233；AWS新加坡ECS发布workflow40078962216成功，生产迁移79已应用。沿用内部ALB及既有公网网关，不新增公网服务端口。
+- 内部代理：openapi-server v0.0.36 workflow40075859998成功；验收发现旧专用ALB DNS已删除。保留现有镜像，将生产上游修复为 https://api.liberfi.io/prediction，任务revision53稳定，携带自有Key查询事件200。配置依据已记录在openapi-server文档提交d77b251。
+- 生产验收：自有/伙伴Key均200；缺失/错误Key均401；事件缓存命中后缺失/错误Key仍401；旧前缀404；任意签名代理仍需内部Bearer；非法relay目标400；浏览器CORS预检通过；两个自有BFF及内部代理200。伙伴日志可按身份查询，抽查未包含原始Key。
+- 凭证和交付：生产与staging配置独立自有/伙伴摘要凭证，原始值仅单独交付；文档包含中文接入流程和自动生成Swagger契约，不含真实Key。真实资金下单、提现、赎回未执行。
+- 后续发布方式：用户选择前端本地部署；旧DEX Actions Vercel Token的团队403未修改。AWS主服务仍使用已验证的既有发布流程。仅维护本报告的提交使用[skip ci]，不重复部署。
