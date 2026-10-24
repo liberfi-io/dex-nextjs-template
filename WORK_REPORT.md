@@ -2018,3 +2018,29 @@
 - Production URL：`https://liberfi-8p55aypmn-sgt-lab.vercel.app`；正式域名 `https://app.liberfi.io/`。
 - 线上验收：首页默认 BSC，展开链菜单仅显示 BSC，WBNB/USDT/USDC 等行情已渲染；`?chain=sol` 自动规范化为 `?chain=bsc`；`/tokens` 自动跳转 BSC/WBNB；首页、Pulse 和 BSC 详情路由均 HTTP 200。
 - Workflow 状态：Release 与最终 Vercel 部署均成功；Node.js deprecation annotation 为非阻塞提示。本条报告使用 `[skip ci]` 单独提交，不重复触发部署。
+
+## 2026-10-24：Prediction 统一 API 鉴权（发布准备）
+
+- 仓库与分支：react-sdk、dex-nextjs-template / codex/unified-prediction-api-auth。
+- 背景：prediction-server 统一 `/api/v1` 并要求自有与伙伴均携带 X-API-Key，避免切换造成自有业务中断。
+- 已完成提交：SDK `e0a55de9e` 修复全部 HTTP 方法的默认请求头和 WS 首消息认证，`988ba5abc` 合并远端现有超时/错误处理；DEX `efe4a03` 接入调用凭证，`baaddbd` 合并远端模块拆分，`e69221c` 保持发布过渡类型兼容。合并时保留远端当前业务。
+- 验证：SDK 87 测试、24项发布构建通过；DEX鉴权/工厂9测试、typecheck通过；本地源码模式联调已完成。原始凭证不进入代码或报告。
+- 推送：SDK 功能分支及main已推送，Release workflow 40075742268；DEX功能分支已推送，main尚未切换。
+- 后续提交计划：仅锁定本次新发布 react-predict 版本与 lockfile，保留其他依赖；拟用标题 `chore(predict): consume authenticated prediction client release`。验证 frozen install、类型、测试和生产构建后部署，workflow注入已配置的仓库Secret。
+- Workflow策略：SDK通过既有Release发布；DEX main推送触发既有Vercel生产流程。完成后追加实际版本、提交和线上验证结果。
+
+## 2026-10-24：Prediction 发布构建修正（提交前）
+
+- 仓库与分支：dex-nextjs-template / codex/unified-prediction-api-auth。
+- 拟用提交标题：`chore(predict): consume authenticated prediction client release`。
+- 背景与完成事项：官方 npm 已确认 react-predict@0.3.93；精确锁定该依赖及 lockfile。发布构建发现 Relayer 转发改造后遗留未使用常量，移除该常量，不改变请求行为。
+- 影响范围：Prediction HTTP/WS 认证和钱包部署/授权转发；保留远端现有模块拆分，不升级无关业务。
+- 验证：更新后类型检查及9项鉴权/客户端测试通过；清理常量后重跑完整发布构建。推送计划为功能分支后 fast-forward main；既有Vercel workflow注入Secret并发布。SDK Release 40075742268 成功，release commit b82582de6已通过git pull同步。
+
+## 2026-10-24：Prediction 发布构建结果（提交前补充）
+
+- 仓库与分支：dex-nextjs-template / codex/unified-prediction-api-auth。
+- 拟用提交：`chore(predict): consume authenticated prediction client release`。
+- 完成事项：精确依赖 react-predict@0.3.93，保留其他依赖范围，修复遗留未使用常量；生产与构建通过既有Secret注入API Key。
+- 验证结果：正式npm依赖下9测试、typecheck、完整生产构建通过。影响仅Prediction接入与钱包Relayer，不改变DEX交易逻辑。
+- 推送状态与workflow：准备推送功能分支及main；main触发Vercel生产部署，成功后核验公开BFF与页面，并追加实际提交及run结果。
