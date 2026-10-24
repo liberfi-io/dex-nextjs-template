@@ -7,8 +7,11 @@ const localSdkRoot = path.resolve(
   process.env.LOCAL_SDK_ROOT || "../../../react-sdk",
 );
 const fs = require("fs");
-const useLocalSdk = process.env.USE_LOCAL_SDK === "true";
-const unpublishedSdkMapper = useLocalSdk
+const useLocalSdk =
+  process.env.USE_LOCAL_SDK === "true" &&
+  process.env.NODE_ENV !== "production" &&
+  fs.existsSync(path.join(localSdkRoot, "packages"));
+const localSdkMapper = useLocalSdk
   ? {
       "^@liberfi.io/react-launchpad$": path.join(
         localSdkRoot,
@@ -37,6 +40,10 @@ const localI18nMapper =
   useLocalSdk && fs.existsSync(localI18nSrc)
     ? {
         "^@liberfi.io/i18n$": localI18nSrc,
+        "^@liberfi.io/i18n/server$": path.join(
+          localSdkRoot,
+          "packages/i18n/src/server.ts",
+        ),
       }
     : {};
 
@@ -46,7 +53,7 @@ module.exports = createJestConfig({
   testMatch: ["<rootDir>/src/**/*.test.{ts,tsx}", "<rootDir>/src/**/*.spec.{ts,tsx}"],
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
   moduleNameMapper: {
-    ...unpublishedSdkMapper,
+    ...localSdkMapper,
     ...localI18nMapper,
     "^@/(.*)$": "<rootDir>/src/$1",
     "^lodash-es$": "lodash",

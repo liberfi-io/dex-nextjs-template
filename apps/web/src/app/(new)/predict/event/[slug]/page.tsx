@@ -1,0 +1,355 @@
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+import type { PredictEvent, ProviderSource } from "@liberfi.io/react-predict";
+import { eventQueryKey, fetchEvent } from "@liberfi.io/react-predict/server";
+import { notFound, redirect } from "next/navigation";
+import { PredictDetailPage } from "src/components/page/PredictDetailPage";
+import {
+  SportsMatchDetailPage,
+  SportsMatchDetailSkeleton,
+} from "src/features/sports/components/SportsMatchDetailPage";
+import { createSportsSsrDeadline } from "src/features/sports/route/sportsSsrDeadline";
+import {
+  resolveSportsEventRoute,
+  type SportsRoutingResult,
+  type SportsSection,
+} from "src/features/sports/route/resolveSportsEventRoute";
+import type { SportsMatchDetail } from "src/features/sports/types";
+import { WorldCupDetailPage } from "src/features/worldcup/components/detail/WorldCupDetailPage";
+import { isWorldcupMarketCode } from "src/features/worldcup/components/detail/deepLink";
+import { fetchWorldcupMatchEvent } from "src/features/worldcup/data/client";
+import {
+  resolveWorldcupEventAttribution,
+  selectWorldcupMarketSlugForEvent,
+} from "src/features/worldcup/data/resolve-event-attribution";
+import {
+  prefetchWorldcupMatchEvent,
+  prefetchWorldcupMatches,
+} from "src/features/worldcup/data/prefetch";
+import { detectLanguage } from "src/i18n/detectLanguage";
+import { mapToApiLang } from "src/i18n/locales";
+import { getPredictionLocaleContext } from "src/i18n/predictionLocaleContext";
+import {
+  MARKET_DATA_FEATURE_CAPABILITY,
+  resolveSportsFeatureFlags,
+} from "src/libs/featureFlags";
+import { getServerPredictClient } from "src/libs/server/predictClient";
+import {
+  getEventMarketDataHydration,
+  getSportsMatchMarketDataHydration,
+} from "src/features/market-data/server";
+import { createServerQueryClient } from "src/libs/server/queryClient";
+import { predictionHref } from "src/components/prediction-navigation";
+
+interface PageProps {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ market?: string; outcome?: string }>;
+}
+
+const PREFETCH_TIMEOUT_MS = 3000;
+const SOURCE_PRIORITY = ["polymarket", "kalshi"] as const;
+
+type ResolvedPredictEvent = {
+  event: PredictEvent;
+  source: ProviderSource;
+  lang: string;
+};
+
+type RuntimeSportsClient = {
+  getSportsRouting?: (
+    slug: string,
+    params?: { lang?: string },
+  ) => Promise<SportsRoutingResult>;
+  getSportsMatchDetail?: (
+    section: SportsSection,
+    matchGroupSlug: string,
+    params?: { lang?: string },
+  ) => Promise<SportsMatchDetail>;
+};
+
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error("prefetch timeout")), timeoutMs),
+    ),
+  ]);
+}
+
+function isNotFoundLikeError(error: unknown): boolean {
+  const status =
+    typeof error === "object" && error !== null && "status" in error
+      ? Number((error as { status?: unknown }).status)
+      : undefined;
+  if (status === 404) return true;
+  if (status && status >= 500) return false;
+
+  const message = error instanceof Error ? error.message.toLowerCase() : "";
+  if (!message) return false;
+  if (
+    message.includes("internal server error") ||
+    message.includes("bad gateway") ||
+    message.includes("service unavailable") ||
+    message.includes("gateway timeout") ||
+    /\b5\d\d\b/.test(message)
+  ) {
+    return false;
+  }
+  return message.includes("not found") || /\b404\b/.test(message);
+}
+
+async function resolvePredictEventBySlug(
+  slug: string,
+): Promise<ResolvedPredictEvent | null> {
+  const { lang, requestHeaders } = await getPredictionLocaleContext();
+  const client = getServerPredictClient({ headers: requestHeaders });
+
+  for (const source of SOURCE_PRIORITY) {
+    try {
+      const event = await fetchEvent(client, slug, source, lang);
+      if (event.slug === slug) return { event, source, lang };
+    } catch (error) {
+      if (isNotFoundLikeError(error)) continue;
+      throw error;
+    }
+  }
+  return null;
+}
+
+function canonicalWorldcupHref(
+  matchSlug: string,
+  marketSlug?: string | null,
+  outcome?: string | null,
+) {
+  const params = new URLSearchParams();
+  if (marketSlug) params.set("market", marketSlug);
+  if (outcome) params.set("outcome", outcome);
+  const qs = params.toString();
+  return `/predict/event/${encodeURIComponent(matchSlug)}${qs ? `?${qs}` : ""}`;
+}
+
+async function renderWorldcupMatchPage(
+  slug: string,
+  market: string | null,
+  outcome: string | null,
+) {
+  const lang = mapToApiLang(await detectLanguage());
+  const queryClient = createServerQueryClient();
+
+  await withTimeout(
+    Promise.all([
+      prefetchWorldcupMatchEvent(queryClient, slug, lang),
+      prefetchWorldcupMatches(queryClient, lang),
+    ]),
+    PREFETCH_TIMEOUT_MS,
+  ).catch(() => {});
+
+  const isCode = market ? isWorldcupMarketCode(market) : false;
+  const initialMarket = isCode ? market : null;
+  const initialMarketSlug = !isCode ? market : null;
+
+  return (
+    <div className="w-full pb-4 lg:pb-16">
+      <div className="w-full px-3 pt-4 sm:px-6">
+        <HydrationBoundary state={dehydrate(queryClient)}>
+          <WorldCupDetailPage
+            id={slug}
+            initialMarket={initialMarket}
+            initialMarketSlug={initialMarketSlug}
+            initialOutcome={outcome}
+          />
+        </HydrationBoundary>
+      </div>
+    </div>
+  );
+}
+
+export default async function Page({ params, searchParams }: PageProps) {
+  const { slug } = await params;
+  const { market = null, outcome = null } = await searchParams;
+  const search = new URLSearchParams();
+  if (market) search.set("market", market);
+  if (outcome) search.set("outcome", outcome);
+
+  const worldcupAttribution = resolveWorldcupEventAttribution(slug);
+  if (worldcupAttribution?.kind === "match") {
+    return renderWorldcupMatchPage(
+      worldcupAttribution.matchSlug,
+      market,
+      outcome,
+    );
+  }
+
+  if (worldcupAttribution?.kind === "event") {
+    const base = process.env.PREDICT_URL;
+    if (!base) {
+      redirect(
+        canonicalWorldcupHref(worldcupAttribution.matchSlug, null, outcome),
+      );
+    }
+
+    const lang = mapToApiLang(await detectLanguage());
+    const event = await fetchWorldcupMatchEvent(
+      base,
+      worldcupAttribution.matchSlug,
+      lang,
+    ).catch(() => null);
+    const marketSlug = event
+      ? selectWorldcupMarketSlugForEvent(
+          event,
+          worldcupAttribution.sourceEventSlug,
+        )
+      : null;
+    redirect(
+      canonicalWorldcupHref(worldcupAttribution.matchSlug, marketSlug, outcome),
+    );
+  }
+
+  const localeContext = await getPredictionLocaleContext();
+  const client = getServerPredictClient({
+    headers: localeContext.requestHeaders,
+  });
+  const sportsClient = client as unknown as RuntimeSportsClient;
+  const deadline = createSportsSsrDeadline(PREFETCH_TIMEOUT_MS);
+  const fallbackCache: { resolved: ResolvedPredictEvent | null } = {
+    resolved: null,
+  };
+  const sportsRoute = await resolveSportsEventRoute({
+    slug,
+    searchParams: search,
+    lang: localeContext.lang,
+    flags: resolveSportsFeatureFlags(process.env),
+    deadline,
+    resolveWorldcupAttribution: () => null,
+    fetchSportsRouting: (_slug, lang) =>
+      sportsClient.getSportsRouting?.(_slug, { lang }) ?? Promise.resolve(null),
+    fetchFallbackEvent: async (_slug) => {
+      const resolved = await resolvePredictEventBySlug(_slug);
+      fallbackCache.resolved = resolved;
+      return resolved ? { event_slug: resolved.event.slug } : null;
+    },
+    fetchSportsMatchDetail: (section, matchGroupSlug, lang) =>
+      sportsClient.getSportsMatchDetail?.(section, matchGroupSlug, { lang }) ??
+      Promise.resolve(null),
+  });
+
+  if (sportsRoute.kind === "sports_child_redirect") {
+    redirect(predictionHref(sportsRoute.redirect_to));
+  }
+
+  if (sportsRoute.kind === "sports_match") {
+    const match = sportsRoute.detail as SportsMatchDetail;
+    const selectedSportsBook =
+      market && (outcome === "yes" || outcome === "no")
+        ? [
+            ...(match.inline_markets ?? []),
+            ...(match.market_groups ?? []).flatMap(
+              (group) => group.markets ?? [],
+            ),
+          ]
+            .find((candidate) => candidate.market_slug === market)
+            ?.outcomes?.find((candidate) => candidate.outcome === outcome)
+            ?.orderbook
+        : undefined;
+    const marketDataHydration = await withTimeout(
+      getSportsMatchMarketDataHydration({
+        enabled: MARKET_DATA_FEATURE_CAPABILITY.enabled,
+        match,
+        lang: localeContext.lang,
+        requestHeaders: localeContext.requestHeaders,
+        selectedBook: selectedSportsBook
+          ? {
+              source: selectedSportsBook.source,
+              marketSlug: selectedSportsBook.market_slug,
+              outcomeKey: selectedSportsBook.outcome,
+              displayOutcome: outcome as "yes" | "no",
+            }
+          : undefined,
+      }),
+      PREFETCH_TIMEOUT_MS,
+    ).catch(() => undefined);
+    return (
+      <SportsMatchDetailPage
+        match={marketDataHydration?.match ?? match}
+        initialMarketSlug={market}
+        initialOutcome={normalizeSportsOutcome(outcome)}
+        marketDataCapability={MARKET_DATA_FEATURE_CAPABILITY}
+        marketDataResource={marketDataHydration?.resource}
+      />
+    );
+  }
+
+  if (sportsRoute.kind === "sports_match_skeleton") {
+    return (
+      <SportsMatchDetailSkeleton
+        matchGroupSlug={sportsRoute.match_group_slug}
+        section={sportsRoute.section}
+        initialMarketSlug={market}
+        initialOutcome={normalizeSportsOutcome(outcome)}
+        marketDataCapability={MARKET_DATA_FEATURE_CAPABILITY}
+      />
+    );
+  }
+
+  if (sportsRoute.kind === "not_found") {
+    notFound();
+  }
+
+  const queryClient = createServerQueryClient();
+  const eventSlug =
+    sportsRoute.kind === "sports_prop" || sportsRoute.kind === "fallback_event"
+      ? sportsRoute.event_slug
+      : slug;
+  const resolved =
+    fallbackCache.resolved?.event.slug === eventSlug
+      ? fallbackCache.resolved
+      : await withTimeout(
+          resolvePredictEventBySlug(eventSlug),
+          PREFETCH_TIMEOUT_MS,
+        );
+  if (!resolved) notFound();
+
+  const selectedEventMarket = market
+    ? resolved.event.markets?.find((candidate) => candidate.slug === market)
+    : undefined;
+  const selectedEventOutcome =
+    outcome === "yes"
+      ? selectedEventMarket?.outcomes[0]
+      : outcome === "no"
+        ? selectedEventMarket?.outcomes[1]
+        : undefined;
+  const marketDataHydration = await withTimeout(
+    getEventMarketDataHydration({
+      enabled: MARKET_DATA_FEATURE_CAPABILITY.enabled,
+      event: resolved.event,
+      requestHeaders: localeContext.requestHeaders,
+      selectedBook:
+        selectedEventMarket && selectedEventOutcome
+          ? {
+              source: selectedEventMarket.source,
+              marketSlug: selectedEventMarket.slug,
+              outcomeKey: selectedEventOutcome.key,
+            }
+          : undefined,
+    }),
+    PREFETCH_TIMEOUT_MS,
+  ).catch(() => undefined);
+  queryClient.setQueryData(
+    eventQueryKey(eventSlug, resolved.source, resolved.lang),
+    marketDataHydration?.event ?? resolved.event,
+  );
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <PredictDetailPage
+        id={eventSlug}
+        source={resolved.source}
+        marketDataCapability={MARKET_DATA_FEATURE_CAPABILITY}
+        marketDataResource={marketDataHydration?.resource}
+      />
+    </HydrationBoundary>
+  );
+}
+
+function normalizeSportsOutcome(outcome: string | null): "yes" | "no" | null {
+  return outcome === "yes" || outcome === "no" ? outcome : null;
+}

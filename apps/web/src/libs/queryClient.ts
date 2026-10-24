@@ -13,7 +13,6 @@ export const queryClient = new QueryClient({
       // 429s we're trying to avoid. Per-query overrides remain
       // available where polling is the only option.
       refetchOnReconnect: false,
-      placeholderData: (prev: unknown) => prev,
     },
   },
 });

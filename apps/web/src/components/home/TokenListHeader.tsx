@@ -1,6 +1,14 @@
 import { useTranslation } from "@liberfi.io/i18n";
 import { Chain, SOLANA_TOKEN_PROTOCOLS } from "@liberfi.io/types";
-import { cn, ChevronUpIcon, SettingsIcon, StyledBadge, Button, StyledPlainTabs, Tab } from "@liberfi.io/ui";
+import {
+  cn,
+  ChevronUpIcon,
+  SettingsIcon,
+  StyledBadge,
+  Button,
+  StyledPlainTabs,
+  Tab,
+} from "@liberfi.io/ui";
 import {
   TokenListFilterModal,
   TokenListFilterPopover,
@@ -15,7 +23,6 @@ import { INSTANT_TRADE_AMOUNT_ID } from "../../application/swapFees";
 import { useOpenPresetForm } from "../../application/useOpenPresetForm";
 import { QuickAmountPresetInputWidget } from "../QuickAmountPresetInput";
 import { Key, useCallback, useMemo, useState } from "react";
-
 
 export type TokenListHeaderProps = {
   /** token list type */
@@ -65,11 +72,9 @@ export function TokenListHeader({
           onSelectionChange={onTypeChange as (key: Key) => void}
           classNames={{ tabContent: "text-base sm:text-xl" }}
         >
-          <Tab key="trending" title={t("extend.token_list.discover.trending")} />
+          <Tab key="trending" title={t("token_list.discover.trending")} />
           {/* only show stocks tab on solana */}
-          {chainId === Chain.SOLANA && (
-            <Tab key="stocks" title={t("extend.token_list.types.stocks")} />
-          )}
+          {chainId === Chain.SOLANA && <Tab key="stocks" title={t("token_list.types.stocks")} />}
         </StyledPlainTabs>
 
         {/* desktop filters & resolution selector etc... */}
@@ -107,7 +112,7 @@ export function TokenListHeader({
           radius="full"
           onPress={handleSettingsMenuToggle}
           className={cn(
-            "sm:hidden border-border text-neutral",
+            "sm:hidden border-border text-text-muted",
             isSettingsMenuOpen && "w-8 min-w-8 h-8 min-h-8 p-0",
           )}
           startContent={
@@ -130,7 +135,7 @@ export function TokenListHeader({
           {isSettingsMenuOpen ? (
             <ChevronUpIcon width={18} height={18} />
           ) : (
-            <span className="text-neutral">{t("trade.preset.short", { n: 1 })}</span>
+            <span className="text-text-muted">{t("trade.preset.short", { n: 1 })}</span>
           )}
         </Button>
       </div>

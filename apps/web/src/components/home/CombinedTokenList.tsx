@@ -20,7 +20,6 @@ import {
 import { chainDisplayName, getNativeToken, txExplorerUrl } from "@liberfi.io/utils";
 import { useSwitchEvmWalletsToChain } from "@liberfi.io/wallet-connector";
 import { useChainSwitchUrlHandler } from "../../hooks/useChainSwitchUrlHandler";
-import { useAsyncModal } from "@liberfi.io/ui-scaffold";
 import {
   AmountPresetInputWidget,
   InstantTradeSwapProvider,
@@ -31,6 +30,16 @@ import {
 import { tokenDetailRoute } from "../../application/routes";
 import { QuickAmountPresetInputWidget } from "../QuickAmountPresetInput";
 import { InstantTradeListButton } from "./InstantTradeListButton";
+import { getTradeErrorToastMessage } from "../../application/trade-error-toast";
+import { DiscoverTokenListMeasurementGate } from "./DiscoverTokenListSkeleton";
+import { useDeferredAsyncModal } from "../modals/DeferredAsyncModalHost";
+import { loadPresetFormModal } from "../modals/modal-loaders";
+import { PRESET_FORM_MODAL_ID } from "../modals/modal-contracts";
+import {
+  markHomepageCriticalPath,
+  observeHomepageFirstTokenRow,
+  observeHomepageRankingResources,
+} from "../../application/performance/homepageCriticalPath";
 
 type ListTab = "trending" | "stocks" | "new";
 
@@ -70,18 +79,32 @@ export function CombinedTokenList() {
   const ref = useRef<HTMLDivElement>(null);
   const { height } = useResizeObserver<HTMLDivElement>({ ref });
 
+  useEffect(() => {
+    markHomepageCriticalPath("hydration_executable");
+    const stopRankingObserver = observeHomepageRankingResources();
+    const stopFirstRowObserver = observeHomepageFirstTokenRow(ref.current);
+    return () => {
+      stopRankingObserver();
+      stopFirstRowObserver();
+    };
+  }, []);
+
   const [filters, setFilters] = useState<TokenListFiltersType | undefined>();
   const [resolution, setResolution] = useState<TokenListResolution>("24h");
 
   const { tabs, activeTab, setActiveTab } = useTabs(chain);
   const nativeToken = useMemo(() => getNativeToken(chain), [chain]);
 
-  const { onOpen: openPresetModal } = useAsyncModal<PresetFormModalParams>("preset");
+  const { onOpen: openPresetModal } =
+    useDeferredAsyncModal<PresetFormModalParams>(
+      PRESET_FORM_MODAL_ID,
+      loadPresetFormModal,
+    );
   const handlePresetClick = useCallback(
     (preset: number) => {
       openPresetModal({
         params: {
-          chains: [Chain.SOLANA, Chain.ETHEREUM, Chain.BINANCE],
+          chains: [Chain.BINANCE],
           defaultChain: chain,
           defaultDirection: "buy",
           defaultPresetIndex: preset,
@@ -93,11 +116,7 @@ export function CombinedTokenList() {
 
   const handleSwapError = useCallback(
     (error: Error, phase: SwapPhase) => {
-      const phaseLabel = t(`trade.swap.phase.${phase}`);
-      const message = error.message
-        ? t("trade.swap.error", { phase: phaseLabel, reason: error.message })
-        : t("trade.swap.errorUnknown", { phase: phaseLabel });
-      toast.error(message);
+      toast.error(getTradeErrorToastMessage(error, phase, t));
     },
     [t],
   );
@@ -168,78 +187,88 @@ export function CombinedTokenList() {
     [router, chain],
   );
 
-  const tokenListContent = useMemo(() => {
-    const commonProps = { chain, resolution, filters, height };
+  const renderTokenListContent = useCallback(
+    (listHeight: number) => {
+      const commonProps = { chain, resolution, filters, height: listHeight };
 
-    switch (activeTab) {
-      case "trending":
-        return (
-          <TrendingTokenListWidget
-            {...commonProps}
-            onSelectToken={handleSelectToken}
-            ActionsComponent={({ token }) => (
-              <div className="w-full h-full flex items-center justify-end">
-                {nativeToken && (
-                  <InstantTradeListButton
-                    id="token-list"
-                    chain={chain}
-                    token={nativeToken}
-                    output={token.address}
-                    size="sm"
-                    radius="full"
-                    className="w-auto"
-                  />
-                )}
-              </div>
-            )}
-          />
-        );
-      case "stocks":
-        return (
-          <StockTokenListWidget
-            {...commonProps}
-            onSelectToken={handleSelectToken}
-            ActionsComponent={({ token }) => (
-              <div className="w-full h-full flex items-center justify-end">
-                {nativeToken && (
-                  <InstantTradeListButton
-                    id="token-list"
-                    chain={chain}
-                    token={nativeToken}
-                    output={token.address}
-                    size="sm"
-                    radius="full"
-                    className="w-auto"
-                  />
-                )}
-              </div>
-            )}
-          />
-        );
-      case "new":
-        return (
-          <NewTokenListWidget
-            {...commonProps}
-            onSelectToken={handleSelectToken}
-            ActionsComponent={({ token }) => (
-              <div className="w-full h-full flex items-center justify-end">
-                {nativeToken && (
-                  <InstantTradeListButton
-                    id="token-list"
-                    chain={chain}
-                    token={nativeToken}
-                    output={token.address}
-                    size="sm"
-                    radius="full"
-                    className="w-auto"
-                  />
-                )}
-              </div>
-            )}
-          />
-        );
-    }
-  }, [activeTab, chain, resolution, filters, height, nativeToken, handleSelectToken]);
+      switch (activeTab) {
+        case "trending":
+          return (
+            <TrendingTokenListWidget
+              {...commonProps}
+              onSelectToken={handleSelectToken}
+              ActionsComponent={({ token }) => (
+                <div className="w-full h-full flex items-center justify-end">
+                  {nativeToken && (
+                    <InstantTradeListButton
+                      id="token-list"
+                      chain={chain}
+                      token={nativeToken}
+                      output={token.address}
+                      size="sm"
+                      radius="full"
+                      className="w-auto"
+                    />
+                  )}
+                </div>
+              )}
+            />
+          );
+        case "stocks":
+          return (
+            <StockTokenListWidget
+              {...commonProps}
+              onSelectToken={handleSelectToken}
+              ActionsComponent={({ token }) => (
+                <div className="w-full h-full flex items-center justify-end">
+                  {nativeToken && (
+                    <InstantTradeListButton
+                      id="token-list"
+                      chain={chain}
+                      token={nativeToken}
+                      output={token.address}
+                      size="sm"
+                      radius="full"
+                      className="w-auto"
+                    />
+                  )}
+                </div>
+              )}
+            />
+          );
+        case "new":
+          return (
+            <NewTokenListWidget
+              {...commonProps}
+              onSelectToken={handleSelectToken}
+              ActionsComponent={({ token }) => (
+                <div className="w-full h-full flex items-center justify-end">
+                  {nativeToken && (
+                    <InstantTradeListButton
+                      id="token-list"
+                      chain={chain}
+                      token={nativeToken}
+                      output={token.address}
+                      size="sm"
+                      radius="full"
+                      className="w-auto"
+                    />
+                  )}
+                </div>
+              )}
+            />
+          );
+      }
+    },
+    [
+      activeTab,
+      chain,
+      filters,
+      handleSelectToken,
+      nativeToken,
+      resolution,
+    ],
+  );
 
   return (
     <InstantTradeSwapProvider
@@ -273,7 +302,7 @@ export function CombinedTokenList() {
                       "text-sm sm:text-base font-medium transition-all cursor-pointer",
                       activeTab === tab
                         ? "text-foreground hover:opacity-70"
-                        : "text-zinc-500 hover:text-zinc-300",
+                        : "text-text-muted hover:text-text-secondary",
                     )}
                   >
                     {t(TAB_I18N_KEYS[tab])}
@@ -286,7 +315,7 @@ export function CombinedTokenList() {
                   size="sm"
                   className="sm:hidden"
                   onSwitchChain={switchChain}
-                  candidates={[Chain.SOLANA, Chain.ETHEREUM, Chain.BINANCE]}
+                  candidates={[Chain.BINANCE]}
                   onSuccess={(c) => {
                     onChainSwitchedUrl(c);
                     toast.success(
@@ -352,7 +381,9 @@ export function CombinedTokenList() {
           </div>
 
           <div className="w-full flex-auto flex flex-col min-h-0" ref={ref}>
-            {tokenListContent}
+            <DiscoverTokenListMeasurementGate height={height}>
+              {renderTokenListContent}
+            </DiscoverTokenListMeasurementGate>
           </div>
         </div>
       </div>

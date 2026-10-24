@@ -45,8 +45,8 @@ export function QuickAmountPresetInputUI({
     <div
       className={cn("relative flex items-center rounded-full h-8 pr-2", className)}
       style={{
-        border: "1px solid rgba(63,63,70,0.5)",
-        background: "rgba(39,39,42,0.6)",
+        border: "1px solid var(--color-border-control)",
+        background: "hsl(var(--heroui-content3) / 0.6)",
       }}
     >
       <StyledNumberInput
@@ -73,7 +73,7 @@ export function QuickAmountPresetInputUI({
       />
       <div
         className="w-px self-stretch my-1.5 mx-0 flex-none"
-        style={{ background: "rgba(63,63,70,0.5)" }}
+        style={{ background: "hsl(var(--heroui-content4) / 0.5)" }}
       />
       <StyledLightTabs
         color="primary"
@@ -101,7 +101,7 @@ export function QuickAmountPresetInputUI({
                 }
                 classNames={{
                   content:
-                    "!p-0 !rounded-[14px] !border !border-[rgba(39,39,42,1)] !bg-[rgba(24,24,27,1)] !shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)]",
+                    "!p-0 !rounded-[14px] !border !border-border-control !bg-surface-interactive !shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)]",
                 }}
                 offset={12}
               >
@@ -175,7 +175,7 @@ function QuickPresetTooltip({
     <div className="flex flex-col py-2">
       <div
         className="flex items-center gap-1.5 px-3 pb-2 mb-1"
-        style={{ borderBottom: "1px solid rgba(39,39,42,1)" }}
+        style={{ borderBottom: "1px solid var(--color-border-control)" }}
       >
         <span className="text-xs font-semibold text-foreground">{label}</span>
       </div>
@@ -210,9 +210,9 @@ function QuickPresetTooltip({
         label={t("trade.preset.antiMev")}
         value={t(`trade.preset.antiMev.${antiMev}`)}
         valueClassName={cn(
-          antiMev === "off" && "text-zinc-500",
+          antiMev === "off" && "text-text-muted",
           antiMev === "reduced" && "text-amber-400",
-          antiMev === "secure" && "text-emerald-400",
+          antiMev === "secure" && "text-success",
         )}
       />
     </div>
@@ -232,7 +232,7 @@ function QuickPresetTooltipRow({
 }) {
   return (
     <div className="flex items-center justify-between gap-6 px-3 py-1">
-      <span className="flex items-center gap-1.5 text-zinc-500 text-xs">
+      <span className="flex items-center gap-1.5 text-text-muted text-xs">
         {icon}
         <span>{label}</span>
       </span>

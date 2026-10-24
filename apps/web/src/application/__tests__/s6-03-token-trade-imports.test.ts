@@ -36,6 +36,9 @@ function collectImports(specifier: string): string[] {
 describe("S6-03 token/trade app adapters", () => {
   it("builds token detail routes without @liberfi/ui-dex", () => {
     expect(tokenDetailRoute(Chain.SOLANA, "mint")).toBe("/tokens/sol/mint");
+    expect(tokenDetailRoute(Chain.SOLANA, "mint", { source: "pulse" })).toBe(
+      "/tokens/sol/mint?source=pulse",
+    );
     expect(tokenDetailRoute("ethereum", "0xabc")).toBe("/tokens/eth/0xabc");
     expect(tokenDetailChainSegment("bnb")).toBe("bsc");
     expect(AppRoute.trade).toBe("/tokens");
@@ -46,8 +49,9 @@ describe("S6-03 token/trade app adapters", () => {
     expect(resolveTokenRouteSlug([])).toBeNull();
     expect(resolveTokenRouteSlug(["sol"])).toBeNull();
     expect(resolveTokenRouteSlug(["not-a-chain", "mint"])).toBeNull();
-    expect(resolveTokenRouteSlug(["sol", "mint"])).toEqual({
-      chainId: Chain.SOLANA,
+    expect(resolveTokenRouteSlug(["sol", "mint"])).toBeNull();
+    expect(resolveTokenRouteSlug(["bsc", "mint"])).toEqual({
+      chainId: Chain.BINANCE,
       address: "mint",
     });
   });
@@ -103,7 +107,7 @@ describe("S6-03 token/trade app adapters", () => {
     expect(collectImports("@liberfi/ui-dex")).not.toEqual(
       expect.arrayContaining([
         "components/BottomTweets.tsx",
-        "components/BottomSolPrice.tsx",
+        "components/BottomPrimaryTokenPrice.tsx",
         "components/MediaTrackPage.tsx",
         "components/home/TokenListHeader.tsx",
         "components/home/InstantBuy2.tsx",
@@ -115,12 +119,12 @@ describe("S6-03 token/trade app adapters", () => {
     );
   });
 
-  it("reads the toolbar SOL quote through the SDK token query", () => {
+  it("reads the toolbar native-token quote through the SDK token query", () => {
     expect(collectImports("@liberfi/ui-dex")).not.toEqual(
-      expect.arrayContaining(["components/BottomSolPrice.tsx"]),
+      expect.arrayContaining(["components/BottomPrimaryTokenPrice.tsx"]),
     );
     expect(collectImports("@liberfi.io/react")).toEqual(
-      expect.arrayContaining(["application/useSolQuotePrice.ts"]),
+      expect.arrayContaining(["application/usePrimaryTokenQuotePrice.ts"]),
     );
   });
 
@@ -159,4 +163,3 @@ describe("S6-03 token/trade app adapters", () => {
     );
   });
 });
-

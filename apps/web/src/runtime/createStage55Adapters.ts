@@ -1,4 +1,4 @@
-import type { ChainStreamClient } from "@chainstream-io/sdk";
+import type { ChainStreamClient, CreateTokenInput } from "@chainstream-io/sdk";
 import { Chain } from "@liberfi.io/types";
 import {
   createLaunchpadCreateRuntime,
@@ -38,10 +38,14 @@ export type Stage55SendTxParams = {
 } & Record<string, unknown>;
 
 export type Stage55LaunchpadPorts = {
-  createToken: (intent: CreateTokenIntent) => Promise<{ serializedTx?: string }>;
+  createToken: (
+    intent: CreateTokenIntent,
+    userAddress: string,
+  ) => Promise<{ serializedTx: string; mintAddress?: string }>;
   createRuntime: (options?: {
     upload?: LaunchpadUploadPort;
     signer?: LaunchpadSignerPort;
+    userAddress?: string;
     onChange?: (snapshot: import("@liberfi.io/react-launchpad").LaunchpadCreateSnapshot) => void;
   }) => LaunchpadCreateRuntime;
 };
@@ -85,18 +89,24 @@ export type Stage55Adapters = {
 
 /**
  * Template-owned launchpad ports. ChainStream DTO stays here.
- * Unpublished `@liberfi.io/react-launchpad` is resolved via local-sdk
- * aliases until the package is published.
+ * Explicit local SDK mode may resolve the package to source during development.
  */
 export function createStage55LaunchpadPorts(
   client: ChainStreamClient,
 ): Stage55LaunchpadPorts {
-  const createToken = async (intent: CreateTokenIntent) =>
-    client.dex.createToken(chainParam(intent.chain), {
+  const createToken = async (
+    intent: CreateTokenIntent,
+    userAddress: string,
+  ) => {
+    const input: CreateTokenInput = {
+      dex: intent.platform,
+      userAddress,
       name: intent.name,
       symbol: intent.symbol,
-      ...(intent.imageUri ? { imageUri: intent.imageUri } : {}),
-    } as Parameters<ChainStreamClient["dex"]["createToken"]>[1]);
+      ...(intent.imageUri ? { image: intent.imageUri } : {}),
+    };
+    return client.dex.createToken(chainParam(intent.chain), input);
+  };
 
   return {
     createToken,
@@ -106,10 +116,19 @@ export function createStage55LaunchpadPorts(
         signer: options.signer,
         onChange: options.onChange,
         execution: {
+          async prepare(intent) {
+            if (!options.userAddress) {
+              throw new Error("missing user address");
+            }
+            const result = await createToken(intent, options.userAddress);
+            return { serializedTx: result.serializedTx };
+          },
           async submit(signed, intent) {
-            void signed;
-            const result = await createToken(intent);
-            return { txHash: result.serializedTx ?? "tx" };
+            const result = await client.transaction.send(
+              chainParam(intent.chain),
+              { signedTx: signed },
+            );
+            return { txHash: result.signature };
           },
         },
       }),
@@ -118,7 +137,7 @@ export function createStage55LaunchpadPorts(
 
 /**
  * Template-owned redpacket ports. Share URLs use the application origin.
- * Unpublished `@liberfi.io/react-redpacket` is resolved via local-sdk.
+ * Explicit local SDK mode may resolve the package to source during development.
  */
 export function createStage55RedpacketPorts(
   client: ChainStreamClient,

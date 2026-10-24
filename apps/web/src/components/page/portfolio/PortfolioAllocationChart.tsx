@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import { Skeleton } from "@heroui/react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Sector } from "recharts";
 import type { PieSectorDataItem } from "recharts/types/polar/Pie";
 import { useWalletPortfoliosQuery } from "@liberfi.io/react";
@@ -23,7 +24,7 @@ const MAX_SLICES = 8;
  */
 const ALLOCATION_COLORS = [
   "#bcff2e",
-  "#f76816",
+  "var(--color-negative)",
   "#9353d3",
   "#f31260",
   "#006FEE",
@@ -70,10 +71,7 @@ export function PortfolioAllocationChart({
 }: PortfolioAllocationChartProps) {
   const { t } = useTranslation();
   const enabled = !!address;
-  const { data, isPending } = useWalletPortfoliosQuery(
-    { chain, address, limit: 100 },
-    { enabled },
-  );
+  const { data, isPending } = useWalletPortfoliosQuery({ chain, address, limit: 100 }, { enabled });
 
   const slices = useMemo<AllocationSlice[]>(() => {
     if (!data) return [];
@@ -89,7 +87,7 @@ export function PortfolioAllocationChart({
   if (!enabled) {
     return (
       <ChartShell className={className}>
-        <EmptyState message={t("extend.portfolio.allocation.noWallet")} />
+        <EmptyState message={t("portfolio.allocation.noWallet")} />
       </ChartShell>
     );
   }
@@ -105,14 +103,14 @@ export function PortfolioAllocationChart({
   if (slices.length === 0) {
     return (
       <ChartShell className={className}>
-        <EmptyState message={t("extend.portfolio.allocation.noHoldings")} />
+        <EmptyState message={t("portfolio.allocation.noHoldings")} />
       </ChartShell>
     );
   }
 
   return (
     <ChartShell className={className}>
-      <div className="flex h-full w-full items-center gap-4 lg:gap-6">
+      <div className="flex h-full w-full flex-col items-center justify-center gap-2 sm:flex-row sm:gap-6">
         {/* Pie */}
         <div className="relative h-[200px] w-[200px] shrink-0">
           <ResponsiveContainer>
@@ -131,11 +129,7 @@ export function PortfolioAllocationChart({
                 activeShape={ActiveSlice}
               >
                 {slices.map((slice) => (
-                  <Cell
-                    key={slice.key}
-                    fill={slice.color}
-                    stroke={slice.color}
-                  />
+                  <Cell key={slice.key} fill={slice.color} stroke={slice.color} />
                 ))}
               </Pie>
             </PieChart>
@@ -143,17 +137,15 @@ export function PortfolioAllocationChart({
         </div>
 
         {/* Legend */}
-        <ul className="flex flex-1 min-w-0 flex-col gap-1.5">
+        <ul className="flex w-full max-w-[260px] min-w-0 flex-none flex-col gap-1.5">
           {slices.map((slice, index) => (
             <li key={slice.key}>
               <button
                 type="button"
                 onClick={() => setActiveIndex(index)}
                 className={cn(
-                  "w-full flex items-center justify-between gap-2 px-2 py-1.5 rounded-md text-left transition-colors cursor-pointer",
-                  index === activeIndex
-                    ? "bg-default-100"
-                    : "hover:bg-default-50",
+                  "grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-4 rounded-md px-2 py-1.5 text-left transition-colors cursor-pointer",
+                  index === activeIndex ? "bg-default-100" : "hover:bg-default-50",
                 )}
               >
                 <span className="flex min-w-0 items-center gap-2">
@@ -162,14 +154,12 @@ export function PortfolioAllocationChart({
                     className="h-2 w-2 rounded-full shrink-0"
                     style={{ backgroundColor: slice.color }}
                   />
-                  <span className="truncate text-xs font-medium text-foreground">
-                    {slice.name}
-                  </span>
-                  <span className="shrink-0 text-[11px] text-default-400 tabular-nums">
+                  <span className="truncate text-xs font-medium text-foreground">{slice.name}</span>
+                  <span className="shrink-0 text-[11px] text-text-muted tabular-nums">
                     {slice.formattedPercentage}
                   </span>
                 </span>
-                <span className="text-xs tabular-nums text-default-500">
+                <span className="text-xs tabular-nums text-text-muted">
                   {slice.formattedValue}
                 </span>
               </button>
@@ -182,13 +172,7 @@ export function PortfolioAllocationChart({
 }
 
 /** Container shared by the chart, loading, and empty states. */
-function ChartShell({
-  className,
-  children,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) {
+function ChartShell({ className, children }: { className?: string; children: React.ReactNode }) {
   const { t } = useTranslation();
   return (
     <section
@@ -197,8 +181,8 @@ function ChartShell({
         className,
       )}
     >
-      <h2 className="mb-3 text-sm font-medium text-default-500">
-        {t("extend.portfolio.allocation.title")}
+      <h2 className="mb-3 text-sm font-medium text-text-muted">
+        {t("portfolio.allocation.title")}
       </h2>
       <div className="min-h-[200px] flex-1">{children}</div>
     </section>
@@ -207,7 +191,7 @@ function ChartShell({
 
 function EmptyState({ message }: { message: string }) {
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center gap-2 py-6 text-default-400">
+    <div className="flex h-full w-full flex-col items-center justify-center gap-2 py-6 text-text-muted">
       <EmptyIcon width={36} height={36} />
       <span className="text-xs">{message}</span>
     </div>
@@ -217,17 +201,28 @@ function EmptyState({ message }: { message: string }) {
 /** Renders when the chart is loading and there is no cached data yet. */
 export function PortfolioAllocationChartLoadingBody() {
   return (
-    <div className="flex h-full w-full items-center gap-4 lg:gap-6 animate-pulse">
-      <div className="relative h-[200px] w-[200px] shrink-0 rounded-full border-[16px] border-default-100" />
-      <ul className="flex flex-1 min-w-0 flex-col gap-2">
+    <div className="flex h-full w-full flex-col items-center justify-center gap-2 sm:flex-row sm:gap-6 animate-pulse">
+      <div
+        data-testid="portfolio-allocation-donut-skeleton"
+        className="relative h-[200px] w-[200px] shrink-0 rounded-full"
+      >
+        <Skeleton className="absolute inset-0 rounded-full">
+          <div className="h-[200px] w-[200px]" />
+        </Skeleton>
+        <div
+          data-testid="portfolio-allocation-donut-hole"
+          className="absolute inset-[32px] rounded-full bg-content1"
+        />
+      </div>
+      <ul className="flex w-full max-w-[260px] min-w-0 flex-none flex-col gap-2">
         {[...Array(5)].map((_, i) => (
           <li
             key={i}
-            className="flex items-center gap-2 rounded-md px-2 py-1.5"
+            className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-md px-2 py-1.5"
           >
             <span className="h-2 w-2 rounded-full bg-default-200" />
             <span className="h-3 w-20 rounded bg-default-200" />
-            <span className="h-3 w-12 rounded bg-default-100 ml-auto" />
+            <span className="h-3 w-12 rounded bg-default-100" />
           </li>
         ))}
       </ul>
@@ -235,10 +230,18 @@ export function PortfolioAllocationChartLoadingBody() {
   );
 }
 
+/** Standalone loading card shared by authentication and portfolio data loading. */
+export function PortfolioAllocationChartSkeleton() {
+  return (
+    <ChartShell>
+      <PortfolioAllocationChartLoadingBody />
+    </ChartShell>
+  );
+}
+
 /** Highlighted-slice renderer. Pulls the active slice slightly outward. */
 function ActiveSlice(props: PieSectorDataItem) {
-  const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } =
-    props;
+  const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props;
   return (
     <Sector
       cx={cx}
@@ -264,9 +267,7 @@ function ActiveSlice(props: PieSectorDataItem) {
  *      holdings, in which case all holdings get their own slice.
  *   4. Compute percentages against the total of the kept slices.
  */
-function computeAllocationSlices(
-  portfolios: ReadonlyArray<Portfolio>,
-): AllocationSlice[] {
+function computeAllocationSlices(portfolios: ReadonlyArray<Portfolio>): AllocationSlice[] {
   const positive = portfolios
     .map((p) => ({ portfolio: p, value: parseFloat(p.amountInUsd ?? "0") }))
     .filter((row) => row.value > 0)

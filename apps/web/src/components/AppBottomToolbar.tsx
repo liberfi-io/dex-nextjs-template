@@ -11,15 +11,26 @@ import {
   TwitterIcon,
   UserGuideIcon,
 } from "@liberfi.io/ui";
-import { ScaffoldToolbar, useAsyncModal, useDraggableDisclosure } from "@liberfi.io/ui-scaffold";
+import { ScaffoldToolbar, useDraggableDisclosure } from "@liberfi.io/ui-scaffold";
 import { useCallback, useMemo } from "react";
 import { BottomToolBarWallet } from "./BottomToolBarWallet";
 import { BottomNetworkStatus } from "./BottomNetworkStatus";
-import { BottomSolPrice } from "./BottomSolPrice";
+import { BottomPrimaryTokenPrice } from "./BottomPrimaryTokenPrice";
 import { PresetFormModalParams, useInstantTradeAmount } from "@liberfi.io/ui-trade";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import { getNativeToken } from "@liberfi.io/utils";
 import { Chain } from "@liberfi.io/types";
+import { useDeferredAsyncModal } from "./modals/DeferredAsyncModalHost";
+import { loadPresetFormModal } from "./modals/modal-loaders";
+import { PRESET_FORM_MODAL_ID } from "./modals/modal-contracts";
+
+type SelectionAwarePresetFormModalParams = PresetFormModalParams & {
+  onPresetIndexChange?: (chain: Chain, presetIndex: number) => void;
+};
+
+type WritableInstantTradeAmount = ReturnType<typeof useInstantTradeAmount> & {
+  setPreset: (preset: number) => void;
+};
 
 /**
  * Bottom toolbar content for the new Scaffold layout.
@@ -33,24 +44,38 @@ export function AppBottomToolbar() {
 
   const nativeToken = useMemo(() => getNativeToken(chain), [chain]);
 
-  const { preset } = useInstantTradeAmount({
+  const { preset, setPreset } = useInstantTradeAmount({
     id: "token-list",
-    chain: chain,
+    chain,
     tokenAddress: nativeToken?.address ?? "",
-  });
+  }) as WritableInstantTradeAmount;
 
-  const { onOpen: openPresetModal } = useAsyncModal<PresetFormModalParams>("preset");
+  const { onOpen: openPresetModal } =
+    useDeferredAsyncModal<SelectionAwarePresetFormModalParams>(
+      PRESET_FORM_MODAL_ID,
+      loadPresetFormModal,
+    );
+
+  const handleModalPresetIndexChange = useCallback(
+    (presetChain: Chain, nextPreset: number) => {
+      if (presetChain === chain) {
+        setPreset(nextPreset);
+      }
+    },
+    [chain, setPreset],
+  );
 
   const handlePresetClick = useCallback(() => {
     openPresetModal({
       params: {
-        chains: [Chain.SOLANA, Chain.ETHEREUM, Chain.BINANCE],
+        chains: [Chain.BINANCE],
         defaultChain: chain,
         defaultDirection: "buy",
         defaultPresetIndex: preset,
+        onPresetIndexChange: handleModalPresetIndexChange,
       },
     });
-  }, [openPresetModal, chain, preset]);
+  }, [openPresetModal, chain, preset, handleModalPresetIndexChange]);
 
   const { onOpen: onOpenMediaTrack } = useDraggableDisclosure("mediaTrack");
   const { onOpen: onOpenAICopilot } = useDraggableDisclosure("aiCopilot");
@@ -63,7 +88,11 @@ export function AppBottomToolbar() {
         startContent={<SettingsIcon width={16} height={16} />}
         onPress={handlePresetClick}
       >
-        {t(`extend.trade.settings.preset${preset + 1}`)}
+        {t(
+          (["trade.settings.preset1", "trade.settings.preset2", "trade.settings.preset3"] as const)[
+            preset
+          ],
+        )}
       </Button>
 
       <BottomToolBarWallet />
@@ -73,8 +102,8 @@ export function AppBottomToolbar() {
       <StyledTooltip content={t("extend.toolbar.media_track_tooltip")}>
         <Button
           size="sm"
-          className="relative h-6 min-h-0 px-1 gap-1 bg-transparent hover:bg-content1 text-neutral text-xs overflow-visible"
-          startContent={<TwitterIcon width={16} height={16} className="text-neutral" />}
+          className="relative h-6 min-h-0 px-1 gap-1 bg-transparent hover:bg-content1 text-text-muted text-xs overflow-visible"
+          startContent={<TwitterIcon width={16} height={16} className="text-text-muted" />}
           onPress={onOpenMediaTrack}
         >
           {t("extend.toolbar.media_track")}
@@ -85,8 +114,8 @@ export function AppBottomToolbar() {
       <StyledTooltip content={t("extend.toolbar.ai_copilot_tooltip")} closeDelay={0}>
         <Button
           size="sm"
-          className="relative h-6 min-h-0 px-2 gap-1 bg-transparent hover:bg-content1 text-neutral text-xs overflow-visible"
-          startContent={<RobotIcon width={18} height={18} className="text-neutral" />}
+          className="relative h-6 min-h-0 px-2 gap-1 bg-transparent hover:bg-content1 text-text-muted text-xs overflow-visible"
+          startContent={<RobotIcon width={18} height={18} className="text-text-muted" />}
           onPress={onOpenAICopilot}
         >
           {t("extend.toolbar.ai_copilot")}
@@ -95,7 +124,7 @@ export function AppBottomToolbar() {
       </StyledTooltip>
 
       <Divider orientation="vertical" className="h-6 bg-content3" />
-      <BottomSolPrice />
+      <BottomPrimaryTokenPrice />
     </div>
   );
 
@@ -112,7 +141,7 @@ export function AppBottomToolbar() {
           <DiscordIcon
             width={18}
             height={18}
-            className="text-neutral hover:opacity-80 cursor-pointer"
+            className="text-text-muted hover:opacity-80 cursor-pointer"
           />
         </Button>
       </StyledTooltip>
@@ -125,7 +154,7 @@ export function AppBottomToolbar() {
           <TwitterIcon
             width={18}
             height={18}
-            className="text-neutral hover:opacity-80 cursor-pointer"
+            className="text-text-muted hover:opacity-80 cursor-pointer"
           />
         </Button>
       </StyledTooltip>
@@ -133,7 +162,7 @@ export function AppBottomToolbar() {
         <UserGuideIcon
           width={18}
           height={18}
-          className="text-neutral hover:opacity-80 cursor-pointer"
+          className="text-text-muted hover:opacity-80 cursor-pointer"
         />
       </StyledTooltip>
     </div>

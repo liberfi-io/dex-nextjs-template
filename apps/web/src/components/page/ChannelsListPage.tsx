@@ -21,14 +21,18 @@ export function ChannelsListPage() {
         <div className="dot-grid" />
         <div className="relative z-[1] px-4 sm:px-6 pt-6 pb-4 sm:pt-8 sm:pb-5 max-w-[1680px] mx-auto">
           <h1
-            className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-white"
+            className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-text-primary"
             style={{ fontFamily: "var(--font-dm-sans, 'DM Sans', sans-serif)" }}
           >
             {t("extend.nav.channels")}
           </h1>
         </div>
       </div>
-      <div className={cn("w-full h-full px-4 max-sm:px-0 flex flex-col gap-2.5 overflow-y-auto custom-scrollbar")}>
+      <div
+        className={cn(
+          "w-full h-full px-4 max-sm:px-0 flex flex-col gap-2.5 overflow-y-auto custom-scrollbar",
+        )}
+      >
         <ChannelsHomePage
           onCreateChannel={() => {
             router.push("/channels/create");

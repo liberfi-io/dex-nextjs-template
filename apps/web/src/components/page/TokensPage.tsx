@@ -2,7 +2,7 @@
 
 import { useParams, redirect } from "next/navigation";
 import { useMemo } from "react";
-import { resolveTokenRouteSlug, tokenDetailRoute } from "../../application/routes";
+import { resolveTokenRouteSlug, defaultTokenDetailRoute } from "../../application/routes";
 import { TokenTradePage } from "./token-detail/TokenTradePage";
 
 /**
@@ -26,7 +26,7 @@ export function TokensPage() {
 
   if (!resolved) {
     return redirect(
-      tokenDetailRoute(
+      defaultTokenDetailRoute(
         process.env.NEXT_PUBLIC_DEFAULT_TOKEN_CHAIN,
         process.env.NEXT_PUBLIC_DEFAULT_TOKEN_ADDRESS ?? "",
       ),

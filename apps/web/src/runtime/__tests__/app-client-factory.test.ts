@@ -4,17 +4,15 @@ import { createPredictWsClient, PredictClient } from "@liberfi.io/react-predict"
 import { ChannelsClient } from "@liberfi.io/ui-channels/client";
 import { MediaTrackClient } from "@liberfi.io/ui-media-track/client";
 import { HyperliquidPerpetualsClient, LiberFiPerpDepositClient } from "@liberfi.io/ui-perpetuals";
-import { PortfolioClient } from "@liberfi.io/ui-portfolio/client";
-import { AppClientBundle, RuntimeConfig } from "../app-runtime.types";
+import { CoreAppClientBundle, RuntimeConfig } from "../app-runtime.types";
 import {
   createAppClients,
   createChannelsClient,
   createDexClients,
   createMediaTrackClient,
-  createPerpetualsClients,
-  createPortfolioClient,
-  createPredictClients,
 } from "../createAppClients";
+import { createPerpetualsClients } from "../createPerpetualsClients";
+import { createPredictClients } from "../createPredictClients";
 
 const CONFIG: RuntimeConfig = {
   origin: "https://app.example.com",
@@ -30,7 +28,7 @@ const CONFIG: RuntimeConfig = {
 };
 
 describe("application client factory", () => {
-  it("constructs both dex clients from one token provider and endpoint", () => {
+  it("constructs both dex clients from one token provider and keeps portfolio data on ChainStream", () => {
     const tokenProvider = { getToken: async () => "dex-token" };
     const createChainStream = jest.fn(
       (...args: ConstructorParameters<typeof ChainStreamClient>) => new ChainStreamClient(...args),
@@ -46,7 +44,6 @@ describe("application client factory", () => {
     });
     expect(createApi).toHaveBeenCalledWith(tokenProvider, {
       serverUrl: CONFIG.dexAggregatorUrl,
-      nativeBalanceApiUrl: "/api/balance",
     });
   });
 
@@ -85,10 +82,7 @@ describe("application client factory", () => {
     });
   });
 
-  it("constructs portfolio and perpetuals clients without coupling their endpoints", () => {
-    const createPortfolio = jest.fn(
-      (...args: ConstructorParameters<typeof PortfolioClient>) => new PortfolioClient(...args),
-    );
+  it("constructs perpetuals clients inside their route-owned factory", () => {
     const createPerpetuals = jest.fn(
       (...args: ConstructorParameters<typeof HyperliquidPerpetualsClient>) =>
         new HyperliquidPerpetualsClient(...args),
@@ -104,13 +98,11 @@ describe("application client factory", () => {
       perpetualsApiUrl: "https://app.example.com/perpetuals-api",
     };
 
-    createPortfolioClient(configured, { createPortfolio });
     createPerpetualsClients(configured, {
       createPerpetuals,
       createPerpetualDeposit,
     });
 
-    expect(createPortfolio).toHaveBeenCalledWith(CONFIG.dexAggregatorUrl);
     expect(createPerpetuals).toHaveBeenCalledWith({ environment: "mainnet" });
     expect(createPerpetualDeposit).toHaveBeenCalledWith({
       baseUrl: configured.perpetualsApiUrl,
@@ -138,14 +130,9 @@ describe("application client factory", () => {
 
   it("assembles one bundle without copying client instances", () => {
     const dexTokenProvider = { getToken: async () => "dex-token" };
-    const channelsTokenProvider = { getToken: async () => "channels-token" };
     const members = {
       ...createDexClients(CONFIG, dexTokenProvider),
       mediaTrack: createMediaTrackClient(CONFIG, dexTokenProvider),
-      channels: createChannelsClient(CONFIG, channelsTokenProvider),
-      ...createPredictClients(CONFIG),
-      portfolio: createPortfolioClient(CONFIG),
-      ...createPerpetualsClients(CONFIG),
     };
 
     const bundle = createAppClients(members);
@@ -164,12 +151,10 @@ describe("application client factory", () => {
     expect(bundle.capabilities.token).toBe(members.api);
     expect(bundle.capabilities.subscription.token).toBe(members.api);
     expect(Object.values(bundle.capabilities)).not.toContain(bundle.chainStream);
-    expect(bundle.predictWs).toBeNull();
-    expect(bundle.perpetualDeposit).toBeUndefined();
   });
 
   it("rejects a missing required bundle member by name", () => {
-    expect(() => createAppClients({ api: undefined } as unknown as AppClientBundle)).toThrow(
+    expect(() => createAppClients({ api: undefined } as unknown as CoreAppClientBundle)).toThrow(
       "Missing required application client: chainStream",
     );
   });

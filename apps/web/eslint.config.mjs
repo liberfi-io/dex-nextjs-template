@@ -100,7 +100,7 @@ export default [
     },
     rules: {
       ...reactHooksPlugin.configs.recommended.rules,
-      "i18next/no-literal-string": "warn",
+      "i18next/no-literal-string": ["error", { mode: "jsx-text-only" }],
       "jsx-a11y/click-events-have-key-events": "off",
       "jsx-a11y/no-static-element-interactions": "off",
       "react/display-name": "off",
@@ -109,6 +109,12 @@ export default [
       react: {
         version: "detect",
       },
+    },
+  },
+  {
+    files: ["src/app/**/route.test.ts"],
+    rules: {
+      "jsdoc/check-tag-names": ["warn", { definedTags: ["jest-environment"] }],
     },
   },
   { plugins: { "@next/next": nextPlugin } },

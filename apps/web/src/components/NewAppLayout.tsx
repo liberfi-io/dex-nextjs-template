@@ -22,7 +22,8 @@ import {
   useState,
   type ComponentType,
 } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
+import dynamic from "next/dynamic";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Chain, Token } from "@liberfi.io/types";
 import {
@@ -34,19 +35,9 @@ import {
   useLocaleContext,
   type LocaleProviderProps,
 } from "@liberfi.io/i18n";
-import {
-  useAuth,
-  useSwitchEvmWalletsToChain,
-  useWallets,
-  type EvmWalletAdapter,
-} from "@liberfi.io/wallet-connector";
+import { useAuth, useSwitchEvmWalletsToChain } from "@liberfi.io/wallet-connector";
 import { useCurrentChain, useSelectChain } from "@liberfi.io/ui-chain-select";
 import type { PredictEvent } from "@liberfi.io/react-predict";
-import {
-  PredictSearchModal,
-  PREDICT_SEARCH_MODAL_ID,
-  PredictWalletProvider,
-} from "@liberfi.io/ui-predict";
 import { predictEventHref } from "./page/predict-source";
 
 const NoPrefetchLink: LinkComponentType = (props) => <ChainAwareLink prefetch={false} {...props} />;
@@ -77,17 +68,18 @@ import {
   type LinkComponentType,
 } from "@liberfi.io/ui";
 import * as UiScaffold from "@liberfi.io/ui-scaffold";
-import { SEARCH_MODAL_ID, SearchModal } from "@liberfi.io/ui-tokens";
+import { SEARCH_MODAL_ID, type SearchModalParams } from "@liberfi.io/ui-tokens";
 import {
   chainDisplayName,
   formatAmount,
   truncateAddress,
   type PredefinedToken,
 } from "@liberfi.io/utils";
-import { useShellChrome } from "../application/layout-chrome";
-import { tokenDetailRoute } from "../application/routes";
+import { resolveHeaderNavigationKey, useShellChrome } from "../application/layout-chrome";
+import { TOKEN_DETAIL_SOURCE_QUERY_PARAM, tokenDetailRoute } from "../application/routes";
 import { useCreateOnrampWidgetUrlMutation } from "../application/server/useCreateOnrampWidgetUrlMutation";
 import { queryClient } from "../libs/queryClient";
+import { ResolvedLocaleProvider } from "../i18n/ResolvedLocaleProvider";
 import { AuthProviders } from "./AuthProviders";
 import { useChainAwareRouter } from "../hooks/useChainAwareRouter";
 import { useChainUrlSync } from "../hooks/useChainUrlSync";
@@ -97,17 +89,23 @@ import {
   applicationLocaleProviderProps,
   createApplicationLocaleRuntime,
 } from "../runtime/createApplicationLocaleRuntime";
-import { PresetFormModal } from "@liberfi.io/ui-trade";
 import { useAccountInfo } from "@liberfi.io/ui-portfolio";
-import { LaunchPadModal, LAUNCHPAD_MODAL_ID } from "./modals/LaunchPadModal";
 import {
   DEPOSIT_HL_USDC_MODAL_ID,
-  DepositHyperliquidUsdcModal,
-} from "./modals/DepositHyperliquidUsdcModal";
-import { ReceiveModal, RECEIVE_MODAL_ID } from "./modals/ReceiveModal";
-import { WebviewModal } from "./modals/WebviewModal";
-import { WithdrawModal, WITHDRAW_MODAL_ID } from "./modals/WithdrawModal";
-import { useHyperliquidBalances } from "../hooks/useHyperliquidBalances";
+  LAUNCHPAD_MODAL_ID,
+  PREDICT_SEARCH_MODAL_ID,
+  RECEIVE_MODAL_ID,
+  WITHDRAW_MODAL_ID,
+} from "./modals/modal-contracts";
+import { DeferredAsyncModalHost, useDeferredAsyncModal } from "./modals/DeferredAsyncModalHost";
+import {
+  loadDepositHyperliquidUsdcModal,
+  loadLaunchPadModal,
+  loadPredictSearchModal,
+  loadReceiveModal,
+  loadTokenSearchModal,
+  loadWithdrawModal,
+} from "./modals/modal-loaders";
 import { HyperliquidUsdcIcon } from "./icons/HyperliquidUsdcIcon";
 import { CashInOutlinedIcon } from "./icons/CashInOutlinedIcon";
 import { ReceiveOutlinedIcon } from "./icons/ReceiveOutlinedIcon";
@@ -115,12 +113,17 @@ import { SendOutlinedIcon } from "./icons/SendOutlinedIcon";
 // TODO: Re-enable when the Convert (闪兑) flow is ready.
 // import { ConvertOutlinedIcon } from "./icons/ConvertOutlinedIcon";
 import { AppBottomToolbar } from "./AppBottomToolbar";
-import { BottomTweets } from "./BottomTweets";
-import { BottomAICopilot } from "./BottomAICopilot";
-import { PredictBalanceIndicator } from "./PredictBalanceIndicator";
-import { FundWalletModal } from "./FundWalletModal";
+import { BottomTweets, BottomTweetsTitle } from "./BottomTweets";
 import { isPulseSupportedChain } from "../lib/pulse";
-import { AppRuntimeProviders } from "../runtime/AppRuntimeProviders";
+import { AppRuntimeProviders, useMediaTrackRuntimeActivity } from "../runtime/AppRuntimeProviders";
+import {
+  HEADER_CONTROL_CLASS,
+  HEADER_CONTROL_SURFACE_CLASS,
+  HEADER_ICON_CONTROL_CLASS,
+} from "./header-control-theme";
+import { resolveHeaderLanguageOption } from "./header-language-selection";
+import { useHyperliquidHeaderState } from "../runtime/HyperliquidHeaderContext";
+import { isMediaTrackRuntimeActive } from "../runtime/media-track-activity";
 
 const {
   Scaffold,
@@ -128,6 +131,7 @@ const {
   ScaffoldFooter,
   Logo,
   DraggablePanelProvider,
+  useDraggableDisclosure,
 } = UiScaffold;
 type NavItem = UiScaffold.NavItem;
 
@@ -138,8 +142,37 @@ const UnpublishedScaffold = UiScaffold as typeof UiScaffold & {
 };
 const ModalCoordinatorProvider = UnpublishedScaffold.ModalCoordinatorProvider;
 const DraggableStateProvider = UnpublishedScaffold.DraggableStateProvider;
-const useAsyncModal = UiScaffold.useAsyncModal;
-
+const WebviewModal = dynamic(
+  () => import("./modals/WebviewModal").then((module) => module.WebviewModal),
+  { ssr: false },
+);
+const PredictBalanceIndicator = dynamic(
+  () => import("./PredictBalanceIndicator").then((module) => module.PredictBalanceIndicator),
+  { ssr: false },
+);
+const BottomAICopilot = dynamic(
+  () => import("./BottomAICopilot").then((module) => module.BottomAICopilot),
+  { ssr: false },
+);
+const PredictRuntimeProviders = dynamic(
+  () =>
+    import("../runtime/PredictRuntimeProviders").then((module) => module.PredictRuntimeProviders),
+  { ssr: false },
+);
+const PerpetualsRuntimeProviders = dynamic(
+  () =>
+    import("../runtime/PerpetualsRuntimeProviders").then(
+      (module) => module.PerpetualsRuntimeProviders,
+    ),
+  { ssr: false },
+);
+const ChannelsRuntimeProviders = dynamic(
+  () =>
+    import("../runtime/ChannelsRuntimeProviders").then(
+      (module) => module.ChannelsRuntimeProviders,
+    ),
+  { ssr: false },
+);
 const navItemsConfig: Omit<NavItem, "label">[] = [
   { key: "discover", href: "/", icon: <HomeIcon width={20} height={20} /> },
   { key: "pulse", href: "/pulse", icon: <PulseIcon width={20} height={20} /> },
@@ -164,18 +197,17 @@ export function NewAppLayout({ children, locale }: PropsWithChildren<{ locale: L
             locale={locale}
             supportedLanguages={["en", "zh"]}
           >
-            <AppRuntimeProviders>
-              <PageShell>{children}</PageShell>
-              <LaunchPadModal />
-              <DepositHyperliquidUsdcModal />
-              <ReceiveModal />
-              <WithdrawModal />
-              <WebviewModal />
-              <StyledToaster />
-              <SearchModal />
-              <PredictSearchModal />
-              <PresetFormModal />
-            </AppRuntimeProviders>
+            <ResolvedLocaleProvider locale={locale}>
+              <AppRuntimeProviders>
+                <DeferredAsyncModalHost>
+                  <RouteRuntimeProviders>
+                    <PageShell>{children}</PageShell>
+                  </RouteRuntimeProviders>
+                  <WebviewModal />
+                  <StyledToaster />
+                </DeferredAsyncModalHost>
+              </AppRuntimeProviders>
+            </ResolvedLocaleProvider>
           </RuntimeLocaleProvider>
         </AuthProviders>
       </QueryClientProvider>
@@ -183,17 +215,46 @@ export function NewAppLayout({ children, locale }: PropsWithChildren<{ locale: L
   );
 }
 
+function RouteRuntimeProviders({ children }: PropsWithChildren) {
+  const pathname = usePathname();
+
+  if (pathname.startsWith("/predict")) {
+    return <PredictRuntimeProviders>{children}</PredictRuntimeProviders>;
+  }
+  if (pathname.startsWith("/perpetuals")) {
+    return <PerpetualsRuntimeProviders>{children}</PerpetualsRuntimeProviders>;
+  }
+  if (pathname.startsWith("/channels")) {
+    return <ChannelsRuntimeProviders>{children}</ChannelsRuntimeProviders>;
+  }
+  return children;
+}
+
 // ---------------------------------------------------------------------------
 // Page shell (withPage — Scaffold with header / footer)
 // ---------------------------------------------------------------------------
 
 function PageShell({ children }: PropsWithChildren) {
+  return (
+    <DraggableStateProvider>
+      <PageShellContent>{children}</PageShellContent>
+    </DraggableStateProvider>
+  );
+}
+
+function PageShellContent({ children }: PropsWithChildren) {
   useChainUrlSync();
   const { t } = useTranslation();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const router = useChainAwareRouter();
   const { chain } = useCurrentChain();
   const { headerVisible, footerVisible } = useShellChrome();
+  const { isOpen: isMediaTrackOpen } = useDraggableDisclosure("mediaTrack");
+  useMediaTrackRuntimeActivity(isMediaTrackRuntimeActive(pathname, isMediaTrackOpen));
+  const [isMediaTrackPaused, setIsMediaTrackPaused] = useState(false);
+  const tokenDetailSource = searchParams.get(TOKEN_DETAIL_SOURCE_QUERY_PARAM);
+  const activeNavigationKey = resolveHeaderNavigationKey(pathname, tokenDetailSource);
 
   const navItems: NavItem[] = useMemo(
     () =>
@@ -224,9 +285,14 @@ function PageShell({ children }: PropsWithChildren) {
   const isPerpetualsPage = pathname.startsWith("/perpetuals");
   const isAuthenticated = authStatus === "authenticated";
 
-  const { onOpen: openPredictSearch, onClose: closePredictSearch } =
-    useAsyncModal(PREDICT_SEARCH_MODAL_ID);
-  const { onOpen: openTokenSearch, onClose: dismissTokenSearch } = useAsyncModal(SEARCH_MODAL_ID);
+  const { onOpen: openPredictSearch, onClose: closePredictSearch } = useDeferredAsyncModal(
+    PREDICT_SEARCH_MODAL_ID,
+    loadPredictSearchModal,
+  );
+  const { onOpen: openTokenSearch, onClose: dismissTokenSearch } = useDeferredAsyncModal<
+    SearchModalParams,
+    Token
+  >(SEARCH_MODAL_ID, loadTokenSearchModal);
 
   const handlePredictHover = useCallback(
     (event: PredictEvent) => {
@@ -271,9 +337,13 @@ function PageShell({ children }: PropsWithChildren) {
 
   const handleSelectToken = useCallback(
     (token: Token) => {
-      router.push(tokenDetailRoute(token.chain, token.address));
+      router.push(
+        tokenDetailRoute(token.chain, token.address, {
+          source: activeNavigationKey === "pulse" ? "pulse" : undefined,
+        }),
+      );
     },
-    [router],
+    [activeNavigationKey, router],
   );
 
   const openActiveSearch = useCallback(async () => {
@@ -337,97 +407,95 @@ function PageShell({ children }: PropsWithChildren) {
   const searchLabel = t(
     isPredictPage ? "predict.search.placeholder" : "tokens.search.placeholder",
   ) as string;
+  const mediaTrackTitle = t("extend.toolbar.media_track_tooltip") as string;
+  const mediaTrackContent = {
+    id: "mediaTrack",
+    ariaLabel: mediaTrackTitle,
+    title: <BottomTweetsTitle isPaused={isMediaTrackPaused}>{mediaTrackTitle}</BottomTweetsTitle>,
+    children: <BottomTweets onPauseChange={setIsMediaTrackPaused} />,
+    modalMaxWidth: 440,
+    modalMinWidth: 320,
+    panelMinWidth: 320,
+    panelMaxWidth: 440,
+  };
 
   return (
-    <PredictWalletProvider enabled={isPredictPage}>
-      {/* FundWalletModal must live INSIDE PredictWalletProvider because it
-          calls usePredictWallet() during render. Rendering it as a sibling of
-          PageShell (outside the provider) would crash with "usePredictWallet
-          must be used within a PredictWalletProvider" the moment the user
-          opens the deposit dialog. */}
-      <FundWalletModal />
-      <DraggableStateProvider>
-      <Scaffold
-        pathname={pathname}
-        onNavigate={onNavigate}
-        headerVisible={headerVisible}
-        footerVisible={footerVisible}
-        toolbar={<AppBottomToolbar />}
-        toolbarVisible={["desktop"]}
-        header={
-          <ScaffoldHeader>
-            <div className="w-full h-full px-6 max-lg:px-4 max-sm:px-3 flex items-center gap-6 max-lg:gap-4 max-sm:gap-2">
-              {/* Left: Logo + desktop nav tabs */}
-              <div className="shrink-0 flex items-center gap-1">
-                <Logo icon={<LogoIcon />} miniIcon={<MiniLogoIcon />} />
-                <div className="hidden sm:flex items-center gap-1 ml-2">
-                  {navItems.map((item) => {
-                    const active =
-                      item.href === "/"
-                        ? !navItemsConfig.some(
-                            (other) => other.href !== "/" && pathname.startsWith(other.href),
-                          )
-                        : pathname.startsWith(item.href);
-                    return (
-                      <NavTab key={item.key} item={item} active={active} onNavigate={onNavigate} />
-                    );
-                  })}
-                </div>
+    <Scaffold
+      pathname={pathname}
+      onNavigate={onNavigate}
+      headerVisible={headerVisible}
+      footerVisible={footerVisible}
+      toolbar={<AppBottomToolbar />}
+      toolbarVisible={["desktop"]}
+      header={
+        <ScaffoldHeader>
+          <div className="w-full h-full px-6 max-lg:px-4 max-sm:px-3 flex items-center gap-6 max-lg:gap-4 max-sm:gap-2">
+            {/* Left: Logo + desktop nav tabs */}
+            <div className="shrink-0 flex items-center gap-1">
+              <Logo icon={<LogoIcon />} miniIcon={<MiniLogoIcon />} />
+              <div className="hidden sm:flex items-center gap-1 ml-2">
+                {navItems.map((item) => {
+                  const active = item.key === activeNavigationKey;
+                  return (
+                    <NavTab key={item.key} item={item} active={active} onNavigate={onNavigate} />
+                  );
+                })}
               </div>
+            </div>
 
-              {/* Center: Search bar — desktop only */}
-              <div className="hidden lg:flex flex-1 min-w-0 justify-center">
-                <HeaderSearchButton
-                  variant="desktop"
-                  label={searchLabel}
-                  onPress={openActiveSearch}
-                  className="max-lg:hidden"
-                />
-              </div>
+            {/* Center: Search bar — desktop only */}
+            <div className="hidden lg:flex flex-1 min-w-0 justify-center">
+              <HeaderSearchButton
+                variant="desktop"
+                label={searchLabel}
+                onPress={openActiveSearch}
+                className="max-lg:hidden"
+              />
+            </div>
 
-              {/* Right: search icon (tablet/mobile) + chain select + launchpad + language + account */}
-              <div className="shrink-0 ml-auto flex items-center gap-2">
-                <HeaderSearchButton
-                  variant="mobile"
-                  label={searchLabel}
-                  onPress={openActiveSearch}
-                  className="lg:hidden"
-                />
+            {/* Right: search icon (tablet/mobile) + chain select + launchpad + language + account */}
+            <div className="shrink-0 ml-auto flex items-center gap-2">
+              <HeaderSearchButton
+                variant="mobile"
+                label={searchLabel}
+                onPress={openActiveSearch}
+                className="lg:hidden"
+              />
 
-                {/* Chain selector is always shown — including on the predict
+              {/* Chain selector is always shown — including on the predict
                     module — so users can manage their underlying on-chain
                     wallet (which funds Polymarket / Kalshi deposits) without
                     leaving the predict experience. */}
-                <ChainSelectDropdown
-                  candidates={[Chain.SOLANA, Chain.ETHEREUM, Chain.BINANCE]}
-                  onSwitchChain={switchChain}
-                  onSelectChain={handleHeaderSelectChain}
-                  onSuccess={(c) => {
-                    onChainSwitchedUrl(c);
-                    toast.success(
-                      t("common.chainSwitched", {
-                        chain: chainDisplayName(c),
-                      }),
-                    );
-                  }}
-                  onError={(e) =>
-                    toast.error(e instanceof Error ? e.message : t("common.chainSwitchFailed"))
-                  }
-                />
+              <ChainSelectDropdown
+                candidates={[Chain.BINANCE]}
+                onSwitchChain={switchChain}
+                onSelectChain={handleHeaderSelectChain}
+                onSuccess={(c) => {
+                  onChainSwitchedUrl(c);
+                  toast.success(
+                    t("common.chainSwitched", {
+                      chain: chainDisplayName(c),
+                    }),
+                  );
+                }}
+                onError={(e) =>
+                  toast.error(e instanceof Error ? e.message : t("common.chainSwitchFailed"))
+                }
+              />
 
-                {/* Global utility cluster — chain switch, launchpad
+              {/* Global utility cluster — chain switch, launchpad
                     entry, language switch — stays together on the left
                     of the right-hand action group on every page,
                     including the predict module. Page-specific actions
                     (predict balance / deposit, perpetuals HL balance,
                     wallet account) come after this cluster. */}
-                <LaunchPadButton />
+              <LaunchPadButton />
 
-                <div className="hidden sm:block">
-                  <LanguageButton />
-                </div>
+              <div className="hidden sm:block">
+                <LanguageButton />
+              </div>
 
-                {/* On the predict module the balance indicator is the
+              {/* On the predict module the balance indicator is the
                     single header entry for prediction-market wallets:
                     its dropdown carries per-venue deposit / withdraw
                     actions inline, so a standalone header deposit
@@ -440,42 +508,32 @@ function PageShell({ children }: PropsWithChildren) {
                     here — the on-chain wallet trigger (DexAccountButton)
                     below covers funding the underlying chain wallet,
                     same as every other module. */}
-                {isPredictPage && isAuthenticated && <PredictBalanceIndicator />}
-                {!isPredictPage && isPerpetualsPage && <HyperliquidBalanceButton />}
-                <DexAccountButton />
-              </div>
+              {isPredictPage && isAuthenticated && <PredictBalanceIndicator />}
+              {!isPredictPage && isPerpetualsPage && <HyperliquidBalanceButton />}
+              <DexAccountButton />
             </div>
-          </ScaffoldHeader>
-        }
-        footer={<ScaffoldFooter navItems={navItems} />}
+          </div>
+        </ScaffoldHeader>
+      }
+      footer={<ScaffoldFooter navItems={navItems} />}
+    >
+      <DraggablePanelProvider
+        contents={[
+          mediaTrackContent,
+          {
+            id: "aiCopilot",
+            title: t("extend.toolbar.ai_copilot"),
+            children: <BottomAICopilot />,
+            modalMaxWidth: 440,
+            modalMinWidth: 320,
+            panelMinWidth: 320,
+            panelMaxWidth: 440,
+          },
+        ]}
       >
-        <DraggablePanelProvider
-          contents={[
-            {
-              id: "mediaTrack",
-              title: t("extend.toolbar.media_track_tooltip"),
-              children: <BottomTweets />,
-              modalMaxWidth: 440,
-              modalMinWidth: 320,
-              panelMinWidth: 320,
-              panelMaxWidth: 440,
-            },
-            {
-              id: "aiCopilot",
-              title: t("extend.toolbar.ai_copilot"),
-              children: <BottomAICopilot />,
-              modalMaxWidth: 440,
-              modalMinWidth: 320,
-              panelMinWidth: 320,
-              panelMaxWidth: 440,
-            },
-          ]}
-        >
-          {children}
-        </DraggablePanelProvider>
-      </Scaffold>
-      </DraggableStateProvider>
-    </PredictWalletProvider>
+        {children}
+      </DraggablePanelProvider>
+    </Scaffold>
   );
 }
 
@@ -498,7 +556,7 @@ function NavTab({
       data-active={active}
       className={cn(
         "px-3 py-1.5 text-sm font-medium rounded-lg transition-colors cursor-pointer whitespace-nowrap focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
-        active ? "text-primary" : "text-neutral hover:bg-content2 hover:text-foreground",
+        active ? "text-primary" : "text-text-muted hover:bg-content2 hover:text-foreground",
       )}
       aria-label={item.label}
       aria-current={active ? "page" : undefined}
@@ -530,16 +588,13 @@ function HeaderSearchButton({
         radius="full"
         onPress={onPress}
         variant="bordered"
-        startContent={<SearchIcon width={16} height={16} className="text-foreground" />}
+        startContent={<SearchIcon width={16} height={16} />}
         endContent={
-          <Kbd className="min-w-6 justify-center text-xs text-foreground bg-content3 rounded-lg">
+          <Kbd className="min-w-6 justify-center rounded-lg bg-surface-strong text-xs text-text-secondary">
             /
           </Kbd>
         }
-        className={cn(
-          "w-56 min-w-0 h-8 min-h-0 border-transparent hover:border-border bg-content2 pl-3 pr-1.5 text-neutral",
-          className,
-        )}
+        className={cn(HEADER_CONTROL_CLASS, "w-56 min-w-0 pl-3 pr-1.5", className)}
       >
         {label}
       </Button>
@@ -554,33 +609,34 @@ function HeaderSearchButton({
       onPress={onPress}
       variant="bordered"
       aria-label={label}
-      className={cn("w-8 min-w-0 h-8 min-h-0 border-1 border-border bg-content2", className)}
+      className={cn(HEADER_CONTROL_CLASS, HEADER_ICON_CONTROL_CLASS, className)}
     >
-      <SearchIcon width={16} height={16} className="text-foreground" />
+      <SearchIcon width={16} height={16} />
     </Button>
   );
 }
 
-const TRIGGER_CLASS =
-  "flex items-center justify-center h-8 rounded-full text-sm font-medium transition-colors border bg-zinc-800/60 border-zinc-700/50 hover:bg-zinc-800 cursor-pointer focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus";
-
 const DROPDOWN_STYLE: React.CSSProperties = {
   borderRadius: 14,
-  border: "1px solid rgba(39,39,42,1)",
-  background: "rgba(24,24,27,1)",
+  border: "1px solid var(--color-border-control)",
+  background: "var(--color-surface-interactive)",
   boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)",
 };
 
 function LaunchPadButton() {
   const { t } = useTranslation();
-  const { onOpen } = useAsyncModal(LAUNCHPAD_MODAL_ID);
+  const { onOpen } = useDeferredAsyncModal(LAUNCHPAD_MODAL_ID, loadLaunchPadModal);
 
   return (
     <button
       type="button"
       onClick={() => onOpen()}
       aria-label={t("extend.header.launchpad")}
-      className={cn(TRIGGER_CLASS, "w-8 text-bullish")}
+      className={cn(
+        HEADER_CONTROL_CLASS,
+        HEADER_ICON_CONTROL_CLASS,
+        "text-brand-primary hover:text-brand-primary",
+      )}
     >
       <RocketIcon width={14} height={14} />
     </button>
@@ -594,6 +650,7 @@ function LanguageButton() {
   const { languages } = useLocaleContext();
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const selectedLocale = resolveHeaderLanguageOption(locale, languages);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -620,7 +677,7 @@ function LanguageButton() {
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         aria-label={t("extend.header.language")}
-        className={cn(TRIGGER_CLASS, "w-8 text-zinc-300 hover:text-white")}
+        className={cn(HEADER_CONTROL_CLASS, HEADER_ICON_CONTROL_CLASS)}
       >
         <TranslateIcon width={14} height={14} />
       </button>
@@ -629,7 +686,7 @@ function LanguageButton() {
         <div className="absolute right-0 mt-2 w-36 z-50 overflow-hidden" style={DROPDOWN_STYLE}>
           <div className="p-1">
             {languages.map((lang) => {
-              const selected = lang.localCode === locale;
+              const selected = lang.localCode === selectedLocale;
               return (
                 <button
                   key={lang.localCode}
@@ -638,8 +695,8 @@ function LanguageButton() {
                   className={cn(
                     "w-full flex items-center justify-between px-3 py-2 rounded-[10px] text-sm transition-all cursor-pointer",
                     selected
-                      ? "bg-[#c7ff2e]/[0.08] text-[#c7ff2e]"
-                      : "text-zinc-400 hover:text-white hover:bg-[rgba(39,39,42,0.5)]",
+                      ? "bg-action-primary/[0.08] text-brand-primary"
+                      : "text-text-secondary hover:text-text-primary hover:bg-surface-strong/50",
                   )}
                 >
                   {lang.displayName}
@@ -735,14 +792,14 @@ function ChainSelectDropdown({
           radius="full"
           variant="bordered"
           onPress={() => setIsOpen(!isOpen)}
-          className="bg-content2 border-transparent hover:border-border"
+          className={cn(HEADER_CONTROL_CLASS, "px-3")}
           startContent={<ChainIcon chain={chain} size={18} />}
           endContent={
             <ChevronDownIcon
               width={16}
               height={16}
               className={cn(
-                "text-neutral transition-transform duration-200",
+                "text-text-muted transition-transform duration-200",
                 isOpen && "rotate-180",
               )}
             />
@@ -759,7 +816,7 @@ function ChainSelectDropdown({
           variant="bordered"
           onPress={() => setIsOpen(!isOpen)}
           isIconOnly
-          className="max-lg:hidden bg-content2 border-1 border-border"
+          className={cn(HEADER_CONTROL_CLASS, HEADER_ICON_CONTROL_CLASS, "max-lg:hidden")}
           disableRipple
           disabled={isSwitching}
         >
@@ -780,8 +837,8 @@ function ChainSelectDropdown({
                   className={cn(
                     "w-full flex items-center gap-2.5 px-3 py-2 rounded-[10px] text-sm transition-all cursor-pointer",
                     selected
-                      ? "bg-[#c7ff2e]/[0.08] text-[#c7ff2e]"
-                      : "text-zinc-400 hover:text-white hover:bg-[rgba(39,39,42,0.5)]",
+                      ? "bg-action-primary/[0.08] text-brand-primary"
+                      : "text-text-secondary hover:text-text-primary hover:bg-surface-strong/50",
                   )}
                 >
                   <ChainIcon chain={c} size={18} />
@@ -815,7 +872,9 @@ function ChainIcon({ chain, size }: { chain: Chain; size: number }) {
   if (chain === Chain.SOLANA) return <SolanaIcon width={size} height={size} />;
   if (chain === Chain.ETHEREUM) return <EthereumIcon width={size} height={size} />;
   if (chain === Chain.BINANCE) return <BinanceIcon width={size} height={size} />;
-  return <div style={{ width: size, height: size }} className="rounded-full bg-content2" />;
+  return (
+    <div style={{ width: size, height: size }} className="rounded-full bg-surface-interactive" />
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -901,7 +960,10 @@ function DexAccountButton() {
       <button
         type="button"
         onClick={() => signIn()}
-        className="flex items-center gap-1.5 h-8 px-3 bg-[#c7ff2e]/10 hover:bg-[#c7ff2e]/20 border border-[#c7ff2e]/25 hover:border-[#c7ff2e]/40 text-[#c7ff2e] rounded-full text-xs font-semibold transition-colors duration-200 cursor-pointer focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        className={cn(
+          HEADER_CONTROL_CLASS,
+          "gap-1.5 px-3 text-xs font-semibold text-brand-primary hover:text-brand-primary",
+        )}
       >
         <SignInIcon width={14} height={14} />
         {t("common.signIn")}
@@ -911,8 +973,8 @@ function DexAccountButton() {
 
   if (status === "authenticating" || status === "deauthenticating") {
     return (
-      <div className="flex items-center justify-center w-8 h-8">
-        <span className="inline-block w-4 h-4 border-[2px] border-zinc-500 border-t-transparent rounded-full animate-spin" />
+      <div className={cn(HEADER_CONTROL_SURFACE_CLASS, HEADER_ICON_CONTROL_CLASS)}>
+        <span className="inline-block w-4 h-4 border-[2px] border-border-control border-t-brand-primary rounded-full animate-spin" />
       </div>
     );
   }
@@ -927,13 +989,13 @@ function DexAccountButton() {
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className={cn(TRIGGER_CLASS, "gap-1.5 px-2.5 text-zinc-300")}
+        className={cn(HEADER_CONTROL_CLASS, "gap-1.5 px-2.5")}
       >
         {nativeToken && <TokenIcon symbol={nativeToken.symbol} size={16} />}
-        <span className="text-xs font-medium text-zinc-100 tabular-nums">
+        <span className="text-xs font-medium text-text-primary tabular-nums">
           {balanceNativeFormatted}
           {!isMobile && nativeToken && (
-            <span className="text-zinc-500 ml-1">{nativeToken.symbol}</span>
+            <span className="text-text-muted ml-1">{nativeToken.symbol}</span>
           )}
         </span>
         <svg
@@ -946,7 +1008,10 @@ function DexAccountButton() {
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className={cn("text-zinc-500 transition-transform duration-200", isOpen && "rotate-180")}
+          className={cn(
+            "text-text-muted transition-transform duration-200",
+            isOpen && "rotate-180",
+          )}
           aria-hidden="true"
         >
           <path d="m6 9 6 6 6-6" />
@@ -959,19 +1024,19 @@ function DexAccountButton() {
           className="fixed inset-0 z-50 flex items-end justify-center"
           onClick={() => setIsOpen(false)}
         >
-          <div className="absolute inset-0 bg-black/60" />
+          <div className="absolute inset-0 bg-surface-scrim" />
           <div
             className="relative w-full max-w-sm mb-safe animate-in slide-in-from-bottom duration-200"
             style={{
               borderRadius: "14px 14px 0 0",
-              border: "1px solid rgba(39,39,42,1)",
+              border: "1px solid var(--color-border-control)",
               borderBottom: "none",
-              background: "rgba(24,24,27,1)",
+              background: "var(--color-surface-interactive)",
             }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-center pt-3 pb-1">
-              <div className="w-8 h-1 rounded-full bg-zinc-700" />
+              <div className="w-8 h-1 rounded-full bg-surface-strong" />
             </div>
             <DexAccountMenuContent
               walletAddress={walletAddress}
@@ -1013,13 +1078,8 @@ function HyperliquidBalanceButton() {
   const { isMobile } = useScreen();
   const { status } = useAccountInfo();
 
-  const wallets = useWallets();
-  const evmWallet = useMemo(
-    () => wallets.find((w) => w.chainNamespace === "EVM") as EvmWalletAdapter | undefined,
-    [wallets],
-  );
-  const evmAddress = evmWallet?.address;
-  const hlBalances = useHyperliquidBalances(evmAddress);
+  const hlBalances = useHyperliquidHeaderState();
+  const evmAddress = hlBalances.evmAddress;
 
   const [isOpen, setIsOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -1051,7 +1111,10 @@ function HyperliquidBalanceButton() {
     };
   }, []);
 
-  const { onOpen: openHlDeposit } = useAsyncModal(DEPOSIT_HL_USDC_MODAL_ID);
+  const { onOpen: openHlDeposit } = useDeferredAsyncModal(
+    DEPOSIT_HL_USDC_MODAL_ID,
+    loadDepositHyperliquidUsdcModal,
+  );
   const handleDeposit = useCallback(() => {
     setIsOpen(false);
     void openHlDeposit();
@@ -1070,12 +1133,12 @@ function HyperliquidBalanceButton() {
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className={cn(TRIGGER_CLASS, "gap-1.5 px-2.5 text-zinc-300")}
+        className={cn(HEADER_CONTROL_CLASS, "gap-1.5 px-2.5")}
       >
         <HyperliquidUsdcIcon size={16} />
-        <span className="text-xs font-medium text-zinc-100 tabular-nums">
+        <span className="text-xs font-medium text-text-primary tabular-nums">
           {formatHlUsdc(hlBalances.perpUsdc)}
-          {!isMobile && <span className="text-zinc-500 ml-1">USDC</span>}
+          {!isMobile && <span className="text-text-muted ml-1">USDC</span>}
         </span>
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -1087,7 +1150,10 @@ function HyperliquidBalanceButton() {
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className={cn("text-zinc-500 transition-transform duration-200", isOpen && "rotate-180")}
+          className={cn(
+            "text-text-muted transition-transform duration-200",
+            isOpen && "rotate-180",
+          )}
           aria-hidden="true"
         >
           <path d="m6 9 6 6 6-6" />
@@ -1100,19 +1166,19 @@ function HyperliquidBalanceButton() {
           className="fixed inset-0 z-50 flex items-end justify-center"
           onClick={() => setIsOpen(false)}
         >
-          <div className="absolute inset-0 bg-black/60" />
+          <div className="absolute inset-0 bg-surface-scrim" />
           <div
             className="relative w-full max-w-sm mb-safe animate-in slide-in-from-bottom duration-200"
             style={{
               borderRadius: "14px 14px 0 0",
-              border: "1px solid rgba(39,39,42,1)",
+              border: "1px solid var(--color-border-control)",
               borderBottom: "none",
-              background: "rgba(24,24,27,1)",
+              background: "var(--color-surface-interactive)",
             }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-center pt-3 pb-1">
-              <div className="w-8 h-1 rounded-full bg-zinc-700" />
+              <div className="w-8 h-1 rounded-full bg-surface-strong" />
             </div>
             <HyperliquidAccountMenuContent
               evmAddress={evmAddress}
@@ -1173,7 +1239,7 @@ function HyperliquidAccountMenuContent({
     <>
       {/* EVM address + Hyperliquid balance summary */}
       <div className="p-2">
-        <div className="w-full flex items-start gap-3 px-3 py-3.5 rounded-[10px] hover:bg-[rgba(39,39,42,0.5)] transition-all">
+        <div className="w-full flex items-start gap-3 px-3 py-3.5 rounded-[10px] hover:bg-surface-strong/50 transition-all">
           {/* Avatar size matches the Dex wallet dropdown for visual
               consistency; top-aligned with the address row to keep a
               clean horizontal baseline regardless of how many balance
@@ -1182,12 +1248,12 @@ function HyperliquidAccountMenuContent({
           <div className="flex-1 min-w-0">
             {/* Row 1: EVM address (always 0x…) + copy */}
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-zinc-300 truncate">
+              <span className="text-sm font-medium text-text-secondary truncate">
                 {truncateAddress(evmAddress)}
               </span>
               <button
                 type="button"
-                className="p-1 rounded hover:bg-zinc-700 text-zinc-500 hover:text-white transition-colors cursor-pointer"
+                className="p-1 rounded hover:bg-surface-strong text-text-muted hover:text-text-primary transition-colors cursor-pointer"
                 title="Copy Address"
                 onClick={onCopy}
               >
@@ -1223,16 +1289,18 @@ function HyperliquidAccountMenuContent({
             </div>
             {/* Row 2: available margin (withdrawable) */}
             <div className="flex items-center justify-between gap-2 text-xs mt-1.5">
-              <span className="text-zinc-500">{t("perpetuals.placeOrder.availableMargin")}</span>
-              <span className="text-zinc-300 tabular-nums font-medium">
-                {formatHlUsdc(availableMargin)} <span className="text-zinc-500">USDC</span>
+              <span className="text-text-muted">{t("perpetuals.placeOrder.availableMargin")}</span>
+              <span className="text-text-secondary tabular-nums font-medium">
+                {formatHlUsdc(availableMargin)} <span className="text-text-muted">USDC</span>
               </span>
             </div>
             {/* Row 3: account value (totalEquity) */}
             <div className="flex items-center justify-between gap-2 text-xs mt-1">
-              <span className="text-zinc-500">{t("perpetuals.placeOrder.perpsAccountValue")}</span>
-              <span className="text-zinc-300 tabular-nums font-medium">
-                {formatHlUsdc(accountValue)} <span className="text-zinc-500">USDC</span>
+              <span className="text-text-muted">
+                {t("perpetuals.placeOrder.perpsAccountValue")}
+              </span>
+              <span className="text-text-secondary tabular-nums font-medium">
+                {formatHlUsdc(accountValue)} <span className="text-text-muted">USDC</span>
               </span>
             </div>
           </div>
@@ -1243,19 +1311,19 @@ function HyperliquidAccountMenuContent({
           sign-out section. Keeps the chrome/colour of a secondary row
           rather than a primary brand button, so the dropdown stays
           information-first. */}
-      <div style={{ borderTop: "1px solid rgba(39,39,42,1)" }} className="p-2">
+      <div style={{ borderTop: "1px solid var(--color-border-control)" }} className="p-2">
         <button
           type="button"
           onClick={onDeposit}
-          className="flex items-center gap-2.5 w-full px-3 py-2 text-sm rounded-[10px] transition-colors cursor-pointer text-zinc-200 hover:bg-[rgba(39,39,42,0.6)]"
+          className="flex items-center gap-2.5 w-full px-3 py-2 text-sm rounded-[10px] transition-colors cursor-pointer text-text-primary hover:bg-surface-strong/60"
         >
           {/* Icon matches the "Buy / 购买" action in the Dex wallet
               dropdown to keep the "add funds" affordance visually
               consistent across both menus. */}
-          <div className="flex items-center justify-center w-7 h-7 rounded-[10px] bg-[rgba(39,39,42,1)] text-zinc-300">
+          <div className="flex items-center justify-center w-7 h-7 rounded-[10px] bg-surface-strong text-text-secondary">
             <CashInOutlinedIcon width={16} height={16} />
           </div>
-          {t("extend.hlDeposit.entryShort")}
+          {t("hlDeposit.entryShort")}
         </button>
       </div>
     </>
@@ -1281,8 +1349,8 @@ function DexAccountMenuContent({
 }) {
   const { t } = useTranslation();
   const { chain } = useCurrentChain();
-  const { onOpen: openReceiveModal } = useAsyncModal(RECEIVE_MODAL_ID);
-  const { onOpen: openWithdrawModal } = useAsyncModal(WITHDRAW_MODAL_ID);
+  const { onOpen: openReceiveModal } = useDeferredAsyncModal(RECEIVE_MODAL_ID, loadReceiveModal);
+  const { onOpen: openWithdrawModal } = useDeferredAsyncModal(WITHDRAW_MODAL_ID, loadWithdrawModal);
   const { mutate: createOnrampWidgetUrl, isPending: isCreatingOnramp } =
     useCreateOnrampWidgetUrlMutation();
 
@@ -1317,7 +1385,7 @@ function DexAccountMenuContent({
           if (win && !win.closed) {
             win.close();
           }
-          toast.error(err.message || t("extend.account.add_cash_failed"));
+          toast.error(err.message || t("account.add_cash_failed"));
         },
       },
     );
@@ -1327,17 +1395,17 @@ function DexAccountMenuContent({
     <>
       {/* Wallet address + copy */}
       <div className="p-2">
-        <div className="w-full flex items-center gap-3 px-3 py-3.5 rounded-[10px] hover:bg-[rgba(39,39,42,0.5)] transition-all">
+        <div className="w-full flex items-center gap-3 px-3 py-3.5 rounded-[10px] hover:bg-surface-strong/50 transition-all">
           <GradientAvatar seed={walletAddress} size={44} className="rounded-xl" />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-zinc-300 truncate">
+              <span className="text-sm font-medium text-text-secondary truncate">
                 {walletAddress ? truncateAddress(walletAddress) : "—"}
               </span>
               {walletAddress && (
                 <button
                   type="button"
-                  className="p-1 rounded hover:bg-zinc-700 text-zinc-500 hover:text-white transition-colors cursor-pointer"
+                  className="p-1 rounded hover:bg-surface-strong text-text-muted hover:text-text-primary transition-colors cursor-pointer"
                   title="Copy Address"
                   onClick={onCopy}
                 >
@@ -1373,13 +1441,13 @@ function DexAccountMenuContent({
               )}
             </div>
             <div className="flex items-center gap-1.5 text-xs mt-2">
-              <span className="text-zinc-500">
-                {t("extend.account.nativeTotalBalance", {
+              <span className="text-text-muted">
+                {t("account.nativeTotalBalance" as never, {
                   symbol: nativeToken?.symbol ?? chainNamespace.toUpperCase(),
                 })}
               </span>
               {nativeToken && <TokenIcon symbol={nativeToken.symbol} size={16} />}
-              <span className="text-zinc-300 tabular-nums font-medium">
+              <span className="text-text-secondary tabular-nums font-medium">
                 {balanceNativeFormatted}
               </span>
             </div>
@@ -1388,40 +1456,40 @@ function DexAccountMenuContent({
       </div>
 
       {/* Action buttons */}
-      <div style={{ borderTop: "1px solid rgba(39,39,42,1)" }} className="px-2 py-3">
+      <div style={{ borderTop: "1px solid var(--color-border-control)" }} className="px-2 py-3">
         <div className="flex items-center justify-around">
           <WalletActionButton
             icon={<ReceiveOutlinedIcon width={18} height={18} />}
-            label={t("extend.account.receive")}
+            label={t("account.receive")}
             onClick={() => openReceiveModal()}
           />
           <WalletActionButton
             icon={<SendOutlinedIcon width={18} height={18} />}
-            label={t("extend.account.withdraw")}
+            label={t("account.withdraw")}
             onClick={() => openWithdrawModal()}
           />
           {/* TODO: Re-enable when the Convert (闪兑) flow is ready.
           <WalletActionButton
             icon={<ConvertOutlinedIcon width={18} height={18} />}
-            label={t("extend.account.convert")}
+            label={t("account.convert")}
           />
           */}
           <WalletActionButton
             icon={<CashInOutlinedIcon width={18} height={18} />}
-            label={t("extend.account.add_cash")}
+            label={t("account.add_cash")}
             onClick={handleAddCash}
           />
         </div>
       </div>
 
       {/* Sign out */}
-      <div style={{ borderTop: "1px solid rgba(39,39,42,1)" }} className="p-2">
+      <div style={{ borderTop: "1px solid var(--color-border-control)" }} className="p-2">
         <button
           type="button"
           onClick={onSignOut}
-          className="flex items-center gap-2.5 w-full px-3 py-2 text-sm rounded-[10px] transition-colors cursor-pointer text-red-400 hover:bg-red-500/10"
+          className="flex items-center gap-2.5 w-full px-3 py-2 text-sm rounded-[10px] transition-colors cursor-pointer text-danger hover:bg-danger/10"
         >
-          <div className="flex items-center justify-center w-7 h-7 rounded-[10px] bg-red-500/10">
+          <div className="flex items-center justify-center w-7 h-7 rounded-[10px] bg-danger/10">
             <svg
               width="14"
               height="14"
@@ -1459,10 +1527,10 @@ function WalletActionButton({
       onClick={onClick}
       className="flex flex-col items-center gap-1.5 px-4 cursor-pointer group"
     >
-      <div className="w-9 h-9 flex items-center justify-center rounded-full bg-zinc-700/60 text-zinc-300 group-hover:bg-zinc-700 group-hover:text-white transition-colors">
+      <div className="w-9 h-9 flex items-center justify-center rounded-full bg-surface-strong/60 text-text-secondary group-hover:bg-surface-strong group-hover:text-text-primary transition-colors">
         {icon}
       </div>
-      <span className="text-xs text-zinc-500 group-hover:text-zinc-300 transition-colors whitespace-nowrap">
+      <span className="text-xs text-text-muted group-hover:text-text-secondary transition-colors whitespace-nowrap">
         {label}
       </span>
     </button>

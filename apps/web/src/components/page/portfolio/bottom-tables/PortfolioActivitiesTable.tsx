@@ -5,13 +5,8 @@ import { useTokensQuery } from "@liberfi.io/react";
 import { usePortfolioActivitiesScript } from "@liberfi.io/ui-portfolio";
 import type { Activity, ActivityType, Chain, Token } from "@liberfi.io/types";
 import { cn } from "@liberfi.io/ui";
-import {
-  formatAmount,
-  formatAmountInUsd,
-  truncateAddress,
-  txExplorerUrl,
-} from "@liberfi.io/utils";
-import { useTranslation } from "@liberfi.io/i18n";
+import { formatAmount, formatAmountInUsd, truncateAddress, txExplorerUrl } from "@liberfi.io/utils";
+import { useLocalizedTimeFormatter, useTranslation } from "@liberfi.io/i18n";
 import { tKey } from "../../../../application/t";
 import {
   alignClass,
@@ -20,41 +15,42 @@ import {
   type BottomTableColumn,
 } from "../../token-detail/bottom-tables/table-shell";
 import { PortfolioActivitiesTableSkeleton } from "../skeletons/PortfolioActivitiesTableSkeleton";
+import { resolvePortfolioTokenSymbol } from "./portfolio-token-symbol";
 
 const COLUMNS: ReadonlyArray<BottomTableColumn> = [
   {
     key: "age",
-    labelKey: "extend.portfolio.headers.age",
+    labelKey: "portfolio.headers.age",
     width: "w-[10%]",
     align: "left",
   },
   {
     key: "type",
-    labelKey: "extend.portfolio.headers.type",
+    labelKey: "portfolio.headers.type",
     width: "w-[10%]",
     align: "left",
   },
   {
     key: "token",
-    labelKey: "extend.portfolio.headers.token",
+    labelKey: "portfolio.headers.token",
     width: "w-[24%]",
     align: "left",
   },
   {
     key: "amount",
-    labelKey: "extend.portfolio.headers.amount",
+    labelKey: "portfolio.headers.amount",
     width: "w-[18%]",
     align: "right",
   },
   {
     key: "usd",
-    labelKey: "extend.portfolio.headers.value",
+    labelKey: "portfolio.headers.value",
     width: "w-[14%]",
     align: "right",
   },
   {
     key: "tx",
-    labelKey: "extend.portfolio.headers.tx",
+    labelKey: "portfolio.headers.tx",
     width: "w-[14%]",
     align: "right",
   },
@@ -73,15 +69,15 @@ export interface PortfolioActivitiesTableProps {
  * we surface the truncated transaction hash with an explorer link, since
  * the user already knows the wallet (it's their own).
  */
-export function PortfolioActivitiesTable({
-  chain,
-  address,
-}: PortfolioActivitiesTableProps) {
+export function PortfolioActivitiesTable({ chain, address }: PortfolioActivitiesTableProps) {
   const { t } = useTranslation();
   const enabled = !!address;
 
-  const { activities, isLoading, hasMore, loadMore } =
-    usePortfolioActivitiesScript({ chain, address, limit: 50 });
+  const { activities, isLoading, hasMore, loadMore } = usePortfolioActivitiesScript({
+    chain,
+    address,
+    limit: 50,
+  });
 
   // Address list of tokens referenced by visible activities — both `from`
   // and `to` may be of interest. Sorted to keep the cache key stable.
@@ -109,20 +105,33 @@ export function PortfolioActivitiesTable({
     return map;
   }, [tokens]);
 
+  // Temporary demo safeguard: while token metadata is whitelist-backed and
+  // incomplete, hide activities whose displayed token has no symbol.
+  const visibleActivities = useMemo(
+    () =>
+      activities.filter((activity) => {
+        const primary = pickPrimaryToken(activity);
+        return resolvePortfolioTokenSymbol(
+          tokenByAddress.get(primary.address)?.symbol,
+          primary.symbol,
+        );
+      }),
+    [activities, tokenByAddress],
+  );
+
   const now = Date.now();
   // Skeleton window: until BOTH the activity list AND the token
   // enrichment have resolved. Without the second clause the rows
   // briefly render with portfolio-only symbols / missing names /
   // missing logos, then jump once the tokens query lands.
   const isInitialLoading =
-    (isLoading && activities.length === 0) ||
-    (tokenAddresses.length > 0 && tokensLoading);
-  const isEmpty = !isLoading && activities.length === 0;
+    (isLoading && activities.length === 0) || (tokenAddresses.length > 0 && tokensLoading);
+  const isEmpty = !isLoading && visibleActivities.length === 0;
 
   if (!enabled) {
     return (
-      <div className="flex h-full items-center justify-center text-xs text-default-400">
-        {t("extend.portfolio.allocation.noWallet")}
+      <div className="flex h-full items-center justify-center text-xs text-text-muted">
+        {t("portfolio.allocation.noWallet")}
       </div>
     );
   }
@@ -138,7 +147,7 @@ export function PortfolioActivitiesTable({
       infiniteScroll={{ hasMore, isLoading, onLoadMore: loadMore }}
     >
       <tbody>
-        {activities.map((activity) => (
+        {visibleActivities.map((activity) => (
           <ActivityRow
             key={activityKey(activity)}
             activity={activity}
@@ -147,12 +156,7 @@ export function PortfolioActivitiesTable({
           />
         ))}
       </tbody>
-      {isEmpty ? (
-        <EmptyBody
-          colSpan={COLUMNS.length}
-          messageKey="extend.portfolio.noActivities"
-        />
-      ) : null}
+      {isEmpty ? <EmptyBody colSpan={COLUMNS.length} messageKey="portfolio.noActivities" /> : null}
     </TableShell>
   );
 }
@@ -165,62 +169,44 @@ interface ActivityRowProps {
 
 function ActivityRow({ activity, now, tokenByAddress }: ActivityRowProps) {
   const { t } = useTranslation();
+  const { formatAgeSince } = useLocalizedTimeFormatter();
   const sideMeta = resolveTypeMeta(activity.type);
   const sideLabel = sideMeta.labelKey
     ? tKey(t, sideMeta.labelKey)
     : (sideMeta.fallbackLabel ?? "--");
   const primary = pickPrimaryToken(activity);
   const enrichedToken = tokenByAddress.get(primary.address);
-  const symbol = enrichedToken?.symbol ?? primary.symbol;
+  const symbol = resolvePortfolioTokenSymbol(enrichedToken?.symbol, primary.symbol);
   const name = enrichedToken?.name ?? primary.name ?? "";
   const imageUrl = enrichedToken?.image ?? primary.image;
 
   const explorer = txExplorerUrl(activity.chain, activity.txHash);
 
   return (
-    <tr className="h-12 border-b border-default-50 transition-colors hover:bg-content2">
-      <td
-        className={cn("px-3 align-middle text-default-500", alignClass("left"))}
-      >
-        {formatAgeShort(activity.time, now)}
+    <tr className="h-12 border-b border-border-subtle/30 transition-colors hover:bg-content2">
+      <td className={cn("px-3 align-middle text-text-muted", alignClass("left"))}>
+        {formatAgeSince(activity.time, now)}
       </td>
-      <td
-        className={cn(
-          "px-3 align-middle font-medium",
-          alignClass("left"),
-          sideMeta.color,
-        )}
-      >
+      <td className={cn("px-3 align-middle font-medium", alignClass("left"), sideMeta.color)}>
         {sideLabel}
       </td>
       <td className={cn("px-3 align-middle", alignClass("left"))}>
         <div className="flex items-center gap-2">
-          <ActivityTokenAvatar
-            imageUrl={imageUrl}
-            symbol={symbol}
-            address={primary.address}
-          />
+          <ActivityTokenAvatar imageUrl={imageUrl} symbol={symbol} address={primary.address} />
           <div className="flex min-w-0 flex-col">
             <span className="truncate text-[13px] font-semibold text-foreground">
               {symbol || "—"}
             </span>
-            {name ? (
-              <span className="truncate text-[11px] text-default-500">
-                {name}
-              </span>
-            ) : null}
+            {name ? <span className="truncate text-[11px] text-text-muted">{name}</span> : null}
           </div>
         </div>
       </td>
       <td
-        className={cn(
-          "px-3 align-middle tabular-nums text-foreground",
-          alignClass("right"),
-        )}
+        className={cn("px-3 align-middle tabular-nums text-foreground", alignClass("right"))}
         style={{ letterSpacing: "-0.2px" }}
       >
         <span>{formatAmount(primary.amount)}</span>
-        <span className="ml-1 text-default-500">{primary.symbol}</span>
+        <span className="ml-1 text-text-muted">{symbol}</span>
       </td>
       <td
         className={cn(
@@ -233,7 +219,7 @@ function ActivityRow({ activity, now, tokenByAddress }: ActivityRowProps) {
       </td>
       <td
         className={cn(
-          "px-3 align-middle font-mono tabular-nums text-default-500",
+          "px-3 align-middle font-mono tabular-nums text-text-muted",
           alignClass("right"),
         )}
       >
@@ -274,39 +260,39 @@ interface TypeMeta {
 
 const TYPE_META: Record<ActivityType, TypeMeta> = {
   buy: {
-    labelKey: "extend.trade.bottom_panel.trades.side_buy",
-    color: "text-bullish",
+    labelKey: "trade.bottom_panel.trades.side_buy",
+    color: "text-positive",
   },
   sell: {
-    labelKey: "extend.trade.bottom_panel.trades.side_sell",
-    color: "text-bearish",
+    labelKey: "trade.bottom_panel.trades.side_sell",
+    color: "text-negative",
   },
   liquidity_initialize: {
-    labelKey: "extend.trade.bottom_panel.trades.side_add_liq",
-    color: "text-bullish",
+    labelKey: "trade.bottom_panel.trades.side_add_liq",
+    color: "text-positive",
   },
   liquidity_add: {
-    labelKey: "extend.trade.bottom_panel.trades.side_add_liq",
-    color: "text-bullish",
+    labelKey: "trade.bottom_panel.trades.side_add_liq",
+    color: "text-positive",
   },
   liquidity_remove: {
-    labelKey: "extend.trade.bottom_panel.trades.side_remove_liq",
-    color: "text-bearish",
+    labelKey: "trade.bottom_panel.trades.side_remove_liq",
+    color: "text-negative",
   },
   red_packet_create: {
-    labelKey: "extend.trade.bottom_panel.trades.side_red_packet",
+    labelKey: "trade.bottom_panel.trades.side_red_packet",
     color: "text-warning",
   },
   red_packet_claim: {
-    labelKey: "extend.trade.bottom_panel.trades.side_red_packet",
+    labelKey: "trade.bottom_panel.trades.side_red_packet",
     color: "text-warning",
   },
   red_packet_complete: {
-    labelKey: "extend.trade.bottom_panel.trades.side_red_packet",
+    labelKey: "trade.bottom_panel.trades.side_red_packet",
     color: "text-warning",
   },
   red_packet_refund: {
-    labelKey: "extend.trade.bottom_panel.trades.side_red_packet",
+    labelKey: "trade.bottom_panel.trades.side_red_packet",
     color: "text-warning",
   },
 };
@@ -315,7 +301,7 @@ function resolveTypeMeta(type: ActivityType | string | undefined): TypeMeta {
   if (type && type in TYPE_META) return TYPE_META[type as ActivityType];
   return {
     labelKey: "",
-    color: "text-default-500",
+    color: "text-text-muted",
     fallbackLabel: type ? String(type).replace(/_/g, " ") : "--",
   };
 }
@@ -330,25 +316,6 @@ function activityKey(a: Activity): string {
   return `${a.txHash}:${a.from?.address ?? ""}:${a.to?.address ?? ""}:${a.poolAddress ?? ""}`;
 }
 
-function formatAgeShort(
-  from: Date | string | number | undefined,
-  now: number,
-): string {
-  if (from == null) return "--";
-  const t = from instanceof Date ? from.getTime() : new Date(from).getTime();
-  const sec = Math.max(0, Math.floor((now - t) / 1000));
-  if (sec < 60) return `${sec}s`;
-  const min = Math.floor(sec / 60);
-  if (min < 60) return `${min}m`;
-  const hr = Math.floor(min / 60);
-  if (hr < 24) return `${hr}h`;
-  const day = Math.floor(hr / 24);
-  if (day < 30) return `${day}d`;
-  const mo = Math.floor(day / 30);
-  if (mo < 12) return `${mo}mo`;
-  return `${Math.floor(day / 365)}y`;
-}
-
 interface ActivityTokenAvatarProps {
   imageUrl?: string;
   symbol?: string;
@@ -361,16 +328,10 @@ interface ActivityTokenAvatarProps {
  * independently — the avatar is a leaf and the abstraction overhead would
  * outweigh the duplication today.
  */
-function ActivityTokenAvatar({
-  imageUrl,
-  symbol,
-  address,
-}: ActivityTokenAvatarProps) {
+function ActivityTokenAvatar({ imageUrl, symbol, address }: ActivityTokenAvatarProps) {
   const ref = useRef<HTMLImageElement>(null);
   const initial = (symbol || "?").charAt(0).toUpperCase();
-  const hash = address
-    .split("")
-    .reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const hash = address.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
   const bg = `hsl(${(hash * 53) % 360}, 60%, 40%)`;
 
   if (imageUrl) {
@@ -395,7 +356,7 @@ function ActivityTokenAvatar({
   return (
     <span
       aria-hidden
-      className="flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-white shrink-0"
+      className="flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-text-primary shrink-0"
       style={{ background: bg }}
     >
       {initial}

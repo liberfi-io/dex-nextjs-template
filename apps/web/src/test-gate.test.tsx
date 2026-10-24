@@ -25,6 +25,6 @@ describe("application test gate", () => {
         slug: "fed-rate-decision",
         source: "polymarket",
       }),
-    ).toBe("/predict/polymarket/fed-rate-decision");
+    ).toBe("/predict/event/fed-rate-decision");
   });
 });

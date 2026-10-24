@@ -8,7 +8,7 @@ export default function Loading() {
         style={{
           position: "relative",
           overflow: "hidden",
-          borderBottom: "1px solid rgba(39,39,42,0.5)",
+          borderBottom: "1px solid var(--color-border-subtle)",
         }}
       >
         <div
@@ -33,10 +33,8 @@ export default function Loading() {
               objectPosition: "center center",
               opacity: 0.3,
               mixBlendMode: "lighten",
-              maskImage:
-                "linear-gradient(to bottom, black 50%, transparent 100%)",
-              WebkitMaskImage:
-                "linear-gradient(to bottom, black 50%, transparent 100%)",
+              maskImage: "linear-gradient(to bottom, black 50%, transparent 100%)",
+              WebkitMaskImage: "linear-gradient(to bottom, black 50%, transparent 100%)",
             }}
           />
           <div
@@ -45,7 +43,7 @@ export default function Loading() {
               inset: 0,
               opacity: 0.025,
               backgroundImage:
-                "radial-gradient(circle at 1px 1px, rgb(255 255 255) 1px, transparent 0)",
+                "radial-gradient(circle at 1px 1px, var(--color-text-primary) 1px, transparent 0)",
               backgroundSize: "20px 20px",
             }}
           />

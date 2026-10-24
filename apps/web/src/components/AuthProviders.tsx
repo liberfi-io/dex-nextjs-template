@@ -21,7 +21,7 @@ export function AuthProviders({ children }: PropsWithChildren) {
     <PrivyWalletConnectorProvider
       privyAppId={process.env.NEXT_PUBLIC_PRIVY_APPID}
       privyClientConfig={{
-        defaultChain: mainnet,
+        defaultChain: bsc,
         supportedChains: [mainnet, bsc],
         appearance: {
           theme: "dark",

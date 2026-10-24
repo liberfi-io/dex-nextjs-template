@@ -1,8 +1,7 @@
 "use client";
 
-import { createContext, PropsWithChildren, useCallback, useContext } from "react";
+import { useCallback } from "react";
 import { useDexClient } from "@liberfi.io/react";
-import { PinataSDK } from "pinata";
 
 export type PinataUploadClient = {
   upload: {
@@ -14,22 +13,26 @@ export type PinataUploadClient = {
   };
 };
 
-const PinataContext = createContext<PinataSDK | null>(null);
+export function createLazyPinataUploadClient(
+  load: () => Promise<PinataUploadClient>,
+): () => Promise<PinataUploadClient> {
+  let clientPromise: Promise<PinataUploadClient> | undefined;
 
-export function PinataProvider({
-  client,
-  children,
-}: PropsWithChildren<{ client: PinataSDK }>) {
-  return <PinataContext.Provider value={client}>{children}</PinataContext.Provider>;
+  return () => {
+    clientPromise ??= load().catch((error) => {
+      clientPromise = undefined;
+      throw error;
+    });
+    return clientPromise;
+  };
 }
 
-export function usePinata() {
-  const client = useContext(PinataContext);
-  if (!client) {
-    throw new Error("usePinata must be used within a PinataProvider");
-  }
-  return client;
-}
+const getPinataUploadClient = createLazyPinataUploadClient(async () => {
+  const { PinataSDK } = await import("pinata");
+  return new PinataSDK({
+    pinataGateway: process.env.NEXT_PUBLIC_PINATA_GATEWAY,
+  }) as unknown as PinataUploadClient;
+});
 
 export async function uploadFileToIpfs(params: {
   file: File;
@@ -42,16 +45,17 @@ export async function uploadFileToIpfs(params: {
 }
 
 export function useUpload() {
-  const pinata = usePinata();
   const { client } = useDexClient();
 
   return useCallback(
-    async (file: File) =>
-      uploadFileToIpfs({
+    async (file: File) => {
+      const pinata = await getPinataUploadClient();
+      return uploadFileToIpfs({
         file,
         getPresignedUploadUrl: () => client.getPresignedUploadUrl(),
-        pinata: pinata as unknown as PinataUploadClient,
-      }),
-    [client, pinata],
+        pinata,
+      });
+    },
+    [client],
   );
 }

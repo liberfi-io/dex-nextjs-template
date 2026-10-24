@@ -77,13 +77,13 @@ export function useHyperliquidUpdateLeverage(): (
   return useCallback(
     async ({ symbol, leverage }: UpdateLeverageParams) => {
       if (!evm?.address) {
-        const message = t("extend.perpetuals.leverage.needsEvmWallet");
+        const message = t("perpetuals.leverage.needsEvmWallet");
         toast.error(message);
         throw new Error(message);
       }
       const provider = await evm.getEip1193Provider();
       if (!provider) {
-        const message = t("extend.perpetuals.leverage.needsEvmWallet");
+        const message = t("perpetuals.leverage.needsEvmWallet");
         toast.error(message);
         throw new Error(message);
       }
@@ -115,15 +115,15 @@ export function useHyperliquidUpdateLeverage(): (
           }),
         ]);
         toast.success(
-          t("extend.perpetuals.leverage.updated", { value: leverage }),
+          t("perpetuals.leverage.updated", { value: leverage }),
         );
       } catch (error) {
         const message =
           error instanceof Error
             ? error.message
-            : t("extend.perpetuals.leverage.updateFailed");
+            : t("perpetuals.leverage.updateFailed");
         toast.error(
-          t("extend.perpetuals.leverage.updateFailed", { reason: message }),
+          t("perpetuals.leverage.updateFailed", { reason: message }),
         );
         throw error;
       }

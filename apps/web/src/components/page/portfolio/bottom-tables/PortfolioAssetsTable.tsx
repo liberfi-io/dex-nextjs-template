@@ -21,41 +21,42 @@ import {
   type BottomTableColumn,
 } from "../../token-detail/bottom-tables/table-shell";
 import { PortfolioAssetsTableSkeleton } from "../skeletons/PortfolioAssetsTableSkeleton";
+import { resolvePortfolioTokenSymbol } from "./portfolio-token-symbol";
 
-const COLUMNS: ReadonlyArray<BottomTableColumn> = [
+export const PORTFOLIO_ASSET_COLUMNS: ReadonlyArray<BottomTableColumn> = [
   {
     key: "token",
-    labelKey: "extend.portfolio.headers.token",
+    labelKey: "portfolio.headers.token",
     width: "w-[26%]",
     align: "left",
   },
   {
     key: "balance",
-    labelKey: "extend.portfolio.headers.balance",
+    labelKey: "portfolio.headers.balance",
     width: "w-[16%]",
     align: "right",
   },
   {
     key: "value",
-    labelKey: "extend.portfolio.headers.value",
+    labelKey: "portfolio.headers.value",
     width: "w-[14%]",
     align: "right",
   },
   {
     key: "price",
-    labelKey: "extend.portfolio.headers.price",
+    labelKey: "portfolio.headers.price",
     width: "w-[14%]",
     align: "right",
   },
   {
     key: "change24h",
-    labelKey: "extend.portfolio.headers.change24h",
+    labelKey: "portfolio.headers.change24h",
     width: "w-[12%]",
     align: "right",
   },
   {
     key: "pnl",
-    labelKey: "extend.portfolio.headers.pnl",
+    labelKey: "portfolio.headers.pnl",
     width: "w-[18%]",
     align: "right",
   },
@@ -85,10 +86,7 @@ export interface PortfolioAssetsTableProps {
  * Joining on `token.address` (chain-scoped) gives one merged row per
  * holding. Rows are stable across re-renders (key = token address).
  */
-export function PortfolioAssetsTable({
-  chain,
-  address,
-}: PortfolioAssetsTableProps) {
+export function PortfolioAssetsTable({ chain, address }: PortfolioAssetsTableProps) {
   const { t } = useTranslation();
   const router = useRouter();
   const enabled = !!address;
@@ -144,7 +142,18 @@ export function PortfolioAssetsTable({
     return map;
   }, [tokens]);
 
-  const rows = portfolios?.portfolios ?? [];
+  // Temporary demo safeguard: while token metadata is whitelist-backed and
+  // incomplete, hide holdings that cannot resolve a display symbol.
+  const rows = useMemo(
+    () =>
+      (portfolios?.portfolios ?? []).filter((portfolio) =>
+        resolvePortfolioTokenSymbol(
+          tokenByAddress.get(portfolio.address)?.symbol,
+          portfolio.symbol,
+        ),
+      ),
+    [portfolios, tokenByAddress],
+  );
   // Skeleton window: until BOTH the holdings list and the token
   // enrichment have resolved. Without the second condition rows would
   // flash on screen with placeholder symbols / missing 24h-change /
@@ -152,25 +161,25 @@ export function PortfolioAssetsTable({
   // enriched values once the tokens query lands — the user sees the
   // page "shake".
   const isInitialLoading =
-    (portfoliosLoading && rows.length === 0) ||
+    (portfoliosLoading && (portfolios?.portfolios.length ?? 0) === 0) ||
     (tokenAddresses.length > 0 && tokensLoading);
   const isEmpty = !portfoliosLoading && rows.length === 0;
 
   if (!enabled) {
     return (
-      <div className="flex h-full items-center justify-center text-xs text-default-400">
-        {t("extend.portfolio.allocation.noWallet")}
+      <div className="flex h-full items-center justify-center text-xs text-text-muted">
+        {t("portfolio.allocation.noWallet")}
       </div>
     );
   }
 
   if (isInitialLoading) {
-    return <PortfolioAssetsTableSkeleton columns={COLUMNS} />;
+    return <PortfolioAssetsTableSkeleton columns={PORTFOLIO_ASSET_COLUMNS} />;
   }
 
   return (
     <TableShell
-      columns={COLUMNS}
+      columns={PORTFOLIO_ASSET_COLUMNS}
       minWidth="min-w-[820px]"
       infiniteScroll={{
         hasMore,
@@ -192,10 +201,7 @@ export function PortfolioAssetsTable({
         ))}
       </tbody>
       {isEmpty ? (
-        <EmptyBody
-          colSpan={COLUMNS.length}
-          messageKey="extend.portfolio.noAssets"
-        />
+        <EmptyBody colSpan={PORTFOLIO_ASSET_COLUMNS.length} messageKey="portfolio.noAssets" />
       ) : null}
     </TableShell>
   );
@@ -209,7 +215,7 @@ interface AssetRowProps {
 }
 
 function AssetRow({ portfolio, pnl, token, onClick }: AssetRowProps) {
-  const symbol = token?.symbol ?? portfolio.symbol;
+  const symbol = resolvePortfolioTokenSymbol(token?.symbol, portfolio.symbol);
   const name = token?.name ?? portfolio.name;
   const imageUrl = token?.image ?? portfolio.image;
   const priceInUsd = token?.marketData?.priceInUsd ?? portfolio.priceInUsd;
@@ -224,39 +230,26 @@ function AssetRow({ portfolio, pnl, token, onClick }: AssetRowProps) {
   //      from the enriched token lookup. Common for newly-listed
   //      memecoins where net-worth lags the price feed.
   //   3. `null` — neither path produced a finite value, render "--".
-  const valueInUsd = resolveValueInUsd(
-    portfolio.amountInUsd,
-    portfolio.amount,
-    priceInUsd,
-  );
+  const valueInUsd = resolveValueInUsd(portfolio.amountInUsd, portfolio.amount, priceInUsd);
 
   return (
     <tr
       onClick={onClick}
-      className="h-12 cursor-pointer border-b border-default-50 transition-colors hover:bg-content2"
+      className="h-12 cursor-pointer border-b border-border-subtle/30 transition-colors hover:bg-content2"
     >
       <td className={cn("px-3 align-middle", alignClass("left"))}>
         <div className="flex items-center gap-2">
-          <TokenAvatar
-            imageUrl={imageUrl}
-            symbol={symbol}
-            address={portfolio.address}
-          />
+          <TokenAvatar imageUrl={imageUrl} symbol={symbol} address={portfolio.address} />
           <div className="flex min-w-0 flex-col">
             <span className="truncate text-[13px] font-semibold text-foreground">
               {symbol || "—"}
             </span>
-            <span className="truncate text-[11px] text-default-500">
-              {name || "—"}
-            </span>
+            <span className="truncate text-[11px] text-text-muted">{name || "—"}</span>
           </div>
         </div>
       </td>
       <td
-        className={cn(
-          "px-3 align-middle tabular-nums text-foreground",
-          alignClass("right"),
-        )}
+        className={cn("px-3 align-middle tabular-nums text-foreground", alignClass("right"))}
         style={{ letterSpacing: "-0.2px" }}
       >
         {formatAmount(portfolio.amount)}
@@ -269,12 +262,7 @@ function AssetRow({ portfolio, pnl, token, onClick }: AssetRowProps) {
       >
         {valueInUsd != null ? formatAmountInUsd(valueInUsd) : "--"}
       </td>
-      <td
-        className={cn(
-          "px-3 align-middle tabular-nums text-default-500",
-          alignClass("right"),
-        )}
-      >
+      <td className={cn("px-3 align-middle tabular-nums text-text-muted", alignClass("right"))}>
         {priceInUsd ? formatPriceInUsd(priceInUsd) : "--"}
       </td>
       <td
@@ -284,17 +272,12 @@ function AssetRow({ portfolio, pnl, token, onClick }: AssetRowProps) {
           changeColor(change24h),
         )}
       >
-        {change24h
-          ? formatPercent(change24h, { showPlusGtThanZero: true })
-          : "--"}
+        {change24h ? formatPercent(change24h, { showPlusGtThanZero: true }) : "--"}
       </td>
       <td className={cn("px-3 align-middle tabular-nums", alignClass("right"))}>
         {profitInUsd ? (
           <span
-            className={cn(
-              "inline-flex flex-col items-end leading-tight",
-              profitColor(profitInUsd),
-            )}
+            className={cn("inline-flex flex-col items-end leading-tight", profitColor(profitInUsd))}
           >
             <span className="font-semibold">
               {formatAmountInUsd(profitInUsd, { showPlusGtThanZero: true })}
@@ -306,7 +289,7 @@ function AssetRow({ portfolio, pnl, token, onClick }: AssetRowProps) {
             ) : null}
           </span>
         ) : (
-          <span className="text-default-500">--</span>
+          <span className="text-text-muted">--</span>
         )}
       </td>
     </tr>
@@ -345,20 +328,20 @@ function resolveValueInUsd(
 
 /** Color helper for the 24h change column. */
 function changeColor(value?: string): string {
-  if (!value) return "text-default-500";
+  if (!value) return "text-text-muted";
   const n = parseFloat(value);
-  if (n > 0) return "text-bullish";
-  if (n < 0) return "text-bearish";
-  return "text-default-500";
+  if (n > 0) return "text-positive";
+  if (n < 0) return "text-negative";
+  return "text-text-muted";
 }
 
 /** Color helper for the PnL column. */
 function profitColor(value?: string): string {
-  if (!value) return "text-default-500";
+  if (!value) return "text-text-muted";
   const n = parseFloat(value);
-  if (n > 0) return "text-bullish";
-  if (n < 0) return "text-bearish";
-  return "text-default-500";
+  if (n > 0) return "text-positive";
+  if (n < 0) return "text-negative";
+  return "text-text-muted";
 }
 
 interface TokenAvatarProps {
@@ -378,9 +361,7 @@ interface TokenAvatarProps {
 function TokenAvatar({ imageUrl, symbol, address }: TokenAvatarProps) {
   const ref = useRef<HTMLImageElement>(null);
   const initial = (symbol || "?").charAt(0).toUpperCase();
-  const hash = address
-    .split("")
-    .reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const hash = address.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
   const bg = `hsl(${(hash * 53) % 360}, 60%, 40%)`;
 
   if (imageUrl) {
@@ -405,7 +386,7 @@ function TokenAvatar({ imageUrl, symbol, address }: TokenAvatarProps) {
   return (
     <span
       aria-hidden
-      className="flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-white shrink-0"
+      className="flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-text-primary shrink-0"
       style={{ background: bg }}
     >
       {initial}

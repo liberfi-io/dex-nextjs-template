@@ -18,17 +18,21 @@ export interface RuntimeConfigPolicyInput {
   origin: string;
 }
 
-export interface AppClientBundle {
+export interface CoreAppClientBundle {
   chainStream: ChainStreamClient;
   api: Client;
   mediaTrack: MediaTrackClient;
-  channels: ChannelsClient;
+  capabilities: CapabilityBundleV1;
+}
+
+export interface PredictAppClientBundle {
   predict: PredictClient;
   predictWs: PredictWsClient | null;
-  portfolio: PortfolioClient;
+}
+
+export interface PerpetualsAppClientBundle {
   perpetuals: HyperliquidPerpetualsClient;
   perpetualDeposit: LiberFiPerpDepositClient | undefined;
-  capabilities: CapabilityBundleV1;
 }
 
 type TokenDataCapability = Pick<
@@ -61,16 +65,10 @@ type WalletDataCapability = Pick<
 >;
 type ActivityDataCapability = Pick<
   Client,
-  | "getWalletTrades"
-  | "getTokenTrades"
-  | "getWalletActivities"
-  | "getTokenActivities"
+  "getWalletTrades" | "getTokenTrades" | "getWalletActivities" | "getTokenActivities"
 >;
 type TradeCapability = Pick<Client, "swapRoute">;
-type TransactionCapability = Pick<
-  Client,
-  "getLatestBlock" | "sendTx" | "checkTxSuccess"
->;
+type TransactionCapability = Pick<Client, "getLatestBlock" | "sendTx" | "checkTxSuccess">;
 type MediaCapability = Pick<Client, "getPresignedUploadUrl">;
 type TokenSubscriptionCapability = Pick<
   Client,
@@ -87,9 +85,7 @@ type TokenSubscriptionCapability = Pick<
 >;
 type WalletSubscriptionCapability = Pick<
   Client,
-  | "subscribeWalletPnl"
-  | "subscribeWalletPortfolios"
-  | "subscribeWalletPortfolioPnls"
+  "subscribeWalletPnl" | "subscribeWalletPortfolios" | "subscribeWalletPortfolioPnls"
 >;
 type ActivitySubscriptionCapability = Pick<
   Client,
@@ -128,7 +124,6 @@ export type RuntimeClientKey =
   | "channels"
   | "predict"
   | "predictWs"
-  | "portfolio"
   | "perpetuals"
   | "perpetualDeposit";
 
@@ -138,14 +133,11 @@ export type RuntimeProviderKey =
   | "auth"
   | "locale"
   | "app-runtime"
-  | "pinata"
   | "application-adapters"
   | "api-client"
   | "media-track"
-  | "channels"
   | "predict"
   | "polymarket"
-  | "portfolio-client"
   | "portfolio-account"
   | "perpetuals"
   | "application-shell";
@@ -162,10 +154,8 @@ export interface PredictWsRouteLifecycle {
 import type { ChainStreamClient } from "@chainstream-io/sdk";
 import type { Client } from "@liberfi.io/client";
 import type { PredictClient, PredictWsClient } from "@liberfi.io/react-predict";
-import type { ChannelsClient } from "@liberfi.io/ui-channels/client";
 import type { MediaTrackClient } from "@liberfi.io/ui-media-track/client";
 import type {
   HyperliquidPerpetualsClient,
   LiberFiPerpDepositClient,
 } from "@liberfi.io/ui-perpetuals";
-import type { PortfolioClient } from "@liberfi.io/ui-portfolio/client";

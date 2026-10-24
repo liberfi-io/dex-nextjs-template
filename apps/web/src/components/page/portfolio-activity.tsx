@@ -1,0 +1,1962 @@
+"use client";
+
+import { useState, useMemo, useCallback, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useTranslation } from "@liberfi.io/i18n";
+import {
+  useWallets,
+  type EvmWalletAdapter,
+} from "@liberfi.io/wallet-connector";
+import {
+  usePredictWallet,
+  PREDICT_SELL_MODAL_ID,
+  type PredictSellModalParams,
+  PREDICT_REDEEM_MODAL_ID,
+  type TradeOutcome,
+  type TradeSide,
+} from "@liberfi.io/ui-predict";
+import {
+  useOrdersMulti,
+  useInfiniteTradesMulti,
+  useCancelOrder,
+  usePolymarket,
+  buildPolymarketL2Headers,
+  type PolymarketSigner,
+  type PredictEvent,
+  type PredictMarket,
+  type PredictPosition,
+  type PredictOrder,
+  type PredictTrade,
+} from "@liberfi.io/react-predict";
+import { cn, toast, PolymarketIcon, KalshiIcon, Sortable } from "@liberfi.io/ui";
+import { useAsyncModal } from "@liberfi.io/ui-scaffold";
+import { useVirtualizer } from "@tanstack/react-virtual";
+import { predictEventHref } from "./predict-source";
+import { Shimmer } from "./portfolio-skeleton";
+import { ENABLE_KALSHI } from "../../libs/featureFlags";
+import {
+  getCancelOrderConfirmationMessages,
+  useCancelOrderResultConfirmation,
+} from "../../features/trade-feedback/cancelOrderConfirmation";
+import { useWorldcupMatches } from "../../features/worldcup/data/queries";
+import { resolveWorldcupEventAttribution } from "../../features/worldcup/data/resolve-event-attribution";
+import {
+  FIFA_AVATAR,
+  buildWorldcupTeamHint,
+  worldcupMatchTitle,
+  type WorldCupTranslate,
+} from "../../features/worldcup/display";
+import {
+  marketLine,
+  marketLabel,
+  periodMarketLabel,
+  sportsType,
+} from "../../features/worldcup/components/detail/marketGrouping";
+import { formatLine } from "../../features/worldcup/odds/convert-price";
+import type { WcMatch } from "../../features/worldcup/types";
+import { TradeModal } from "../TradeModal";
+import { TradePanel } from "../../features/worldcup/components/detail/TradePanel";
+import { SETUP_WALLET_MODAL_ID } from "../SetupWalletModal";
+import type { PredictRedeemModalParams, RedeemOutcome } from "../PredictRedeemModal";
+import {
+  resolveOpposedSidePositive,
+  resolvePositionOutcome,
+} from "./positionOutcomeIdentity";
+
+export type ActivityTab = "positions" | "orders" | "history";
+
+/** Fixed scroll height used when panels are embedded (non flex-fill) layouts. */
+export const ACTIVITY_LIST_HEIGHT = 600;
+
+/**
+ * Temporarily hide the source (Polymarket / Kalshi) badge shown in the row
+ * subtitle of the positions / orders / history lists. Kept as a flag (not
+ * removed) so it can be re-enabled by flipping this back to `true`.
+ */
+const SHOW_SOURCE_BADGE = false;
+
+// ---------------------------------------------------------------------------
+// Positions panel
+// ---------------------------------------------------------------------------
+
+export type PositionSortKey = "value" | "pnl" | "size";
+type ActivityEvent = {
+  slug?: string;
+  title?: string;
+  image_url?: string;
+  title_trans?: unknown;
+};
+type ActivityOutcome = {
+  key: string;
+  label?: string;
+  label_trans?: unknown;
+};
+type ActivityMarket = {
+  slug?: string;
+  event_slug?: string;
+  question?: string;
+  image_url?: string;
+  provider_meta?: Record<string, unknown>;
+  providerMeta?: Record<string, unknown>;
+  question_trans?: unknown;
+  group_item_title_trans?: unknown;
+  outcomes?: ActivityOutcome[];
+};
+type TranslatedEvent = ActivityEvent & {
+  title_trans?: unknown;
+};
+type TranslatedMarket = ActivityMarket & {
+  question_trans?: unknown;
+  outcomes?: ActivityOutcome[];
+};
+type WorldcupMatchBySlug = Map<string, WcMatch>;
+type ActivityItem = {
+  event?: ActivityEvent;
+  market?: ActivityMarket;
+  side?: string;
+  outcome?: string;
+};
+type ActivityDisplay = {
+  title: string;
+  subtitle: string;
+  imageUrl?: string;
+  outcomeLabel?: string;
+  subtitleTone?: "bullish" | "bearish";
+  plainSide?: boolean;
+  plainSideLabel?: string;
+  plainSidePositive?: boolean;
+  hideSide?: boolean;
+};
+type WorldcupSellRequest = {
+  event: PredictEvent;
+  market: PredictMarket;
+  outcome: TradeOutcome;
+  initialPositionSide?: string;
+};
+
+type PositionSortOrder = "asc" | "desc";
+
+const POSITION_ROW_GRID =
+  "grid-cols-[minmax(280px,1.4fr)_minmax(72px,0.45fr)_minmax(116px,0.8fr)_minmax(86px,0.55fr)_minmax(86px,0.55fr)_minmax(112px,0.8fr)_minmax(96px,0.55fr)]";
+
+const POSITION_TABLE_MIN_WIDTH = 980;
+
+function positionSortValue(p: PredictPosition, key: PositionSortKey): number {
+  switch (key) {
+    case "value":
+      return p.current_value ?? p.size * (p.current_price ?? 0);
+    case "pnl":
+      return p.pnl ?? 0;
+    case "size":
+      return p.size ?? 0;
+  }
+}
+
+function positionRowKey(position: PredictPosition, fallback: number): string {
+  return [
+    position.source,
+    position.market?.slug ?? fallback,
+    position.side || "unknown",
+  ].join("-");
+}
+
+function translatedText(base: string | undefined, translated: unknown): string | undefined {
+  return typeof translated === "string" && translated.trim() ? translated : base;
+}
+
+function activityEventTitle(item: ActivityItem): string {
+  const event = item.event as TranslatedEvent | undefined;
+  return translatedText(item.event?.title, event?.title_trans) ?? "—";
+}
+
+function activityOutcomeLabel(item: ActivityItem): string {
+  const market = item.market as TranslatedMarket | undefined;
+  const outcome = market?.outcomes?.[0];
+  return translatedText(outcome?.label, outcome?.label_trans) ?? "";
+}
+
+function worldcupMatchSlugForActivity(item: ActivityItem): string | null {
+  const slug = item.market?.event_slug || item.event?.slug;
+  if (!slug) return null;
+  return resolveWorldcupEventAttribution(slug)?.matchSlug ?? null;
+}
+
+function toWorldcupPredictMarket(market: ActivityMarket): PredictMarket {
+  return {
+    ...market,
+    slug: market.slug ?? "",
+    source: "polymarket",
+    status: "open",
+    question: market.question ?? "",
+    event_slug: market.event_slug ?? "",
+    image_url: market.image_url,
+    provider_meta: market.provider_meta ?? market.providerMeta,
+  } as PredictMarket;
+}
+
+function activityOutcomeSide(item: ActivityItem): string | undefined {
+  const side = item.side?.trim();
+  const normalizedSide = side?.toLowerCase();
+  return normalizedSide === "buy" || normalizedSide === "sell"
+    ? item.outcome
+    : item.outcome ?? side;
+}
+
+function isWorldcupMoneylineMarket(market: ActivityMarket): boolean {
+  const type = sportsType(toWorldcupPredictMarket(market));
+  return (
+    type === "moneyline" ||
+    type === "soccer_match_winner" ||
+    type === "soccer_halftime_result" ||
+    type === "soccer_second_half_result"
+  );
+}
+
+function isWorldcupBothTeamsToScoreMarket(market: ActivityMarket): boolean {
+  const type = sportsType(toWorldcupPredictMarket(market));
+  return (
+    type === "both_teams_to_score" ||
+    type === "both_teams_to_score_first_half" ||
+    type === "both_teams_to_score_second_half"
+  );
+}
+
+function isWorldcupSpreadMarket(market: ActivityMarket): boolean {
+  return sportsType(toWorldcupPredictMarket(market)) === "spreads";
+}
+
+function isWorldcupTotalsMarket(market: ActivityMarket): boolean {
+  const type = sportsType(toWorldcupPredictMarket(market));
+  return (
+    type === "totals" ||
+    type === "first_half_totals" ||
+    type === "second_half_totals"
+  );
+}
+
+function isWorldcupHalfTotalsMarket(market: ActivityMarket): boolean {
+  const type = sportsType(toWorldcupPredictMarket(market));
+  return type === "first_half_totals" || type === "second_half_totals";
+}
+
+function isWorldcupFirstToScoreMarket(market: ActivityMarket): boolean {
+  return sportsType(toWorldcupPredictMarket(market)) === "soccer_first_to_score";
+}
+
+function isWorldcupExactScoreMarket(market: ActivityMarket): boolean {
+  return sportsType(toWorldcupPredictMarket(market)) === "soccer_exact_score";
+}
+
+function isWorldcupTeamTotalGoalsMarket(market: ActivityMarket): boolean {
+  const type = sportsType(toWorldcupPredictMarket(market));
+  return (
+    type === "soccer_team_totals" ||
+    type === "soccer_first_half_team_totals" ||
+    type === "soccer_second_half_team_totals"
+  );
+}
+
+function isWorldcupCornerTotalMarket(market: ActivityMarket): boolean {
+  const type = sportsType(toWorldcupPredictMarket(market));
+  return (
+    type === "soccer_second_half_total_corners" ||
+    type === "total_corners" ||
+    type === "soccer_first_half_total_corners"
+  );
+}
+
+function isWorldcupTeamTotalCornersMarket(market: ActivityMarket): boolean {
+  return sportsType(toWorldcupPredictMarket(market)) === "soccer_team_total_corners";
+}
+
+function isWorldcupCornerOddEvenMarket(market: ActivityMarket): boolean {
+  return sportsType(toWorldcupPredictMarket(market)) === "soccer_game_corners_odd_even";
+}
+
+function isWorldcupPlayerPropMarket(market: ActivityMarket): boolean {
+  const type = sportsType(toWorldcupPredictMarket(market));
+  return (
+    type === "soccer_player_goals" ||
+    type === "soccer_player_goals_plus_assists" ||
+    type === "soccer_player_assists" ||
+    type === "soccer_player_shots" ||
+    type === "soccer_player_shots_on_target" ||
+    type === "soccer_player_goalkeeper_saves"
+  );
+}
+
+function textMatchesAny(text: string, keys: Set<string>): boolean {
+  const lower = text.toLowerCase();
+  for (const key of keys) {
+    if (key && lower.includes(key)) return true;
+  }
+  return false;
+}
+
+function marketMetaString(market: ActivityMarket, key: string): string {
+  const value = (market.provider_meta ?? market.providerMeta)?.[key];
+  return typeof value === "string" ? value : "";
+}
+
+function spreadCoverTeam(
+  market: ActivityMarket,
+  hint: NonNullable<ReturnType<typeof buildWorldcupTeamHint>>,
+): { label: string; keys: Set<string> } | undefined {
+  const text =
+    `${market.outcomes?.[0]?.label ?? ""} ${marketMetaString(market, "polymarket.groupItemTitle")}`.trim() ||
+    market.question ||
+    "";
+  if (textMatchesAny(text, hint.homeKeys) && hint.homeLabel) {
+    return { label: hint.homeLabel, keys: hint.homeKeys };
+  }
+  if (textMatchesAny(text, hint.awayKeys) && hint.awayLabel) {
+    return { label: hint.awayLabel, keys: hint.awayKeys };
+  }
+  return undefined;
+}
+
+function worldcupSpreadSubtitle(
+  market: ActivityMarket,
+  hint: NonNullable<ReturnType<typeof buildWorldcupTeamHint>>,
+  translate: WorldCupTranslate,
+): string | undefined {
+  if (!isWorldcupSpreadMarket(market)) return undefined;
+  const team = spreadCoverTeam(market, hint);
+  if (!team) return undefined;
+  const line = Math.abs(marketLine(toWorldcupPredictMarket(market)) ?? 0);
+  if (!line) return undefined;
+  return translate("extend.worldcup.spreadHandicap", {
+    team: team.label,
+    line: formatLine(line, false),
+  });
+}
+
+function worldcupSpreadSideIsPositive(
+  market: ActivityMarket,
+  side: string | undefined,
+  hint: NonNullable<ReturnType<typeof buildWorldcupTeamHint>>,
+): boolean | undefined {
+  if (!isWorldcupSpreadMarket(market) || !side) return undefined;
+  const team = spreadCoverTeam(market, hint);
+  if (!team) return undefined;
+  const opposingKeys =
+    team.keys === hint.homeKeys ? hint.awayKeys : hint.homeKeys;
+  return resolveOpposedSidePositive(side, team.keys, opposingKeys);
+}
+
+function worldcupTotalsSubtitle(
+  market: ActivityMarket,
+  translate: WorldCupTranslate,
+): string | undefined {
+  const predictMarket = toWorldcupPredictMarket(market);
+  if (sportsType(predictMarket) !== "totals") return undefined;
+  const line = marketLine(predictMarket);
+  if (line === undefined) return undefined;
+  return translate("extend.worldcup.marketWithLine", {
+    market: translate("extend.worldcup.detail.markets.type.totals"),
+    line: formatLine(Math.abs(line), false),
+  });
+}
+
+function worldcupHalfTotalsSubtitle(
+  market: ActivityMarket,
+  translate: WorldCupTranslate,
+): string | undefined {
+  if (!isWorldcupHalfTotalsMarket(market)) return undefined;
+  const predictMarket = toWorldcupPredictMarket(market);
+  const line = marketLine(predictMarket);
+  if (line === undefined) return undefined;
+  return translate("extend.worldcup.marketWithLine", {
+    market: translate(`extend.worldcup.detail.markets.type.${sportsType(predictMarket)}`),
+    line: formatLine(Math.abs(line), false),
+  });
+}
+
+function worldcupBothTeamsToScoreSubtitle(
+  market: ActivityMarket,
+  hint: NonNullable<ReturnType<typeof buildWorldcupTeamHint>>,
+  translate: WorldCupTranslate,
+): string | undefined {
+  if (!isWorldcupBothTeamsToScoreMarket(market)) return undefined;
+  const type = sportsType(toWorldcupPredictMarket(market));
+  if (type === "both_teams_to_score") {
+    return translate("extend.worldcup.bothTeamsToScore");
+  }
+  return periodMarketLabel(
+    type,
+    translate("extend.worldcup.bothTeamsToScore"),
+    hint,
+  );
+}
+
+function worldcupTotalSideLabel(
+  side: string | undefined,
+  translate: WorldCupTranslate,
+): { label: string; tone: "bullish" | "bearish"; positive: boolean } | undefined {
+  const normalizedSide = side?.trim().toLowerCase();
+  if (normalizedSide === "over" || normalizedSide === "yes") {
+    return {
+      label: translate("extend.worldcup.totalSide.over"),
+      tone: "bullish",
+      positive: true,
+    };
+  }
+  if (normalizedSide === "under" || normalizedSide === "no") {
+    return {
+      label: translate("extend.worldcup.totalSide.under"),
+      tone: "bearish",
+      positive: false,
+    };
+  }
+  return undefined;
+}
+
+function worldcupCornerOddEvenSideLabel(
+  side: string | undefined,
+  translate: WorldCupTranslate,
+): { label: string; positive: boolean } | undefined {
+  const normalizedSide = side?.trim().toLowerCase();
+  if (normalizedSide === "odd" || normalizedSide === "yes") {
+    return {
+      label: translate("extend.worldcup.cornerSide.odd"),
+      positive: true,
+    };
+  }
+  if (normalizedSide === "even" || normalizedSide === "no") {
+    return {
+      label: translate("extend.worldcup.cornerSide.even"),
+      positive: false,
+    };
+  }
+  return undefined;
+}
+
+function worldcupTeamTotalGoalsSubtitle(
+  market: ActivityMarket,
+  hint: NonNullable<ReturnType<typeof buildWorldcupTeamHint>>,
+  translate: WorldCupTranslate,
+): string | undefined {
+  if (!isWorldcupTeamTotalGoalsMarket(market)) return undefined;
+  const predictMarket = toWorldcupPredictMarket(market);
+  const line = marketLine(predictMarket);
+  if (line === undefined) return undefined;
+  const label = marketLabel(predictMarket, hint);
+  const team =
+    hint.homeLabel && textMatchesAny(label, hint.homeKeys)
+      ? hint.homeLabel
+      : hint.awayLabel && textMatchesAny(label, hint.awayKeys)
+        ? hint.awayLabel
+        : label;
+  const subtitle = translate("extend.worldcup.teamTotalGoals", {
+    team,
+    line: formatLine(Math.abs(line), false),
+  });
+  return periodMarketLabel(sportsType(predictMarket), subtitle, hint);
+}
+
+function worldcupCornerTotalSubtitle(
+  market: ActivityMarket,
+  translate: WorldCupTranslate,
+): string | undefined {
+  if (!isWorldcupCornerTotalMarket(market)) return undefined;
+  const predictMarket = toWorldcupPredictMarket(market);
+  const line = marketLine(predictMarket);
+  if (line === undefined) return undefined;
+  return translate("extend.worldcup.marketWithLine", {
+    market: translate(`extend.worldcup.detail.markets.type.${sportsType(predictMarket)}`),
+    line: formatLine(Math.abs(line), false),
+  });
+}
+
+function worldcupTeamTotalCornersSubtitle(
+  market: ActivityMarket,
+  hint: NonNullable<ReturnType<typeof buildWorldcupTeamHint>>,
+  translate: WorldCupTranslate,
+): string | undefined {
+  if (!isWorldcupTeamTotalCornersMarket(market)) return undefined;
+  const predictMarket = toWorldcupPredictMarket(market);
+  const line = marketLine(predictMarket);
+  if (line === undefined) return undefined;
+  const label = marketLabel(predictMarket, hint);
+  const team =
+    hint.homeLabel && textMatchesAny(label, hint.homeKeys)
+      ? hint.homeLabel
+      : hint.awayLabel && textMatchesAny(label, hint.awayKeys)
+        ? hint.awayLabel
+        : label;
+  return translate("extend.worldcup.teamMarketWithLine", {
+    team,
+    market: translate("extend.worldcup.detail.markets.type.total_corners"),
+    line: formatLine(Math.abs(line), false),
+  });
+}
+
+function worldcupFirstToScoreSubtitle(
+  market: ActivityMarket,
+  hint: NonNullable<ReturnType<typeof buildWorldcupTeamHint>>,
+  translate: WorldCupTranslate,
+): string | undefined {
+  if (!isWorldcupFirstToScoreMarket(market)) return undefined;
+  const optionLabel = marketLabel(toWorldcupPredictMarket(market), hint);
+  if (!optionLabel) return undefined;
+  return `${translate("extend.worldcup.detail.markets.type.soccer_first_to_score")} (${optionLabel})`;
+}
+
+function stripMarketLabelPrefix(label: string): string {
+  const idx = label.indexOf(": ");
+  return idx >= 0 ? label.slice(idx + 2).trim() : label;
+}
+
+function worldcupExactScoreSubtitle(
+  market: ActivityMarket,
+  hint: NonNullable<ReturnType<typeof buildWorldcupTeamHint>>,
+): string | undefined {
+  if (!isWorldcupExactScoreMarket(market)) return undefined;
+  const label = stripMarketLabelPrefix(marketLabel(toWorldcupPredictMarket(market), hint));
+  const score = label.match(/(\d+)\s*[-–]\s*(\d+)/);
+  if (!score || !hint.homeLabel || !hint.awayLabel) return label;
+  return `${hint.homeLabel} ${score[1]} - ${score[2]} ${hint.awayLabel}`;
+}
+
+function worldcupMoneylineOutcomeLabel(
+  market: ActivityMarket,
+  match: WcMatch,
+  translate: WorldCupTranslate,
+): string | undefined {
+  if (!isWorldcupMoneylineMarket(market)) return undefined;
+  const hint = buildWorldcupTeamHint(match, translate);
+  return marketLabel(toWorldcupPredictMarket(market), hint);
+}
+
+function activityDisplay(
+  item: ActivityItem,
+  worldcupMatchBySlug: WorldcupMatchBySlug,
+  translate: WorldCupTranslate,
+): ActivityDisplay {
+  const matchSlug = worldcupMatchSlugForActivity(item);
+  const match = matchSlug ? worldcupMatchBySlug.get(matchSlug) : undefined;
+  if (match && item.market) {
+    const hint = buildWorldcupTeamHint(match, translate);
+    const outcomeSide = activityOutcomeSide(item);
+    const outcomeLabel = worldcupMoneylineOutcomeLabel(item.market, match, translate);
+    const bothTeamsToScoreSubtitle = hint
+      ? worldcupBothTeamsToScoreSubtitle(item.market, hint, translate)
+      : undefined;
+    const spreadSubtitle = hint
+      ? worldcupSpreadSubtitle(item.market, hint, translate)
+      : undefined;
+    const totalsSubtitle = worldcupTotalsSubtitle(item.market, translate);
+    const halfTotalsSubtitle = worldcupHalfTotalsSubtitle(item.market, translate);
+    const firstToScoreSubtitle = hint
+      ? worldcupFirstToScoreSubtitle(item.market, hint, translate)
+      : undefined;
+    const exactScoreSubtitle = hint
+      ? worldcupExactScoreSubtitle(item.market, hint)
+      : undefined;
+    const isPlayerProp = isWorldcupPlayerPropMarket(item.market);
+    const teamTotalGoalsSubtitle = hint
+      ? worldcupTeamTotalGoalsSubtitle(item.market, hint, translate)
+      : undefined;
+    const cornerTotalSubtitle = worldcupCornerTotalSubtitle(item.market, translate);
+    const teamTotalCornersSubtitle = hint
+      ? worldcupTeamTotalCornersSubtitle(item.market, hint, translate)
+      : undefined;
+    const isCornerOddEven = isWorldcupCornerOddEvenMarket(item.market);
+    const cornerOddEvenSubtitle = isCornerOddEven
+      ? translate("extend.worldcup.detail.markets.type.soccer_game_corners_odd_even")
+      : undefined;
+    const totalsSide = totalsSubtitle
+      ? worldcupTotalSideLabel(outcomeSide, translate)
+      : undefined;
+    const teamTotalGoalsSide = teamTotalGoalsSubtitle
+      ? worldcupTotalSideLabel(outcomeSide, translate)
+      : undefined;
+    const halfTotalsSide = halfTotalsSubtitle
+      ? worldcupTotalSideLabel(outcomeSide, translate)
+      : undefined;
+    const cornerTotalSide = cornerTotalSubtitle
+      ? worldcupTotalSideLabel(outcomeSide, translate)
+      : undefined;
+    const teamTotalCornersSide = teamTotalCornersSubtitle
+      ? worldcupTotalSideLabel(outcomeSide, translate)
+      : undefined;
+    const cornerOddEvenSide = isCornerOddEven
+      ? worldcupCornerOddEvenSideLabel(outcomeSide, translate)
+      : undefined;
+    const spreadSideIsPositive = hint
+      ? worldcupSpreadSideIsPositive(item.market, outcomeSide, hint)
+      : undefined;
+    return {
+      title: worldcupMatchTitle(match, hint) ?? activityEventTitle(item),
+      subtitle: outcomeLabel
+        ? ""
+        : bothTeamsToScoreSubtitle ??
+          spreadSubtitle ??
+            halfTotalsSubtitle ??
+            totalsSubtitle ??
+            teamTotalGoalsSubtitle ??
+            cornerTotalSubtitle ??
+            teamTotalCornersSubtitle ??
+            cornerOddEvenSubtitle ??
+            firstToScoreSubtitle ??
+            exactScoreSubtitle ??
+            marketLabel(toWorldcupPredictMarket(item.market), hint),
+      imageUrl: FIFA_AVATAR,
+      outcomeLabel,
+      plainSide: Boolean(
+        outcomeLabel ||
+          bothTeamsToScoreSubtitle ||
+          spreadSubtitle ||
+          totalsSubtitle ||
+          halfTotalsSubtitle ||
+          teamTotalGoalsSubtitle ||
+          cornerTotalSubtitle ||
+          teamTotalCornersSubtitle ||
+          cornerOddEvenSubtitle ||
+          firstToScoreSubtitle ||
+          exactScoreSubtitle ||
+          isPlayerProp,
+      ),
+      plainSideLabel:
+        totalsSide?.label ??
+        teamTotalGoalsSide?.label ??
+        halfTotalsSide?.label ??
+        cornerTotalSide?.label ??
+        teamTotalCornersSide?.label ??
+        cornerOddEvenSide?.label,
+      plainSidePositive:
+        totalsSide?.positive ??
+        teamTotalGoalsSide?.positive ??
+        halfTotalsSide?.positive ??
+        cornerTotalSide?.positive ??
+        teamTotalCornersSide?.positive ??
+        cornerOddEvenSide?.positive ??
+        spreadSideIsPositive,
+    };
+  }
+
+  return {
+    title: activityEventTitle(item),
+    subtitle: activityOutcomeLabel(item),
+    imageUrl: item.market?.image_url || item.event?.image_url,
+  };
+}
+
+function sellOutcomeForPosition(
+  position: PredictPosition,
+  display: ActivityDisplay,
+): RedeemOutcome | undefined {
+  const market = position.market;
+  return resolvePositionOutcome({
+    side: position.side,
+    positiveSide:
+      market &&
+      isWorldcupSpreadMarket(market) &&
+      typeof display.plainSidePositive === "boolean"
+        ? display.plainSidePositive
+        : undefined,
+    mapsOverUnder:
+      market !== undefined &&
+      (isWorldcupTotalsMarket(market) ||
+        isWorldcupTeamTotalGoalsMarket(market) ||
+        isWorldcupCornerTotalMarket(market) ||
+        isWorldcupTeamTotalCornersMarket(market)),
+    mapsOddEven:
+      market !== undefined && isWorldcupCornerOddEvenMarket(market),
+  });
+}
+
+function sellPositionSideOverride(position: PredictPosition): string | undefined {
+  const side = position.side?.trim();
+  if (!side || side.toLowerCase() === "yes" || side.toLowerCase() === "no") {
+    return undefined;
+  }
+  if (!position.market) return undefined;
+  return isWorldcupSpreadMarket(position.market) ||
+    isWorldcupTotalsMarket(position.market) ||
+    isWorldcupTeamTotalGoalsMarket(position.market) ||
+    isWorldcupCornerTotalMarket(position.market) ||
+    isWorldcupTeamTotalCornersMarket(position.market) ||
+    isWorldcupCornerOddEvenMarket(position.market)
+    ? side
+    : undefined;
+}
+
+function worldcupTradeEvent(
+  position: PredictPosition,
+  display: ActivityDisplay,
+): PredictEvent | undefined {
+  if (!position.event) return undefined;
+  return {
+    ...(position.event as PredictEvent),
+    title: display.title,
+    image_url: FIFA_AVATAR,
+  };
+}
+
+function worldcupTradeMarket(
+  position: PredictPosition,
+  display: ActivityDisplay,
+): PredictMarket | undefined {
+  if (!position.market) return undefined;
+  const label = display.outcomeLabel ?? display.subtitle ?? position.market.question ?? "";
+  const market = toWorldcupPredictMarket(position.market);
+  const outcomes = market.outcomes?.length
+    ? [{ ...market.outcomes[0], label }, ...market.outcomes.slice(1)]
+    : market.outcomes;
+  return {
+    ...market,
+    question: label || market.question,
+    outcomes,
+  };
+}
+
+export function PositionsPanel({
+  positions,
+  isLoading,
+  search,
+  fill = true,
+}: {
+  positions: PredictPosition[];
+  isLoading: boolean;
+  search: string;
+  /** Fill the available flex height (page layout) vs. fixed max-height (embedded). */
+  fill?: boolean;
+}) {
+  const { t } = useTranslation();
+  const { onOpen: openSetupWallet } = useAsyncModal(SETUP_WALLET_MODAL_ID);
+  const [sort, setSort] = useState<{
+    field: PositionSortKey;
+    order: PositionSortOrder;
+  } | null>(null);
+  const [worldcupSellRequest, setWorldcupSellRequest] =
+    useState<WorldcupSellRequest | null>(null);
+  const [worldcupTradeSide, setWorldcupTradeSide] = useState<TradeSide>("sell");
+  const translate = t as WorldCupTranslate;
+  const hasWorldcupPositions = useMemo(
+    () => positions.some((position) => Boolean(worldcupMatchSlugForActivity(position))),
+    [positions],
+  );
+  const { data: worldcupMatches = [] } = useWorldcupMatches({
+    enabled: hasWorldcupPositions,
+  });
+  const worldcupMatchBySlug = useMemo(
+    () => new Map(worldcupMatches.map((match) => [match.slug, match])),
+    [worldcupMatches],
+  );
+
+  const filtered = useMemo(() => {
+    let list = positions;
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      list = list.filter(
+        (p) => {
+          const display = activityDisplay(p, worldcupMatchBySlug, translate);
+          return (
+            display.title.toLowerCase().includes(q) ||
+            display.subtitle.toLowerCase().includes(q)
+          );
+        },
+      );
+    }
+    const sorted = [...list];
+    if (!sort) return sorted;
+    const dir = sort.order === "asc" ? 1 : -1;
+    return sorted.sort((a, b) => dir * (positionSortValue(a, sort.field) - positionSortValue(b, sort.field)));
+  }, [positions, search, sort, translate, worldcupMatchBySlug]);
+
+  const handleSort =
+    (field: PositionSortKey) => (dir: "asc" | "desc" | undefined) => {
+      setSort(dir ? { field, order: dir } : null);
+    };
+  const sortFor = (field: PositionSortKey): PositionSortOrder | undefined =>
+    sort?.field === field ? sort.order : undefined;
+  const handleWorldcupSell = useCallback(
+    (position: PredictPosition, display: ActivityDisplay) => {
+      const event = worldcupTradeEvent(position, display);
+      const market = worldcupTradeMarket(position, display);
+      const outcome = sellOutcomeForPosition(position, display);
+      if (!event || !market || !outcome) return;
+      setWorldcupSellRequest({
+        event,
+        market,
+        outcome,
+        initialPositionSide: sellPositionSideOverride(position),
+      });
+      setWorldcupTradeSide("sell");
+    },
+    [],
+  );
+
+  const parentRef = useRef<HTMLDivElement>(null);
+  const virtualizer = useVirtualizer({
+    count: filtered.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 72,
+    overscan: 10,
+    measureElement: (el) => el.getBoundingClientRect().height,
+  });
+
+  if (isLoading) return <PanelSkeleton />;
+
+  return (
+    <div className={cn("flex flex-col", fill && "min-h-0 flex-1")}>
+      {/* Position rows */}
+      {filtered.length === 0 ? (
+        <EmptyState message={t("extend.portfolio.noPositions")} icon="positions" />
+      ) : (
+        <div
+          ref={parentRef}
+          className={cn(
+            "overflow-y-auto overflow-x-hidden rounded-xl border border-border-subtle/30 bg-surface-base no-scrollbar",
+            fill && "min-h-0 flex-1",
+          )}
+          style={fill ? undefined : { maxHeight: ACTIVITY_LIST_HEIGHT }}
+        >
+          <div className="overflow-x-auto overflow-y-visible no-scrollbar">
+            <div style={{ minWidth: POSITION_TABLE_MIN_WIDTH, width: "100%" }}>
+            <div
+              className={cn(
+                "sticky top-0 z-20 grid items-center gap-4 border-b border-border-subtle/50 bg-surface-base/95 px-5 py-2 text-[11px] font-medium uppercase tracking-wide text-text-muted backdrop-blur",
+                POSITION_ROW_GRID,
+              )}
+            >
+              <span>{t("extend.leaderboard.detail.colMarket")}</span>
+              <span className="flex justify-end">
+                <Sortable sort={sortFor("size")} onSortChange={handleSort("size")}>
+                  {t("extend.leaderboard.detail.colShares")}
+                </Sortable>
+              </span>
+              <span className="text-right">{t("extend.leaderboard.detail.colAvgNow")}</span>
+              <span className="text-right">{t("extend.portfolio.invested")}</span>
+              <span className="flex justify-end">
+                <Sortable sort={sortFor("value")} onSortChange={handleSort("value")}>
+                  {t("extend.leaderboard.detail.colValue")}
+                </Sortable>
+              </span>
+              <span className="flex justify-end">
+                <Sortable sort={sortFor("pnl")} onSortChange={handleSort("pnl")}>
+                  {t("extend.leaderboard.detail.colTotalPnl")}
+                </Sortable>
+              </span>
+              <span className="sticky right-0 z-30 -mr-5 bg-surface-base/95 py-2 pr-5 text-right lg:static lg:mr-0 lg:bg-transparent lg:py-0">
+                {t("extend.portfolio.action")}
+              </span>
+            </div>
+            <div className="relative w-full bg-surface-base" style={{ height: virtualizer.getTotalSize() }}>
+              {virtualizer.getVirtualItems().map((vItem) => {
+                const pos = filtered[vItem.index];
+                return (
+                  <div
+                    key={positionRowKey(pos, vItem.index)}
+                    ref={virtualizer.measureElement}
+                    data-index={vItem.index}
+                    className="absolute left-0 top-0 w-full"
+                    style={{ transform: `translateY(${vItem.start}px)` }}
+                  >
+                    <PositionRow
+                      position={pos}
+                      translate={translate}
+                      worldcupMatchBySlug={worldcupMatchBySlug}
+                      isLast={vItem.index === filtered.length - 1}
+                      onWorldcupSell={handleWorldcupSell}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          </div>
+        </div>
+      )}
+      <TradeModal
+        open={Boolean(worldcupSellRequest)}
+        onClose={() => setWorldcupSellRequest(null)}
+        title={t(`extend.worldcup.detail.trade.${worldcupTradeSide}`)}
+      >
+        {worldcupSellRequest ? (
+          <TradePanel
+            event={worldcupSellRequest.event}
+            market={worldcupSellRequest.market}
+            outcome={worldcupSellRequest.outcome}
+            side={worldcupTradeSide}
+            initialPositionSide={worldcupSellRequest.initialPositionSide}
+            onSideChange={setWorldcupTradeSide}
+            onOutcomeChange={(outcome) =>
+              setWorldcupSellRequest((current) =>
+                current ? { ...current, outcome } : current,
+              )
+            }
+            onSetupRequired={() => openSetupWallet()}
+            onSuccess={() => setWorldcupSellRequest(null)}
+          />
+        ) : null}
+      </TradeModal>
+    </div>
+  );
+}
+
+function PositionRow({
+  position,
+  translate,
+  worldcupMatchBySlug,
+  isLast,
+  onWorldcupSell,
+}: {
+  position: PredictPosition;
+  translate: WorldCupTranslate;
+  worldcupMatchBySlug: WorldcupMatchBySlug;
+  isLast: boolean;
+  onWorldcupSell: (position: PredictPosition, display: ActivityDisplay) => void;
+}) {
+  const { t } = useTranslation();
+  const router = useRouter();
+  const { onOpen: openSellModal } = useAsyncModal<PredictSellModalParams>(PREDICT_SELL_MODAL_ID);
+  const { onOpen: openRedeemModal } = useAsyncModal<PredictRedeemModalParams>(PREDICT_REDEEM_MODAL_ID);
+  const pnl = position.pnl ?? 0;
+  const pnlPercent = position.pnl_percent ?? 0;
+  const avgPrice = position.avg_price ?? 0;
+  const currentPrice = position.current_price ?? 0;
+  const invested = position.size * avgPrice;
+  const currentValue = position.current_value ?? position.size * currentPrice;
+  const pnlColor = pnl > 0 ? "text-positive" : pnl < 0 ? "text-negative" : "text-text-muted";
+  const display = activityDisplay(position, worldcupMatchBySlug, translate);
+  const marketLabel = display.title;
+  const marketName = display.outcomeLabel ?? display.subtitle;
+  const marketNameToneClass =
+    display.subtitleTone === "bullish"
+      ? "text-positive"
+      : display.subtitleTone === "bearish"
+        ? "text-negative"
+        : "text-text-muted";
+  const originalSideLabel = position.side;
+  const isYes = originalSideLabel?.toLowerCase() === "yes";
+  const usePlainSide = Boolean(display.plainSide);
+  const plainSidePositive = display.plainSidePositive ?? isYes;
+  const sideLabel = usePlainSide
+    ? display.plainSideLabel ??
+      t(plainSidePositive ? "extend.worldcup.detail.trade.yes" : "extend.worldcup.detail.trade.no")
+    : position.side;
+  const showSideCapsule = Boolean(sideLabel) && !display.hideSide;
+  const source = position.source;
+  const cellBorder = isLast ? "border-b border-transparent" : "border-b border-border-subtle/30";
+
+  const imageUrl = display.imageUrl;
+  const eventSlug = position.event?.slug;
+  const href = eventSlug ? predictEventHref({ slug: eventSlug, source }) : undefined;
+  const handleNavigate = useCallback(() => {
+    if (href) router.push(href);
+  }, [href, router]);
+  const handlePrefetch = useCallback(() => {
+    if (href) router.prefetch(href);
+  }, [href, router]);
+
+  const handleSell = useCallback(
+    () => {
+      if (!position.event || !position.market) return;
+      if (worldcupMatchSlugForActivity(position)) {
+        onWorldcupSell(position, display);
+        return;
+      }
+      const initialPositionSide = sellPositionSideOverride(position);
+      const initialOutcome = sellOutcomeForPosition(position, display);
+      if (!initialOutcome) return;
+      openSellModal({
+        params: {
+          event: position.event,
+          market: position.market,
+          initialOutcome,
+          ...(initialPositionSide ? { initialPositionSide } : {}),
+        } as PredictSellModalParams & { initialPositionSide?: string },
+      });
+    },
+    [position, display, onWorldcupSell, openSellModal],
+  );
+
+  const handleRedeem = useCallback(
+    () => {
+      if (!position.event || !position.market) return;
+      openRedeemModal({
+        params: {
+          event: position.event,
+          market: position.market,
+          position,
+          display: {
+            title: display.title,
+            marketLabel: marketName,
+            sideLabel,
+            outcome: sellOutcomeForPosition(position, display),
+          },
+        },
+      });
+    },
+    [position, display, marketName, sideLabel, openRedeemModal],
+  );
+
+  return (
+    <div
+      className={cn(
+        "group transition-[background-color] duration-150 hover:bg-surface-interactive/30",
+      )}
+    >
+      <div
+        className={cn(
+          "grid items-stretch gap-4 px-5",
+          POSITION_ROW_GRID,
+        )}
+      >
+        {/* Col 1: Icon + event info */}
+        <div className={cn("flex min-w-0 items-center gap-3 py-3", cellBorder)}>
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border-subtle/50 bg-surface-raised">
+            {imageUrl ? (
+              <img src={imageUrl} alt="" className="h-full w-full object-cover" />
+            ) : source === "kalshi" ? (
+              <KalshiIcon width={32} height={12} />
+            ) : (
+              <PolymarketIcon width={24} height={24} />
+            )}
+          </div>
+          <div className="min-w-0 flex-1">
+            <span
+              className={cn("mb-1 line-clamp-1 text-sm font-medium text-white", eventSlug && "cursor-pointer hover:underline")}
+              onClick={handleNavigate}
+              onMouseEnter={handlePrefetch}
+            >
+              {marketLabel}
+            </span>
+            <div className="flex min-w-0 items-center gap-2 text-xs text-text-muted">
+              {marketName && <span className={cn("max-w-[240px] truncate", marketNameToneClass)}>{marketName}</span>}
+              {marketName && showSideCapsule && <span className="text-text-disabled">&bull;</span>}
+              {showSideCapsule && (
+                <span
+                  className={cn(
+                    "inline-block shrink-0 text-xs font-medium",
+                    usePlainSide ? "" : "rounded px-1.5 py-0.5",
+                    plainSidePositive ? "text-positive" : "text-negative",
+                    !usePlainSide && (isYes ? "bg-positive/10" : "bg-negative/10"),
+                  )}
+                >
+                  {sideLabel}
+                </span>
+              )}
+              {SHOW_SOURCE_BADGE && (
+                <>
+                  {(marketName || showSideCapsule) && <span className="text-text-disabled">&bull;</span>}
+                  <span className="inline-flex items-center gap-1">
+                    {source === "kalshi" ? (
+                      <KalshiIcon width={36} height={12} />
+                    ) : (
+                      <>
+                        <PolymarketIcon width={16} height={16} />
+                        <span className="text-text-muted">{t("predict.platform.polymarket")}</span>
+                      </>
+                    )}
+                  </span>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Col 2: Shares */}
+        <div className={cn("flex items-center justify-end py-3 text-right text-sm tabular-nums text-text-secondary", cellBorder)}>
+          {formatShares(position.size)}
+        </div>
+
+        {/* Col 3: Price change */}
+        <div className={cn("flex items-center justify-end py-3 text-right", cellBorder)}>
+          <span className="text-sm">
+            {formatPrice(avgPrice)}{" "}
+            <span className="text-text-disabled">&rarr;</span>{" "}
+            <span className={currentPrice > avgPrice ? "text-positive" : currentPrice < avgPrice ? "text-negative" : ""}>
+              {formatPrice(currentPrice)}
+            </span>
+          </span>
+        </div>
+
+        {/* Col 4: Invested */}
+        <div className={cn("flex items-center justify-end py-3 text-right", cellBorder)}>
+          <div className="text-sm font-medium text-white">${invested.toFixed(2)}</div>
+        </div>
+
+        {/* Col 5: Value */}
+        <div className={cn("flex items-center justify-end py-3 text-right", cellBorder)}>
+          <div className="text-sm font-semibold text-white">${currentValue.toFixed(2)}</div>
+        </div>
+
+        {/* Col 6: Total PnL */}
+        <div className={cn("flex items-center justify-end py-3 text-right", cellBorder)}>
+          <div className={cn("text-xs font-semibold", pnlColor)}>
+            {pnl >= 0 ? "+" : "-"}${Math.abs(pnl).toFixed(2)} ({pnlPercent >= 0 ? "+" : ""}
+            {pnlPercent.toFixed(1)}%)
+          </div>
+        </div>
+
+        {/* Col 7: Sell / Redeem button */}
+        <div
+          className={cn(
+            "sticky right-0 z-10 -mr-5 flex items-center justify-end bg-surface-base py-3 pr-5 text-right transition-[background-color] duration-150 group-hover:bg-surface-interactive lg:static lg:z-auto lg:mr-0 lg:bg-transparent lg:group-hover:bg-transparent",
+            cellBorder,
+          )}
+        >
+          {position.redeemable ? (
+            <button
+              type="button"
+              onClick={handleRedeem}
+              className="cursor-pointer rounded-lg border border-positive/30 bg-positive/10 px-4 py-2 text-sm font-medium text-positive transition-all hover:border-positive/50 hover:bg-positive/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bullish/60"
+            >
+              {t("extend.portfolio.redeem", { defaultValue: t("predict.redeem.confirm") })}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleSell}
+              className="cursor-pointer rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-400 transition-all hover:border-red-500/50 hover:bg-red-500/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500/60"
+            >
+              {t("extend.portfolio.sell")}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Orders panel
+// ---------------------------------------------------------------------------
+
+export function OrdersPanel({
+  solanaAddr,
+  evmAddr,
+  fill = true,
+}: {
+  solanaAddr: string;
+  evmAddr: string;
+  fill?: boolean;
+}) {
+  const { t, i18n } = useTranslation();
+  const router = useRouter();
+  const translate = t as WorldCupTranslate;
+  const wallets = useWallets();
+  const evmWallet = useMemo(
+    () => wallets.find((w) => w.chainNamespace === "EVM" && w.isConnected) as EvmWalletAdapter | undefined,
+    [wallets],
+  );
+  const { polymarketSafeAddress } = usePredictWallet();
+  const { credentials, authenticate } = usePolymarket();
+  const confirmCancelOrder = useCancelOrderResultConfirmation();
+  const cancelResultMessages = useMemo(
+    () => getCancelOrderConfirmationMessages(t, i18n),
+    [i18n, t],
+  );
+
+  // Auto-authenticate with Polymarket to obtain L2 HMAC credentials.
+  // Privy embedded wallets sign silently — no user popup.
+  useEffect(() => {
+    if (credentials || !evmWallet) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const provider = await evmWallet.getEip1193Provider();
+        if (!provider || cancelled) return;
+        const usesSafe = !!polymarketSafeAddress;
+        const signer: PolymarketSigner = {
+          address: evmWallet.address,
+          signatureType: usesSafe ? 2 : 0,
+          signTypedData: async (domain, types, primaryType, value) => {
+            const domainFields: { name: string; type: string }[] = [];
+            if ("name" in domain) domainFields.push({ name: "name", type: "string" });
+            if ("version" in domain) domainFields.push({ name: "version", type: "string" });
+            if ("chainId" in domain) domainFields.push({ name: "chainId", type: "uint256" });
+            if ("verifyingContract" in domain) domainFields.push({ name: "verifyingContract", type: "address" });
+            if ("salt" in domain) domainFields.push({ name: "salt", type: "bytes32" });
+            const fullTypes = { EIP712Domain: domainFields, ...types };
+            return (await provider.request({
+              method: "eth_signTypedData_v4",
+              params: [
+                evmWallet.address,
+                JSON.stringify({ domain, types: fullTypes, primaryType, message: value }),
+              ],
+            })) as string;
+          },
+        };
+        if (!cancelled) await authenticate(signer);
+      } catch {
+        // Credential derivation failed — orders will stay in loading state.
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [credentials, evmWallet, polymarketSafeAddress, authenticate]);
+
+  const polymarketGetHeaders = useMemo(() => {
+    if (!credentials) return undefined;
+    return async (): Promise<Record<string, string>> => {
+      const headers = await buildPolymarketL2Headers(credentials.address, {
+        apiKey: credentials.apiKey,
+        secret: credentials.secret,
+        passphrase: credentials.passphrase,
+        method: "GET",
+        requestPath: "/data/orders",
+      });
+      return headers as unknown as Record<string, string>;
+    };
+  }, [credentials]);
+
+  const cancelMutation = useCancelOrder(
+    {
+      getHeaders: credentials
+        ? async (vars) => {
+            const body = JSON.stringify({ orderID: vars.id });
+            const headers = await buildPolymarketL2Headers(credentials.address, {
+              apiKey: credentials.apiKey,
+              secret: credentials.secret,
+              passphrase: credentials.passphrase,
+              method: "DELETE",
+              requestPath: "/order",
+              body,
+            });
+            return headers as unknown as Record<string, string>;
+          }
+        : undefined,
+    },
+    {
+      onSuccess: (_data, vars) => {
+        void confirmCancelOrder({
+          source: vars.source,
+          user: vars.source === "kalshi" ? solanaAddr : evmAddr,
+          kalshiUser: ENABLE_KALSHI ? solanaAddr || undefined : undefined,
+          polymarketUser: evmAddr || undefined,
+          orderId: vars.id,
+          messages: cancelResultMessages,
+          getOrdersHeaders: polymarketGetHeaders,
+        });
+      },
+      onError: () => {
+        toast.error(t("extend.portfolio.cancelFailed"));
+      },
+    },
+  );
+
+  const credentialsReady = !!polymarketGetHeaders;
+  const { data, isLoading: queryLoading } = useOrdersMulti(
+    {
+      kalshi_user: ENABLE_KALSHI ? solanaAddr || undefined : undefined,
+      polymarket_user: evmAddr || undefined,
+    },
+    { getHeaders: polymarketGetHeaders },
+    { enabled: credentialsReady && Boolean(evmAddr), refetchInterval: false },
+  );
+  const isLoading = queryLoading || !credentialsReady;
+
+  const orders = useMemo(() => {
+    const all = data?.orders ?? [];
+    const openStatuses = new Set<string>(["live", "open", "submitted", "pending"]);
+    return all.filter((o: PredictOrder) => openStatuses.has(o.status));
+  }, [data]);
+  const hasWorldcupOrders = useMemo(
+    () => orders.some((order) => Boolean(worldcupMatchSlugForActivity(order))),
+    [orders],
+  );
+  const { data: worldcupMatches = [] } = useWorldcupMatches({
+    enabled: hasWorldcupOrders,
+  });
+  const worldcupMatchBySlug = useMemo(
+    () => new Map(worldcupMatches.map((match) => [match.slug, match])),
+    [worldcupMatches],
+  );
+
+  const handleCancel = useCallback(
+    (order: PredictOrder) => {
+      cancelMutation.mutate({ source: order.source, id: order.id });
+    },
+    [cancelMutation],
+  );
+
+  const handleNavigate = useCallback(
+    (order: PredictOrder) => {
+      if (order.event?.slug) {
+        router.push(predictEventHref({ slug: order.event.slug, source: order.source }));
+      }
+    },
+    [router],
+  );
+
+  const handlePrefetch = useCallback(
+    (order: PredictOrder) => {
+      if (order.event?.slug) {
+        router.prefetch(predictEventHref({ slug: order.event.slug, source: order.source }));
+      }
+    },
+    [router],
+  );
+
+  const parentRef = useRef<HTMLDivElement>(null);
+  const virtualizer = useVirtualizer({
+    count: orders.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 64,
+    overscan: 10,
+    measureElement: (el) => el.getBoundingClientRect().height,
+  });
+
+  if (isLoading) return <PanelSkeleton />;
+  if (orders.length === 0) return <EmptyState message={t("extend.portfolio.noOrders")} icon="orders" />;
+
+  return (
+    <div
+      ref={parentRef}
+      className={cn(
+        "mt-4 overflow-auto rounded-xl border border-border-subtle/30 bg-surface-raised/20 custom-scrollbar",
+        fill && "min-h-0 flex-1",
+      )}
+      style={fill ? undefined : { maxHeight: ACTIVITY_LIST_HEIGHT }}
+    >
+      <div className="relative w-full" style={{ height: virtualizer.getTotalSize() }}>
+        {virtualizer.getVirtualItems().map((vItem) => {
+          const order = orders[vItem.index];
+          return (
+            <div
+              key={order.id}
+              ref={virtualizer.measureElement}
+              data-index={vItem.index}
+              className="absolute left-0 top-0 w-full"
+              style={{ transform: `translateY(${vItem.start}px)` }}
+            >
+              <OrderRow
+                order={order}
+                onCancel={handleCancel}
+                onNavigate={handleNavigate}
+	                onPrefetch={handlePrefetch}
+	                isCancelling={cancelMutation.isPending}
+	                isLast={vItem.index === orders.length - 1}
+	                translate={translate}
+	                worldcupMatchBySlug={worldcupMatchBySlug}
+	              />
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function OrderRow({
+  order,
+  onCancel,
+  onNavigate,
+  onPrefetch,
+  isCancelling,
+  isLast,
+  translate,
+  worldcupMatchBySlug,
+}: {
+  order: PredictOrder;
+  onCancel: (order: PredictOrder) => void;
+  onNavigate: (order: PredictOrder) => void;
+  onPrefetch: (order: PredictOrder) => void;
+  isCancelling: boolean;
+  isLast: boolean;
+  translate: WorldCupTranslate;
+  worldcupMatchBySlug: WorldcupMatchBySlug;
+}) {
+  const { t } = useTranslation();
+  const isBuy = order.side === "BUY";
+  const source = order.source;
+  const display = activityDisplay(order, worldcupMatchBySlug, translate);
+  const imageUrl = display.imageUrl;
+  const title = display.title;
+  const subtitle = display.subtitle;
+  const canCancel = !order.status || !({ matched: 1, cancelled: 1, invalid: 1, closed: 1, failed: 1, expired: 1 } as Record<string, number>)[order.status];
+
+  return (
+    <div
+      className={cn(
+        "group transition-[background-color] duration-150 hover:bg-surface-interactive/30",
+        !isLast && "border-b border-border-subtle/30",
+      )}
+    >
+      {/* Desktop */}
+      <div className="hidden items-center gap-4 px-5 py-4 lg:flex">
+        {/* Image */}
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border-subtle/50 bg-surface-raised">
+          {imageUrl ? (
+            <img src={imageUrl} alt="" className="h-full w-full object-cover" />
+          ) : source === "kalshi" ? (
+            <KalshiIcon width={32} height={12} />
+          ) : (
+            <PolymarketIcon width={24} height={24} />
+          )}
+        </div>
+
+        {/* Title + source */}
+        <div className="min-w-0 flex-1">
+          <span
+            className={cn(
+              "mb-1 line-clamp-1 text-sm font-medium text-white",
+              order.event?.slug && "cursor-pointer hover:underline",
+            )}
+            onClick={() => onNavigate(order)}
+            onMouseEnter={() => onPrefetch(order)}
+          >
+            {title}
+          </span>
+          {subtitle && (
+            <span className="mb-0.5 line-clamp-1 text-xs text-text-muted">
+              {subtitle}
+            </span>
+          )}
+          {SHOW_SOURCE_BADGE && (
+            <div className="flex items-center gap-1.5 text-xs text-text-muted">
+              {source === "kalshi" ? (
+                <KalshiIcon width={36} height={12} />
+              ) : (
+                <>
+                  <PolymarketIcon width={14} height={14} />
+                  <span>{t("predict.platform.polymarket")}</span>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Side + Outcome */}
+        <div className="min-w-[100px] shrink-0 text-center">
+          <span
+            className={cn(
+              "inline-block rounded px-2 py-1 text-xs font-semibold",
+              isBuy ? "bg-positive/10 text-positive" : "bg-negative/10 text-negative",
+            )}
+          >
+            {order.side} {order.outcome ? <span className="capitalize">{order.outcome}</span> : null}
+          </span>
+        </div>
+
+        {/* Price */}
+        <div className="min-w-[80px] shrink-0 text-right">
+          <div className="text-[10px] text-text-muted">{t("extend.portfolio.price")}</div>
+          <div className="text-sm font-mono font-medium text-white">
+            {order.price ? formatPrice(parseFloat(order.price)) : "—"}
+          </div>
+        </div>
+
+        {/* Filled / Total */}
+        <div className="min-w-[100px] shrink-0 text-right">
+          <div className="text-[10px] text-text-muted">{t("extend.portfolio.filledTotal")}</div>
+          <div className="text-sm font-mono font-medium text-white">
+            {order.size_matched ?? "0"}<span className="text-text-muted">/{order.original_size ?? "—"}</span>
+          </div>
+        </div>
+
+        {/* Cancel button */}
+        {canCancel && (
+          <button
+            type="button"
+            onClick={() => onCancel(order)}
+            disabled={isCancelling}
+            className="w-[72px] shrink-0 inline-flex items-center justify-center gap-1.5 cursor-pointer rounded-lg border border-red-500/30 bg-red-500/10 py-1.5 text-xs font-medium text-red-400 transition-all hover:bg-red-500/20 disabled:opacity-50"
+          >
+            {isCancelling && (
+              <svg className="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+            )}
+            {t("extend.portfolio.cancel")}
+          </button>
+        )}
+      </div>
+
+      {/* Compact layout (tablet + mobile) */}
+      <div className="flex items-center gap-3 p-4 lg:hidden">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border-subtle/50 bg-surface-raised">
+          {imageUrl ? (
+            <img src={imageUrl} alt="" className="h-full w-full object-cover" />
+          ) : source === "kalshi" ? (
+            <KalshiIcon width={30} height={11} />
+          ) : (
+            <PolymarketIcon width={22} height={22} />
+          )}
+        </div>
+        <div className="min-w-0 flex-1">
+          <span
+            className={cn(
+              "truncate text-sm font-medium text-white block",
+              order.event?.slug && "cursor-pointer hover:underline",
+            )}
+            onClick={() => onNavigate(order)}
+            onMouseEnter={() => onPrefetch(order)}
+          >
+            {title}
+          </span>
+          {subtitle && (
+            <span className="mt-0.5 block truncate text-xs text-text-muted">
+              {subtitle}
+            </span>
+          )}
+          <div className="mt-1 flex items-center gap-1.5 text-xs text-text-muted">
+            <span
+              className={cn(
+                "rounded px-1.5 py-0.5 font-semibold",
+                isBuy ? "bg-positive/10 text-positive" : "bg-negative/10 text-negative",
+              )}
+            >
+              {order.side} {order.outcome ? <span className="capitalize">{order.outcome}</span> : null}
+            </span>
+          </div>
+        </div>
+        <div className="shrink-0 text-right">
+          <div className="font-mono text-sm font-medium text-white">
+            {order.price ? formatPrice(parseFloat(order.price)) : "—"}
+          </div>
+          <div className="font-mono text-xs text-text-muted">
+            {order.size_matched ?? "0"}<span className="text-text-disabled">/{order.original_size ?? "—"}</span>
+          </div>
+        </div>
+        {canCancel && (
+          <button
+            type="button"
+            onClick={() => onCancel(order)}
+            disabled={isCancelling}
+            className="inline-flex shrink-0 items-center justify-center gap-1.5 cursor-pointer rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-xs font-medium text-red-400 disabled:opacity-50"
+          >
+            {isCancelling && (
+              <svg className="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+            )}
+            {t("extend.portfolio.cancel")}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Trades (history) panel
+// ---------------------------------------------------------------------------
+
+export function TradesPanel({
+  solanaAddr,
+  evmAddr,
+  fill = true,
+}: {
+  solanaAddr: string;
+  evmAddr: string;
+  fill?: boolean;
+}) {
+  const { t } = useTranslation();
+  const router = useRouter();
+  const translate = t as WorldCupTranslate;
+
+  const {
+    data: tradesData,
+    isLoading,
+    fetchNextPage,
+    hasNextPage: hasMore,
+    isFetchingNextPage: isFetchingMore,
+  } = useInfiniteTradesMulti({
+    kalshi_user: ENABLE_KALSHI ? solanaAddr || undefined : undefined,
+    polymarket_user: evmAddr || undefined,
+    limit: 50,
+  });
+
+  const trades = useMemo(
+    () => tradesData?.pages.flatMap((p) => p.items) ?? [],
+    [tradesData],
+  );
+  const hasWorldcupTrades = useMemo(
+    () => trades.some((trade) => Boolean(worldcupMatchSlugForActivity(trade))),
+    [trades],
+  );
+  const { data: worldcupMatches = [] } = useWorldcupMatches({
+    enabled: hasWorldcupTrades,
+  });
+  const worldcupMatchBySlug = useMemo(
+    () => new Map(worldcupMatches.map((match) => [match.slug, match])),
+    [worldcupMatches],
+  );
+
+  const parentRef = useRef<HTMLDivElement>(null);
+  const virtualizer = useVirtualizer({
+    count: trades.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 64,
+    overscan: 10,
+    measureElement: (el) => el.getBoundingClientRect().height,
+  });
+  const virtualItems = virtualizer.getVirtualItems();
+
+  useEffect(() => {
+    const last = virtualItems[virtualItems.length - 1];
+    if (!last) return;
+    if (last.index >= trades.length - 5 && hasMore && !isFetchingMore) {
+      fetchNextPage();
+    }
+  }, [virtualItems, trades.length, hasMore, isFetchingMore, fetchNextPage]);
+
+  const handleNavigate = useCallback(
+    (trade: PredictTrade) => {
+      if (trade.event?.slug) {
+        router.push(predictEventHref({ slug: trade.event.slug, source: trade.source }));
+      }
+    },
+    [router],
+  );
+
+  const handlePrefetch = useCallback(
+    (trade: PredictTrade) => {
+      if (trade.event?.slug) {
+        router.prefetch(predictEventHref({ slug: trade.event.slug, source: trade.source }));
+      }
+    },
+    [router],
+  );
+
+  if (isLoading) return <PanelSkeleton />;
+  if (trades.length === 0) return <EmptyState message={t("extend.portfolio.noTrades")} icon="trades" />;
+
+  return (
+    <div
+      ref={parentRef}
+      className={cn(
+        "mt-4 overflow-auto rounded-xl border border-border-subtle/30 bg-surface-raised/20 custom-scrollbar",
+        fill && "min-h-0 flex-1",
+      )}
+      style={fill ? undefined : { maxHeight: ACTIVITY_LIST_HEIGHT }}
+    >
+      <div className="relative w-full" style={{ height: virtualizer.getTotalSize() }}>
+        {virtualItems.map((vItem) => {
+          const trade = trades[vItem.index];
+          return (
+            <div
+              key={trade.id ?? vItem.index}
+              ref={virtualizer.measureElement}
+              data-index={vItem.index}
+              className="absolute left-0 top-0 w-full"
+              style={{ transform: `translateY(${vItem.start}px)` }}
+            >
+              <TradeRow
+                trade={trade}
+	                isLast={vItem.index === trades.length - 1}
+	                onNavigate={handleNavigate}
+	                onPrefetch={handlePrefetch}
+	                translate={translate}
+	                worldcupMatchBySlug={worldcupMatchBySlug}
+	              />
+            </div>
+          );
+        })}
+      </div>
+      {isFetchingMore && (
+        <div className="flex justify-center border-t border-border-subtle/30 py-3">
+          <span className="text-xs text-text-muted">{t("extend.portfolio.loadMore")}...</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TradeRow({
+  trade,
+  isLast,
+  onNavigate,
+  onPrefetch,
+  translate,
+  worldcupMatchBySlug,
+}: {
+  trade: PredictTrade;
+  isLast: boolean;
+  onNavigate: (trade: PredictTrade) => void;
+  onPrefetch: (trade: PredictTrade) => void;
+  translate: WorldCupTranslate;
+  worldcupMatchBySlug: WorldcupMatchBySlug;
+}) {
+  const { t } = useTranslation();
+  const isRedeem = trade.type === "REDEEM";
+  const isBuy = trade.side?.toUpperCase() === "BUY";
+  const timeStr = formatTimestamp(trade.timestamp);
+  const price = trade.price ?? 0;
+  const usdSize = trade.usd_size ?? 0;
+  const source = trade.source;
+  const display = activityDisplay(trade, worldcupMatchBySlug, translate);
+  const eventTitle = display.title;
+  const marketQuestion = display.subtitle;
+  const outcomeLabel = trade.outcome ?? "—";
+  const tradeImageUrl = display.imageUrl;
+
+  return (
+    <div
+      className={cn(
+        "group transition-[background-color] duration-150 hover:bg-surface-interactive/30",
+        !isLast && "border-b border-border-subtle/30",
+      )}
+    >
+      {/* Desktop row */}
+      <div className="hidden items-center gap-4 px-5 py-4 lg:flex">
+        {/* Col 1: Icon + title + source */}
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border-subtle/50 bg-surface-raised">
+            {tradeImageUrl ? (
+              <img src={tradeImageUrl} alt="" className="h-full w-full object-cover" />
+            ) : source === "kalshi" ? (
+              <KalshiIcon width={32} height={12} />
+            ) : (
+              <PolymarketIcon width={24} height={24} />
+            )}
+          </div>
+          <div className="min-w-0 flex-1">
+            {(eventTitle || marketQuestion) && (
+              <span
+                className={cn(
+                  "mb-0.5 line-clamp-1 text-sm font-medium text-white",
+                  trade.event?.slug && "cursor-pointer hover:underline",
+                )}
+                onClick={() => onNavigate(trade)}
+                onMouseEnter={() => onPrefetch(trade)}
+              >
+                {eventTitle || marketQuestion}
+              </span>
+            )}
+            {eventTitle && marketQuestion && eventTitle !== marketQuestion && (
+              <span className="mb-0.5 line-clamp-1 text-xs text-text-muted">
+                {marketQuestion}
+              </span>
+            )}
+            {SHOW_SOURCE_BADGE && (
+              <div className="flex items-center gap-1.5 text-xs text-text-muted">
+                <span className="inline-flex items-center gap-1">
+                  {source === "kalshi" ? (
+                    <KalshiIcon width={36} height={12} />
+                  ) : (
+                    <>
+                      <PolymarketIcon width={14} height={14} />
+                      <span className="text-text-muted">{t("predict.platform.polymarket")}</span>
+                    </>
+                  )}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Col 2: Side + Outcome badge */}
+        <div className="min-w-[120px] shrink-0 text-center">
+          <span
+            className={cn(
+              "inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-sm font-semibold",
+              isRedeem
+                ? "bg-primary/10 text-primary"
+                : isBuy
+                  ? "bg-positive/10 text-positive"
+                  : "bg-negative/10 text-negative",
+            )}
+          >
+            {isRedeem ? t("predict.profile.redeem") : trade.side}
+            {outcomeLabel !== "—" && <span className="capitalize"> {outcomeLabel}</span>}
+          </span>
+        </div>
+
+        {/* Col 3: Price x Shares = Total */}
+        <div className="min-w-[160px] shrink-0 text-right">
+          {isRedeem ? (
+            <>
+              {trade.size > 0 && (
+                <div className="text-xs font-mono text-text-muted">
+                  {formatShares(trade.size)}{t("predict.trade.sharesUnit")}
+                </div>
+              )}
+              <div className="text-base font-bold text-white">
+                {usdSize > 0 ? `+$${usdSize.toFixed(2)}` : "$0.00"}
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="text-xs font-mono text-text-muted">
+                {formatPrice(price)} &times; {formatShares(trade.size)}{t("predict.trade.sharesUnit")}
+              </div>
+              <div className="text-base font-bold text-white">${usdSize.toFixed(2)}</div>
+            </>
+          )}
+        </div>
+
+        {/* Col 4: Time */}
+        <div className="min-w-[80px] shrink-0 text-right">
+          <span className="whitespace-nowrap text-xs text-text-muted">{timeStr}</span>
+        </div>
+      </div>
+
+      {/* Compact layout (tablet + mobile) */}
+      <div className="flex items-center gap-3 p-4 lg:hidden">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border-subtle/50 bg-surface-raised">
+          {tradeImageUrl ? (
+            <img src={tradeImageUrl} alt="" className="h-full w-full object-cover" />
+          ) : source === "kalshi" ? (
+            <KalshiIcon width={30} height={11} />
+          ) : (
+            <PolymarketIcon width={22} height={22} />
+          )}
+        </div>
+        <div className="min-w-0 flex-1">
+          {(eventTitle || marketQuestion) && (
+            <span
+              className={cn(
+                "truncate text-sm font-medium text-white block",
+                trade.event?.slug && "cursor-pointer hover:underline",
+              )}
+              onClick={() => onNavigate(trade)}
+              onMouseEnter={() => onPrefetch(trade)}
+            >
+              {eventTitle || marketQuestion}
+            </span>
+          )}
+          <div className="mt-1 flex items-center gap-1.5 text-xs text-text-muted">
+            <span
+              className={cn(
+                "inline-flex items-center gap-1 rounded-md px-2 py-0.5 font-semibold",
+                isRedeem
+                  ? "bg-primary/10 text-primary"
+                  : isBuy
+                    ? "bg-positive/10 text-positive"
+                    : "bg-negative/10 text-negative",
+              )}
+            >
+              {isRedeem ? t("predict.profile.redeem") : trade.side}
+              {outcomeLabel !== "—" && <span className="capitalize"> {outcomeLabel}</span>}
+            </span>
+            <span className="text-text-muted">{timeStr}</span>
+          </div>
+        </div>
+        <div className="shrink-0 text-right">
+          {isRedeem ? (
+            <>
+              <div className="text-sm font-bold text-white">
+                {usdSize > 0 ? `+$${usdSize.toFixed(2)}` : "$0.00"}
+              </div>
+              {trade.size > 0 && (
+                <div className="font-mono text-xs text-text-muted">
+                  {formatShares(trade.size)}{t("predict.trade.sharesUnit")}
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              <div className="text-sm font-bold text-white">${usdSize.toFixed(2)}</div>
+              <div className="font-mono text-xs text-text-muted">
+                {formatPrice(price)} &times; {formatShares(trade.size)}{t("predict.trade.sharesUnit")}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Shared helpers & icons
+// ---------------------------------------------------------------------------
+
+export function EmptyState({ message, icon = "default" }: { message: string; icon?: "positions" | "orders" | "trades" | "default" }) {
+  return (
+    <div className="flex flex-col items-center justify-center gap-4 py-20">
+      <EmptyIcon type={icon} />
+      <span className="text-sm text-text-muted">{message}</span>
+    </div>
+  );
+}
+
+function EmptyIcon({ type }: { type: string }) {
+  const shared = { viewBox: "0 0 24 24", width: 40, height: 40, fill: "none", stroke: "currentColor", strokeWidth: 1, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, style: { color: "var(--color-text-disabled)" } as React.CSSProperties };
+  if (type === "positions") {
+    return (
+      <svg {...shared}>
+        <path d="M3 3v16a2 2 0 0 0 2 2h16" />
+        <path d="M7 16l4-8 4 4 6-10" />
+      </svg>
+    );
+  }
+  if (type === "orders") {
+    return (
+      <svg {...shared}>
+        <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+        <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+        <path d="M8 13h2" />
+        <path d="M8 17h2" />
+      </svg>
+    );
+  }
+  if (type === "trades") {
+    return (
+      <svg {...shared}>
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
+      </svg>
+    );
+  }
+  return (
+    <svg {...shared}>
+      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+    </svg>
+  );
+}
+
+export function PanelSkeleton() {
+  return (
+    <div className="mt-4 overflow-hidden rounded-xl border border-border-subtle/30 bg-surface-raised/20">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} className={i < 3 ? "border-b border-border-subtle/30" : undefined}>
+          {/* Desktop shimmer */}
+          <div className="hidden lg:flex items-center gap-3" style={{ padding: "16px 20px" }}>
+            <Shimmer delay={i * 120} style={{ height: 44, width: 44, borderRadius: 8, flexShrink: 0 }} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <Shimmer delay={i * 120 + 50} style={{ height: 14, width: i % 2 === 0 ? "65%" : "50%", marginBottom: 8 }} />
+              <Shimmer delay={i * 120 + 100} style={{ height: 10, width: "40%" }} />
+            </div>
+            <Shimmer delay={i * 120 + 80} style={{ height: 20, width: 72, flexShrink: 0 }} />
+          </div>
+          {/* Compact shimmer (tablet + mobile) */}
+          <div className="lg:hidden" style={{ padding: "12px 16px" }}>
+            <div style={{ display: "flex", gap: 12, marginBottom: 10 }}>
+              <Shimmer delay={i * 120} style={{ height: 40, width: 40, borderRadius: 8, flexShrink: 0 }} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <Shimmer delay={i * 120 + 50} style={{ height: 14, width: i % 2 === 0 ? "75%" : "60%", marginBottom: 6 }} />
+                <Shimmer delay={i * 120 + 100} style={{ height: 10, width: "35%" }} />
+              </div>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <Shimmer delay={i * 120 + 80} style={{ height: 12, width: 90 }} />
+              <Shimmer delay={i * 120 + 120} style={{ height: 14, width: 60 }} />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * Default 2 decimals: Polymarket ROUNDING_CONFIG.size is always 2;
+ * DFlow uses 0. 2 is a safe upper bound for all providers.
+ */
+function formatShares(size: number, maxDecimals = 2): string {
+  const factor = Math.pow(10, maxDecimals);
+  return parseFloat((Math.floor(size * factor) / factor).toFixed(maxDecimals)).toString();
+}
+
+function formatPrice(price: number): string {
+  const cents = price * 100;
+  if (cents < 1 && cents > 0) return "< 1\u00A2";
+  return `${cents.toFixed(1)}\u00A2`;
+}
+
+function formatTimestamp(unixSeconds: number): string {
+  const date = new Date(unixSeconds * 1000);
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const day = date.getDate().toString().padStart(2, "0");
+  const hours = date.getHours().toString().padStart(2, "0");
+  const mins = date.getMinutes().toString().padStart(2, "0");
+  return `${month}/${day} ${hours}:${mins}`;
+}

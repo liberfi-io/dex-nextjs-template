@@ -39,7 +39,7 @@ function collectImports(specifier: string): string[] {
 }
 
 describe("Stage 5.5 launchpad/redpacket parity", () => {
-  it("loads unpublished react packages only through Stage55 adapters", () => {
+  it("loads Stage55 react packages only through Stage55 adapters", () => {
     expect(collectImports("@liberfi.io/react-launchpad")).toEqual([
       "runtime/__tests__/stage55-adapters.test.ts",
       "runtime/createStage55Adapters.ts",
@@ -49,7 +49,7 @@ describe("Stage 5.5 launchpad/redpacket parity", () => {
     ]);
   });
 
-  it("switches production widgets onto unpublished SDK UI", () => {
+  it("switches production widgets onto published SDK UI", () => {
     expect(collectImports("@liberfi.io/ui-launchpad")).toEqual(
       expect.arrayContaining([
         "components/modals/LaunchPadModal.tsx",

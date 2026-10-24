@@ -1,17 +1,8 @@
 "use client";
 
 import { useTokenQuery, useTokenSecurityQuery } from "@liberfi.io/react";
-import {
-  Chain,
-  type TokenMarketData,
-} from "@liberfi.io/types";
-import {
-  CheckIcon,
-  Link,
-  StyledTooltip,
-  XCloseIcon,
-  cn,
-} from "@liberfi.io/ui";
+import { Chain, type TokenMarketData } from "@liberfi.io/types";
+import { CheckIcon, Link, StyledTooltip, XCloseIcon, cn } from "@liberfi.io/ui";
 import { CollapsibleSection } from "@liberfi.io/ui-scaffold";
 import { formatPercent, SafeBigNumber } from "@liberfi.io/utils";
 import { useTranslation } from "@liberfi.io/i18n";
@@ -36,7 +27,7 @@ export interface SidebarSecurityCheckProps {
 type CheckStatus = "safe" | "risk" | "unknown";
 
 interface CheckSpec {
-  /** Translation key under `extend.trade.security_check.items`. */
+  /** Translation key under `trade.security_check.items`. */
   key: string;
   /** Resolved status from the security payload. */
   status: CheckStatus;
@@ -67,13 +58,10 @@ interface CheckSpec {
  * upstream payload render as `--` (`unknown`) instead of being hidden, so
  * the row count stays stable across tokens.
  *
- * All colors come from HeroUI theme tokens (`text-bullish`, `text-bearish`,
- * `text-default-700`) — no hardcoded hex.
+ * All colors come from HeroUI theme tokens (`text-positive`, `text-negative`,
+ * `text-text-secondary`) — no hardcoded hex.
  */
-export function SidebarSecurityCheck({
-  chain,
-  address,
-}: SidebarSecurityCheckProps) {
+export function SidebarSecurityCheck({ chain, address }: SidebarSecurityCheckProps) {
   const { t } = useTranslation();
   const { data: token } = useTokenQuery({ chain, address });
   const { data: securityData } = useTokenSecurityQuery({ chain, address });
@@ -84,10 +72,7 @@ export function SidebarSecurityCheck({
     [chain, token?.marketData, security, t],
   );
 
-  const providerLinks = useMemo(
-    () => buildSecurityProviderLinks(chain, address),
-    [chain, address],
-  );
+  const providerLinks = useMemo(() => buildSecurityProviderLinks(chain, address), [chain, address]);
 
   const overall = useMemo<CheckStatus>(() => {
     if (checks.every((c) => c.status === "unknown")) return "unknown";
@@ -96,14 +81,14 @@ export function SidebarSecurityCheck({
   }, [checks]);
 
   const overallText = useMemo(() => {
-    if (overall === "unknown") return t("extend.trade.security_check.unknown");
-    if (overall === "risk") return t("extend.trade.security_check.review");
-    return t("extend.trade.security_check.safe");
+    if (overall === "unknown") return t("trade.security_check.unknown");
+    if (overall === "risk") return t("trade.security_check.review");
+    return t("trade.security_check.safe");
   }, [overall, t]);
 
   return (
     <CollapsibleSection
-      title={t("extend.trade.security_check.title")}
+      title={t("trade.security_check.title")}
       defaultOpen
       className="border-t border-divider"
       bodyClassName="px-4 pb-4"
@@ -112,10 +97,10 @@ export function SidebarSecurityCheck({
           className={cn(
             "mr-2 text-[12px] font-medium",
             overall === "safe"
-              ? "text-bullish"
+              ? "text-positive"
               : overall === "risk"
-                ? "text-bearish"
-                : "text-default-700",
+                ? "text-negative"
+                : "text-text-secondary",
           )}
         >
           {overallText}
@@ -126,8 +111,8 @@ export function SidebarSecurityCheck({
         {checks.map((c) => (
           <CheckRow
             key={c.key}
-            label={tKey(t, `extend.trade.security_check.items.${c.key}`)}
-            tooltip={tKey(t, `extend.trade.security_check.items.${c.key}_tip`)}
+            label={tKey(t, `trade.security_check.items.${c.key}`)}
+            tooltip={tKey(t, `trade.security_check.items.${c.key}_tip`)}
             status={c.status}
             value={c.value}
             showIcon={c.showIcon}
@@ -177,9 +162,7 @@ function CheckRow({
   return (
     <li className="flex h-7 items-center justify-between gap-2">
       <StyledTooltip content={tooltip} placement="top">
-        <span className="cursor-default text-[12px] font-normal text-default-700">
-          {label}
-        </span>
+        <span className="cursor-default text-[12px] font-normal text-text-secondary">{label}</span>
       </StyledTooltip>
       <span className="flex shrink-0 items-center gap-1 text-[12px] font-medium text-foreground tabular-nums">
         {value}
@@ -191,12 +174,12 @@ function CheckRow({
 
 function StatusIndicator({ status }: { status: CheckStatus }) {
   if (status === "unknown") {
-    return <span className="text-[12px] text-default-700">--</span>;
+    return <span className="text-[12px] text-text-secondary">--</span>;
   }
   if (status === "safe") {
-    return <CheckIcon className="h-3 w-3 shrink-0 text-bullish" />;
+    return <CheckIcon className="h-3 w-3 shrink-0 text-positive" />;
   }
-  return <XCloseIcon className="h-3 w-3 shrink-0 text-bearish" />;
+  return <XCloseIcon className="h-3 w-3 shrink-0 text-negative" />;
 }
 
 /**
@@ -228,16 +211,16 @@ function buildChecks(
       flagCheck("no_blacklist", security?.hasBlacklist, false),
       taxPairCheck(
         "buy_sell_tax",
-        t("extend.trade.security_check.values.buy"),
+        t("trade.security_check.values.buy"),
         security?.buyTaxRatio,
-        t("extend.trade.security_check.values.sell"),
+        t("trade.security_check.values.sell"),
         security?.sellTaxRatio,
       ),
       taxPairCheck(
         "tax_rate",
-        t("extend.trade.security_check.values.average"),
+        t("trade.security_check.values.average"),
         security?.averageTaxRatio,
-        t("extend.trade.security_check.values.high"),
+        t("trade.security_check.values.high"),
         security?.maxTaxRatio,
       ),
       serializedSafetyCheck(security),
@@ -253,11 +236,7 @@ function buildChecks(
   ];
 }
 
-function flagCheck(
-  key: string,
-  value: boolean | undefined,
-  safeWhen: boolean,
-): CheckSpec {
+function flagCheck(key: string, value: boolean | undefined, safeWhen: boolean): CheckSpec {
   if (value === undefined) return { key, status: "unknown" };
   return { key, status: value === safeWhen ? "safe" : "risk" };
 }
@@ -272,10 +251,7 @@ function top10Check(ratio: string | undefined): CheckSpec {
   };
 }
 
-function burnCheck(
-  key: string,
-  security: TokenSecurityDetails | undefined,
-): CheckSpec {
+function burnCheck(key: string, security: TokenSecurityDetails | undefined): CheckSpec {
   const burnRatio = getBurnRatio(security);
   if (burnRatio !== undefined) {
     return {
@@ -304,25 +280,20 @@ function taxPairCheck(
     showIcon: false,
     value: (
       <>
-        {firstLabel} {formatRatioValue(firstRatio)} / {secondLabel}{" "}
-        {formatRatioValue(secondRatio)}
+        {firstLabel} {formatRatioValue(firstRatio)} / {secondLabel} {formatRatioValue(secondRatio)}
       </>
     ),
   };
 }
 
 function serializedSafetyCheck(security: TokenSecurityDetails | undefined): CheckSpec {
-  const score =
-    security?.serializedCriticalVulnCount ?? security?.serializedVulnCount;
+  const score = security?.serializedCriticalVulnCount ?? security?.serializedVulnCount;
   if (score === undefined && security?.isSerializedSafe === undefined) {
     return { key: "security_score", status: "unknown" };
   }
   return {
     key: "security_score",
-    status:
-      security?.isSerializedSafe === false || (score ?? 0) > 0
-        ? "risk"
-        : "safe",
+    status: security?.isSerializedSafe === false || (score ?? 0) > 0 ? "risk" : "safe",
     value: score ?? 0,
   };
 }

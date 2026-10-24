@@ -5,7 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { chainIdBySlug } from "@liberfi.io/utils";
 import { useCurrentChain, useSelectChain } from "@liberfi.io/ui-chain-select";
 import { useSwitchEvmWalletsToChain } from "@liberfi.io/wallet-connector";
-import type { Chain } from "@liberfi.io/types";
+import { Chain } from "@liberfi.io/types";
 import { chainQueryValue } from "../libs/chainQuery";
 
 /**
@@ -62,7 +62,13 @@ export function useChainUrlSync(): void {
     if (!slug) return;
 
     const queryChain = chainIdBySlug(slug);
-    if (!queryChain) return;
+    if (queryChain !== Chain.BINANCE) {
+      // Old shared links must not restore chains without market data.
+      params.set("chain", "bsc");
+      const targetPath = pathname.startsWith("/tokens/") ? "/" : pathname;
+      router.replace(`${targetPath}?${params.toString()}`);
+      return;
+    }
 
     if (pathname.startsWith("/tokens/")) {
       // Token detail page: compare the URL path's chain segment against the

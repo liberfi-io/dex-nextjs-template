@@ -1,7 +1,4 @@
-import { createElement, type PropsWithChildren } from "react";
-import { renderHook } from "@testing-library/react";
-import { PinataProvider, uploadFileToIpfs, usePinata } from "./pinata";
-import type { PinataSDK } from "pinata";
+import { createLazyPinataUploadClient, uploadFileToIpfs } from "./pinata";
 
 function fakePinata(cid = "bafytest") {
   const url = jest.fn().mockResolvedValue({ cid });
@@ -16,9 +13,7 @@ function fakePinata(cid = "bafytest") {
 describe("uploadFileToIpfs", () => {
   it("uploads through a SDK presigned URL and returns the ipfs gateway path", async () => {
     const pinata = fakePinata();
-    const getPresignedUploadUrl = jest
-      .fn()
-      .mockResolvedValue("https://signed.example/upload");
+    const getPresignedUploadUrl = jest.fn().mockResolvedValue("https://signed.example/upload");
     const file = new File(["hi"], "hi.png", { type: "image/png" });
 
     const result = await uploadFileToIpfs({
@@ -34,20 +29,26 @@ describe("uploadFileToIpfs", () => {
   });
 });
 
-describe("usePinata", () => {
-  it("throws outside PinataProvider", () => {
-    const spy = jest.spyOn(console, "error").mockImplementation(() => undefined);
-    expect(() => renderHook(() => usePinata())).toThrow(
-      /must be used within a PinataProvider/,
-    );
-    spy.mockRestore();
+describe("createLazyPinataUploadClient", () => {
+  it("does not load Pinata until the first upload needs it", async () => {
+    const client = fakePinata();
+    const load = jest.fn().mockResolvedValue(client);
+    const getClient = createLazyPinataUploadClient(load);
+
+    expect(load).not.toHaveBeenCalled();
+    await expect(getClient()).resolves.toBe(client);
+    expect(load).toHaveBeenCalledTimes(1);
   });
 
-  it("returns the provided Pinata client", () => {
-    const client = fakePinata() as unknown as PinataSDK;
-    const wrapper = ({ children }: PropsWithChildren) =>
-      createElement(PinataProvider, { client }, children);
-    const { result } = renderHook(() => usePinata(), { wrapper });
-    expect(result.current).toBe(client);
+  it("shares one in-flight client load across concurrent uploads", async () => {
+    const client = fakePinata();
+    const load = jest.fn().mockResolvedValue(client);
+    const getClient = createLazyPinataUploadClient(load);
+
+    const [first, second] = await Promise.all([getClient(), getClient()]);
+
+    expect(first).toBe(client);
+    expect(second).toBe(client);
+    expect(load).toHaveBeenCalledTimes(1);
   });
 });

@@ -3,14 +3,7 @@
 import { useCallback, useState } from "react";
 import { Tooltip } from "@heroui/react";
 import { useTranslation } from "@liberfi.io/i18n";
-import {
-  cn,
-  RefreshIcon,
-  toast,
-  TriangleDownIcon,
-  TriangleUpIcon,
-} from "@liberfi.io/ui";
-import { useAsyncModal } from "@liberfi.io/ui-scaffold";
+import { cn, RefreshIcon, toast, TriangleDownIcon, TriangleUpIcon } from "@liberfi.io/ui";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
 import {
   useAccountInfo,
@@ -22,9 +15,16 @@ import { useCreateOnrampWidgetUrlMutation } from "../../../application/server/us
 import { CashInOutlinedIcon } from "../../icons/CashInOutlinedIcon";
 import { ReceiveOutlinedIcon } from "../../icons/ReceiveOutlinedIcon";
 import { SendOutlinedIcon } from "../../icons/SendOutlinedIcon";
-import { RECEIVE_MODAL_ID } from "../../modals/ReceiveModal";
-import { WITHDRAW_MODAL_ID } from "../../modals/WithdrawModal";
+import {
+  RECEIVE_MODAL_ID,
+  WITHDRAW_MODAL_ID,
+} from "../../modals/modal-contracts";
 import { PortfolioGradientAvatar } from "./PortfolioGradientAvatar";
+import { useDeferredAsyncModal } from "../../modals/DeferredAsyncModalHost";
+import {
+  loadReceiveModal,
+  loadWithdrawModal,
+} from "../../modals/modal-loaders";
 
 /**
  * Portfolio page header — wallet identity + balance + PnL + action cluster.
@@ -32,11 +32,11 @@ import { PortfolioGradientAvatar } from "./PortfolioGradientAvatar";
  * Visual contract:
  *   - Avatar: 56×56 deterministic gradient seeded by the wallet address.
  *   - Address row: truncated 0xABCD…WXYZ + copy affordance.
- *   - Balance + PnL: laid out on the same row (baseline-aligned) so the
- *     ratio reads as a price-tag suffix to the headline number — keeps
- *     the headline visually anchored and uses the available width.
+ *   - Balance + PnL: the balance remains the visual headline while the
+ *     24-hour change sits on its own supporting row, preventing the
+ *     narrower summary card from feeling crowded.
  *   - Actions row: Receive / Send / Buy as circular icon buttons in a
- *     left-aligned cluster directly underneath the basic info. Mirrors
+ *     bottom-aligned cluster underneath the basic info. Mirrors
  *     the wallet dropdown's `WalletActionButton` so the visual identity
  *     of these actions is consistent across the app, and leaves room to
  *     extend with new operations (Convert, Stake, …) without changing
@@ -62,8 +62,14 @@ export function PortfolioHeader() {
   const bullish = totalProfitInUsd >= 0;
 
   // Modal openers
-  const { onOpen: openReceive } = useAsyncModal(RECEIVE_MODAL_ID);
-  const { onOpen: openWithdraw } = useAsyncModal(WITHDRAW_MODAL_ID);
+  const { onOpen: openReceive } = useDeferredAsyncModal(
+    RECEIVE_MODAL_ID,
+    loadReceiveModal,
+  );
+  const { onOpen: openWithdraw } = useDeferredAsyncModal(
+    WITHDRAW_MODAL_ID,
+    loadWithdrawModal,
+  );
   const { mutate: createOnrampWidgetUrl, isPending: isCreatingOnramp } =
     useCreateOnrampWidgetUrlMutation();
 
@@ -94,7 +100,7 @@ export function PortfolioHeader() {
         },
         onError: (err) => {
           if (win && !win.closed) win.close();
-          toast.error(err.message || t("extend.account.add_cash_failed"));
+          toast.error(err.message || t("account.add_cash_failed"));
         },
       },
     );
@@ -112,8 +118,8 @@ export function PortfolioHeader() {
   return (
     <div
       className={cn(
-        "w-full flex flex-col gap-4",
-        "p-4 lg:p-5 rounded-2xl border border-default-100 bg-content1",
+        "w-full flex flex-col gap-5",
+        "p-5 lg:p-6 rounded-2xl border border-default-100 bg-content1",
       )}
     >
       {/* Identity + balance + PnL */}
@@ -124,26 +130,22 @@ export function PortfolioHeader() {
           className="rounded-2xl"
         />
 
-        <div className="flex flex-col min-w-0 flex-1 gap-1.5">
+        <div className="flex flex-col min-w-0 flex-1 gap-2">
           {/* Address + copy */}
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs font-medium text-default-500 tabular-nums">
+          <div className="flex min-w-0 items-center gap-1.5">
+            <span className="text-xs font-medium text-text-muted tabular-nums">
               {walletAddress ? truncateAddress(walletAddress) : "—"}
             </span>
             {walletAddress && (
               <Tooltip
-                content={
-                  copied
-                    ? t("extend.portfolio.copied")
-                    : t("extend.portfolio.copyAddress")
-                }
+                content={copied ? t("portfolio.copied") : t("portfolio.copyAddress")}
                 placement="top"
                 size="sm"
               >
                 <button
                   type="button"
-                  className="p-1 rounded hover:bg-default-100 text-default-400 hover:text-foreground transition-colors cursor-pointer"
-                  aria-label={t("extend.portfolio.copyAddress")}
+                  className="p-1 rounded hover:bg-default-100 text-text-muted hover:text-foreground transition-colors cursor-pointer"
+                  aria-label={t("portfolio.copyAddress")}
                   onClick={handleCopy}
                 >
                   {copied ? (
@@ -177,88 +179,70 @@ export function PortfolioHeader() {
                 </button>
               </Tooltip>
             )}
-          </div>
 
-          {/* Balance + PnL grouped as a single unit (vertically
-              centered so the small PnL chip sits on the headline's
-              middle), refresh icon pushed to the far right via
-              `ml-auto`. flex-wrap keeps the row from overflowing on
-              ultra-narrow viewports. */}
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <span className="text-2xl lg:text-3xl font-semibold text-foreground tabular-nums leading-none">
-              {balanceUsd}
-            </span>
-
-            {/* PnL — same row as balance. text-sm so it reads with the
-                headline rather than as auxiliary metadata. */}
-            <div className="flex items-center gap-1.5 text-sm leading-none">
-              <span
-                className={cn(
-                  "tabular-nums font-medium",
-                  bullish ? "text-bullish" : "text-bearish",
-                )}
-              >
-                {profitUsdText}
-              </span>
-              <span
-                className={cn(
-                  "inline-flex items-center gap-0.5 tabular-nums",
-                  bullish ? "text-bullish" : "text-bearish",
-                )}
-              >
-                {bullish ? (
-                  <TriangleUpIcon width={10} height={10} />
-                ) : (
-                  <TriangleDownIcon width={10} height={10} />
-                )}
-                {ratioText}
-              </span>
-              <span className="text-xs text-default-400">
-                ({t("extend.common.time.24h")})
-              </span>
-            </div>
-
-            {/* Refresh — anchored to the far right of the row, isolated
-                from the balance+PnL group so it reads as a side
-                affordance rather than an inline chip. */}
             <button
               type="button"
               onClick={() => refetchSummary()}
-              aria-label={t("extend.portfolio.refresh")}
-              className="ml-auto p-1.5 rounded-md hover:bg-default-100 text-default-400 hover:text-foreground transition-colors cursor-pointer"
+              aria-label={t("portfolio.refresh")}
+              className="ml-auto shrink-0 rounded-md p-1.5 text-text-muted transition-colors hover:bg-default-100 hover:text-foreground cursor-pointer"
             >
-              <RefreshIcon
-                width={14}
-                height={14}
-                className={cn(isFetching && "animate-spin")}
-              />
+              <RefreshIcon width={14} height={14} className={cn(isFetching && "animate-spin")} />
             </button>
+          </div>
+
+          <span className="text-3xl font-semibold leading-none text-foreground tabular-nums lg:text-4xl">
+            {balanceUsd}
+          </span>
+
+          {/* The period change is supporting information, so keeping it
+              below the headline preserves a clear reading order. */}
+          <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm leading-none">
+            <span
+              className={cn(
+                "tabular-nums font-medium",
+                bullish ? "text-positive" : "text-negative",
+              )}
+            >
+              {profitUsdText}
+            </span>
+            <span
+              className={cn(
+                "inline-flex items-center gap-0.5 tabular-nums",
+                bullish ? "text-positive" : "text-negative",
+              )}
+            >
+              {bullish ? (
+                <TriangleUpIcon width={10} height={10} />
+              ) : (
+                <TriangleDownIcon width={10} height={10} />
+              )}
+              {ratioText}
+            </span>
+            <span className="text-xs text-text-muted">({t("extend.common.time.24h")})</span>
           </div>
         </div>
       </div>
 
-      {/* Actions — circular cluster sitting directly below the basic
-          info block. Uses `justify-around` so the three buttons are
-          distributed evenly across the card's full width, mirroring
-          the wallet dropdown's `WalletActionButton` row in
-          `NewAppLayout`. New actions added later (Convert, Stake, …)
-          slot in alongside without changing the surrounding layout. */}
-      <div className="flex items-start justify-around">
+      {/* The chart determines this row's height on desktop. `mt-auto`
+          intentionally consumes the remaining space above the actions,
+          distributing the card's whitespace instead of leaving a dead
+          area below the controls. */}
+      <div className="mt-auto grid grid-cols-3 gap-2 pt-2">
         <ActionButton
           icon={<ReceiveOutlinedIcon width={18} height={18} />}
-          label={t("extend.account.receive")}
+          label={t("account.receive")}
           onClick={() => openReceive()}
           disabled={disabled}
         />
         <ActionButton
           icon={<SendOutlinedIcon width={18} height={18} />}
-          label={t("extend.account.withdraw")}
+          label={t("account.withdraw")}
           onClick={() => openWithdraw()}
           disabled={disabled}
         />
         <ActionButton
           icon={<CashInOutlinedIcon width={18} height={18} />}
-          label={t("extend.account.add_cash")}
+          label={t("account.add_cash")}
           onClick={handleAddCash}
           disabled={disabled || isCreatingOnramp}
         />
@@ -283,7 +267,7 @@ interface ActionButtonProps {
  * Background color: `bg-default-200` (and `bg-default-300` on hover).
  * `bg-default-100` (the lightest neutral) is too close to `bg-content1`
  * in the dark theme, leaving the circle nearly invisible against the
- * card. The dropdown's `WalletActionButton` uses `bg-zinc-700/60` for
+ * card. The dropdown's `WalletActionButton` uses `bg-surface-strong/60` for
  * the same reason — we use the equivalent HeroUI token so the contrast
  * holds across themes.
  */
@@ -294,14 +278,15 @@ function ActionButton({ icon, label, onClick, disabled }: ActionButtonProps) {
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "flex flex-col items-center gap-1.5 px-3 py-1 cursor-pointer group rounded-lg",
+        "flex min-w-0 flex-col items-center gap-2 rounded-xl px-3 py-2 cursor-pointer group",
+        "transition-colors hover:bg-default-50 focus-visible:bg-default-50",
         "disabled:cursor-not-allowed disabled:opacity-40",
       )}
     >
-      <span className="w-9 h-9 flex items-center justify-center rounded-full bg-default-200 text-default-600 group-hover:bg-default-300 group-hover:text-foreground transition-colors">
+      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-default-200 text-text-muted transition-colors group-hover:bg-default-300 group-hover:text-foreground">
         {icon}
       </span>
-      <span className="text-[11px] text-default-500 group-hover:text-foreground transition-colors whitespace-nowrap">
+      <span className="text-xs text-text-muted group-hover:text-foreground transition-colors whitespace-nowrap">
         {label}
       </span>
     </button>

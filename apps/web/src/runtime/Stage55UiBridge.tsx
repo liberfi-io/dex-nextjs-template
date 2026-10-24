@@ -12,7 +12,6 @@ import {
   RedpacketUiProvider,
   type RedpacketUiPorts,
 } from "@liberfi.io/ui-redpacket";
-import { toast } from "@liberfi.io/ui";
 import { useAuthCallback, useConnectedWallet } from "@liberfi.io/wallet-connector";
 import { asJsx } from "../application/jsx";
 import { useUpload } from "../application/pinata";
@@ -57,19 +56,20 @@ export function LaunchpadUiBridge({ children }: PropsWithChildren) {
       createRuntime: (onChange) =>
         adapters.launchpad.createRuntime({
           onChange,
+          userAddress: wallet?.address,
           upload: {
             upload: async (intent) => intent.imageUri ?? "",
           },
           signer: {
-            sign: async () => {
+            sign: async (serializedTx) => {
               if (!wallet) throw new Error("missing signer");
-              return "signed";
+              const signed = await wallet.signTransaction(
+                Buffer.from(serializedTx, "base64"),
+              );
+              return Buffer.from(signed).toString("base64");
             },
           },
         }),
-      onCreated: (snapshot) => {
-        if (snapshot.txHash) toast.success(snapshot.txHash);
-      },
     }),
     [adapters.launchpad, chain, generateAsync, requireAuth, upload, wallet],
   );
@@ -114,7 +114,7 @@ export function RedpacketUiBridge({ children }: PropsWithChildren) {
         }),
       shareUrl: adapters.redpacket.shareUrl,
       copyText: async (text) => {
-        await browserAppSdk.copyToClipboard(text, t("extend.redpacket.share.copy_claim_url"));
+        await browserAppSdk.copyToClipboard(text, t("redpacket.share.copy_claim_url"));
       },
     }),
     [adapters.redpacket, chain, requireAuth, router, t, wallet],

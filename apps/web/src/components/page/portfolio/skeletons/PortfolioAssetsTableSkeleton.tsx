@@ -30,16 +30,19 @@ export function PortfolioAssetsTableSkeleton({
 }: PortfolioAssetsTableSkeletonProps) {
   const { t } = useTranslation();
   return (
-    <div className="flex h-full flex-col">
+    <div data-testid="portfolio-assets-table-skeleton" className="flex h-full flex-col">
       <div className="custom-scrollbar min-h-0 flex-1 overflow-auto">
         <table className="w-full table-fixed border-collapse text-[12px] min-w-[820px]">
-          <thead className="sticky top-0 z-10 bg-content1">
+          <thead
+            data-testid="portfolio-table-header-skeleton"
+            className="sticky top-0 z-10 bg-content1"
+          >
             <tr className="border-b border-divider">
               {columns.map((col) => (
                 <th
                   key={col.key}
                   className={cn(
-                    "h-9 px-3 align-middle text-[12px] font-medium text-default-500",
+                    "h-9 px-3 align-middle text-[12px] font-medium text-text-muted",
                     alignClass(col.align),
                     col.width,
                   )}

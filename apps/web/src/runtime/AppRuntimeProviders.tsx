@@ -1,28 +1,31 @@
 "use client";
 
-import { type ComponentType, PropsWithChildren, useMemo } from "react";
+import {
+  createContext,
+  type ComponentProps,
+  type ComponentType,
+  PropsWithChildren,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import Cookies from "js-cookie";
 import { DexClientProvider as ApiClientProvider } from "@liberfi.io/react";
-import { PolymarketProvider } from "@liberfi.io/react-predict";
-import { ChannelsProvider } from "@liberfi.io/ui-channels";
 import { MediaTrackProvider } from "@liberfi.io/ui-media-track";
-import { PerpetualsProvider } from "@liberfi.io/ui-perpetuals";
-import { PortfolioClientProvider, PortfolioProvider } from "@liberfi.io/ui-portfolio";
+import { PortfolioProvider } from "@liberfi.io/ui-portfolio";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
-import { useAuth, useConnectedWallet } from "@liberfi.io/wallet-connector";
-import { PinataProvider } from "../application/pinata";
+import { useConnectedWallet } from "@liberfi.io/wallet-connector";
+import { PrimaryTokenPricePoller } from "../application/PrimaryTokenPricePoller";
 import { useDexTokenProvider } from "../application/useDexTokenProvider";
-import { HyperliquidAccountStateSync } from "../components/HyperliquidAccountStateSync";
-import { pinata } from "../libs/pinata";
 import {
-  type AppClientBundle,
   type CapabilityBundleV1,
+  type CoreAppClientBundle,
   RuntimeConfig,
 } from "./app-runtime.types";
 import { readRuntimeConfig } from "./readRuntimeConfig";
 import { Stage51AdaptersProvider } from "./Stage51AdaptersProvider";
 import { Stage53AdaptersProvider } from "./Stage53AdaptersProvider";
-import { Stage54AdaptersProvider } from "./Stage54AdaptersProvider";
 import { Stage55AdaptersProvider } from "./Stage55AdaptersProvider";
 import { useAppClientBundle } from "./useAppClientBundle";
 
@@ -44,15 +47,35 @@ type ReactCapabilityInput = {
 
 const CapabilityClientProvider = ApiClientProvider as ComponentType<
   PropsWithChildren<{
-    client: AppClientBundle["api"];
-    subscribeClient: AppClientBundle["api"];
+    client: CoreAppClientBundle["api"];
+    subscribeClient: CoreAppClientBundle["api"];
     capabilities: ReactCapabilityInput;
   }>
 >;
+const ActivatableMediaTrackProvider = MediaTrackProvider as ComponentType<
+  ComponentProps<typeof MediaTrackProvider> & { active?: boolean }
+>;
 
-function projectReactCapabilities(
-  bundle: CapabilityBundleV1,
-): ReactCapabilityInput {
+const AppRuntimeConfigContext = createContext<RuntimeConfig | null>(null);
+const MediaTrackRuntimeActivityContext = createContext<((active: boolean) => void) | null>(null);
+
+export function useAppRuntimeConfig(): RuntimeConfig {
+  const config = useContext(AppRuntimeConfigContext);
+  if (!config) {
+    throw new Error("useAppRuntimeConfig must be used within AppRuntimeProviders");
+  }
+  return config;
+}
+
+export function useMediaTrackRuntimeActivity(active: boolean) {
+  const setActive = useContext(MediaTrackRuntimeActivityContext);
+  useEffect(() => {
+    setActive?.(active);
+    return () => setActive?.(false);
+  }, [active, setActive]);
+}
+
+function projectReactCapabilities(bundle: CapabilityBundleV1): ReactCapabilityInput {
   return {
     token: bundle.token,
     wallet: bundle.wallet,
@@ -83,65 +106,53 @@ export function AppRuntimeProviders({
       async get() {
         return Cookies.get("dex-token") ?? null;
       },
+      async remove() {
+        Cookies.remove("dex-token", {
+          secure: true,
+          sameSite: "strict",
+        });
+      },
     }),
     [],
   );
   const dexTokenProvider = useDexTokenProvider(dexTokenLoader);
-  const { user } = useAuth();
-  const channelsAccessToken = user?.accessToken ?? null;
-  const channelsTokenProvider = useMemo(
-    () => ({ getToken: async () => channelsAccessToken }),
-    [channelsAccessToken],
-  );
   const clients = useAppClientBundle({
     config,
     dexTokenProvider,
-    channelsTokenProvider,
   });
   const reactCapabilities = useMemo(
     () => projectReactCapabilities(clients.capabilities),
     [clients.capabilities],
   );
+  const [mediaTrackActive, setMediaTrackActive] = useState(false);
   const { chain } = useCurrentChain();
   const wallet = useConnectedWallet(chain);
 
   return (
-    <PinataProvider client={pinata}>
-      <CapabilityClientProvider
-        client={clients.api}
-        subscribeClient={clients.api}
-        capabilities={reactCapabilities}
-      >
-        <Stage51AdaptersProvider api={clients.api}>
-          <Stage53AdaptersProvider>
-            <Stage54AdaptersProvider
-              client={clients.predict}
-              wsClient={clients.predictWs}
-              wsEnabled={config.predictWsEnabled}
-            >
+    <AppRuntimeConfigContext.Provider value={config}>
+      <MediaTrackRuntimeActivityContext.Provider value={setMediaTrackActive}>
+        <CapabilityClientProvider
+          client={clients.api}
+          subscribeClient={clients.api}
+          capabilities={reactCapabilities}
+        >
+          <PrimaryTokenPricePoller />
+          <Stage51AdaptersProvider api={clients.api}>
+            <Stage53AdaptersProvider>
               <Stage55AdaptersProvider client={clients.chainStream} origin={config.origin}>
-                <MediaTrackProvider client={clients.mediaTrack}>
-                  <ChannelsProvider client={clients.channels}>
-                    <PolymarketProvider>
-                      <PortfolioClientProvider client={clients.portfolio}>
-                        <PortfolioProvider chain={chain} address={wallet?.address ?? ""}>
-                          <PerpetualsProvider
-                            client={clients.perpetuals}
-                            depositClient={clients.perpetualDeposit}
-                          >
-                            <HyperliquidAccountStateSync />
-                            {children}
-                          </PerpetualsProvider>
-                        </PortfolioProvider>
-                      </PortfolioClientProvider>
-                    </PolymarketProvider>
-                  </ChannelsProvider>
-                </MediaTrackProvider>
+                <ActivatableMediaTrackProvider
+                  client={clients.mediaTrack}
+                  active={mediaTrackActive}
+                >
+                  <PortfolioProvider chain={chain} address={wallet?.address ?? ""}>
+                    {children}
+                  </PortfolioProvider>
+                </ActivatableMediaTrackProvider>
               </Stage55AdaptersProvider>
-            </Stage54AdaptersProvider>
-          </Stage53AdaptersProvider>
-        </Stage51AdaptersProvider>
-      </CapabilityClientProvider>
-    </PinataProvider>
+            </Stage53AdaptersProvider>
+          </Stage51AdaptersProvider>
+        </CapabilityClientProvider>
+      </MediaTrackRuntimeActivityContext.Provider>
+    </AppRuntimeConfigContext.Provider>
   );
 }

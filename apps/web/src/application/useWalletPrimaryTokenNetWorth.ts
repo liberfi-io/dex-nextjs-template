@@ -2,16 +2,27 @@
 
 import { useMemo } from "react";
 import { useCurrentChain } from "@liberfi.io/ui-chain-select";
-import { getPrimaryTokenAddress } from "./tokens";
+import { formatAmount } from "@liberfi.io/utils";
+import { useCurrentWalletAddress } from "./useCurrentWalletAddress";
 import { useWalletPortfolios } from "./useWalletPortfolios";
+
+export function formatWalletPrimaryTokenBalance(amount: string | undefined) {
+  return amount === undefined ? "--" : formatAmount(amount);
+}
 
 export function useWalletPrimaryTokenNetWorth() {
   const { chain } = useCurrentChain();
-  const primaryTokenAddress = getPrimaryTokenAddress(chain);
-  const { data: walletPortfolios } = useWalletPortfolios();
+  const walletAddress = useCurrentWalletAddress();
+  const { data: walletPortfolios, isError } = useWalletPortfolios();
 
   return useMemo(
-    () => walletPortfolios?.portfolios?.find((portfolio) => portfolio.address === primaryTokenAddress),
-    [walletPortfolios, primaryTokenAddress],
+    () =>
+      !isError &&
+      walletAddress &&
+      walletPortfolios?.chain === chain &&
+      walletPortfolios.address.toLowerCase() === walletAddress.toLowerCase()
+        ? { amount: walletPortfolios.balanceInNative }
+        : undefined,
+    [chain, isError, walletAddress, walletPortfolios],
   );
 }

@@ -3,10 +3,7 @@
 import { useMemo, useState } from "react";
 import { useTokenQuery } from "@liberfi.io/react";
 import type { Chain } from "@liberfi.io/types";
-import {
-  TabBarUnderline,
-  type TabBarUnderlineItem,
-} from "@liberfi.io/ui-scaffold";
+import { TabBarUnderline, type TabBarUnderlineItem } from "@liberfi.io/ui-scaffold";
 import { useTranslation } from "@liberfi.io/i18n";
 import { BottomDevTokensTable } from "./bottom-tables/BottomDevTokensTable";
 import { BottomHoldersTable } from "./bottom-tables/BottomHoldersTable";
@@ -41,39 +38,27 @@ export function BottomDataPanel({ chain, address }: BottomDataPanelProps) {
 
   const tabItems = useMemo<ReadonlyArray<TabBarUnderlineItem<BottomTab>>>(
     () => [
-      { key: "trades", label: t("extend.trade.titles.activities") },
+      { key: "trades", label: t("trade.titles.activities") },
       {
         key: "holders",
-        label: t("extend.trade.titles.holders"),
+        label: t("trade.titles.holders"),
         count: holdersCount ?? undefined,
       },
-      { key: "top-traders", label: t("extend.trade.titles.top_traders") },
-      { key: "dev-tokens", label: t("extend.trade.titles.dev_tokens") },
+      { key: "top-traders", label: t("trade.titles.top_traders") },
+      { key: "dev-tokens", label: t("trade.titles.dev_tokens") },
     ],
     [t, holdersCount],
   );
 
   return (
     <div className="flex h-full w-full flex-col overflow-hidden">
-      <TabBarUnderline<BottomTab>
-        items={tabItems}
-        value={activeTab}
-        onChange={setActiveTab}
-      />
+      <TabBarUnderline<BottomTab> items={tabItems} value={activeTab} onChange={setActiveTab} />
 
       <div className="min-h-0 flex-1 overflow-hidden">
-        {activeTab === "trades" && (
-          <BottomTradesTable chain={chain} address={address} />
-        )}
-        {activeTab === "holders" && (
-          <BottomHoldersTable chain={chain} address={address} />
-        )}
-        {activeTab === "top-traders" && (
-          <BottomTopTradersTable chain={chain} address={address} />
-        )}
-        {activeTab === "dev-tokens" && (
-          <BottomDevTokensTable chain={chain} address={address} />
-        )}
+        {activeTab === "trades" && <BottomTradesTable chain={chain} address={address} />}
+        {activeTab === "holders" && <BottomHoldersTable chain={chain} address={address} />}
+        {activeTab === "top-traders" && <BottomTopTradersTable chain={chain} address={address} />}
+        {activeTab === "dev-tokens" && <BottomDevTokensTable chain={chain} address={address} />}
       </div>
     </div>
   );

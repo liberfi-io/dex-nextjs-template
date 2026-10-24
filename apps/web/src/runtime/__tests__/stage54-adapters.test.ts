@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import { createStage54PredictPorts } from "../createStage54Adapters";
 import type { PredictClient, PredictWsClient } from "@liberfi.io/react-predict";
 
@@ -24,5 +26,19 @@ describe("createStage54PredictPorts", () => {
     });
     expect(ports.wsClient).toBe(ws);
     expect(ports.wsEnabled).toBe(true);
+  });
+
+  it("nests the updated market-data runtime inside the predict provider", () => {
+    const source = fs.readFileSync(
+      path.resolve(process.cwd(), "src/runtime/Stage54AdaptersProvider.tsx"),
+      "utf8",
+    );
+    const predictProvider = source.indexOf("<PredictProvider");
+    const marketDataProvider = source.indexOf("<MarketDataProvider");
+    const predictProviderClose = source.indexOf("</PredictProvider>");
+
+    expect(predictProvider).toBeGreaterThan(-1);
+    expect(marketDataProvider).toBeGreaterThan(predictProvider);
+    expect(marketDataProvider).toBeLessThan(predictProviderClose);
   });
 });
