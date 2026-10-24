@@ -33,6 +33,27 @@ jobs:
       - name: Install Vercel CLI
         run: pnpm add -g vercel
 
+      - name: Verify Vercel project access
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          node <<'JS'
+          (async () => {
+          const team = encodeURIComponent(process.env.VERCEL_ORG_ID);
+          const project = encodeURIComponent(process.env.VERCEL_PROJECT_ID);
+          const headers = { Authorization: `Bearer ${process.env.VERCEL_TOKEN}` };
+          const response = await fetch(`https://api.vercel.com/v9/projects/${project}?teamId=${team}`, { headers });
+          const result = await response.json();
+          console.log(JSON.stringify({ status: response.status, project: result.name, error: result.error?.code, message: result.error?.message }));
+          if (!response.ok) {
+            const projects = await fetch(`https://api.vercel.com/v9/projects?teamId=${team}&limit=100`, { headers });
+            const body = await projects.json();
+            console.log(JSON.stringify({ status: projects.status, error: body.error?.code, message: body.error?.message, projects: body.projects?.map(({id,name}) => ({id,name})) }));
+            process.exit(1);
+          }
+          })().catch(error => { console.error(error.message); process.exit(1); });
+          JS
+
       - name: Pull Vercel environment
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
 

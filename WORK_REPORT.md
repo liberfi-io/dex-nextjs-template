@@ -2044,3 +2044,11 @@
 - 完成事项：精确依赖 react-predict@0.3.93，保留其他依赖范围，修复遗留未使用常量；生产与构建通过既有Secret注入API Key。
 - 验证结果：正式npm依赖下9测试、typecheck、完整生产构建通过。影响仅Prediction接入与钱包Relayer，不改变DEX交易逻辑。
 - 推送状态与workflow：准备推送功能分支及main；main触发Vercel生产部署，成功后核验公开BFF与页面，并追加实际提交及run结果。
+
+## 2026-10-24：Vercel 项目访问诊断（提交前）
+
+- 仓库与分支：dex-nextjs-template / codex/unified-prediction-api-auth；拟用标题 `fix(deploy): diagnose Vercel project access before build`。
+- 问题背景：生产 workflow 40076307163 在读取既有 Vercel 项目设置时失败，尚未构建或部署；当前线上版本未改变。
+- 完成事项与范围：部署前只读检查已配置团队/项目的 API 访问，失败时输出错误类别和该团队可见项目清单，不输出部署令牌或业务凭证。
+- 验证计划：检查workflow格式、推送并查看只读诊断；生产prediction-server强制鉴权暂缓，待客户端部署完成。
+- 推送状态与workflow：本次推送功能分支及main，触发既有Vercel流程；后续追加诊断和发布结果。
