@@ -2091,3 +2091,9 @@
 - 完成：Go1.25全race通过，SDK107测试与类型检查通过，React18/19消费检查通过，完整pnpm build 24项通过。两个make run实例连接共享隔离PG，真实Polymarket盘口收到；Ticket过期后连接心跳正常，禁用后最终复测13.62秒断开。
 - 独立审查发现并修复浏览器关闭码与清理阻塞撤销两项P1，均有RED->GREEN回归；模拟SDK运行超过1小时保持连接。所有隔离本地测试服务、PG和Redis均已清理。
 - 前端：未修改业务代码、依赖或部署；仅按仓库规则追加本报告。前端迁移说明和94操作V2文档包已准备，必须与生产服务端上线窗口协调，当前生产仍为旧版本。
+
+
+## 2026-10-24：WSS Ticket SDK 官方安装包验收完成
+
+- react-predict@0.3.94 官方tarball现已可下载，SHA-512与官方metadata一致，发布包类型声明确认包含getTicket、WsTicketRequestError、createWsTicket与expires_at。此前404阻塞已消除，已通知用户无需npm登录，不再要求维护者认证。
+- SDK发布结果：源码f01e295eb、Release workflow40084293810成功、release commit01c2d7f52已拉取；服务端CI40084282523成功。生产服务端及两个前端仍按约定不部署，前端同事先准备Ticket迁移，待V2生产窗口切换。
