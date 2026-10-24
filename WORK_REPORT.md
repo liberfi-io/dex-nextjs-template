@@ -2072,3 +2072,22 @@
 - 生产验收：自有/伙伴Key均200；缺失/错误Key均401；事件缓存命中后缺失/错误Key仍401；旧前缀404；任意签名代理仍需内部Bearer；非法relay目标400；浏览器CORS预检通过；两个自有BFF及内部代理200。伙伴日志可按身份查询，抽查未包含原始Key。
 - 凭证和交付：生产与staging配置独立自有/伙伴摘要凭证，原始值仅单独交付；文档包含中文接入流程和自动生成Swagger契约，不含真实Key。真实资金下单、提现、赎回未执行。
 - 后续发布方式：用户选择前端本地部署；旧DEX Actions Vercel Token的团队403未修改。AWS主服务仍使用已验证的既有发布流程。仅维护本报告的提交使用[skip ci]，不重复部署。
+
+
+## 2026-10-24：WSS Ticket V2 SDK 发布前记录
+
+- 仓库与分支：react-sdk / codex/unified-prediction-api-auth；拟提交 `feat(predict): support one-time WebSocket tickets`。
+- 背景与范围：客户后端保管长期Key，浏览器短期Ticket直连WSS；新增异步取票、取消和代次保护、认证后连接状态、抖动重连、明确失败分类，修复订阅回执状态与盘口REST兜底。保留旧SDK配置供旧服务使用，新服务拒绝旧消息Key。
+- 验证：react-predict 107测试通过，包typecheck通过；React18/19消费类型及运行测试通过；pnpm build 24项成功。独立审查两项P1已回归修复，补充了浏览器合法关闭码与清理不阻塞撤销测试；模拟超过1小时SDK连接保持。
+- 服务端：隔离PostgreSQL双实例一次性消费、真实上游盘口帧、Ticket过期后心跳及撤销断开已验证；Go全race通过，make run成功。未修改或部署自有前端，不执行生产服务端部署或真实资金交易。
+- 预期推送与workflow：SDK推送功能分支及main，通过既有Release workflow发布，预期react-predict 0.3.94；只在成功及官方registry核验后报告发布完成。
+
+
+## 2026-10-24：WSS Ticket V2 代码与发布结果
+
+- SDK提交 f01e295eb `feat(predict): support one-time WebSocket tickets` 已推送功能分支及main。Release workflow 40084293810 成功，release commit 01c2d7f52 已主动拉取，官方npm元数据和npm view已显示react-predict@0.3.94。
+- SDK安装验收尚未完成：官方tarball仍返回404；同次发布types@0.4.96的tarball可下载，npm状态页无事件。不能只凭workflow成功宣称SDK已可安装；已请维护者在本地npm login后查询精确版本生命周期状态。不得未经诊断自动改版本重发。
+- 服务端源码ef73e03、对接文档2f2b3f0已推送codex/prediction-partner-api；CI40084282523成功，仅功能分支，未合并main、未部署生产、未应用生产迁移80。
+- 完成：Go1.25全race通过，SDK107测试与类型检查通过，React18/19消费检查通过，完整pnpm build 24项通过。两个make run实例连接共享隔离PG，真实Polymarket盘口收到；Ticket过期后连接心跳正常，禁用后最终复测13.62秒断开。
+- 独立审查发现并修复浏览器关闭码与清理阻塞撤销两项P1，均有RED->GREEN回归；模拟SDK运行超过1小时保持连接。所有隔离本地测试服务、PG和Redis均已清理。
+- 前端：未修改业务代码、依赖或部署；仅按仓库规则追加本报告。前端迁移说明和94操作V2文档包已准备，必须与生产服务端上线窗口协调，当前生产仍为旧版本。
