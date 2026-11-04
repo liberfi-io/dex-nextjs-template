@@ -20,7 +20,7 @@ export function useOpenPresetForm() {
     (preset: number) => {
       openPresetModal({
         params: {
-          chains: [Chain.BINANCE],
+          chains: [Chain.ROBINHOOD],
           defaultChain: chain,
           defaultDirection: "buy",
           defaultPresetIndex: preset,

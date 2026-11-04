@@ -68,7 +68,7 @@ export function AppBottomToolbar() {
   const handlePresetClick = useCallback(() => {
     openPresetModal({
       params: {
-        chains: [Chain.BINANCE],
+        chains: [Chain.ROBINHOOD],
         defaultChain: chain,
         defaultDirection: "buy",
         defaultPresetIndex: preset,

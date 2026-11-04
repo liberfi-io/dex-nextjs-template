@@ -203,7 +203,7 @@ function buildChecks(
     ];
   }
 
-  if (chain === Chain.BINANCE || chain === Chain.ETHEREUM) {
+  if (chain === Chain.ROBINHOOD || chain === Chain.BINANCE || chain === Chain.ETHEREUM) {
     return [
       flagCheck("open_source", security?.isOpenSource, true),
       flagCheck("not_honeypot", security?.isHoneypot, false),

@@ -43,7 +43,7 @@ export function PulseInstantBuyAmountInput({
     (preset: number) => {
       openPresetModal({
         params: {
-          chains: [Chain.BINANCE],
+          chains: [Chain.ROBINHOOD],
           defaultChain: chain,
           defaultDirection: "buy",
           defaultPresetIndex: preset,

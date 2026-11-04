@@ -2018,3 +2018,47 @@
 - Production URL：`https://liberfi-8p55aypmn-sgt-lab.vercel.app`；正式域名 `https://app.liberfi.io/`。
 - 线上验收：首页默认 BSC，展开链菜单仅显示 BSC，WBNB/USDT/USDC 等行情已渲染；`?chain=sol` 自动规范化为 `?chain=bsc`；`/tokens` 自动跳转 BSC/WBNB；首页、Pulse 和 BSC 详情路由均 HTTP 200。
 - Workflow 状态：Release 与最终 Vercel 部署均成功；Node.js deprecation annotation 为非阻塞提示。本条报告使用 `[skip ci]` 单独提交，不重复触发部署。
+
+
+## 2026-11-04：Robinhood 主网 SDK 接入（提交前）
+
+- 仓库与分支：react-sdk/main；拟提交标题：`feat(chain): default to Robinhood mainnet`。
+- 问题背景：Chainstream 行情服务切换至 Robinhood 主网，原 BSC 默认链导致网站请求与数据范围不一致。
+- 计划完成事项：升级 Chainstream 2.1.28 → 2.1.29，注册主网 4663、ETH 元数据与浏览器地址，HTTP/WS 双向映射，默认链/缓存/搜索/预设改为 Robinhood；新 execution 路由明确拒绝，不丢弃交易绑定。同步修复经用户确认的三处 TradingView 测试 mock 字段。
+- 影响范围：types、utils、client、ui-chain-select、ui-tokens、ui-trade；媒体 token 识别回归与 TradingView 测试。新增 0x 执行交易不在本次范围。
+- 验证计划与已完成结果：Client 237 项、utils 268 项、链选择 38 项、TradingView 工具栏 10 项、媒体链映射 5 项通过；31 个 workspace typecheck 通过；发布阶段 pnpm build 24/24 通过。消费者本地 59 套/272 项测试通过，首页/详情/活动/K 线 Robinhood API HTTP 200，旧 BSC query 自动归一化。dist-only 消费者 fixture 已用仓库脚本刷新。
+- 预期推送状态：提交后 fast-forward 推送 main，禁止 force push。
+- Workflow 策略：main push 触发 Release；监听运行结果、官方 npm 核实版本并 git pull 同步 release commit，然后更新消费者并触发 Vercel 部署。
+
+
+## 2026-11-04：Robinhood SDK 提交与格式校验
+
+- 仓库/分支：react-sdk/main；初始提交 c7b399b57，标题 `feat(chain): default to Robinhood mainnet`，尚未推送、workflow 尚未触发。
+- 实际完成与验证：主网默认链与 SDK 兼容代码已提交，lint-staged 通过，测试/typecheck/build 结果同上。
+- 提交前检查发现计划附录原始 diff 存在行尾空白；拟以同标题 amend 未推送提交，只清理计划文本行尾空白，不改变代码与审批范围。验收为 git diff --check 与提交内容检查；推送策略仍为 main/Release。
+
+- SDK amend 后最终提交：`1dc8450cb8e9d0eec4c8597f95199f61d24fae13` — `feat(chain): default to Robinhood mainnet`；计划行尾空白已清理，whitespace 检查通过；准备推送 main，Release 待触发。
+
+- 推送结果：SDK `1dc8450cb8e9d0eec4c8597f95199f61d24fae13` 已推送 main，pre-push 构建通过；Release run `41848273263` 已触发，当前进行中。未 force push，尚未确认 npm 发布。
+
+- 本地补充验收：Robinhood META 详情已展示真实价格与图表、USD/ETH 计价；交易/地址浏览器链接指向主网 blockscout；搜索请求 `chains[]=robinhood&q=META` 返回 HTTP 200。已结束本次任务自行启动的 Next dev 进程，以便使用正式 npm 依赖执行发布构建；未重启或终止用户原有服务。
+
+
+## 2026-11-04：Robinhood SDK npm 发布完成
+
+- SDK 业务提交：`1dc8450cb8e9d0eec4c8597f95199f61d24fae13`，已推送 main。Release run `41848273263`、job `126637420986` 成功；release commit `e6b6cb9b0450c65cbbf7c3daaa5822e97f74ec52` 已通过 git pull --ff-only 同步。
+- 官方 registry 已逐包核实本次消费者全部 24 个新版本；发布后的元数据传播延迟已消退，未用镜像源判断版本。
+- npm 版本：`@liberfi.io/client@0.3.111`；`@liberfi.io/hooks@0.1.289`；`@liberfi.io/i18n@0.1.294`；`@liberfi.io/react@0.3.111`；`@liberfi.io/react-launchpad@0.1.24`；`@liberfi.io/react-predict@0.3.95`；`@liberfi.io/react-redpacket@0.1.24`；`@liberfi.io/types@0.4.97`；`@liberfi.io/ui@0.3.97`；`@liberfi.io/ui-chain-select@2.0.96`；`@liberfi.io/ui-channels@0.1.302`；`@liberfi.io/ui-launchpad@1.0.24`；`@liberfi.io/ui-media-track@0.1.292`；`@liberfi.io/ui-perpetuals@1.1.94`；`@liberfi.io/ui-portfolio@3.0.96`；`@liberfi.io/ui-predict@4.0.95`；`@liberfi.io/ui-redpacket@1.0.24`；`@liberfi.io/ui-scaffold@2.0.96`；`@liberfi.io/ui-tokens@3.0.97`；`@liberfi.io/ui-trade@3.0.97`；`@liberfi.io/ui-tradingview@0.1.250`；`@liberfi.io/utils@0.2.96`；`@liberfi.io/wallet-connector@0.2.96`；`@liberfi.io/wallet-connector-privy@1.1.94`。
+- 验证结果：SDK 发布构建通过，Release 成功；Node.js deprecation 与 runner image migration 仅为提示。接下来同步消费者锁文件并执行正式包测试、typecheck、生产构建及 Vercel 部署。
+
+
+## 2026-11-04：Robinhood 主网网站部署（提交前）
+
+- 仓库与分支：dex-nextjs-template/main；拟提交标题：`feat(chain): deploy Robinhood mainnet defaults`。
+- 问题背景：需要让线上默认行情链、唯一可选链和已发布 SDK 的主网能力一致。
+- 完成事项：顶部/首页/Pulse 与预设仅开放 Robinhood；旧 URL 归一化；无有效主网默认代币时回首页；K 线原生计价 ETH；钱包默认网络 4663；安全展示不借用其他链链接。24 个 LiberFi npm 依赖已同步至此次 Release 版本，Chainstream 为 2.1.29。
+- 影响范围：链入口、详情路由、原生币展示、钱包配置、SDK 依赖与锁文件。原预测市场/Hyperliquid 入金网络不作全局替换；新增 0x execution 交易未接入。
+- 验证结果：正式 npm 依赖安装成功；`USE_LOCAL_SDK=false pnpm --filter @liberfi/web test`：59 套/272 项 + 14 项构建配置全部通过；`USE_LOCAL_SDK=false pnpm --filter @liberfi/web typecheck` 通过；`USE_LOCAL_SDK=false pnpm build` 通过（1/1，1 分 9 秒）；git diff --check 通过。本地真实主网列表、详情、活动、K 线和搜索 HTTP 200；旧 bsc query 自动改 robinhood。
+- npm 同步记录：发布后官方版本元数据及 tarball 存在数分钟传播延迟；等待全部可安装后才进入正式构建，未使用镜像旧版本兜底。
+- 预期推送状态：fast-forward 推送 main，禁止 force push。
+- Workflow 策略：main push 触发 `Deploy to Vercel`，监听成功后核实正式域名；最后以报告专用 `[skip ci]` 提交追加结果，避免重复部署。

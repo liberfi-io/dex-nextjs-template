@@ -104,7 +104,7 @@ export function CombinedTokenList() {
     (preset: number) => {
       openPresetModal({
         params: {
-          chains: [Chain.BINANCE],
+          chains: [Chain.ROBINHOOD],
           defaultChain: chain,
           defaultDirection: "buy",
           defaultPresetIndex: preset,
@@ -315,7 +315,7 @@ export function CombinedTokenList() {
                   size="sm"
                   className="sm:hidden"
                   onSwitchChain={switchChain}
-                  candidates={[Chain.BINANCE]}
+                  candidates={[Chain.ROBINHOOD]}
                   onSuccess={(c) => {
                     onChainSwitchedUrl(c);
                     toast.success(

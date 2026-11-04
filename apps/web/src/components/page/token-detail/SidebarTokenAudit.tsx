@@ -177,7 +177,7 @@ function buildMetrics(
     ];
   }
 
-  if (chain === Chain.BINANCE || chain === Chain.ETHEREUM) {
+  if (chain === Chain.ROBINHOOD || chain === Chain.BINANCE || chain === Chain.ETHEREUM) {
     return [
       ...metrics,
       booleanMetric("not_honeypot", security?.isHoneypot, false),

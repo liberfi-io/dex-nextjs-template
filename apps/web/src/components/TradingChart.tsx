@@ -43,6 +43,7 @@ export type TradingChartProps = {
 
 function getNativeQuote(chain: Chain): TvChartQuoteType {
   switch (chain) {
+    case Chain.ROBINHOOD:
     case Chain.ETHEREUM:
       return TvChartQuoteType.ETH;
     case Chain.BINANCE:

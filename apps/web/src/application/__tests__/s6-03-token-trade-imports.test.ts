@@ -50,8 +50,8 @@ describe("S6-03 token/trade app adapters", () => {
     expect(resolveTokenRouteSlug(["sol"])).toBeNull();
     expect(resolveTokenRouteSlug(["not-a-chain", "mint"])).toBeNull();
     expect(resolveTokenRouteSlug(["sol", "mint"])).toBeNull();
-    expect(resolveTokenRouteSlug(["bsc", "mint"])).toEqual({
-      chainId: Chain.BINANCE,
+    expect(resolveTokenRouteSlug(["robinhood", "mint"])).toEqual({
+      chainId: Chain.ROBINHOOD,
       address: "mint",
     });
   });

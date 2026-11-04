@@ -309,7 +309,7 @@ export function PulsePage() {
                 size="sm"
                 className="sm:hidden"
                 onSwitchChain={switchChain}
-                candidates={[Chain.BINANCE]}
+                candidates={[Chain.ROBINHOOD]}
                 onSuccess={(chain) => {
                   onChainSwitchedUrl(chain);
                   toast.success(

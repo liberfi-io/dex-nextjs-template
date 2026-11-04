@@ -16,6 +16,7 @@ export const getPrimaryTokenSymbol = (chainId: Chain) => {
   switch (chainId) {
     case Chain.SOLANA:
       return SOL_TOKEN_SYMBOL;
+    case Chain.ROBINHOOD:
     case Chain.ETHEREUM:
       return ETH_TOKEN_SYMBOL;
     case Chain.BINANCE:
@@ -29,6 +30,7 @@ export const getPrimaryTokenAddress = (chainId: Chain) => {
   switch (chainId) {
     case Chain.SOLANA:
       return SOL_TOKEN_ADDRESS;
+    case Chain.ROBINHOOD:
     case Chain.ETHEREUM:
       return ETH_TOKEN_ADDRESS;
     case Chain.BINANCE:
@@ -42,6 +44,7 @@ export const getPrimaryTokenDecimals = (chainId: Chain) => {
   switch (chainId) {
     case Chain.SOLANA:
       return SOL_TOKEN_DECIMALS;
+    case Chain.ROBINHOOD:
     case Chain.ETHEREUM:
       return ETH_TOKEN_DECIMALS;
     case Chain.BINANCE:
@@ -55,6 +58,7 @@ export const getPrimaryTokenAvatar = (chainId: Chain) => {
   switch (chainId) {
     case Chain.SOLANA:
       return "/images/tokens/sol.svg";
+    case Chain.ROBINHOOD:
     case Chain.ETHEREUM:
       return "/images/tokens/eth.webp";
     case Chain.BINANCE:

@@ -218,6 +218,8 @@ export class ClientDataFeedModule {
         return Chain.ETHEREUM;
       case "56":
       case "binance":
+      case "robinhood":
+        return Chain.ROBINHOOD;
       case "bsc":
         return Chain.BINANCE;
       case "900900900":

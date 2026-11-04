@@ -2,6 +2,7 @@
 
 import { PropsWithChildren, useCallback } from "react";
 import { mainnet, bsc } from "viem/chains";
+import { robinhoodMainnet } from "../application/robinhood-chain";
 import {
   PrivyAuthProvider,
   PrivyWalletConnectorProvider,
@@ -21,8 +22,8 @@ export function AuthProviders({ children }: PropsWithChildren) {
     <PrivyWalletConnectorProvider
       privyAppId={process.env.NEXT_PUBLIC_PRIVY_APPID}
       privyClientConfig={{
-        defaultChain: bsc,
-        supportedChains: [mainnet, bsc],
+        defaultChain: robinhoodMainnet,
+        supportedChains: [robinhoodMainnet, mainnet, bsc],
         appearance: {
           theme: "dark",
           accentColor: "#BCFF2E",

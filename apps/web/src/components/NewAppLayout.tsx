@@ -467,7 +467,7 @@ function PageShellContent({ children }: PropsWithChildren) {
                     wallet (which funds Polymarket / Kalshi deposits) without
                     leaving the predict experience. */}
               <ChainSelectDropdown
-                candidates={[Chain.BINANCE]}
+                candidates={[Chain.ROBINHOOD]}
                 onSwitchChain={switchChain}
                 onSelectChain={handleHeaderSelectChain}
                 onSuccess={(c) => {
@@ -869,6 +869,7 @@ function ChainSelectDropdown({
 }
 
 function ChainIcon({ chain, size }: { chain: Chain; size: number }) {
+  if (chain === Chain.ROBINHOOD) return <span aria-label="Robinhood" style={{ width: size, height: size }} className="inline-flex items-center justify-center rounded-full bg-surface-interactive text-xs">R</span>;
   if (chain === Chain.SOLANA) return <SolanaIcon width={size} height={size} />;
   if (chain === Chain.ETHEREUM) return <EthereumIcon width={size} height={size} />;
   if (chain === Chain.BINANCE) return <BinanceIcon width={size} height={size} />;

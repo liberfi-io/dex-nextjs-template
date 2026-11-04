@@ -62,9 +62,9 @@ export function useChainUrlSync(): void {
     if (!slug) return;
 
     const queryChain = chainIdBySlug(slug);
-    if (queryChain !== Chain.BINANCE) {
+    if (queryChain !== Chain.ROBINHOOD) {
       // Old shared links must not restore chains without market data.
-      params.set("chain", "bsc");
+      params.set("chain", "robinhood");
       const targetPath = pathname.startsWith("/tokens/") ? "/" : pathname;
       router.replace(`${targetPath}?${params.toString()}`);
       return;
