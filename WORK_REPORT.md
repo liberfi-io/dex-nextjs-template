@@ -2192,3 +2192,12 @@
 - 推送与 workflow 策略：推送 main，使用 [skip ci] 跳过已知凭证无权限的 Actions；沿用已授权且已登录的本地 Vercel 生产发布，随后核实正式域名图标。
 
 - 提交前补充：vercel build --prod 成功；本地开发配置已恢复，产物不含 .env 文件。
+
+
+## 2026-11-04：官方链图标修正（提交后与部署验收）
+
+- 实际提交：987699868b553d58dc144a29f06b4118b7e81b5c — fix(chain): use official Robinhood symbol [skip ci]；已推送 dex-nextjs-template/main。
+- 完成结果：链切换按钮与下拉候选均使用官方羽毛图片，替换 R 字母占位符；图片本地托管且附官方来源。
+- 验证：本地 dev、类型检查、Vercel 生产构建通过；生产两处图片加载成功、尺寸20×20；whitespace 检查通过，开发 .env.local 已恢复，上传产物无 .env 文件。
+- 发布结果：本地 Vercel 生产部署 dpl_3m52HddnLLUC3R1B9r3YLin1mWN5 Ready，https://liberfi-93hiudts5-sgt-lab.vercel.app 已关联 https://app.liberfi.io；线上按钮与展开菜单已验收并截图。
+- Workflow 状态：按既定本地发布方案使用 [skip ci]，未触发 Actions 或 npm 发布。报告专用提交继续使用 [skip ci]，不重复部署。
