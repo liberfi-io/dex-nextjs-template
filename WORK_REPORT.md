@@ -2153,3 +2153,19 @@
 - 完成事项：保留远端预测鉴权和部署诊断、双方工作记录及已发布主网依赖；修复 WebSocket getTicket/apiKey 互斥配置，新增两项契约测试；市场默认及唯一候选保持 Robinhood。
 - 验证：62 套/276 项网站测试、14 项配置检查、typecheck 通过；本地 dev 旧 bsc URL 自动归一化 Robinhood，首页 HTTP 200；发布构建 1/1 通过，耗时 54.936 秒。原有 JSDoc lint 提示不影响构建。
 - 影响范围：消费者合并同步与鉴权最小适配，无新增交易执行能力。预期推送 main，触发 Deploy to Vercel；若既有团队权限错误仍存在则按确认方案使用本地部署。禁止 force push。
+
+
+## 2026-11-04：合并发布提交后
+
+- 网站实际提交：5e9a1a0a90246627920a115fcb87305962b9683c — merge: preserve remote updates for Robinhood deployment；已推送 main，保留 f9e83d71b34d5d52b00ddec25454a4abb7f51da6 主网业务提交及远端更新，无 force push。
+- SDK 补充计划提交 08f9ae2fe 已推送 main，使用 [skip ci]，不重复发包。SDK npm 发布仍为成功的 Release 41848273263、release commit e6b6cb9b0450c65cbbf7c3daaa5822e97f74ec52。
+- 验证结果：276 项测试、14 项配置检查、类型检查、本地页面归一化及生产构建均通过。
+- 网站 workflow：Deploy to Vercel 41859906194 已触发，尚在运行；本机 CLI 未检测到已有登录凭证，最终部署状态待核实。
+
+
+## 2026-11-04：生产部署认证阻塞
+
+- Deploy to Vercel run 41859906194 失败于 Verify Vercel project access，项目查询及团队项目列表均返回 HTTP 403 / forbidden / Not authorized；未进入 Build/Deploy，线上尚未更新。
+- 代码提交和 npm 发布均已完成且推送 main；测试、typecheck、生产构建均通过。不是构建错误，不回滚已验证代码或 npm 包。
+- 已检查本机 Vercel CLI，未发现已有登录凭证；已请用户使用有 sgt-lab/liberfi-dex 权限的账号执行 vercel login，或提供现有有效凭证文件路径。等待认证后按已确认方案本地部署，不输出或提交原始凭证。
+- 本条报告专用提交使用 [skip ci]，避免重复触发已知权限失败的 workflow。
