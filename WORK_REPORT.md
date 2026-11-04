@@ -2169,3 +2169,14 @@
 - 代码提交和 npm 发布均已完成且推送 main；测试、typecheck、生产构建均通过。不是构建错误，不回滚已验证代码或 npm 包。
 - 已检查本机 Vercel CLI，未发现已有登录凭证；已请用户使用有 sgt-lab/liberfi-dex 权限的账号执行 vercel login，或提供现有有效凭证文件路径。等待认证后按已确认方案本地部署，不输出或提交原始凭证。
 - 本条报告专用提交使用 [skip ci]，避免重复触发已知权限失败的 workflow。
+
+
+## 2026-11-04：Robinhood 主网生产部署完成
+
+- 用户完成本机 Vercel 登录后，项目访问和 production 配置拉取成功；沿用已确认的本地发布路径，未修改 GitHub Actions 凭证。
+- 发布源码：网站 main 的主网提交 f9e83d71b34d5d52b00ddec25454a4abb7f51da6、合并兼容提交 5e9a1a0a90246627920a115fcb87305962b9683c；部署时 HEAD d576d63（报告提交）。SDK Release 41848273263 已成功，release commit e6b6cb9b0450c65cbbf7c3daaa5822e97f74ec52。
+- 本地 vercel build --prod 和 vercel deploy --prebuilt --prod 均成功。构建临时隔离开发 .env.local，完成后自动恢复；已确认产物中不含 .env 文件，仓库未提交凭证。
+- 生产部署：dpl_5UQk2psxKHwGa2k9izuWR2BbK5Q4，状态 Ready；部署地址 https://liberfi-d2u33z6gy-sgt-lab.vercel.app；正式域名 app.liberfi.io、dex.liberfi.io 已指向此次部署。
+- 线上验收：正式首页默认 Robinhood，展开链选择只有 Robinhood；旧 ?chain=bsc 自动变为 ?chain=robinhood；META、SPY、NVDA 等主网行情真实数据已加载。未执行真实资金交易。
+- 验证汇总：276 项测试、14 项配置检查、typecheck、pnpm build、Vercel 生产构建与线上入口验证均通过。Actions run 41859906194 的 403 仍为原有凭证问题，此次已通过本地发布完成，不将该 run 记为成功。
+- 收尾：本记录专用提交使用 [skip ci] 推送 main，不重复触发部署；后续若使用 Actions 仍需更新其有效团队凭证。
