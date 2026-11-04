@@ -24,6 +24,7 @@ import {
 } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Chain, Token } from "@liberfi.io/types";
 import {
@@ -869,7 +870,17 @@ function ChainSelectDropdown({
 }
 
 function ChainIcon({ chain, size }: { chain: Chain; size: number }) {
-  if (chain === Chain.ROBINHOOD) return <span aria-label="Robinhood" style={{ width: size, height: size }} className="inline-flex items-center justify-center rounded-full bg-surface-interactive text-xs">R</span>;
+  if (chain === Chain.ROBINHOOD) {
+    return (
+      <Image
+        src="/images/chains/robinhood.jpg"
+        alt="Robinhood Chain"
+        width={Math.max(size, 20)}
+        height={Math.max(size, 20)}
+        className="shrink-0 rounded-full"
+      />
+    );
+  }
   if (chain === Chain.SOLANA) return <SolanaIcon width={size} height={size} />;
   if (chain === Chain.ETHEREUM) return <EthereumIcon width={size} height={size} />;
   if (chain === Chain.BINANCE) return <BinanceIcon width={size} height={size} />;

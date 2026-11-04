@@ -2180,3 +2180,15 @@
 - 线上验收：正式首页默认 Robinhood，展开链选择只有 Robinhood；旧 ?chain=bsc 自动变为 ?chain=robinhood；META、SPY、NVDA 等主网行情真实数据已加载。未执行真实资金交易。
 - 验证汇总：276 项测试、14 项配置检查、typecheck、pnpm build、Vercel 生产构建与线上入口验证均通过。Actions run 41859906194 的 403 仍为原有凭证问题，此次已通过本地发布完成，不将该 run 记为成功。
 - 收尾：本记录专用提交使用 [skip ci] 推送 main，不重复触发部署；后续若使用 Actions 仍需更新其有效团队凭证。
+
+
+## 2026-11-04：链切换官方图标修正（提交前）
+
+- 仓库/分支：dex-nextjs-template/main；拟提交 fix(chain): use official Robinhood symbol [skip ci]。
+- 背景：链选择按钮及菜单中的 R 占位符不符合真实品牌展示需求。
+- 完成事项：使用官方 Robinhood Chain brand-assets-v1 的未修改 Robinhood_Avatar.jpg；资源随网站托管，按钮和候选项共用 Next Image，最小显示 20px；附资源来源说明。
+- 影响范围：仅网站链切换图标及静态资源，不变更 SDK 版本和链逻辑，不发布 npm。
+- 验证：本地 dev 两处图片 complete=true、naturalWidth>0，20×20 显示；类型检查通过（首次与 dev 类型生成并发导致临时缺失 .next/types，服务稳定后重跑通过）。生产 Vercel 构建正在执行，成功后才提交发布。
+- 推送与 workflow 策略：推送 main，使用 [skip ci] 跳过已知凭证无权限的 Actions；沿用已授权且已登录的本地 Vercel 生产发布，随后核实正式域名图标。
+
+- 提交前补充：vercel build --prod 成功；本地开发配置已恢复，产物不含 .env 文件。
