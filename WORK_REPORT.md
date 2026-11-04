@@ -2019,6 +2019,60 @@
 - 线上验收：首页默认 BSC，展开链菜单仅显示 BSC，WBNB/USDT/USDC 等行情已渲染；`?chain=sol` 自动规范化为 `?chain=bsc`；`/tokens` 自动跳转 BSC/WBNB；首页、Pulse 和 BSC 详情路由均 HTTP 200。
 - Workflow 状态：Release 与最终 Vercel 部署均成功；Node.js deprecation annotation 为非阻塞提示。本条报告使用 `[skip ci]` 单独提交，不重复触发部署。
 
+## 2026-10-24：Prediction 统一 API 鉴权（发布准备）
+
+- 仓库与分支：react-sdk、dex-nextjs-template / codex/unified-prediction-api-auth。
+- 背景：prediction-server 统一 `/api/v1` 并要求自有与伙伴均携带 X-API-Key，避免切换造成自有业务中断。
+- 已完成提交：SDK `e0a55de9e` 修复全部 HTTP 方法的默认请求头和 WS 首消息认证，`988ba5abc` 合并远端现有超时/错误处理；DEX `efe4a03` 接入调用凭证，`baaddbd` 合并远端模块拆分，`e69221c` 保持发布过渡类型兼容。合并时保留远端当前业务。
+- 验证：SDK 87 测试、24项发布构建通过；DEX鉴权/工厂9测试、typecheck通过；本地源码模式联调已完成。原始凭证不进入代码或报告。
+- 推送：SDK 功能分支及main已推送，Release workflow 40075742268；DEX功能分支已推送，main尚未切换。
+- 后续提交计划：仅锁定本次新发布 react-predict 版本与 lockfile，保留其他依赖；拟用标题 `chore(predict): consume authenticated prediction client release`。验证 frozen install、类型、测试和生产构建后部署，workflow注入已配置的仓库Secret。
+- Workflow策略：SDK通过既有Release发布；DEX main推送触发既有Vercel生产流程。完成后追加实际版本、提交和线上验证结果。
+
+## 2026-10-24：Prediction 发布构建修正（提交前）
+
+- 仓库与分支：dex-nextjs-template / codex/unified-prediction-api-auth。
+- 拟用提交标题：`chore(predict): consume authenticated prediction client release`。
+- 背景与完成事项：官方 npm 已确认 react-predict@0.3.93；精确锁定该依赖及 lockfile。发布构建发现 Relayer 转发改造后遗留未使用常量，移除该常量，不改变请求行为。
+- 影响范围：Prediction HTTP/WS 认证和钱包部署/授权转发；保留远端现有模块拆分，不升级无关业务。
+- 验证：更新后类型检查及9项鉴权/客户端测试通过；清理常量后重跑完整发布构建。推送计划为功能分支后 fast-forward main；既有Vercel workflow注入Secret并发布。SDK Release 40075742268 成功，release commit b82582de6已通过git pull同步。
+
+## 2026-10-24：Prediction 发布构建结果（提交前补充）
+
+- 仓库与分支：dex-nextjs-template / codex/unified-prediction-api-auth。
+- 拟用提交：`chore(predict): consume authenticated prediction client release`。
+- 完成事项：精确依赖 react-predict@0.3.93，保留其他依赖范围，修复遗留未使用常量；生产与构建通过既有Secret注入API Key。
+- 验证结果：正式npm依赖下9测试、typecheck、完整生产构建通过。影响仅Prediction接入与钱包Relayer，不改变DEX交易逻辑。
+- 推送状态与workflow：准备推送功能分支及main；main触发Vercel生产部署，成功后核验公开BFF与页面，并追加实际提交及run结果。
+
+## 2026-10-24：Vercel 项目访问诊断（提交前）
+
+- 仓库与分支：dex-nextjs-template / codex/unified-prediction-api-auth；拟用标题 `fix(deploy): diagnose Vercel project access before build`。
+- 问题背景：生产 workflow 40076307163 在读取既有 Vercel 项目设置时失败，尚未构建或部署；当前线上版本未改变。
+- 完成事项与范围：部署前只读检查已配置团队/项目的 API 访问，失败时输出错误类别和该团队可见项目清单，不输出部署令牌或业务凭证。
+- 验证计划：检查workflow格式、推送并查看只读诊断；生产prediction-server强制鉴权暂缓，待客户端部署完成。
+- 推送状态与workflow：本次推送功能分支及main，触发既有Vercel流程；后续追加诊断和发布结果。
+
+## 2026-10-24：发布状态与本地部署切换（提交后）
+
+- 仓库与分支：SDK及DEX / codex/unified-prediction-api-auth。SDK发布提交 b82582de6、react-predict@0.3.93及workflow40075742268已确认成功。DEX a673470 锁定SDK并通过生产构建，f5f3b73增加只读访问诊断，均已推送功能分支及main。
+- DEX生产workflow40076307163、40076418353均未部署成功：Vercel API明确403，现有Token无sgt-lab团队权限，线上仍为原版本。
+- 用户要求改为本地部署；本机Vercel CLI65.2.0已准备，缺少有效Vercel认证，已创建权限0600的本地空凭证模板并请用户填写；报告不保存原始Token/API Key。
+- Prediction模板新版本生产workflow40076306091成功，但主服务暂缓强制鉴权以保护现有DEX调用；为保持旧钱包Relayer兼容，原版本恢复workflow40076698135正在运行。服务主版本仍v0.0.232；内部openapi-server v0.0.36已成功发布。
+- 服务端功能CI40075851533成功，staging40076109569仍在执行。生产迁移79和两条独立摘要凭证已配置；文档包已校验，不含真实凭证。真实资金联调未执行。
+
+## 2026-10-24：Prediction 统一 API 生产发布完成
+
+- 仓库与分支：react-sdk、dex-nextjs-template / codex/unified-prediction-api-auth；服务端 / codex/prediction-partner-api；所有业务源码已推送对应功能分支和main。
+- SDK：react-predict@0.3.93 官方 npm 已验证；Release workflow 40075742268 成功；release commit b82582de6 已拉取。SDK 87测试及24项构建通过。
+- 自有前端按用户要求改为本地 Vercel 发布。Prediction 生产部署 dpl_F4PoQ9E2iyGFEmBSUhPaETpc5z41；DEX 生产部署 dpl_GPZ88YZz6WGiHnU4bek87Ga86Hnx；正式域名分别为 predict.liberfi.io 和 app.liberfi.io。两者生产构建、正式首页和 BFF 调用通过，已配置自有 API Key。
+- 本地 DEX 构建修正：原 .env.local 被文件追踪列为依赖而触发上传拒绝。最终构建临时隔离开发环境，仅使用拉取的生产配置；发布后原文件恢复，两个应用的生产函数输出均不含 .env 文件。没有把本地环境文件或原始凭证提交仓库。
+- 主服务：代码70f62ce、文档35729b9，生产v0.0.233；AWS新加坡ECS发布workflow40078962216成功，生产迁移79已应用。沿用内部ALB及既有公网网关，不新增公网服务端口。
+- 内部代理：openapi-server v0.0.36 workflow40075859998成功；验收发现旧专用ALB DNS已删除。保留现有镜像，将生产上游修复为 https://api.liberfi.io/prediction，任务revision53稳定，携带自有Key查询事件200。配置依据已记录在openapi-server文档提交d77b251。
+- 生产验收：自有/伙伴Key均200；缺失/错误Key均401；事件缓存命中后缺失/错误Key仍401；旧前缀404；任意签名代理仍需内部Bearer；非法relay目标400；浏览器CORS预检通过；两个自有BFF及内部代理200。伙伴日志可按身份查询，抽查未包含原始Key。
+- 凭证和交付：生产与staging配置独立自有/伙伴摘要凭证，原始值仅单独交付；文档包含中文接入流程和自动生成Swagger契约，不含真实Key。真实资金下单、提现、赎回未执行。
+- 后续发布方式：用户选择前端本地部署；旧DEX Actions Vercel Token的团队403未修改。AWS主服务仍使用已验证的既有发布流程。仅维护本报告的提交使用[skip ci]，不重复部署。
+
 
 ## 2026-11-04：Robinhood 主网 SDK 接入（提交前）
 
@@ -2062,3 +2116,40 @@
 - npm 同步记录：发布后官方版本元数据及 tarball 存在数分钟传播延迟；等待全部可安装后才进入正式构建，未使用镜像旧版本兜底。
 - 预期推送状态：fast-forward 推送 main，禁止 force push。
 - Workflow 策略：main push 触发 `Deploy to Vercel`，监听成功后核实正式域名；最后以报告专用 `[skip ci]` 提交追加结果，避免重复部署。
+
+
+## 2026-11-04：Robinhood 网站提交后记录
+
+- 仓库/分支：dex-nextjs-template/main；实际提交：`f9e83d71b34d5d52b00ddec25454a4abb7f51da6` — `feat(chain): deploy Robinhood mainnet defaults`。
+- 完成事项与验证：上述主网入口、正式依赖与测试/build 全部完成，提交内容已复查。
+- 推送状态：即将推送 main；Deploy to Vercel 尚待触发，最终 run 与线上结果在完成后追加。
+
+
+## 2026-11-04：网站推送受阻与冲突检查
+
+- main 推送被拒绝（fetch first）；已 fetch，远端新增六个提交，最新为 ba2580955675f24e96920ce2154af73cee73ab43，包含预测市场鉴权和部署诊断更新。
+- 只读 merge-tree 检查发现 WORK_REPORT.md、apps/web/package.json、pnpm-lock.yaml 三处冲突，未执行实际合并，未 force push，线上部署尚未触发。
+- 已在升级计划追加具体合并方案，按项目冲突规则等待用户确认；建议保留双方工作记录和远端功能，依赖采用本次已验证版本，重新安装并运行网站测试、类型检查与发布构建后推送。
+
+
+## 2026-11-04：合并验证发现兼容性问题
+
+- 已按用户确认解决三处冲突，保留远端预测鉴权及部署诊断更新和本次依赖版本；尚未提交合并或推送。
+- 验证：61 套/274 项网站测试及 14 项配置检查通过；类型检查因远端 WebSocket 工厂无条件注入 apiKey 与 SDK getTicket 互斥类型冲突失败。
+- 已提出保留 getTicket、仅在无 getTicket 分支注入 apiKey 的最小兼容修复，并补充既有本地 Vercel 发布路径；按 SDK 升级计划门禁等待确认后执行。
+
+
+## 2026-11-04：升级补充计划归档（提交前）
+
+- 仓库/分支：react-sdk/main；拟提交 docs(plan): record approved deployment reconciliation [skip ci]。
+- 背景与完成事项：归档用户已确认的远端合并、WebSocket 互斥鉴权兼容修复和本地 Vercel 备用发布方案，保持执行过程可审计。
+- 影响范围：仅升级计划文档，不修改 npm 包；验证计划为 whitespace 和提交范围检查。预期推送 main，使用 [skip ci] 避免重复 Release。
+
+
+## 2026-11-04：补充计划提交后及网站合并提交前
+
+- SDK 文档实际提交：08f9ae2fe90a3fc6abe19484fc8763d83fdbd71d — docs(plan): record approved deployment reconciliation [skip ci]；whitespace 与范围检查通过，main 推送进行中，不触发 Release。
+- 网站仓库/分支：dex-nextjs-template/main；拟提交 merge: preserve remote updates for Robinhood deployment。
+- 完成事项：保留远端预测鉴权和部署诊断、双方工作记录及已发布主网依赖；修复 WebSocket getTicket/apiKey 互斥配置，新增两项契约测试；市场默认及唯一候选保持 Robinhood。
+- 验证：62 套/276 项网站测试、14 项配置检查、typecheck 通过；本地 dev 旧 bsc URL 自动归一化 Robinhood，首页 HTTP 200；发布构建 1/1 通过，耗时 54.936 秒。原有 JSDoc lint 提示不影响构建。
+- 影响范围：消费者合并同步与鉴权最小适配，无新增交易执行能力。预期推送 main，触发 Deploy to Vercel；若既有团队权限错误仍存在则按确认方案使用本地部署。禁止 force push。

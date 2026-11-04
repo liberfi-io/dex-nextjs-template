@@ -1,3 +1,4 @@
+import { predictApiHeaders } from "src/libs/predictApiHeaders";
 import {
   createPredictWsClient,
   PredictClient,
@@ -17,9 +18,19 @@ export type PredictRuntimeConfig = Pick<
 >;
 
 const DEFAULT_PREDICT_CLIENT_FACTORIES: PredictClientFactories = {
-  createPredict: (endpoint) => new PredictClient(endpoint),
-  createPredictWs: createPredictWsClient,
+  createPredict: (endpoint) => new PredictClient(endpoint, { headers: () => predictApiHeaders() }),
+  createPredictWs: createAuthenticatedPredictWsClient,
 };
+
+export function createAuthenticatedPredictWsClient(config: PredictWsClientConfig): PredictWsClient {
+  if (config.getTicket !== undefined) {
+    return createPredictWsClient(config);
+  }
+  return createPredictWsClient({
+    ...config,
+    apiKey: () => process.env.NEXT_PUBLIC_PREDICT_API_KEY ?? "",
+  });
+}
 
 export function createPredictClients(
   config: PredictRuntimeConfig,
