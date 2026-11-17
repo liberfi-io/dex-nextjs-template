@@ -114,7 +114,6 @@ import { SendOutlinedIcon } from "./icons/SendOutlinedIcon";
 // TODO: Re-enable when the Convert (闪兑) flow is ready.
 // import { ConvertOutlinedIcon } from "./icons/ConvertOutlinedIcon";
 import { AppBottomToolbar } from "./AppBottomToolbar";
-import { BottomTweets, BottomTweetsTitle } from "./BottomTweets";
 import { isPulseSupportedChain } from "../lib/pulse";
 import { AppRuntimeProviders, useMediaTrackRuntimeActivity } from "../runtime/AppRuntimeProviders";
 import {
@@ -124,7 +123,6 @@ import {
 } from "./header-control-theme";
 import { resolveHeaderLanguageOption } from "./header-language-selection";
 import { useHyperliquidHeaderState } from "../runtime/HyperliquidHeaderContext";
-import { isMediaTrackRuntimeActive } from "../runtime/media-track-activity";
 
 const {
   Scaffold,
@@ -132,7 +130,6 @@ const {
   ScaffoldFooter,
   Logo,
   DraggablePanelProvider,
-  useDraggableDisclosure,
 } = UiScaffold;
 type NavItem = UiScaffold.NavItem;
 
@@ -251,9 +248,7 @@ function PageShellContent({ children }: PropsWithChildren) {
   const router = useChainAwareRouter();
   const { chain } = useCurrentChain();
   const { headerVisible, footerVisible } = useShellChrome();
-  const { isOpen: isMediaTrackOpen } = useDraggableDisclosure("mediaTrack");
-  useMediaTrackRuntimeActivity(isMediaTrackRuntimeActive(pathname, isMediaTrackOpen));
-  const [isMediaTrackPaused, setIsMediaTrackPaused] = useState(false);
+  useMediaTrackRuntimeActivity(false);
   const tokenDetailSource = searchParams.get(TOKEN_DETAIL_SOURCE_QUERY_PARAM);
   const activeNavigationKey = resolveHeaderNavigationKey(pathname, tokenDetailSource);
 
@@ -408,17 +403,6 @@ function PageShellContent({ children }: PropsWithChildren) {
   const searchLabel = t(
     isPredictPage ? "predict.search.placeholder" : "tokens.search.placeholder",
   ) as string;
-  const mediaTrackTitle = t("extend.toolbar.media_track_tooltip") as string;
-  const mediaTrackContent = {
-    id: "mediaTrack",
-    ariaLabel: mediaTrackTitle,
-    title: <BottomTweetsTitle isPaused={isMediaTrackPaused}>{mediaTrackTitle}</BottomTweetsTitle>,
-    children: <BottomTweets onPauseChange={setIsMediaTrackPaused} />,
-    modalMaxWidth: 440,
-    modalMinWidth: 320,
-    panelMinWidth: 320,
-    panelMaxWidth: 440,
-  };
 
   return (
     <Scaffold
@@ -520,7 +504,6 @@ function PageShellContent({ children }: PropsWithChildren) {
     >
       <DraggablePanelProvider
         contents={[
-          mediaTrackContent,
           {
             id: "aiCopilot",
             title: t("extend.toolbar.ai_copilot"),

@@ -1,5 +1,5 @@
-import { MediaTrackPage } from "../../../components/MediaTrackPage";
+import { redirect } from "next/navigation";
 
 export default function Page() {
-  return <MediaTrackPage />;
+  redirect("/");
 }

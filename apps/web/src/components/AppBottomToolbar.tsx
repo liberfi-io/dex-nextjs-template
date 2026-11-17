@@ -77,7 +77,6 @@ export function AppBottomToolbar() {
     });
   }, [openPresetModal, chain, preset, handleModalPresetIndexChange]);
 
-  const { onOpen: onOpenMediaTrack } = useDraggableDisclosure("mediaTrack");
   const { onOpen: onOpenAICopilot } = useDraggableDisclosure("aiCopilot");
 
   const left = (
@@ -98,18 +97,6 @@ export function AppBottomToolbar() {
       <BottomToolBarWallet />
 
       <Divider orientation="vertical" className="h-6 bg-content3" />
-
-      <StyledTooltip content={t("extend.toolbar.media_track_tooltip")}>
-        <Button
-          size="sm"
-          className="relative h-6 min-h-0 px-1 gap-1 bg-transparent hover:bg-content1 text-text-muted text-xs overflow-visible"
-          startContent={<TwitterIcon width={16} height={16} className="text-text-muted" />}
-          onPress={onOpenMediaTrack}
-        >
-          {t("extend.toolbar.media_track")}
-          <div className="w-2 h-2 rounded-full bg-danger absolute top-0 right-0 translate-x-px -translate-y-px" />
-        </Button>
-      </StyledTooltip>
 
       <StyledTooltip content={t("extend.toolbar.ai_copilot_tooltip")} closeDelay={0}>
         <Button

@@ -2201,3 +2201,12 @@
 - 验证：本地 dev、类型检查、Vercel 生产构建通过；生产两处图片加载成功、尺寸20×20；whitespace 检查通过，开发 .env.local 已恢复，上传产物无 .env 文件。
 - 发布结果：本地 Vercel 生产部署 dpl_3m52HddnLLUC3R1B9r3YLin1mWN5 Ready，https://liberfi-93hiudts5-sgt-lab.vercel.app 已关联 https://app.liberfi.io；线上按钮与展开菜单已验收并截图。
 - Workflow 状态：按既定本地发布方案使用 [skip ci]，未触发 Actions 或 npm 发布。报告专用提交继续使用 [skip ci]，不重复部署。
+
+
+## 2026-11-17 停用 x-monitor 网站入口（提交前）
+- 仓库与分支：dex-nextjs-template / main；拟用提交标题：fix(web): hide retired media tracking entry [skip ci]。
+- 背景：配合 x-monitor 停用计划，避免底部入口或旧地址继续访问失效采集服务。
+- 完成事项：隐藏媒体追踪按钮、移除浮动面板注册、关闭该功能实时活动状态，旧 /media-track 地址跳回首页；保留官方 X 链接和 AI 功能。
+- 影响范围：三个前端文件；未变更 AWS 实例、ECS 服务或 EKS。WORK_REPORT 既有未提交内容保留，不混入本次提交。
+- 验证：本地 dev 首页200、旧地址307及Location=/；preset现有测试和改动文件ESLint通过，git diff --check通过。
+- 推送状态与 workflow 策略：拟推送 main；使用[skip ci]避免重复部署/通知，Vercel CLI独立执行用户授权的生产部署。首次远端构建遇到Next字体解析失败，正在重试，未确认上线前不视为发布成功。
