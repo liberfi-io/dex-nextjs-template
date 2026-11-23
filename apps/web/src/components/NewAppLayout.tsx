@@ -52,7 +52,6 @@ import {
   LogoIcon,
   MiniLogoIcon,
   PulseIcon,
-  RocketIcon,
   SignInIcon,
   SolanaIcon,
   // SignalIcon,
@@ -93,7 +92,6 @@ import {
 import { useAccountInfo } from "@liberfi.io/ui-portfolio";
 import {
   DEPOSIT_HL_USDC_MODAL_ID,
-  LAUNCHPAD_MODAL_ID,
   PREDICT_SEARCH_MODAL_ID,
   RECEIVE_MODAL_ID,
   WITHDRAW_MODAL_ID,
@@ -101,7 +99,6 @@ import {
 import { DeferredAsyncModalHost, useDeferredAsyncModal } from "./modals/DeferredAsyncModalHost";
 import {
   loadDepositHyperliquidUsdcModal,
-  loadLaunchPadModal,
   loadPredictSearchModal,
   loadReceiveModal,
   loadTokenSearchModal,
@@ -438,7 +435,7 @@ function PageShellContent({ children }: PropsWithChildren) {
               />
             </div>
 
-            {/* Right: search icon (tablet/mobile) + chain select + launchpad + language + account */}
+            {/* Right: search icon (tablet/mobile) + chain select + language + account */}
             <div className="shrink-0 ml-auto flex items-center gap-2">
               <HeaderSearchButton
                 variant="mobile"
@@ -468,13 +465,13 @@ function PageShellContent({ children }: PropsWithChildren) {
                 }
               />
 
-              {/* Global utility cluster — chain switch, launchpad
-                    entry, language switch — stays together on the left
+              {/* Global utility cluster — chain switch and
+                    language switch — stays together on the left
                     of the right-hand action group on every page,
                     including the predict module. Page-specific actions
                     (predict balance / deposit, perpetuals HL balance,
                     wallet account) come after this cluster. */}
-              <LaunchPadButton />
+              {/* Launchpad entry is temporarily unavailable. */}
 
               <div className="hidden sm:block">
                 <LanguageButton />
@@ -606,26 +603,6 @@ const DROPDOWN_STYLE: React.CSSProperties = {
   background: "var(--color-surface-interactive)",
   boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)",
 };
-
-function LaunchPadButton() {
-  const { t } = useTranslation();
-  const { onOpen } = useDeferredAsyncModal(LAUNCHPAD_MODAL_ID, loadLaunchPadModal);
-
-  return (
-    <button
-      type="button"
-      onClick={() => onOpen()}
-      aria-label={t("extend.header.launchpad")}
-      className={cn(
-        HEADER_CONTROL_CLASS,
-        HEADER_ICON_CONTROL_CLASS,
-        "text-brand-primary hover:text-brand-primary",
-      )}
-    >
-      <RocketIcon width={14} height={14} />
-    </button>
-  );
-}
 
 function LanguageButton() {
   const { t } = useTranslation();

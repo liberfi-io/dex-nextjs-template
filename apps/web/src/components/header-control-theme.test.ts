@@ -45,8 +45,8 @@ describe("Header control theme contract", () => {
     expect(headerTriggerSource).not.toContain("border-transparent");
     expect(headerTriggerSource).not.toContain("bg-action-primary/10");
     expect(headerTriggerSource).not.toContain("bg-content2");
-    expect(headerTriggerSource.match(/cn\(\s*HEADER_CONTROL_CLASS/g)).toHaveLength(8);
+    expect(headerTriggerSource.match(/cn\(\s*HEADER_CONTROL_CLASS/g)).toHaveLength(7);
     expect(accountTriggerSource.match(/cn\(HEADER_CONTROL_SURFACE_CLASS/g)).toHaveLength(1);
-    expect(headerTriggerSource.match(/HEADER_ICON_CONTROL_CLASS/g)).toHaveLength(5);
+    expect(headerTriggerSource.match(/HEADER_ICON_CONTROL_CLASS/g)).toHaveLength(4);
   });
 });
